@@ -1,0 +1,64 @@
+---
+title: Getting Started
+description: Install and configure React Aria UI components
+---
+
+## Prerequisites
+
+- React 19+
+- Tailwind CSS v4
+- TypeScript 5.0+
+
+## Installation
+
+### Using shadcn CLI
+
+The easiest way to add components is via the shadcn CLI:
+
+```bash
+npx shadcn@latest add https://ui.oakoss.com/r/button
+```
+
+### Manual Installation
+
+1. Install dependencies:
+
+```bash
+npm install react-aria-components class-variance-authority tailwind-merge
+```
+
+2. Copy the component source into your project
+3. Import and use:
+
+```tsx
+import { Button } from '@/components/ui/button';
+
+export function Example() {
+  return <Button variant="primary">Click me</Button>;
+}
+```
+
+## Configuration
+
+### Tailwind CSS v4
+
+Ensure your Tailwind config includes the component paths:
+
+```css
+@import 'tailwindcss';
+@source './src/components/**/*.tsx';
+```
+
+### Path Aliases
+
+Configure your `tsconfig.json` with path aliases:
+
+```json
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
+```

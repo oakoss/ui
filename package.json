@@ -1,0 +1,40 @@
+{
+  "name": "ui",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "format": "prettier -uwl --cache .",
+    "format:check": "prettier -uc --cache .",
+    "postinstall": "pnpm run lint:ws",
+    "lint": "turbo run lint -- --max-warnings 0 --cache --cache-location node_modules/.cache/eslint/.eslintcache",
+    "lint:fix": "turbo run lint -- --fix --cache --cache-location node_modules/.cache/eslint/.eslintcache",
+    "lint:md": "markdownlint-cli2 '**/*.md'",
+    "lint:md:fix": "markdownlint-cli2 '**/*.md' --fix",
+    "lint:ws": "sherif",
+    "typecheck": "turbo run typecheck"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git"
+    }
+  },
+  "devDependencies": {
+    "@commitlint/config-conventional": "^20.2.0",
+    "@jbabin91/tsc-files": "^0.8.4",
+    "commitlint": "^20.2.0",
+    "cz-git": "^1.12.0",
+    "lefthook": "^2.0.13",
+    "markdownlint-cli2": "^0.20.0",
+    "prettier": "^3.7.4",
+    "prettier-plugin-packagejson": "^2.5.20",
+    "sherif": "^1.9.0",
+    "turbo": "^2.7.2",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@10.27.0+sha512.72d699da16b1179c14ba9e64dc71c9a40988cbdc65c264cb0e489db7de917f20dcf4d64d8723625f2969ba52d4b7e2a1170682d9ac2a5dcaeaab732b7e16f04a",
+  "engines": {
+    "node": ">=25.1.0"
+  }
+}

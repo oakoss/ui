@@ -1,0 +1,10 @@
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Dependency directories
+.tanstack
+node_modules
+
+# Generated files
+*.gen.ts

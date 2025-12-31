@@ -1,0 +1,50 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build outputs
+dist
+build
+out
+.output
+.nitro
+.next
+
+# TypeScript
+*.tsbuildinfo
+
+# Turbo
+.turbo
+
+# TanStack
+.tanstack
+
+# Fumadocs (generated source maps)
+.source
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Testing
+coverage
+test-results
+playwright-report
+blob-report
+playwright/.cache
+
+# Vercel
+.vercel
+
+# Debug logs
+*.log
+
+# Editor/OS
+.DS_Store
+*.pem
+.cache
+.idea
+*.swp
+*.swo
