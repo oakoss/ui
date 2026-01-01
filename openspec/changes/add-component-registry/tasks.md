@@ -70,7 +70,7 @@
 - [x] 9.4 Add `react-aria-tailwind-button` item with registryDependencies
 - [x] 9.5 Add `react-aria-css` style item
 - [x] 9.6 Add `react-aria-css-button` item (no utils dependency for CSS)
-- [ ] 9.7 Configure `css` field for Tailwind plugins
+- [x] 9.7 Configure `css` field for Tailwind plugins
 
 ## 10. Build & Verification
 
@@ -78,7 +78,7 @@
 - [x] 10.2 Verify `public/r/registry.json` is valid
 - [x] 10.3 Verify individual component JSONs have `content` property
 - [x] 10.4 Verify `registryDependencies` use full URLs
-- [ ] 10.5 Test with `shadcn view` command locally
+- [x] 10.5 Test with `shadcn view` command locally
 
 ## 11. Turbo Integration
 
@@ -88,8 +88,8 @@
 
 ## 12. Documentation
 
-- [ ] 12.1 Create `packages/ui/README.md` with overview
-- [ ] 12.2 Document installation for Tailwind style
-- [ ] 12.3 Document installation for CSS style
-- [ ] 12.4 Document development workflow
-- [ ] 12.5 Document adding new components
+- [x] 12.1 Create `packages/ui/README.md` with overview
+- [x] 12.2 Document installation for Tailwind style
+- [x] 12.3 Document installation for CSS style
+- [x] 12.4 Document development workflow
+- [x] 12.5 Document adding new components

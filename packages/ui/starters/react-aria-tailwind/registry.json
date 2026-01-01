@@ -8,13 +8,22 @@
       "type": "registry:lib",
       "title": "Tailwind Utilities",
       "description": "Focus ring preset and compose helper for Tailwind Variants",
-      "dependencies": ["tailwind-variants", "tailwind-merge"],
+      "dependencies": [
+        "tailwind-variants",
+        "tailwind-merge",
+        "tailwindcss-react-aria-components",
+        "tailwindcss-animate"
+      ],
       "files": [
         {
           "path": "lib/utils.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "css": {
+        "@plugin \"tailwindcss-react-aria-components\"": {},
+        "@plugin \"tailwindcss-animate\"": {}
+      }
     },
     {
       "name": "button",
