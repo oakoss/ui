@@ -1,4 +1,4 @@
-import reactConfig from '@repo/eslint-config/react';
+import reactConfig from '@oakoss/eslint-config/react';
 import { defineConfig, globalIgnores } from 'eslint/config';
 
 export default defineConfig(

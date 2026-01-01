@@ -1,5 +1,5 @@
 {
-  "extends": "@repo/typescript-config/tanstack-start.json",
+  "extends": "@oakoss/typescript-config/tanstack-start.json",
   "include": ["**/*.ts", "**/*.tsx", ".source/**/*.ts"],
   "exclude": ["node_modules", "dist", ".output", ".vinxi", ".tanstack"],
   "compilerOptions": {
