@@ -7,14 +7,14 @@
  * Usage: pnpm build
  */
 
-import * as fs from 'node:fs';
-import * as path from 'node:path';
+import fs from 'node:fs';
+import path from 'node:path';
 
 const ROOT_DIR = path.resolve(import.meta.dirname, '..');
 const PUBLIC_DIR = path.join(ROOT_DIR, 'public', 'r');
 const STARTERS_DIR = path.join(ROOT_DIR, 'starters');
 
-interface RegistryFile {
+type RegistryFile = {
   path: string;
   type:
     | 'registry:ui'
@@ -24,9 +24,9 @@ interface RegistryFile {
     | 'registry:style';
   content: string;
   target?: string;
-}
+};
 
-interface RegistryItem {
+type RegistryItem = {
   $schema: string;
   name: string;
   type: string;
@@ -42,9 +42,9 @@ interface RegistryItem {
     dark?: Record<string, string>;
   };
   css?: Record<string, unknown>;
-}
+};
 
-interface SourceRegistryItem {
+type SourceRegistryItem = {
   name: string;
   type: string;
   title?: string;
@@ -52,27 +52,27 @@ interface SourceRegistryItem {
   dependencies?: string[];
   devDependencies?: string[];
   registryDependencies?: string[];
-  files: Array<{
+  files: {
     path: string;
     type: RegistryFile['type'];
     target?: string;
-  }>;
+  }[];
   cssVars?: RegistryItem['cssVars'];
   css?: RegistryItem['css'];
-}
+};
 
-interface SourceRegistry {
+type SourceRegistry = {
   $schema: string;
   name: string;
   homepage?: string;
   items: SourceRegistryItem[];
-}
+};
 
 /**
  * Read file content and return as string
  */
 function readFileContent(filePath: string): string {
-  return fs.readFileSync(filePath, 'utf-8');
+  return fs.readFileSync(filePath, 'utf8');
 }
 
 /**
@@ -81,19 +81,16 @@ function readFileContent(filePath: string): string {
  */
 function transformImports(content: string, _starter: string): string {
   // Transform @/starters/react-aria-tailwind/src/lib/* to @/lib/*
-  content = content.replace(
-    /@\/starters\/react-aria-tailwind\/src\/lib\//g,
+  content = content.replaceAll(
+    '@/starters/react-aria-tailwind/src/lib/',
     '@/lib/',
   );
 
   // Transform @/starters/react-aria-css/src/lib/* to @/lib/*
-  content = content.replace(
-    /@\/starters\/react-aria-css\/src\/lib\//g,
-    '@/lib/',
-  );
+  content = content.replaceAll('@/starters/react-aria-css/src/lib/', '@/lib/');
 
   // Transform @/starters/*/src/components/ui/* to @/components/ui/*
-  content = content.replace(
+  content = content.replaceAll(
     /@\/starters\/[^/]+\/src\/components\/ui\//g,
     '@/components/ui/',
   );
@@ -112,7 +109,7 @@ function inlineCssImports(
   // Match CSS import statements like: import './Button.css';
   const cssImportRegex = /import\s+['"]\.\/([^'"]+\.css)['"]\s*;?\n?/g;
 
-  return content.replace(cssImportRegex, (match, cssFileName) => {
+  return content.replaceAll(cssImportRegex, (match, cssFileName) => {
     const cssPath = path.join(path.dirname(basePath), cssFileName);
     if (fs.existsSync(cssPath)) {
       // Remove CSS imports from the component - CSS will be included separately
@@ -205,12 +202,12 @@ function buildRegistryIndex(): void {
     );
   });
 
-  interface IndexItem {
+  type IndexItem = {
     name: string;
     type: string;
     title?: string;
     description?: string;
-  }
+  };
 
   const items: IndexItem[] = [];
 

@@ -207,6 +207,9 @@ importers:
         specifier: ^3.2.2
         version: 3.2.2(tailwind-merge@3.4.0)(tailwindcss@4.1.18)
     devDependencies:
+      '@oakoss/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
       '@oakoss/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
@@ -216,6 +219,9 @@ importers:
       '@types/react':
         specifier: ^19.2.7
         version: 19.2.7
+      eslint:
+        specifier: ^9.39.2
+        version: 9.39.2(jiti@2.6.1)
       tsx:
         specifier: ^4.21.0
         version: 4.21.0

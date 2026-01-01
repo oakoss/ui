@@ -1,10 +1,11 @@
 'use client';
 
+import './Button.css';
+
 import {
   Button as RACButton,
   type ButtonProps as RACButtonProps,
 } from 'react-aria-components';
-import './Button.css';
 
 type ButtonVariant =
   | 'primary'
@@ -16,12 +17,12 @@ type ButtonVariant =
 
 type ButtonSize = 'sm' | 'md' | 'lg';
 
-interface ButtonProps extends RACButtonProps {
+type ButtonProps = {
   /** The visual style of the button. @default "primary" */
   variant?: ButtonVariant;
   /** The size of the button. @default "md" */
   size?: ButtonSize;
-}
+} & RACButtonProps;
 
 function Button({
   variant = 'primary',
@@ -33,10 +34,10 @@ function Button({
     <RACButton
       {...props}
       className={`react-aria-Button button button-base ${className ?? ''}`}
-      data-variant={variant}
       data-size={size}
+      data-variant={variant}
     />
   );
 }
 
-export { Button, type ButtonProps, type ButtonVariant, type ButtonSize };
+export { Button, type ButtonProps, type ButtonSize, type ButtonVariant };

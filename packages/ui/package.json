@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsx scripts/build-registry.ts",
-    "lint": "echo 'No eslint config for @oakoss/ui yet'",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -15,9 +15,11 @@
     "tailwind-variants": "^3.2.2"
   },
   "devDependencies": {
+    "@oakoss/eslint-config": "workspace:*",
     "@oakoss/typescript-config": "workspace:*",
     "@types/node": "^25.0.3",
     "@types/react": "^19.2.7",
+    "eslint": "^9.39.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },

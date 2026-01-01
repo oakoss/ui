@@ -2,10 +2,11 @@
 
 import {
   Button as RACButton,
-  composeRenderProps,
   type ButtonProps as RACButtonProps,
+  composeRenderProps,
 } from 'react-aria-components';
 import { tv, type VariantProps } from 'tailwind-variants';
+
 import { focusRing } from '@/starters/react-aria-tailwind/src/lib/utils';
 
 const buttonVariants = tv({
@@ -46,7 +47,7 @@ const buttonVariants = tv({
 
 type ButtonVariants = VariantProps<typeof buttonVariants>;
 
-interface ButtonProps extends RACButtonProps, ButtonVariants {}
+type ButtonProps = {} & RACButtonProps & ButtonVariants;
 
 function Button({ className, variant, size, ...props }: ButtonProps) {
   return (
