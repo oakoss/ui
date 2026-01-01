@@ -222,6 +222,9 @@ importers:
       eslint:
         specifier: ^9.39.2
         version: 9.39.2(jiti@2.6.1)
+      prettier:
+        specifier: ^3.7.4
+        version: 3.7.4
       tsx:
         specifier: ^4.21.0
         version: 4.21.0
