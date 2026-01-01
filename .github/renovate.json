@@ -5,6 +5,7 @@
     ":widenPeerDependencies",
     "schedule:monthly"
   ],
+  "rangeStrategy": "replace",
   "labels": ["dependencies"],
   "lockFileMaintenance": {
     "enabled": false
