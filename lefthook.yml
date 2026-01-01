@@ -8,7 +8,7 @@ pre-commit:
   commands:
     typecheck:
       glob: '*.{ts,tsx}'
-      run: pnpm tsc-files {staged_files}
+      run: pnpm typecheck
     lint-md:
       glob: '*.md'
       run: pnpm markdownlint-cli2 --no-globs --fix {staged_files}
