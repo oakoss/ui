@@ -1,0 +1,36 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "react-aria-tailwind",
+  "homepage": "https://github.com/oakoss/ui",
+  "items": [
+    {
+      "name": "utils",
+      "type": "registry:lib",
+      "title": "Tailwind Utilities",
+      "description": "Focus ring preset and compose helper for Tailwind Variants",
+      "dependencies": ["tailwind-variants", "tailwind-merge"],
+      "files": [
+        {
+          "path": "lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "A button component with variants built on React Aria and Tailwind Variants",
+      "dependencies": ["react-aria-components", "tailwind-variants"],
+      "registryDependencies": [
+        "https://ui.oakoss.com/r/react-aria-tailwind-utils.json"
+      ],
+      "files": [
+        {
+          "path": "components/ui/Button.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    }
+  ]
+}

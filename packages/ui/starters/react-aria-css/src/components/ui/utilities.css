@@ -1,0 +1,84 @@
+/*
+ * Utility CSS Classes
+ * Focus ring and button base styles for React Aria components
+ */
+
+@layer utilities {
+  /* Focus ring utility using CSS variables from theme */
+  .focus-ring {
+    outline: none;
+    transition: outline 200ms;
+  }
+
+  .focus-ring:where([data-focus-visible]) {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  /* Base button styles */
+  .button-base {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--spacing) * 2);
+    border: none;
+    border-radius: var(--radius);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    transition-property: background-color, color, opacity, transform;
+    transition-duration: 150ms;
+    -webkit-tap-highlight-color: transparent;
+
+    /* Icon sizing */
+    > svg {
+      width: 1rem;
+      height: 1rem;
+      flex-shrink: 0;
+    }
+
+    /* Pressed state */
+    &:where([data-pressed]) {
+      transform: scale(0.98);
+    }
+
+    /* Disabled state */
+    &:where([data-disabled]) {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Focus ring */
+    &:where([data-focus-visible]) {
+      outline: 2px solid var(--focus-ring-color);
+      outline-offset: var(--focus-ring-offset);
+    }
+  }
+
+  /* Icon-only button (square) */
+  .button-icon-only {
+    aspect-ratio: 1;
+    padding: 0;
+  }
+}
+
+/* Forced colors mode */
+@media (forced-colors: active) {
+  .focus-ring:where([data-focus-visible]) {
+    outline: 2px solid Highlight;
+  }
+
+  .button-base:where([data-focus-visible]) {
+    outline: 2px solid Highlight;
+  }
+
+  .button-base:where([data-disabled]) {
+    opacity: 1;
+    color: GrayText;
+  }
+}

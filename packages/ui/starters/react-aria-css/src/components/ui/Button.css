@@ -1,0 +1,134 @@
+/*
+ * Button Component Styles
+ * Uses data-variant and data-size attributes for styling
+ */
+
+@import './theme.css';
+@import './utilities.css';
+
+.react-aria-Button.button {
+  /* Size variants */
+  &[data-size='sm'] {
+    height: calc(var(--spacing) * 8);
+    padding: 0 calc(var(--spacing) * 3);
+    font-size: 0.75rem;
+
+    > svg {
+      width: 0.875rem;
+      height: 0.875rem;
+    }
+  }
+
+  &[data-size='md'] {
+    height: calc(var(--spacing) * 9);
+    padding: 0 calc(var(--spacing) * 4);
+    font-size: 0.875rem;
+  }
+
+  &[data-size='lg'] {
+    height: calc(var(--spacing) * 11);
+    padding: 0 calc(var(--spacing) * 8);
+    font-size: 1rem;
+
+    > svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
+
+  /* Variant: Primary (default) */
+  &[data-variant='primary'] {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+
+    &:where([data-hovered]) {
+      background-color: hsl(var(--primary) / 0.9);
+    }
+  }
+
+  /* Variant: Secondary */
+  &[data-variant='secondary'] {
+    background-color: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
+
+    &:where([data-hovered]) {
+      background-color: hsl(var(--secondary) / 0.8);
+    }
+  }
+
+  /* Variant: Destructive */
+  &[data-variant='destructive'] {
+    background-color: hsl(var(--destructive));
+    color: hsl(var(--destructive-foreground));
+
+    &:where([data-hovered]) {
+      background-color: hsl(var(--destructive) / 0.9);
+    }
+  }
+
+  /* Variant: Outline */
+  &[data-variant='outline'] {
+    background-color: transparent;
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--border));
+
+    &:where([data-hovered]) {
+      background-color: hsl(var(--accent));
+      color: hsl(var(--accent-foreground));
+    }
+  }
+
+  /* Variant: Ghost */
+  &[data-variant='ghost'] {
+    background-color: transparent;
+    color: hsl(var(--foreground));
+
+    &:where([data-hovered]) {
+      background-color: hsl(var(--accent));
+      color: hsl(var(--accent-foreground));
+    }
+  }
+
+  /* Variant: Link */
+  &[data-variant='link'] {
+    background-color: transparent;
+    color: hsl(var(--primary));
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    height: auto;
+    padding: 0;
+
+    &:where([data-hovered]) {
+      text-decoration-thickness: 2px;
+    }
+
+    &:where([data-pressed]) {
+      transform: none;
+    }
+  }
+}
+
+/* Forced colors mode variant overrides */
+@media (forced-colors: active) {
+  .react-aria-Button.button {
+    &[data-variant='primary'],
+    &[data-variant='secondary'],
+    &[data-variant='destructive'] {
+      background-color: ButtonFace;
+      color: ButtonText;
+      border: 1px solid ButtonBorder;
+    }
+
+    &[data-variant='outline'],
+    &[data-variant='ghost'] {
+      background-color: transparent;
+      color: ButtonText;
+      border: 1px solid ButtonBorder;
+    }
+
+    &[data-variant='link'] {
+      color: LinkText;
+      border: none;
+    }
+  }
+}

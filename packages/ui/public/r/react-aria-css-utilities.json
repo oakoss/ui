@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "react-aria-css-utilities",
+  "type": "registry:style",
+  "title": "Utilities",
+  "description": "Focus ring and button base utility classes",
+  "registryDependencies": ["https://ui.oakoss.com/r/react-aria-css-theme.json"],
+  "files": [
+    {
+      "path": "components/ui/utilities.css",
+      "type": "registry:style",
+      "content": "/*\n * Utility CSS Classes\n * Focus ring and button base styles for React Aria components\n */\n\n@layer utilities {\n  /* Focus ring utility using CSS variables from theme */\n  .focus-ring {\n    outline: none;\n    transition: outline 200ms;\n  }\n\n  .focus-ring:where([data-focus-visible]) {\n    outline: 2px solid var(--focus-ring-color);\n    outline-offset: var(--focus-ring-offset);\n  }\n\n  /* Base button styles */\n  .button-base {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    gap: calc(var(--spacing) * 2);\n    border: none;\n    border-radius: var(--radius);\n    font-family: var(--font-sans);\n    font-size: 0.875rem;\n    font-weight: 500;\n    line-height: 1;\n    text-decoration: none;\n    cursor: pointer;\n    user-select: none;\n    white-space: nowrap;\n    transition-property: background-color, color, opacity, transform;\n    transition-duration: 150ms;\n    -webkit-tap-highlight-color: transparent;\n\n    /* Icon sizing */\n    > svg {\n      width: 1rem;\n      height: 1rem;\n      flex-shrink: 0;\n    }\n\n    /* Pressed state */\n    &:where([data-pressed]) {\n      transform: scale(0.98);\n    }\n\n    /* Disabled state */\n    &:where([data-disabled]) {\n      opacity: 0.5;\n      cursor: not-allowed;\n    }\n\n    /* Focus ring */\n    &:where([data-focus-visible]) {\n      outline: 2px solid var(--focus-ring-color);\n      outline-offset: var(--focus-ring-offset);\n    }\n  }\n\n  /* Icon-only button (square) */\n  .button-icon-only {\n    aspect-ratio: 1;\n    padding: 0;\n  }\n}\n\n/* Forced colors mode */\n@media (forced-colors: active) {\n  .focus-ring:where([data-focus-visible]) {\n    outline: 2px solid Highlight;\n  }\n\n  .button-base:where([data-focus-visible]) {\n    outline: 2px solid Highlight;\n  }\n\n  .button-base:where([data-disabled]) {\n    opacity: 1;\n    color: GrayText;\n  }\n}\n"
+    }
+  ]
+}

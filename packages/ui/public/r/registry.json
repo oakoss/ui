@@ -1,0 +1,37 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "@oakoss/ui",
+  "homepage": "https://github.com/oakoss/ui",
+  "items": [
+    {
+      "name": "react-aria-css-theme",
+      "type": "registry:style",
+      "title": "Theme",
+      "description": "CSS variables and base styles compatible with shadcn theming"
+    },
+    {
+      "name": "react-aria-css-utilities",
+      "type": "registry:style",
+      "title": "Utilities",
+      "description": "Focus ring and button base utility classes"
+    },
+    {
+      "name": "react-aria-css-button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "A button component with variants built on React Aria and plain CSS"
+    },
+    {
+      "name": "react-aria-tailwind-utils",
+      "type": "registry:lib",
+      "title": "Tailwind Utilities",
+      "description": "Focus ring preset and compose helper for Tailwind Variants"
+    },
+    {
+      "name": "react-aria-tailwind-button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "A button component with variants built on React Aria and Tailwind Variants"
+    }
+  ]
+}

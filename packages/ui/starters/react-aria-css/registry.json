@@ -1,0 +1,55 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "react-aria-css",
+  "homepage": "https://github.com/oakoss/ui",
+  "items": [
+    {
+      "name": "theme",
+      "type": "registry:style",
+      "title": "Theme",
+      "description": "CSS variables and base styles compatible with shadcn theming",
+      "files": [
+        {
+          "path": "components/ui/theme.css",
+          "type": "registry:style"
+        }
+      ]
+    },
+    {
+      "name": "utilities",
+      "type": "registry:style",
+      "title": "Utilities",
+      "description": "Focus ring and button base utility classes",
+      "registryDependencies": [
+        "https://ui.oakoss.com/r/react-aria-css-theme.json"
+      ],
+      "files": [
+        {
+          "path": "components/ui/utilities.css",
+          "type": "registry:style"
+        }
+      ]
+    },
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "A button component with variants built on React Aria and plain CSS",
+      "dependencies": ["react-aria-components"],
+      "registryDependencies": [
+        "https://ui.oakoss.com/r/react-aria-css-theme.json",
+        "https://ui.oakoss.com/r/react-aria-css-utilities.json"
+      ],
+      "files": [
+        {
+          "path": "components/ui/Button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/Button.css",
+          "type": "registry:component"
+        }
+      ]
+    }
+  ]
+}

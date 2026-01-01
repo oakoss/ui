@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "react-aria-tailwind-utils",
+  "type": "registry:lib",
+  "title": "Tailwind Utilities",
+  "description": "Focus ring preset and compose helper for Tailwind Variants",
+  "dependencies": ["tailwind-variants", "tailwind-merge"],
+  "files": [
+    {
+      "path": "lib/utils.ts",
+      "type": "registry:lib",
+      "content": "import { composeRenderProps } from 'react-aria-components';\nimport { twMerge } from 'tailwind-merge';\nimport { tv } from 'tailwind-variants';\n\n/**\n * Focus ring preset for consistent focus styling across components.\n * Extends this in your component's tv() definition.\n */\nexport const focusRing = tv({\n  base: 'outline outline-ring/70 outline-offset-2 forced-colors:outline-[Highlight]',\n  variants: {\n    isFocusVisible: {\n      false: 'outline-0',\n      true: 'outline-2',\n    },\n  },\n});\n\n/**\n * Composes render props with Tailwind classes.\n * Merges the provided Tailwind classes with any className from render props.\n */\nexport function composeTailwindRenderProps<T>(\n  className: string | ((v: T) => string) | undefined,\n  tw: string,\n): string | ((v: T) => string) {\n  return composeRenderProps(className, (className) => twMerge(tw, className));\n}\n"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "react-aria-css-button",
+  "type": "registry:ui",
+  "title": "Button",
+  "description": "A button component with variants built on React Aria and plain CSS",
+  "dependencies": ["react-aria-components"],
+  "registryDependencies": [
+    "https://ui.oakoss.com/r/react-aria-css-theme.json",
+    "https://ui.oakoss.com/r/react-aria-css-utilities.json"
+  ],
+  "files": [
+    {
+      "path": "components/ui/Button.tsx",
+      "type": "registry:ui",
+      "content": "'use client';\n\nimport {\n  Button as RACButton,\n  type ButtonProps as RACButtonProps,\n} from 'react-aria-components';\n\ntype ButtonVariant =\n  | 'primary'\n  | 'secondary'\n  | 'destructive'\n  | 'outline'\n  | 'ghost'\n  | 'link';\n\ntype ButtonSize = 'sm' | 'md' | 'lg';\n\ninterface ButtonProps extends RACButtonProps {\n  /** The visual style of the button. @default \"primary\" */\n  variant?: ButtonVariant;\n  /** The size of the button. @default \"md\" */\n  size?: ButtonSize;\n}\n\nfunction Button({\n  variant = 'primary',\n  size = 'md',\n  className,\n  ...props\n}: ButtonProps) {\n  return (\n    <RACButton\n      {...props}\n      className={`react-aria-Button button button-base ${className ?? ''}`}\n      data-variant={variant}\n      data-size={size}\n    />\n  );\n}\n\nexport { Button, type ButtonProps, type ButtonVariant, type ButtonSize };\n"
+    },
+    {
+      "path": "components/ui/Button.css",
+      "type": "registry:component",
+      "content": "/*\n * Button Component Styles\n * Uses data-variant and data-size attributes for styling\n */\n\n@import './theme.css';\n@import './utilities.css';\n\n.react-aria-Button.button {\n  /* Size variants */\n  &[data-size='sm'] {\n    height: calc(var(--spacing) * 8);\n    padding: 0 calc(var(--spacing) * 3);\n    font-size: 0.75rem;\n\n    > svg {\n      width: 0.875rem;\n      height: 0.875rem;\n    }\n  }\n\n  &[data-size='md'] {\n    height: calc(var(--spacing) * 9);\n    padding: 0 calc(var(--spacing) * 4);\n    font-size: 0.875rem;\n  }\n\n  &[data-size='lg'] {\n    height: calc(var(--spacing) * 11);\n    padding: 0 calc(var(--spacing) * 8);\n    font-size: 1rem;\n\n    > svg {\n      width: 1.25rem;\n      height: 1.25rem;\n    }\n  }\n\n  /* Variant: Primary (default) */\n  &[data-variant='primary'] {\n    background-color: hsl(var(--primary));\n    color: hsl(var(--primary-foreground));\n\n    &:where([data-hovered]) {\n      background-color: hsl(var(--primary) / 0.9);\n    }\n  }\n\n  /* Variant: Secondary */\n  &[data-variant='secondary'] {\n    background-color: hsl(var(--secondary));\n    color: hsl(var(--secondary-foreground));\n\n    &:where([data-hovered]) {\n      background-color: hsl(var(--secondary) / 0.8);\n    }\n  }\n\n  /* Variant: Destructive */\n  &[data-variant='destructive'] {\n    background-color: hsl(var(--destructive));\n    color: hsl(var(--destructive-foreground));\n\n    &:where([data-hovered]) {\n      background-color: hsl(var(--destructive) / 0.9);\n    }\n  }\n\n  /* Variant: Outline */\n  &[data-variant='outline'] {\n    background-color: transparent;\n    color: hsl(var(--foreground));\n    border: 1px solid hsl(var(--border));\n\n    &:where([data-hovered]) {\n      background-color: hsl(var(--accent));\n      color: hsl(var(--accent-foreground));\n    }\n  }\n\n  /* Variant: Ghost */\n  &[data-variant='ghost'] {\n    background-color: transparent;\n    color: hsl(var(--foreground));\n\n    &:where([data-hovered]) {\n      background-color: hsl(var(--accent));\n      color: hsl(var(--accent-foreground));\n    }\n  }\n\n  /* Variant: Link */\n  &[data-variant='link'] {\n    background-color: transparent;\n    color: hsl(var(--primary));\n    text-decoration: underline;\n    text-underline-offset: 4px;\n    height: auto;\n    padding: 0;\n\n    &:where([data-hovered]) {\n      text-decoration-thickness: 2px;\n    }\n\n    &:where([data-pressed]) {\n      transform: none;\n    }\n  }\n}\n\n/* Forced colors mode variant overrides */\n@media (forced-colors: active) {\n  .react-aria-Button.button {\n    &[data-variant='primary'],\n    &[data-variant='secondary'],\n    &[data-variant='destructive'] {\n      background-color: ButtonFace;\n      color: ButtonText;\n      border: 1px solid ButtonBorder;\n    }\n\n    &[data-variant='outline'],\n    &[data-variant='ghost'] {\n      background-color: transparent;\n      color: ButtonText;\n      border: 1px solid ButtonBorder;\n    }\n\n    &[data-variant='link'] {\n      color: LinkText;\n      border: none;\n    }\n  }\n}\n"
+    }
+  ]
+}
