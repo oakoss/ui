@@ -4,6 +4,18 @@
   "homepage": "https://github.com/oakoss/ui",
   "items": [
     {
+      "name": "types",
+      "type": "registry:lib",
+      "title": "Type Utilities",
+      "description": "Utility types like Prettify for better IDE tooltips",
+      "files": [
+        {
+          "path": "types/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
       "name": "utils",
       "type": "registry:lib",
       "title": "Tailwind Utilities",
@@ -26,12 +38,26 @@
       }
     },
     {
+      "name": "icons",
+      "type": "registry:ui",
+      "title": "Icons",
+      "description": "Icon components using lucide-react. Swap this file to change icon libraries.",
+      "dependencies": ["lucide-react"],
+      "files": [
+        {
+          "path": "components/ui/icons.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "button",
       "type": "registry:ui",
       "title": "Button",
       "description": "A button component with variants, icons, and loading state built on React Aria",
       "dependencies": ["react-aria-components", "tailwind-variants"],
       "registryDependencies": [
+        "https://ui.oakoss.com/r/react-aria-tailwind-types.json",
         "https://ui.oakoss.com/r/react-aria-tailwind-utils.json"
       ],
       "files": [
@@ -66,6 +92,23 @@
       "files": [
         {
           "path": "components/ui/ButtonGroup.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "accordion",
+      "type": "registry:ui",
+      "title": "Accordion",
+      "description": "A vertically stacked set of interactive headings that reveal content",
+      "dependencies": ["react-aria-components", "tailwind-variants"],
+      "registryDependencies": [
+        "https://ui.oakoss.com/r/react-aria-tailwind-icons.json",
+        "https://ui.oakoss.com/r/react-aria-tailwind-utils.json"
+      ],
+      "files": [
+        {
+          "path": "components/ui/Accordion.tsx",
           "type": "registry:ui"
         }
       ]

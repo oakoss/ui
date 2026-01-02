@@ -4,6 +4,12 @@
   "homepage": "https://github.com/oakoss/ui",
   "items": [
     {
+      "name": "react-aria-css-types",
+      "type": "registry:lib",
+      "title": "Type Utilities",
+      "description": "Utility types like Prettify for better IDE tooltips"
+    },
+    {
       "name": "react-aria-css-theme",
       "type": "registry:style",
       "title": "Theme",
@@ -14,6 +20,12 @@
       "type": "registry:style",
       "title": "Utilities",
       "description": "Focus ring and button base utility classes"
+    },
+    {
+      "name": "react-aria-css-icons",
+      "type": "registry:ui",
+      "title": "Icons",
+      "description": "Icon components using lucide-react. Swap this file to change icon libraries."
     },
     {
       "name": "react-aria-css-button",
@@ -34,10 +46,28 @@
       "description": "Groups related buttons together with proper styling and accessibility"
     },
     {
+      "name": "react-aria-css-accordion",
+      "type": "registry:ui",
+      "title": "Accordion",
+      "description": "A vertically stacked set of interactive headings that reveal content"
+    },
+    {
+      "name": "react-aria-tailwind-types",
+      "type": "registry:lib",
+      "title": "Type Utilities",
+      "description": "Utility types like Prettify for better IDE tooltips"
+    },
+    {
       "name": "react-aria-tailwind-utils",
       "type": "registry:lib",
       "title": "Tailwind Utilities",
       "description": "Focus ring preset and compose helper for Tailwind Variants"
+    },
+    {
+      "name": "react-aria-tailwind-icons",
+      "type": "registry:ui",
+      "title": "Icons",
+      "description": "Icon components using lucide-react. Swap this file to change icon libraries."
     },
     {
       "name": "react-aria-tailwind-button",
@@ -56,6 +86,12 @@
       "type": "registry:ui",
       "title": "Button Group",
       "description": "Groups related buttons together with proper styling and accessibility"
+    },
+    {
+      "name": "react-aria-tailwind-accordion",
+      "type": "registry:ui",
+      "title": "Accordion",
+      "description": "A vertically stacked set of interactive headings that reveal content"
     }
   ]
 }

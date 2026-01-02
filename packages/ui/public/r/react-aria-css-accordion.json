@@ -1,0 +1,25 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "react-aria-css-accordion",
+  "type": "registry:ui",
+  "title": "Accordion",
+  "description": "A vertically stacked set of interactive headings that reveal content",
+  "dependencies": ["react-aria-components"],
+  "registryDependencies": [
+    "https://ui.oakoss.com/r/react-aria-css-theme.json",
+    "https://ui.oakoss.com/r/react-aria-css-utilities.json",
+    "https://ui.oakoss.com/r/react-aria-css-icons.json"
+  ],
+  "files": [
+    {
+      "path": "components/ui/Accordion.tsx",
+      "type": "registry:ui",
+      "content": "'use client';\n\n\nimport {\n  Button as ButtonPrimitive,\n  composeRenderProps,\n  Disclosure as AccordionItemPrimitive,\n  DisclosureGroup as AccordionPrimitive,\n  type DisclosureGroupProps as AccordionPrimitiveProps,\n  DisclosurePanel as AccordionContentPrimitive,\n  type DisclosurePanelProps as AccordionContentPrimitiveProps,\n  type DisclosureProps as AccordionItemPrimitiveProps,\n  Heading as HeadingPrimitive,\n} from 'react-aria-components';\n\nimport { Icons } from '@/components/ui/icons';\n\n// Accordion (DisclosureGroup)\ntype AccordionProps = AccordionPrimitiveProps;\n\nfunction Accordion({ className, ...props }: AccordionProps) {\n  return (\n    <AccordionPrimitive\n      className={`accordion ${className ?? ''}`}\n      data-slot=\"accordion\"\n      {...props}\n    />\n  );\n}\n\n// AccordionItem (Disclosure)\ntype AccordionItemProps = AccordionItemPrimitiveProps;\n\nfunction AccordionItem({ className, ...props }: AccordionItemProps) {\n  return (\n    <AccordionItemPrimitive\n      className={composeRenderProps(className, (className) =>\n        `accordion-item ${className ?? ''}`.trim(),\n      )}\n      data-slot=\"accordion-item\"\n      {...props}\n    />\n  );\n}\n\n// AccordionTrigger\ntype AccordionTriggerProps = {\n  children: React.ReactNode;\n  className?: string;\n};\n\nfunction AccordionTrigger({ children, className }: AccordionTriggerProps) {\n  return (\n    <HeadingPrimitive className=\"accordion-heading\">\n      <ButtonPrimitive\n        className={`accordion-trigger focus-ring ${className ?? ''}`}\n        data-slot=\"accordion-trigger\"\n        slot=\"trigger\"\n      >\n        {children}\n        <Icons.ChevronDown aria-hidden className=\"accordion-chevron\" />\n      </ButtonPrimitive>\n    </HeadingPrimitive>\n  );\n}\n\n// AccordionContent (DisclosurePanel)\ntype AccordionContentProps = AccordionContentPrimitiveProps;\n\nfunction AccordionContent({\n  children,\n  className,\n  ...props\n}: AccordionContentProps) {\n  return (\n    <AccordionContentPrimitive\n      className={composeRenderProps(className, (className) =>\n        `accordion-content ${className ?? ''}`.trim(),\n      )}\n      data-slot=\"accordion-content\"\n      {...props}\n    >\n      <div className=\"accordion-content-inner\">{children}</div>\n    </AccordionContentPrimitive>\n  );\n}\n\nexport { Accordion, AccordionContent, AccordionItem, AccordionTrigger };\nexport type {\n  AccordionContentProps,\n  AccordionItemProps,\n  AccordionProps,\n  AccordionTriggerProps,\n};\n"
+    },
+    {
+      "path": "components/ui/Accordion.css",
+      "type": "registry:component",
+      "content": "/* Accordion */\n.accordion {\n  width: 100%;\n}\n\n/* Accordion Item */\n.accordion-item {\n  border-bottom: 1px solid var(--border);\n}\n\n.accordion-item:last-child {\n  border-bottom: none;\n}\n\n/* Accordion Heading */\n.accordion-heading {\n  display: flex;\n}\n\n/* Accordion Trigger */\n.accordion-trigger {\n  display: flex;\n  flex: 1;\n  align-items: flex-start;\n  justify-content: space-between;\n  gap: 1rem;\n  padding-block: 1rem;\n  border-radius: var(--radius-md);\n  font-size: 0.875rem;\n  font-weight: 500;\n  text-align: left;\n  cursor: default;\n  transition: all 150ms ease;\n  background: transparent;\n  border: none;\n  color: inherit;\n}\n\n.accordion-trigger:hover {\n  text-decoration: underline;\n}\n\n.accordion-trigger[data-disabled] {\n  pointer-events: none;\n  opacity: 0.5;\n}\n\n/* Accordion Chevron */\n.accordion-chevron {\n  flex-shrink: 0;\n  color: var(--muted-foreground);\n  pointer-events: none;\n  transform: translateY(0.125rem);\n  transition: transform 200ms ease;\n}\n\n[data-expanded] .accordion-chevron {\n  transform: translateY(0.125rem) rotate(180deg);\n}\n\n/* Accordion Content */\n.accordion-content {\n  overflow: hidden;\n  font-size: 0.875rem;\n  height: var(--disclosure-panel-height);\n  transition: height 200ms ease-out;\n}\n\n.accordion-content-inner {\n  padding-bottom: 1rem;\n}\n"
+    }
+  ]
+}

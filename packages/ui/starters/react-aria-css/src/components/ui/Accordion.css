@@ -1,0 +1,71 @@
+/* Accordion */
+.accordion {
+  width: 100%;
+}
+
+/* Accordion Item */
+.accordion-item {
+  border-bottom: 1px solid var(--border);
+}
+
+.accordion-item:last-child {
+  border-bottom: none;
+}
+
+/* Accordion Heading */
+.accordion-heading {
+  display: flex;
+}
+
+/* Accordion Trigger */
+.accordion-trigger {
+  display: flex;
+  flex: 1;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: default;
+  transition: all 150ms ease;
+  background: transparent;
+  border: none;
+  color: inherit;
+}
+
+.accordion-trigger:hover {
+  text-decoration: underline;
+}
+
+.accordion-trigger[data-disabled] {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* Accordion Chevron */
+.accordion-chevron {
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+  pointer-events: none;
+  transform: translateY(0.125rem);
+  transition: transform 200ms ease;
+}
+
+[data-expanded] .accordion-chevron {
+  transform: translateY(0.125rem) rotate(180deg);
+}
+
+/* Accordion Content */
+.accordion-content {
+  overflow: hidden;
+  font-size: 0.875rem;
+  height: var(--disclosure-panel-height);
+  transition: height 200ms ease-out;
+}
+
+.accordion-content-inner {
+  padding-bottom: 1rem;
+}
