@@ -10,7 +10,7 @@
     {
       "path": "components/ui/Separator.tsx",
       "type": "registry:ui",
-      "content": "'use client';\n\n\nimport {\n  Separator as RACSeparator,\n  type SeparatorProps as RACSeparatorProps,\n} from 'react-aria-components';\n\ntype SeparatorProps = RACSeparatorProps;\n\nfunction Separator({\n  className,\n  orientation = 'horizontal',\n  ...props\n}: SeparatorProps) {\n  return (\n    <RACSeparator\n      className={`separator ${className ?? ''}`}\n      data-slot=\"separator\"\n      orientation={orientation}\n      {...props}\n    />\n  );\n}\n\nexport { Separator };\nexport type { SeparatorProps };\n"
+      "content": "'use client';\n\n\nimport {\n  Separator as SeparatorPrimitive,\n  type SeparatorProps as SeparatorPrimitiveProps,\n} from 'react-aria-components';\n\ntype SeparatorProps = SeparatorPrimitiveProps;\n\nfunction Separator({\n  className,\n  orientation = 'horizontal',\n  ...props\n}: SeparatorProps) {\n  return (\n    <SeparatorPrimitive\n      className={`separator ${className ?? ''}`}\n      data-slot=\"separator\"\n      orientation={orientation}\n      {...props}\n    />\n  );\n}\n\nexport { Separator };\nexport type { SeparatorProps };\n"
     },
     {
       "path": "components/ui/Separator.css",

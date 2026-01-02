@@ -1,8 +1,8 @@
 'use client';
 
 import {
-  Separator as RACSeparator,
-  type SeparatorProps as RACSeparatorProps,
+  Separator as SeparatorPrimitive,
+  type SeparatorProps as SeparatorPrimitiveProps,
 } from 'react-aria-components';
 import { tv, type VariantProps } from 'tailwind-variants';
 
@@ -21,7 +21,7 @@ const separatorVariants = tv({
 
 type SeparatorVariants = VariantProps<typeof separatorVariants>;
 
-type SeparatorProps = RACSeparatorProps & SeparatorVariants;
+type SeparatorProps = SeparatorPrimitiveProps & SeparatorVariants;
 
 function Separator({
   className,
@@ -29,7 +29,7 @@ function Separator({
   ...props
 }: SeparatorProps) {
   return (
-    <RACSeparator
+    <SeparatorPrimitive
       className={separatorVariants({ orientation, className })}
       data-slot="separator"
       orientation={orientation}

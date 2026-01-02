@@ -3,11 +3,11 @@
 import './Separator.css';
 
 import {
-  Separator as RACSeparator,
-  type SeparatorProps as RACSeparatorProps,
+  Separator as SeparatorPrimitive,
+  type SeparatorProps as SeparatorPrimitiveProps,
 } from 'react-aria-components';
 
-type SeparatorProps = RACSeparatorProps;
+type SeparatorProps = SeparatorPrimitiveProps;
 
 function Separator({
   className,
@@ -15,7 +15,7 @@ function Separator({
   ...props
 }: SeparatorProps) {
   return (
-    <RACSeparator
+    <SeparatorPrimitive
       className={`separator ${className ?? ''}`}
       data-slot="separator"
       orientation={orientation}

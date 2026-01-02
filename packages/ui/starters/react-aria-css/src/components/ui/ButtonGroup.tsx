@@ -3,8 +3,8 @@
 import './ButtonGroup.css';
 
 import {
-  Group as RACGroup,
-  type GroupProps as RACGroupProps,
+  Group as GroupPrimitive,
+  type GroupProps as GroupPrimitiveProps,
 } from 'react-aria-components';
 
 import {
@@ -17,7 +17,7 @@ type ButtonGroupOrientation = 'horizontal' | 'vertical';
 type ButtonGroupProps = {
   /** The orientation of the button group. @default "horizontal" */
   orientation?: ButtonGroupOrientation;
-} & RACGroupProps;
+} & GroupPrimitiveProps;
 
 function ButtonGroup({
   className,
@@ -25,7 +25,7 @@ function ButtonGroup({
   ...props
 }: ButtonGroupProps) {
   return (
-    <RACGroup
+    <GroupPrimitive
       className={`button-group ${className ?? ''}`}
       data-orientation={orientation}
       data-slot="button-group"

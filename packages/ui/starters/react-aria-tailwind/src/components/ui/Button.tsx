@@ -1,13 +1,14 @@
 'use client';
 
 import {
-  Button as RACButton,
-  type ButtonProps as RACButtonProps,
+  Button as ButtonPrimitive,
+  type ButtonProps as ButtonPrimitiveProps,
   composeRenderProps,
 } from 'react-aria-components';
 import { tv, type VariantProps } from 'tailwind-variants';
 
 import { focusRing } from '@/starters/react-aria-tailwind/src/lib/utils';
+import { type Prettify } from '@/starters/react-aria-tailwind/src/types/utils';
 
 const buttonVariants = tv({
   extend: focusRing,
@@ -56,13 +57,15 @@ const buttonVariants = tv({
 
 type ButtonVariants = VariantProps<typeof buttonVariants>;
 
-type ButtonProps = {
-  /** Icon to display before the button content */
-  iconLeft?: React.ReactNode;
-  /** Icon to display after the button content */
-  iconRight?: React.ReactNode;
-} & RACButtonProps &
-  ButtonVariants;
+type ButtonProps = Prettify<
+  {
+    /** Icon to display before the button content */
+    iconLeft?: React.ReactNode;
+    /** Icon to display after the button content */
+    iconRight?: React.ReactNode;
+  } & ButtonPrimitiveProps &
+    ButtonVariants
+>;
 
 /**
  * Spinner component for loading state
@@ -102,7 +105,7 @@ function Button({
   ...props
 }: ButtonProps) {
   return (
-    <RACButton
+    <ButtonPrimitive
       className={composeRenderProps(className, (className, renderProps) =>
         buttonVariants({ ...renderProps, variant, size, className }),
       )}
@@ -132,7 +135,7 @@ function Button({
           {!isPending && iconRight}
         </>
       ))}
-    </RACButton>
+    </ButtonPrimitive>
   );
 }
 

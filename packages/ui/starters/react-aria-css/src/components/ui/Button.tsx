@@ -3,10 +3,12 @@
 import './Button.css';
 
 import {
-  Button as RACButton,
-  type ButtonProps as RACButtonProps,
+  Button as ButtonPrimitive,
+  type ButtonProps as ButtonPrimitiveProps,
   composeRenderProps,
 } from 'react-aria-components';
+
+import { type Prettify } from '@/starters/react-aria-css/src/types/utils';
 
 type ButtonVariant =
   | 'default'
@@ -18,16 +20,18 @@ type ButtonVariant =
 
 type ButtonSize = 'default' | 'sm' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg';
 
-type ButtonProps = {
-  /** The visual style of the button. @default "default" */
-  variant?: ButtonVariant;
-  /** The size of the button. @default "default" */
-  size?: ButtonSize;
-  /** Icon to display before the button content */
-  iconLeft?: React.ReactNode;
-  /** Icon to display after the button content */
-  iconRight?: React.ReactNode;
-} & RACButtonProps;
+type ButtonProps = Prettify<
+  {
+    /** The visual style of the button. @default "default" */
+    variant?: ButtonVariant;
+    /** The size of the button. @default "default" */
+    size?: ButtonSize;
+    /** Icon to display before the button content */
+    iconLeft?: React.ReactNode;
+    /** Icon to display after the button content */
+    iconRight?: React.ReactNode;
+  } & ButtonPrimitiveProps
+>;
 
 /**
  * Spinner component for loading state
@@ -67,7 +71,7 @@ function Button({
   ...props
 }: ButtonProps) {
   return (
-    <RACButton
+    <ButtonPrimitive
       {...props}
       className={`react-aria-Button button button-base ${className ?? ''}`}
       data-size={size}
@@ -99,7 +103,7 @@ function Button({
           {!isPending && iconRight}
         </>
       ))}
-    </RACButton>
+    </ButtonPrimitive>
   );
 }
 
