@@ -10,7 +10,7 @@ Components are installed using the shadcn CLI. Choose your preferred styling app
 
 Uses [Tailwind Variants](https://www.tailwind-variants.org/) for styling with full Tailwind CSS support.
 
-```bash
+```sh
 # Install a component
 npx shadcn@latest add https://ui.oakoss.com/r/react-aria-tailwind-button.json
 
@@ -22,7 +22,7 @@ npx shadcn@latest add https://ui.oakoss.com/r/react-aria-tailwind-utils.json
 
 Uses CSS custom properties and data attributes. No Tailwind required.
 
-```bash
+```sh
 # Install a component
 npx shadcn@latest add https://ui.oakoss.com/r/react-aria-css-button.json
 
@@ -44,7 +44,7 @@ npx shadcn@latest add https://ui.oakoss.com/r/react-aria-css-utilities.json
 
 ### Project Structure
 
-```text
+```sh
 packages/ui/
 ├── starters/
 │   ├── react-aria-tailwind/     # Tailwind-based components
@@ -63,7 +63,7 @@ packages/ui/
 
 ### Scripts
 
-```bash
+```sh
 pnpm --filter @oakoss/ui build      # Build registry JSON files
 pnpm --filter @oakoss/ui lint       # Run ESLint
 pnpm --filter @oakoss/ui typecheck  # Run TypeScript check
@@ -73,35 +73,35 @@ pnpm --filter @oakoss/ui typecheck  # Run TypeScript check
 
 1. Create the component in both starters:
 
-   ```text
-   starters/react-aria-tailwind/src/components/ui/NewComponent.tsx
-   starters/react-aria-css/src/components/ui/NewComponent.tsx
-   starters/react-aria-css/src/components/ui/NewComponent.css
-   ```
+```sh
+starters/react-aria-tailwind/src/components/ui/NewComponent.tsx
+starters/react-aria-css/src/components/ui/NewComponent.tsx
+starters/react-aria-css/src/components/ui/NewComponent.css
+```
 
 2. Add entries to each `registry.json`:
 
-   ```json
-   {
-     "name": "newcomponent",
-     "type": "registry:ui",
-     "title": "New Component",
-     "description": "Description of the component",
-     "dependencies": ["react-aria-components"],
-     "files": [
-       {
-         "path": "components/ui/NewComponent.tsx",
-         "type": "registry:ui"
-       }
-     ]
-   }
-   ```
+```json
+{
+  "name": "newcomponent",
+  "type": "registry:ui",
+  "title": "New Component",
+  "description": "Description of the component",
+  "dependencies": ["react-aria-components"],
+  "files": [
+    {
+      "path": "components/ui/NewComponent.tsx",
+      "type": "registry:ui"
+    }
+  ]
+}
+```
 
 3. Build the registry:
 
-   ```bash
-   pnpm --filter @oakoss/ui build
-   ```
+```sh
+pnpm --filter @oakoss/ui build
+```
 
 4. Verify the output in `public/r/`.
 
@@ -117,7 +117,7 @@ pnpm --filter @oakoss/ui typecheck  # Run TypeScript check
 
 Production registry will be available at:
 
-```text
+```sh
 https://ui.oakoss.com/r/registry.json
 https://ui.oakoss.com/r/react-aria-tailwind-button.json
 https://ui.oakoss.com/r/react-aria-css-button.json

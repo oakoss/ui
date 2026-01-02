@@ -4,9 +4,7 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 export default defineConfig(
   // Ignore generated output files
   globalIgnores(['public/**']),
-
   ...reactConfig,
-
   // Required: Set tsconfigRootDir for type-checked rules
   {
     files: ['**/*.{ts,tsx}'],
@@ -16,7 +14,6 @@ export default defineConfig(
       },
     },
   },
-
   // UI package-specific overrides
   {
     files: ['**/*.{ts,tsx}'],
@@ -25,7 +22,6 @@ export default defineConfig(
       'unicorn/filename-case': 'off',
     },
   },
-
   // Disable Tailwind plugin for CSS starter (no tailwind.config)
   {
     files: ['starters/react-aria-css/**/*.{ts,tsx}'],
