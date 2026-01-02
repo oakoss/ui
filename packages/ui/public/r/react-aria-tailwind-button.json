@@ -3,7 +3,7 @@
   "name": "react-aria-tailwind-button",
   "type": "registry:ui",
   "title": "Button",
-  "description": "A button component with variants built on React Aria and Tailwind Variants",
+  "description": "A button component with variants, icons, and loading state built on React Aria",
   "dependencies": ["react-aria-components", "tailwind-variants"],
   "registryDependencies": [
     "https://ui.oakoss.com/r/react-aria-tailwind-utils.json"

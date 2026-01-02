@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "react-aria-css-button-group",
+  "type": "registry:ui",
+  "title": "Button Group",
+  "description": "Groups related buttons together with proper styling and accessibility",
+  "dependencies": ["react-aria-components"],
+  "registryDependencies": [
+    "https://ui.oakoss.com/r/react-aria-css-theme.json",
+    "https://ui.oakoss.com/r/react-aria-css-separator.json"
+  ],
+  "files": [
+    {
+      "path": "components/ui/ButtonGroup.tsx",
+      "type": "registry:ui",
+      "content": "'use client';\n\n\nimport {\n  Group as RACGroup,\n  type GroupProps as RACGroupProps,\n} from 'react-aria-components';\n\nimport { Separator, type SeparatorProps } from '@/components/ui/Separator';\n\ntype ButtonGroupOrientation = 'horizontal' | 'vertical';\n\ntype ButtonGroupProps = {\n  /** The orientation of the button group. @default \"horizontal\" */\n  orientation?: ButtonGroupOrientation;\n} & RACGroupProps;\n\nfunction ButtonGroup({\n  className,\n  orientation = 'horizontal',\n  ...props\n}: ButtonGroupProps) {\n  return (\n    <RACGroup\n      className={`button-group ${className ?? ''}`}\n      data-orientation={orientation}\n      data-slot=\"button-group\"\n      {...props}\n    />\n  );\n}\n\ntype ButtonGroupSeparatorProps = SeparatorProps;\n\nfunction ButtonGroupSeparator({\n  className,\n  orientation = 'vertical',\n  ...props\n}: ButtonGroupSeparatorProps) {\n  return (\n    <Separator\n      className={`button-group-separator ${className ?? ''}`}\n      data-slot=\"button-group-separator\"\n      orientation={orientation}\n      {...props}\n    />\n  );\n}\n\nexport { ButtonGroup, ButtonGroupSeparator };\nexport type { ButtonGroupOrientation, ButtonGroupProps, ButtonGroupSeparatorProps };\n"
+    },
+    {
+      "path": "components/ui/ButtonGroup.css",
+      "type": "registry:component",
+      "content": "/*\n * ButtonGroup Component Styles\n */\n\n@import './theme.css';\n\n.button-group {\n  display: flex;\n  width: fit-content;\n  align-items: stretch;\n}\n\n/* Focus states */\n.button-group > *:focus-visible {\n  z-index: 10;\n  position: relative;\n}\n\n/* Horizontal orientation (default) */\n.button-group[data-orientation='horizontal'] {\n  /* Remove inner border-radius */\n  > *:not(:first-child) {\n    border-top-left-radius: 0;\n    border-bottom-left-radius: 0;\n  }\n\n  > *:not(:last-child) {\n    border-top-right-radius: 0;\n    border-bottom-right-radius: 0;\n  }\n\n  /* Remove inner borders to prevent double borders */\n  > *:not(:first-child) {\n    border-left-width: 0;\n  }\n}\n\n/* Vertical orientation */\n.button-group[data-orientation='vertical'] {\n  flex-direction: column;\n\n  /* Remove inner border-radius */\n  > *:not(:first-child) {\n    border-top-left-radius: 0;\n    border-top-right-radius: 0;\n  }\n\n  > *:not(:last-child) {\n    border-bottom-left-radius: 0;\n    border-bottom-right-radius: 0;\n  }\n\n  /* Remove inner borders to prevent double borders */\n  > *:not(:first-child) {\n    border-top-width: 0;\n  }\n}\n\n/* ButtonGroup Separator */\n.button-group-separator {\n  background-color: hsl(var(--input));\n  position: relative;\n  margin: 0 !important;\n  align-self: stretch;\n}\n\n.button-group-separator[aria-orientation='vertical'] {\n  height: auto;\n}\n"
+    }
+  ]
+}

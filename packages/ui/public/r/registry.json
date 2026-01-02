@@ -19,7 +19,19 @@
       "name": "react-aria-css-button",
       "type": "registry:ui",
       "title": "Button",
-      "description": "A button component with variants built on React Aria and plain CSS"
+      "description": "A button component with variants, icons, and loading state built on React Aria"
+    },
+    {
+      "name": "react-aria-css-separator",
+      "type": "registry:ui",
+      "title": "Separator",
+      "description": "A visual separator for dividing content"
+    },
+    {
+      "name": "react-aria-css-button-group",
+      "type": "registry:ui",
+      "title": "Button Group",
+      "description": "Groups related buttons together with proper styling and accessibility"
     },
     {
       "name": "react-aria-tailwind-utils",
@@ -31,7 +43,19 @@
       "name": "react-aria-tailwind-button",
       "type": "registry:ui",
       "title": "Button",
-      "description": "A button component with variants built on React Aria and Tailwind Variants"
+      "description": "A button component with variants, icons, and loading state built on React Aria"
+    },
+    {
+      "name": "react-aria-tailwind-separator",
+      "type": "registry:ui",
+      "title": "Separator",
+      "description": "A visual separator for dividing content"
+    },
+    {
+      "name": "react-aria-tailwind-button-group",
+      "type": "registry:ui",
+      "title": "Button Group",
+      "description": "Groups related buttons together with proper styling and accessibility"
     }
   ]
 }

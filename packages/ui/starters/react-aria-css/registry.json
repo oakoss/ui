@@ -34,7 +34,7 @@
       "name": "button",
       "type": "registry:ui",
       "title": "Button",
-      "description": "A button component with variants built on React Aria and plain CSS",
+      "description": "A button component with variants, icons, and loading state built on React Aria",
       "dependencies": ["react-aria-components"],
       "registryDependencies": [
         "https://ui.oakoss.com/r/react-aria-css-theme.json",
@@ -47,6 +47,47 @@
         },
         {
           "path": "components/ui/Button.css",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "separator",
+      "type": "registry:ui",
+      "title": "Separator",
+      "description": "A visual separator for dividing content",
+      "dependencies": ["react-aria-components"],
+      "registryDependencies": [
+        "https://ui.oakoss.com/r/react-aria-css-theme.json"
+      ],
+      "files": [
+        {
+          "path": "components/ui/Separator.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/Separator.css",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "button-group",
+      "type": "registry:ui",
+      "title": "Button Group",
+      "description": "Groups related buttons together with proper styling and accessibility",
+      "dependencies": ["react-aria-components"],
+      "registryDependencies": [
+        "https://ui.oakoss.com/r/react-aria-css-theme.json",
+        "https://ui.oakoss.com/r/react-aria-css-separator.json"
+      ],
+      "files": [
+        {
+          "path": "components/ui/ButtonGroup.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/ButtonGroup.css",
           "type": "registry:component"
         }
       ]

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "react-aria-css-separator",
+  "type": "registry:ui",
+  "title": "Separator",
+  "description": "A visual separator for dividing content",
+  "dependencies": ["react-aria-components"],
+  "registryDependencies": ["https://ui.oakoss.com/r/react-aria-css-theme.json"],
+  "files": [
+    {
+      "path": "components/ui/Separator.tsx",
+      "type": "registry:ui",
+      "content": "'use client';\n\n\nimport {\n  Separator as RACSeparator,\n  type SeparatorProps as RACSeparatorProps,\n} from 'react-aria-components';\n\ntype SeparatorProps = RACSeparatorProps;\n\nfunction Separator({\n  className,\n  orientation = 'horizontal',\n  ...props\n}: SeparatorProps) {\n  return (\n    <RACSeparator\n      className={`separator ${className ?? ''}`}\n      data-slot=\"separator\"\n      orientation={orientation}\n      {...props}\n    />\n  );\n}\n\nexport { Separator };\nexport type { SeparatorProps };\n"
+    },
+    {
+      "path": "components/ui/Separator.css",
+      "type": "registry:component",
+      "content": "/*\n * Separator Component Styles\n */\n\n@import './theme.css';\n\n.separator {\n  flex-shrink: 0;\n  background-color: hsl(var(--border));\n}\n\n.separator[aria-orientation='horizontal'] {\n  height: 1px;\n  width: 100%;\n}\n\n.separator[aria-orientation='vertical'] {\n  width: 1px;\n  align-self: stretch;\n}\n"
+    }
+  ]
+}

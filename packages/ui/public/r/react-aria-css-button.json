@@ -3,7 +3,7 @@
   "name": "react-aria-css-button",
   "type": "registry:ui",
   "title": "Button",
-  "description": "A button component with variants built on React Aria and plain CSS",
+  "description": "A button component with variants, icons, and loading state built on React Aria",
   "dependencies": ["react-aria-components"],
   "registryDependencies": [
     "https://ui.oakoss.com/r/react-aria-css-theme.json",

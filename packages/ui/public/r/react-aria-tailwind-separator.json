@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "react-aria-tailwind-separator",
+  "type": "registry:ui",
+  "title": "Separator",
+  "description": "A visual separator for dividing content",
+  "dependencies": ["react-aria-components", "tailwind-variants"],
+  "files": [
+    {
+      "path": "components/ui/Separator.tsx",
+      "type": "registry:ui",
+      "content": "'use client';\n\nimport {\n  Separator as RACSeparator,\n  type SeparatorProps as RACSeparatorProps,\n} from 'react-aria-components';\nimport { tv, type VariantProps } from 'tailwind-variants';\n\nconst separatorVariants = tv({\n  base: 'shrink-0 bg-border',\n  variants: {\n    orientation: {\n      horizontal: 'h-px w-full',\n      vertical: 'w-px self-stretch',\n    },\n  },\n  defaultVariants: {\n    orientation: 'horizontal',\n  },\n});\n\ntype SeparatorVariants = VariantProps<typeof separatorVariants>;\n\ntype SeparatorProps = RACSeparatorProps & SeparatorVariants;\n\nfunction Separator({\n  className,\n  orientation = 'horizontal',\n  ...props\n}: SeparatorProps) {\n  return (\n    <RACSeparator\n      className={separatorVariants({ orientation, className })}\n      data-slot=\"separator\"\n      orientation={orientation}\n      {...props}\n    />\n  );\n}\n\nexport { Separator, separatorVariants };\nexport type { SeparatorProps };\n"
+    }
+  ]
+}

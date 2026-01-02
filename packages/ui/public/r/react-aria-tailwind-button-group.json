@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "react-aria-tailwind-button-group",
+  "type": "registry:ui",
+  "title": "Button Group",
+  "description": "Groups related buttons together with proper styling and accessibility",
+  "dependencies": ["react-aria-components", "tailwind-variants"],
+  "registryDependencies": [
+    "https://ui.oakoss.com/r/react-aria-tailwind-separator.json"
+  ],
+  "files": [
+    {
+      "path": "components/ui/ButtonGroup.tsx",
+      "type": "registry:ui",
+      "content": "'use client';\n\nimport {\n  Group as RACGroup,\n  type GroupProps as RACGroupProps,\n} from 'react-aria-components';\nimport { tv } from 'tailwind-variants';\n\nimport { Separator } from '@/components/ui/Separator';\n\nconst buttonGroupVariants = tv({\n  base: [\n    'flex w-fit items-stretch',\n    // Focus states\n    '[&>*]:focus-visible:z-10 [&>*]:focus-visible:relative',\n  ],\n  variants: {\n    orientation: {\n      horizontal: [\n        // Remove inner border-radius\n        '[&>*:not(:first-child)]:rounded-l-none',\n        '[&>*:not(:last-child)]:rounded-r-none',\n        // Remove inner borders to prevent double borders\n        '[&>*:not(:first-child)]:border-l-0',\n      ],\n      vertical: [\n        'flex-col',\n        // Remove inner border-radius\n        '[&>*:not(:first-child)]:rounded-t-none',\n        '[&>*:not(:last-child)]:rounded-b-none',\n        // Remove inner borders to prevent double borders\n        '[&>*:not(:first-child)]:border-t-0',\n      ],\n    },\n  },\n  defaultVariants: {\n    orientation: 'horizontal',\n  },\n});\n\ntype ButtonGroupProps = {\n  /** The orientation of the button group. @default \"horizontal\" */\n  orientation?: 'horizontal' | 'vertical';\n  className?: string;\n} & Omit<RACGroupProps, 'className'>;\n\nfunction ButtonGroup({\n  className,\n  orientation = 'horizontal',\n  ...props\n}: ButtonGroupProps) {\n  return (\n    <RACGroup\n      className={buttonGroupVariants({ orientation }) + (className ? ` ${className}` : '')}\n      data-orientation={orientation}\n      data-slot=\"button-group\"\n      {...props}\n    />\n  );\n}\n\ntype ButtonGroupSeparatorProps = React.ComponentProps<typeof Separator>;\n\nfunction ButtonGroupSeparator({\n  className,\n  orientation = 'vertical',\n  ...props\n}: ButtonGroupSeparatorProps) {\n  return (\n    <Separator\n      className={`bg-input relative !m-0 self-stretch ${orientation === 'vertical' ? 'h-auto' : ''} ${className ?? ''}`}\n      data-slot=\"button-group-separator\"\n      orientation={orientation}\n      {...props}\n    />\n  );\n}\n\nexport { ButtonGroup, ButtonGroupSeparator, buttonGroupVariants };\nexport type { ButtonGroupProps, ButtonGroupSeparatorProps };\n"
+    }
+  ]
+}

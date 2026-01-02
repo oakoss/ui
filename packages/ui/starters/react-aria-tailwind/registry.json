@@ -29,7 +29,7 @@
       "name": "button",
       "type": "registry:ui",
       "title": "Button",
-      "description": "A button component with variants built on React Aria and Tailwind Variants",
+      "description": "A button component with variants, icons, and loading state built on React Aria",
       "dependencies": ["react-aria-components", "tailwind-variants"],
       "registryDependencies": [
         "https://ui.oakoss.com/r/react-aria-tailwind-utils.json"
@@ -37,6 +37,35 @@
       "files": [
         {
           "path": "components/ui/Button.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "separator",
+      "type": "registry:ui",
+      "title": "Separator",
+      "description": "A visual separator for dividing content",
+      "dependencies": ["react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "components/ui/Separator.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "button-group",
+      "type": "registry:ui",
+      "title": "Button Group",
+      "description": "Groups related buttons together with proper styling and accessibility",
+      "dependencies": ["react-aria-components", "tailwind-variants"],
+      "registryDependencies": [
+        "https://ui.oakoss.com/r/react-aria-tailwind-separator.json"
+      ],
+      "files": [
+        {
+          "path": "components/ui/ButtonGroup.tsx",
           "type": "registry:ui"
         }
       ]

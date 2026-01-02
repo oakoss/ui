@@ -1,0 +1,69 @@
+/*
+ * ButtonGroup Component Styles
+ */
+
+@import './theme.css';
+
+.button-group {
+  display: flex;
+  width: fit-content;
+  align-items: stretch;
+}
+
+/* Focus states */
+.button-group > *:focus-visible {
+  z-index: 10;
+  position: relative;
+}
+
+/* Horizontal orientation (default) */
+.button-group[data-orientation='horizontal'] {
+  /* Remove inner border-radius */
+  > *:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  > *:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  /* Remove inner borders to prevent double borders */
+  > *:not(:first-child) {
+    border-left-width: 0;
+  }
+}
+
+/* Vertical orientation */
+.button-group[data-orientation='vertical'] {
+  flex-direction: column;
+
+  /* Remove inner border-radius */
+  > *:not(:first-child) {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  > *:not(:last-child) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  /* Remove inner borders to prevent double borders */
+  > *:not(:first-child) {
+    border-top-width: 0;
+  }
+}
+
+/* ButtonGroup Separator */
+.button-group-separator {
+  background-color: hsl(var(--input));
+  position: relative;
+  margin: 0 !important;
+  align-self: stretch;
+}
+
+.button-group-separator[aria-orientation='vertical'] {
+  height: auto;
+}

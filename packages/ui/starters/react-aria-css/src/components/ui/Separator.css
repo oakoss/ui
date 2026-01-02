@@ -1,0 +1,20 @@
+/*
+ * Separator Component Styles
+ */
+
+@import './theme.css';
+
+.separator {
+  flex-shrink: 0;
+  background-color: hsl(var(--border));
+}
+
+.separator[aria-orientation='horizontal'] {
+  height: 1px;
+  width: 100%;
+}
+
+.separator[aria-orientation='vertical'] {
+  width: 1px;
+  align-self: stretch;
+}
