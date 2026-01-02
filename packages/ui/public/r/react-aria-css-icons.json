@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "react-aria-css-icons",
+  "type": "registry:ui",
+  "title": "Icons",
+  "description": "Icon components using lucide-react. Swap this file to change icon libraries.",
+  "dependencies": ["lucide-react"],
+  "files": [
+    {
+      "path": "components/ui/icons.tsx",
+      "type": "registry:ui",
+      "content": "import { ChevronDown } from 'lucide-react';\n\n/**\n * Icon components mapped from lucide-react.\n * Swap this file to change icon libraries without updating components.\n *\n * @example\n * import { Icons } from '@/components/ui/icons';\n * <Icons.ChevronDown className=\"size-4\" />\n */\nexport const Icons = {\n  ChevronDown: ChevronDown,\n} as const;\n\nexport type IconName = keyof typeof Icons;\nexport type IconProps = React.ComponentProps<(typeof Icons)[IconName]>;\n"
+    }
+  ]
+}
