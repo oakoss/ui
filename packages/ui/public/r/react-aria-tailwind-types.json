@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "react-aria-tailwind-types",
+  "type": "registry:lib",
+  "title": "Type Utilities",
+  "description": "Utility types like Prettify for better IDE tooltips",
+  "files": [
+    {
+      "path": "types/utils.ts",
+      "type": "registry:lib",
+      "content": "/**\n * Flattens intersection types for better IDE tooltips.\n *\n * When you hover over a type that uses intersections (`A & B`) or utilities\n * like `Omit<>`, TypeScript shows the unexpanded form. Prettify forces\n * TypeScript to evaluate and display the final flattened shape.\n *\n * @example\n * type UserResponse = Omit<User, \"password\"> & { role: string };\n * // Hover shows: Omit<User, \"password\"> & { role: string }\n *\n * type PrettyUserResponse = Prettify<Omit<User, \"password\"> & { role: string }>;\n * // Hover shows: { id: string; name: string; role: string }\n */\nexport type Prettify<T> = {\n  [K in keyof T]: T[K];\n} & {};\n"
+    }
+  ]
+}
