@@ -32,13 +32,13 @@ openspec/                # Spec-driven development
 
 ### Installation
 
-```bash
+```sh
 pnpm install
 ```
 
 ### Development
 
-```bash
+```sh
 # Start all apps in dev mode
 pnpm dev
 
@@ -48,13 +48,13 @@ pnpm --filter docs dev
 
 ### Build
 
-```bash
+```sh
 pnpm build
 ```
 
 ### Linting & Formatting
 
-```bash
+```sh
 pnpm lint          # ESLint
 pnpm lint:fix      # ESLint with auto-fix
 pnpm format        # Prettier

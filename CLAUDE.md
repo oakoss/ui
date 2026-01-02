@@ -35,7 +35,7 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 
 ## Commands
 
-```bash
+```sh
 pnpm dev                        # Start all apps in dev mode (Turbo)
 pnpm build                      # Build all packages/apps
 pnpm lint                       # ESLint (zero warnings allowed)

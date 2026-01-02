@@ -6,7 +6,7 @@
 
 The shadcn CLI can install components from any registry that follows the schema. Users run:
 
-```bash
+```sh
 # From official shadcn registry
 pnpm dlx shadcn@latest add button
 
@@ -50,7 +50,7 @@ The manifest file that defines all available components:
 
 The shadcn CLI includes a `build` command:
 
-```bash
+```sh
 # Generates public/r/*.json files from registry.json
 pnpm dlx shadcn@latest build
 
@@ -235,7 +235,7 @@ To use `@your-ui/button` syntax, register in the shadcn registry index:
 
 Until then, users can add via URL:
 
-```bash
+```sh
 pnpm dlx shadcn add https://your-ui.dev/r/button.json
 ```
 
@@ -258,7 +258,7 @@ The CLI handles the difference between v3 (`tailwind.config.js`) and v4 (`@theme
 
 ## CLI Commands
 
-```bash
+```sh
 # Build registry JSON files
 pnpm dlx shadcn build
 

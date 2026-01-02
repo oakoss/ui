@@ -4,7 +4,7 @@
 
 Fumadocs CLI has a TanStack Start template:
 
-```bash
+```sh
 # Create new project with TanStack Start + Fumadocs
 pnpm create fumadocs-app my-ui --template tanstack-start --pm pnpm
 
@@ -78,7 +78,7 @@ import { useButton, useDialog } from 'react-aria';
 
 Using Tailwind v4 with the official React Aria plugin:
 
-```bash
+```sh
 pnpm add tailwindcss@next tailwindcss-react-aria-components
 ```
 
@@ -103,7 +103,7 @@ Full-stack React framework with:
 
 Using the `create-fumadocs-app` CLI with TanStack Start template handles integration automatically.
 
-```bash
+```sh
 pnpm create fumadocs-app my-ui --template tanstack-start --pm pnpm
 ```
 
@@ -118,7 +118,7 @@ pnpm create fumadocs-app my-ui --template tanstack-start --pm pnpm
 
 **Fumadocs CLI for customization:**
 
-```bash
+```sh
 # Add customizable components
 pnpm dlx @fumadocs/cli add
 
@@ -218,7 +218,7 @@ function Button({ variant, size, className, ...props }: ButtonProps) {
 
 **No npm packages.** Everything distributed via JSON registry files:
 
-```bash
+```sh
 # Install a component
 pnpm dlx shadcn add https://react-aria-ui.dev/r/button.json
 

@@ -14,7 +14,7 @@ Build a design system using:
 
 ## Quick Start
 
-```bash
+```sh
 # Create docs site with TanStack Start + Fumadocs
 pnpm create fumadocs-app react-aria-ui --template tanstack-start --pm pnpm
 ```

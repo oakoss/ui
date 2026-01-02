@@ -5,7 +5,7 @@ This is a Tanstack Start application generated with
 
 Run development server:
 
-```bash
+```sh
 npm run dev
 # or
 pnpm dev

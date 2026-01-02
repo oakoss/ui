@@ -103,7 +103,7 @@ After deployment, create separate PR to:
 
 ### CLI Commands
 
-```bash
+```sh
 # Essential commands
 openspec list                  # List active changes
 openspec list --specs          # List specifications
@@ -352,7 +352,7 @@ Example for RENAMED:
 
 ### Validation Tips
 
-```bash
+```sh
 # Always use strict mode for comprehensive checks
 openspec validate [change] --strict
 
@@ -365,7 +365,7 @@ openspec show [spec] --json -r 1
 
 ## Happy Path Script
 
-```bash
+```sh
 # 1) Explore current state
 openspec spec list --long
 openspec list
@@ -512,7 +512,7 @@ Only add complexity with:
 
 ### CLI Essentials
 
-```bash
+```sh
 openspec list              # What's in progress?
 openspec show [item]       # View details
 openspec validate --strict # Is it correct?

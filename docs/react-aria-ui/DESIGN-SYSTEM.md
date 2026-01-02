@@ -356,7 +356,7 @@ Everything goes through the registry - no npm packages to install:
 
 Hooks are distributed the same way as components:
 
-```bash
+```sh
 # Install a hook
 pnpm dlx shadcn add https://react-aria-ui.dev/r/use-media-query.json
 
