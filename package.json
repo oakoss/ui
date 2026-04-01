@@ -21,18 +21,18 @@
     }
   },
   "devDependencies": {
-    "@commitlint/config-conventional": "20.3.0",
-    "commitlint": "20.3.0",
+    "@commitlint/config-conventional": "20.5.0",
+    "commitlint": "20.5.0",
     "cz-git": "1.12.0",
-    "lefthook": "2.0.13",
-    "markdownlint-cli2": "0.20.0",
-    "prettier": "3.7.4",
-    "prettier-plugin-packagejson": "2.5.20",
-    "sherif": "1.9.0",
-    "turbo": "2.7.2",
+    "lefthook": "2.1.4",
+    "markdownlint-cli2": "0.22.0",
+    "prettier": "3.8.1",
+    "prettier-plugin-packagejson": "2.5.22",
+    "sherif": "1.11.0",
+    "turbo": "2.8.21",
     "typescript": "5.9.3"
   },
-  "packageManager": "pnpm@10.30.2",
+  "packageManager": "pnpm@10.33.0",
   "engines": {
     "node": ">=25.1.0"
   }
