@@ -1,96 +1,145 @@
-# Agent Instructions
+# Project Instructions for AI Agents
 
-This project uses **bd** (beads) for issue tracking. Run `bd prime` for full workflow context.
+## Issue Tracking
 
-> **Architecture in one line:** Issues live in a local Dolt database
-> (`.beads/dolt/`); cross-machine sync uses `bd dolt push/pull` (a
-> git-compatible protocol), stored under `refs/dolt/data` on your git
-> remote — separate from `refs/heads/*` where your code lives.
-> `.beads/issues.jsonl` is a passive export, not the wire protocol.
->
-> See [SYNC_CONCEPTS.md](https://github.com/gastownhall/beads/blob/main/docs/SYNC_CONCEPTS.md)
-> for the one-screen overview and anti-patterns (don't treat JSONL as the
-> source of truth; don't `bd import` during normal operation; don't
-> reach for third-party Dolt hosting before trying the default).
+This project uses **GitHub Issues** as the source of truth and **GitHub Projects v2** for the roadmap view.
 
-## Quick Reference
+### Quick reference
 
 ```bash
-bd ready              # Find available work
-bd show <id>          # View issue details
-bd update <id> --claim  # Claim work atomically
-bd close <id>         # Complete work
-bd dolt push          # Push beads data to remote
+gh issue list                       # See open Issues
+gh issue view <number>              # Read an Issue
+gh issue create                     # File a new Issue (uses .github/ISSUE_TEMPLATE/)
+gh issue comment <number> -b "..."  # Comment on an Issue
+gh pr create --fill                 # Open a PR from the current branch
 ```
 
-## Non-Interactive Shell Commands
+### Workflow
 
-**ALWAYS use non-interactive flags** with file operations to avoid hanging on confirmation prompts.
+1. Triage: a maintainer moves new Issues from `status:needs-triage` to `status:ready` and applies `priority:*`, `complexity:*`, and `area:*` labels.
+2. Pick up: claim an Issue labeled `status:ready` (prefer `complexity:simple` for agent runs) and self-label `status:in-progress`.
+3. Branch: `issue/<number>-<short-slug>`.
+4. Commit: Conventional Commits via `pnpm commit`; reference the Issue with `closes #N`.
+5. PR: `gh pr create --fill --label "status:needs-review"`.
+6. Merge: the Issue closes automatically when the PR merges.
 
-Shell commands like `cp`, `mv`, and `rm` may be aliased to include `-i` (interactive) mode on some systems, causing the agent to hang indefinitely waiting for y/n input.
-
-**Use these forms instead:**
-```bash
-# Force overwrite without prompting
-cp -f source dest           # NOT: cp source dest
-mv -f source dest           # NOT: mv source dest
-rm -f file                  # NOT: rm file
-
-# For recursive operations
-rm -rf directory            # NOT: rm -r directory
-cp -rf source dest          # NOT: cp -r source dest
-```
-
-**Other commands that may prompt:**
-- `scp` - use `-o BatchMode=yes` for non-interactive
-- `ssh` - use `-o BatchMode=yes` to fail instead of prompting
-- `apt-get` - use `-y` flag
-- `brew` - use `HOMEBREW_NO_AUTO_UPDATE=1` env var
-
-<!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:7510c1e2 -->
-## Beads Issue Tracker
-
-This project uses **bd (beads)** for issue tracking. Run `bd prime` to see full workflow context and commands.
-
-### Quick Reference
-
-```bash
-bd ready              # Find available work
-bd show <id>          # View issue details
-bd update <id> --claim  # Claim work
-bd close <id>         # Complete work
-```
+See [`docs/governance/labels.md`](docs/governance/labels.md) for the full label state machine. The `/fix-issue` skill at `.claude/skills/fix-issue/SKILL.md` runs the view, implement, test, and PR loop.
 
 ### Rules
 
-- Use `bd` for ALL task tracking — do NOT use TodoWrite, TaskCreate, or markdown TODO lists
-- Run `bd prime` for detailed command reference and session close protocol
-- Use `bd remember` for persistent knowledge — do NOT use MEMORY.md files
-
-**Architecture in one line:** issues live in a local Dolt DB; sync uses `refs/dolt/data` on your git remote; `.beads/issues.jsonl` is a passive export. See https://github.com/gastownhall/beads/blob/main/docs/SYNC_CONCEPTS.md for details and anti-patterns.
+- Use `gh` CLI for all GitHub interactions. Reach for an MCP server only when you need Projects v2 mutations.
+- GitHub Issues are the source of truth. Don't track work in TodoWrite, markdown TODOs, or local notes.
+- Decisions live in `docs/adr/`; investigations live in `docs/research/`. Don't create MEMORY.md files.
 
 ## Session Completion
 
-**When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
+When ending a work session:
 
-**MANDATORY WORKFLOW:**
+1. **Update Issue status** — close completed Issues; move in-progress ones to `status:needs-review`.
+2. **Pass quality gates** — `pnpm lint`, `pnpm lint:md`, and any component tests.
+3. **Push PRs to remote** — `git push` must succeed before the session ends.
+4. **Hand off** — drop context for the next session in a PR comment or a fresh Issue.
 
-1. **File issues for remaining work** - Create issues for anything that needs follow-up
-2. **Run quality gates** (if code changed) - Tests, linters, builds
-3. **Update issue status** - Close finished work, update in-progress items
-4. **PUSH TO REMOTE** - This is MANDATORY:
-   ```bash
-   git pull --rebase
-   git push
-   git status  # MUST show "up to date with origin"
-   ```
-5. **Clean up** - Clear stashes, prune remote branches
-6. **Verify** - All changes committed AND pushed
-7. **Hand off** - Provide context for next session
+## Build & Test
 
-**CRITICAL RULES:**
-- Work is NOT complete until `git push` succeeds
-- NEVER stop before pushing - that leaves work stranded locally
-- NEVER say "ready to push when you are" - YOU must push
-- If push fails, resolve and retry until it succeeds
-<!-- END BEADS INTEGRATION -->
+```bash
+pnpm install            # Installs deps; lefthook's postinstall wires up git hooks
+pnpm lint               # oxlint
+pnpm format             # oxfmt (writes in place)
+pnpm format:check       # oxfmt --check (CI-friendly; no writes)
+pnpm lint:md            # markdownlint-cli2 on all *.md
+pnpm lint:md:fix        # markdownlint-cli2 --fix on all *.md
+pnpm commit             # Conventional Commits prompt (cz-git)
+pnpm commitlint --edit  # Validate the most recent commit message
+```
+
+### Git hooks (lefthook)
+
+Lefthook's own `postinstall` script wires up hooks on `pnpm install` (allowed in `pnpm-workspace.yaml` via `allowBuilds`). The configured hooks:
+
+- **pre-commit** (parallel): `oxlint`, `oxfmt` (auto-stages fixes), `markdownlint-cli2 --fix` (auto-stages fixes) — all scoped to staged files only
+- **commit-msg**: `commitlint` validates Conventional Commits
+
+If hooks ever drift out of sync (rare), reinstall with `pnpm exec lefthook install`. To skip hooks in an emergency: `LEFTHOOK=0 git commit ...`. Don't habitually use `--no-verify`.
+
+## Architecture Overview
+
+oakoss/ui is a layered React design system:
+
+- **`@oakoss/tokens`** — DTCG 2025.10 source tokens compiled by [Terrazzo](https://terrazzo.app) into CSS variables, JS constants, and Tailwind theme output. Framework-agnostic; the only npm-published surface in foundation phase.
+- **Primitives** — thin wrappers over [React Aria Components](https://react-aria.adobe.com/) that bind tokens and expose unstyled, accessible behavior.
+- **Styled components** — opinionated compositions on top of primitives. Distributed as registry items (source files copied into the consumer's repo), not as a runtime npm dependency.
+- **Recipes** — multi-component patterns (e.g. data tables with virtualization, modal flows).
+
+Distribution is **registry-led hybrid**: components ship via a [shadcn-compatible registry](https://ui.shadcn.com/docs/registry) (`registry.json`), while tokens and shared utilities ship as small npm packages under `@oakoss/*`. See [ADR-0002](docs/adr/0002-registry-led-hybrid-distribution.md).
+
+Multi-framework is **React-primary**. Tokens are framework-agnostic by construction; Lit/Web Components targets are deferred to post-v1.0. See [ADR-0003](docs/adr/0003-react-primary-defer-web-components.md).
+
+AI integration uses the registry's `registry.json` as a discovery surface plus an `@oakoss/mcp-server` for richer tool-use clients. See [ADR-0008](docs/adr/0008-ai-integration-shadcn-registry-and-mcp.md).
+
+## Conventions & Patterns
+
+### File and naming
+
+- Filenames are `kebab-case` (`button.tsx`, `use-controlled-state.ts`)
+- React component exports are `PascalCase`; hooks are `useCamelCase`
+- No relative parent imports (`../../`) — use tsconfig path aliases instead
+- Prefer `type` over `interface` unless declaration-merging is genuinely needed
+- Inline type imports: `import { type ComponentProps } from 'react'`
+
+### Tokens
+
+Never use raw values (hex colors, px sizes, ms durations) in component code. Pull from `@oakoss/tokens`. If a token is missing, add it to the source set first; don't hardcode.
+
+### Accessibility
+
+Every component targets [WCAG 2.2 AA](https://www.w3.org/TR/WCAG22/), [EN 301 549](https://www.etsi.org/standards-search#search=EN%20301%20549), and Section 508. Tests run via `eslint-plugin-jsx-a11y` and `@storybook/addon-a11y`. See [`docs/accessibility/README.md`](docs/accessibility/README.md).
+
+### ADRs vs RFCs
+
+- **ADR** ([`docs/adr/`](docs/adr/)) — captures an architectural decision after it's been made. Short, immutable once accepted.
+- **RFC** ([`docs/rfcs/`](docs/rfcs/)) — proposes a new component API or significant change before implementation. Discussion happens on the RFC PR.
+
+Use ADRs for build pipeline, dependency, and testing-strategy decisions. Use RFCs for anything that adds public API surface.
+
+### Comments and prose
+
+See the [Comment policy](#comment-policy) below. Prose in docs (READMEs, ADRs, RFCs) should avoid the AI-flavored patterns called out in the `de-slopify` reference.
+
+# Comment policy
+
+Comments are useful when they add value. Keep them clean and minimal.
+
+A good comment:
+
+- Is accurate (matches the code; remove if stale)
+- Earns its place (explains WHY or non-obvious context, not WHAT)
+- Is concise (one or two lines unless documenting a complex invariant)
+
+Avoid:
+
+- Restating what the code does
+- Section markers like `// ===== HELPERS =====`
+- Hedge words, apologies, "obviously", "basically", "just"
+- "Note:" / "Important:" prefixes when surrounding text already conveys importance
+- TODOs without ticket references
+- Cross-references that belong in the PR description ("added for X", "used by Y")
+- Multi-line comments on trivial code
+- AI-flavored phrasings ("Here we...", "Let's...", "This...")
+
+When in doubt: keep the comment, but make it tighter.
+
+# Fix-vs-defer policy
+
+When addressing review findings (from the review-cycle skill, PR comments, or any other reviewer):
+
+Default to fixing inline. Defer to a follow-up only if:
+
+- The fix is substantially more work than writing the follow-up itself
+- The fix requires architectural changes spanning files outside this PR scope
+- The fix requires a new dependency or schema migration not in this PR
+- The fix would invalidate unrelated tests
+
+If you can describe the fix in one sentence, just do the fix.
+
+When deferring, briefly state which criterion above applies.

@@ -1,0 +1,47 @@
+{
+  "name": "oakoss-ui",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Enterprise OSS React design system built on React Aria Components and distributed via a shadcn-compatible registry.",
+  "homepage": "https://github.com/oakoss/ui#readme",
+  "bugs": {
+    "url": "https://github.com/oakoss/ui/issues"
+  },
+  "license": "MIT",
+  "author": "oakoss contributors",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oakoss/ui.git"
+  },
+  "type": "module",
+  "scripts": {
+    "commit": "cz",
+    "commitlint": "commitlint --edit",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "lint:md": "markdownlint-cli2 '**/*.md'",
+    "lint:md:fix": "markdownlint-cli2 --fix '**/*.md'"
+  },
+  "devDependencies": {
+    "@commitlint/config-conventional": "^21.0.1",
+    "commitizen": "^4.3.1",
+    "commitlint": "^21.0.1",
+    "cz-git": "^1.13.1",
+    "lefthook": "^2.1.8",
+    "markdownlint-cli2": "^0.22.1",
+    "oxfmt": "^0.51.0",
+    "oxlint": "^1.66.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git"
+    }
+  },
+  "engines": {
+    "node": ">=24.15.0",
+    "pnpm": ">=11.3.0"
+  },
+  "packageManager": "pnpm@11.3.0"
+}

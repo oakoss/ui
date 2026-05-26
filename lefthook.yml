@@ -1,0 +1,27 @@
+# https://lefthook.dev/configuration/
+
+output:
+  - failure
+  - execution_out
+
+pre-commit:
+  parallel: true
+  jobs:
+    - name: oxlint
+      glob: '*.{js,jsx,ts,tsx,mjs,cjs}'
+      run: pnpm exec oxlint {staged_files}
+
+    - name: oxfmt
+      glob: '*.{js,jsx,ts,tsx,mjs,cjs,json,jsonc,css,html}'
+      run: pnpm exec oxfmt {staged_files}
+      stage_fixed: true
+
+    - name: markdownlint
+      glob: '*.md'
+      run: pnpm exec markdownlint-cli2 --fix {staged_files}
+      stage_fixed: true
+
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: pnpm exec commitlint --edit {1}

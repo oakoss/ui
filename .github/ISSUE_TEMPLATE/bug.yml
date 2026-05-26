@@ -1,0 +1,62 @@
+name: Bug Report
+description: A bug in an existing component or behavior
+title: '[bug] '
+labels: ['type:bug', 'status:needs-triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Include a minimum reproduction so we can confirm and fix quickly.
+  - type: input
+    id: component
+    attributes:
+      label: Component
+      description: Which component does this affect?
+      placeholder: Button
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: oakoss/ui version (or commit SHA)
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Minimum code or a StackBlitz / CodeSandbox link.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: dropdown
+    id: a11y
+    attributes:
+      label: Accessibility impact
+      description: Does this bug affect keyboard nav, screen readers, or WCAG conformance?
+      options:
+        - 'Yes — blocks WCAG 2.2 AA conformance'
+        - 'Possibly — needs investigation'
+        - 'No'
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Browser, OS, React version, Tailwind version, framework (Next.js, Vite, etc.)
+    validations:
+      required: false

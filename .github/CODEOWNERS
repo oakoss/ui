@@ -1,0 +1,26 @@
+# GitHub CODEOWNERS for oakoss/ui
+# Docs: https://docs.github.com/en/repositories/managing-your-repositories-settings-and-security/managing-repository-settings/about-code-owners
+#
+# Last-matching pattern wins. Keep rules ordered from broad to specific.
+# Team permissions: @oakoss/core (admin) > @oakoss/maintainer (maintain) > @oakoss/contributor (write).
+
+# Default owner: long-term maintainers review every change.
+*                               @oakoss/maintainer
+
+# Architectural direction is a core-team decision.
+/docs/adr/                      @oakoss/core
+/docs/rfcs/                     @oakoss/core
+
+# Governance, licensing, and security policy: core-team only.
+/LICENSE                        @oakoss/core
+/docs/CODE_OF_CONDUCT.md        @oakoss/core
+/docs/CONTRIBUTING.md           @oakoss/core
+/docs/SECURITY.md               @oakoss/core
+/docs/governance/               @oakoss/core
+
+# CI, repo automation, agent instructions, and CODEOWNERS itself.
+/.github/                       @oakoss/core
+/.claude/                       @oakoss/core
+/AGENTS.md                      @oakoss/core
+/CLAUDE.md                      @oakoss/core
+/lefthook.yml                   @oakoss/core

@@ -1,5 +1,11 @@
+# Node / pnpm
+node_modules/
+*.log
 
-# Beads / Dolt files (added by bd init)
-.dolt/
-*.db
-.beads-credential-key
+# macOS
+.DS_Store
+
+# Claude Code: personal config and review-cycle sentinels
+.claude/settings.local.json
+.claude/.review-mark
+.claude/.no-review-gate

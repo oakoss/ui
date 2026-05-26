@@ -1,0 +1,62 @@
+name: New Component Proposal
+description: Propose a new component for the design system
+title: '[component] '
+labels: ['type:component', 'status:needs-triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For substantial new surfaces, file an RFC in `docs/rfcs/` first. Use this template for additions whose shape is already clear.
+  - type: input
+    id: name
+    attributes:
+      label: Component name
+      placeholder: SegmentedControl
+    validations:
+      required: true
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: What patterns does this enable that existing components don't?
+    validations:
+      required: true
+  - type: textarea
+    id: api-sketch
+    attributes:
+      label: API sketch
+      description: Rough JSX of how consumers would use it.
+      render: tsx
+    validations:
+      required: true
+  - type: input
+    id: rac-primitive
+    attributes:
+      label: React Aria primitive
+      description: Which `react-aria-components` primitive does this wrap?
+      placeholder: react-aria-components/RadioGroup
+    validations:
+      required: true
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Target release
+      options:
+        - Unsure / Maintainer to decide
+        - v0.1
+        - v0.2
+        - v1.0
+        - Future
+    validations:
+      required: true
+  - type: dropdown
+    id: a11y-coverage
+    attributes:
+      label: A11y coverage check
+      description: Does the proposed RAC primitive ship i18n, RTL, keyboard, and screen-reader support out of the box?
+      options:
+        - 'Yes — covered by RAC'
+        - 'Partially — some gaps to address'
+        - 'No — significant a11y work required'
+    validations:
+      required: true

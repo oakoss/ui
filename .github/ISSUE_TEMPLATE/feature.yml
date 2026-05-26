@@ -1,0 +1,42 @@
+name: Feature Request
+description: A new capability, recipe, or enhancement to an existing component
+title: '[feature] '
+labels: ['type:feature', 'status:needs-triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For significant proposals (new public API, breaking changes), please file an RFC in `docs/rfcs/` instead.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What use case is currently underserved?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What would solving this look like?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: What other approaches did you consider?
+    validations:
+      required: false
+  - type: dropdown
+    id: target
+    attributes:
+      label: Target release
+      options:
+        - Unsure / Maintainer to decide
+        - v0.1
+        - v0.2
+        - v1.0
+        - Future
+    validations:
+      required: true
