@@ -19,7 +19,7 @@ The only true "must publish" trigger is a third-party package needing to peer-de
 
 ## Decision
 
-- `@oakoss/tokens` is a **workspace-only package**. It is never published to npm. Internal `@oakoss/*` packages resolve it via `workspace:*`. External consumers receive it via the shadcn-compatible registry, which ships the compiled outputs (CSS variables, JS/TS constants, and any styling-layer-specific artifacts once decision 004 — TBD — is locked) as source files copied into the consumer's repo.
+- `@oakoss/tokens` is a **workspace-only package**. It is never published to npm. Internal `@oakoss/*` packages resolve it via `workspace:*`. External consumers receive it via the shadcn-compatible registry, which ships the compiled outputs (CSS variables, JS/TS constants, and any styling-layer-specific artifacts once the pending styling-layer decision is locked — see [`../research/styling-layer-evaluation.md`](../research/styling-layer-evaluation.md)) as source files copied into the consumer's repo.
 - Theming lives in a **single workspace package — `@oakoss/themes`** — containing multiple theme variants (default, dark, and any future brand variants) as DTCG source files. Each variant is exposed as its own registry item. We do not publish `@oakoss/theme-default`, `@oakoss/theme-brand-x`, or any per-variant npm package.
 - `@oakoss/mcp-server` and any other binary or runtime package may still be published to npm. This decision narrows decision 002 only for tokens and themes, not for the broader distribution model.
 
