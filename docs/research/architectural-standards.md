@@ -147,3 +147,21 @@ Plasmic: open-sourced December 2023, MIT, still active (`plasmicapp/plasmic` las
 - Plasmic: `plasmicapp/plasmic` (gh API)
 - Custom Elements Manifest analyzer docs
 - `react-docgen.dev`
+
+## Verification log
+
+### 2026-05-27 — DTCG and Terrazzo re-verified via context7
+
+Re-verified the DTCG and Terrazzo claims behind [decision 004](../decisions/004-dtcg-tokens-with-terrazzo.md) before authoring `@oakoss/tokens`, per the "Verify external-system claims" bullet in [`../decisions/README.md`](../decisions/README.md)'s Scope discipline section. Sources: context7 queries against `/design-tokens/community-group`, `/terrazzoapp/terrazzo`, and `/style-dictionary/style-dictionary`.
+
+Findings:
+
+- **DTCG Format Module 2025.10** is still the stable Final Community Group Report. The DTCG FAQ describes it as the "first stable version, v2025.10" while noting the spec "is still in active development and not yet on the W3C Standards Track" — exactly the governance posture decision 004 captured.
+- **Post-stable drafts** — the **Resolver Module** carries an explicit `do-not-cite-directly` preview-draft banner. Additional in-progress technical reports (notably a standalone **Color Module**) sit under `technical-reports/` with `CG-DRAFT` / `isPreview: true` Respec configs but were not individually re-verified for banner text here. The decision 004 mitigation ("pin to 2025.10, treat post-stable drafts as opt-in") covers both cases.
+- **Terrazzo** is healthy and actively developing toward a `2.0 stable` release. The plugin set (`@terrazzo/plugin-css`, `-tailwind`, `-js`, `-sass`, `-vanilla-extract`) is intact. A lighter `@terrazzo/plugin-css-in-js` exists for client-side use where the plugin-js resolver weight is overkill.
+- **Terrazzo 2.0 will introduce breaking changes to `@terrazzo/plugin-js`** to support the DTCG Resolver Module. Decision 004 did not flag this specifically; track it before locking the `@oakoss/tokens` build pipeline so the first release does not land on an about-to-break API.
+- **Style Dictionary** remains a credible fallback. v4 ships first-class DTCG support today; v5 is still in development, with full 2025.10 support being added.
+
+Cross-decision note: the DTCG Resolver Module (preview draft) is the spec mechanism for multi-theme variant resolution that [decision 009](../decisions/009-tokens-and-themes-via-registry.md) commits to via `@oakoss/themes`. Re-check once Terrazzo 2.0 stable lands so the theme-variant authoring approach uses the spec's intended resolver shape rather than an ad-hoc layout.
+
+No changes to decision 004 needed.
