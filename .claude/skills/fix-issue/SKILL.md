@@ -26,7 +26,7 @@ Take a GitHub Issue from read to PR.
 
 - Never bypass commit hooks (`--no-verify`) without explicit user approval.
 - Don't auto-merge PRs; the maintainer owns the merge decision.
-- Breaking changes require an RFC (see `docs/rfcs/`).
+- Breaking changes require a proposal (see `docs/proposals/`).
 - A11y fixes should cite the WCAG criterion in the PR body.
 
 ## Policies in scope

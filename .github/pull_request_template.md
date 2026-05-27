@@ -18,8 +18,8 @@ closes #
 - [ ] New feature (non-breaking change that adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing usage to change)
 - [ ] Docs / chore (no runtime impact)
-- [ ] New component implementation (link the already-merged RFC from `docs/rfcs/`)
-- [ ] RFC (new architectural proposal added to `docs/rfcs/`)
+- [ ] New component implementation (link the already-merged proposal from `docs/proposals/`)
+- [ ] Proposal (new architectural proposal added to `docs/proposals/`)
 
 ## Test plan
 

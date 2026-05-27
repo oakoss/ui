@@ -98,9 +98,9 @@ Every component targets [WCAG 2.2 AA](https://www.w3.org/TR/WCAG22/), [EN 301 54
 ### Decisions vs Proposals
 
 - **Decision** ([`docs/decisions/`](docs/decisions/)) — captures an architectural decision after it's been made. Short, immutable once accepted.
-- **Proposal** ([`docs/rfcs/`](docs/rfcs/)) — proposes a new component API or significant change before implementation. Discussion happens on the RFC PR.
+- **Proposal** ([`docs/proposals/`](docs/proposals/)) — proposes a new component API or significant change before implementation. Discussion happens on the proposal PR.
 
-Use decisions for build pipeline, dependency, and testing-strategy decisions. Use RFCs for anything that adds public API surface.
+Use decisions for build pipeline, dependency, and testing-strategy decisions. Use proposals for anything that adds public API surface.
 
 ### Comments and prose
 

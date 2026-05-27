@@ -1,9 +1,9 @@
-# RFC-NNNN: <short title>
+# <short title>
 
 - **Status:** Draft | Active comment period | Accepted | Rejected
 - **Comment period ends:** YYYY-MM-DD
 - **Authors:** @handle
-- **Related:** links to issues, decisions, prior Proposals
+- **Related:** links to issues, decisions, prior proposals
 
 ## Summary
 

@@ -49,7 +49,7 @@ pnpm dlx shadcn@latest add <component>
 
 ## Contributing
 
-See [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md). New components and significant changes go through the RFC process in [`docs/rfcs/`](docs/rfcs/).
+See [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md). New components and significant changes go through the proposal process in [`docs/proposals/`](docs/proposals/).
 
 ## Code of Conduct
 

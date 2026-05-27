@@ -53,7 +53,7 @@ Use [Conventional Commits](https://www.conventionalcommits.org/). The easiest pa
 
 ## New components and significant changes
 
-Anything that adds API surface, changes tokens, or affects multiple components needs an RFC first. See [`rfcs/`](rfcs/) and [`rfcs/_template.md`](rfcs/_template.md).
+Anything that adds API surface, changes tokens, or affects multiple components needs a proposal first. See [`proposals/`](proposals/) and [`proposals/000-template.md`](proposals/000-template.md).
 
 Smaller architectural decisions (build pipeline, dependency choices, testing strategy) are captured as decisions in [`decisions/`](decisions/).
 

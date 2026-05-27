@@ -9,7 +9,7 @@
 
 # Architectural direction is a core-team decision.
 /docs/decisions/                      @oakoss/core
-/docs/rfcs/                     @oakoss/core
+/docs/proposals/                     @oakoss/core
 
 # Governance, licensing, and security policy: core-team only.
 /LICENSE                        @oakoss/core

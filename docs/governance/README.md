@@ -7,7 +7,7 @@ How the project is run, decided, and maintained.
 ## Contents
 
 - Working group charter (who decides what, how seats rotate)
-- RFC process (see [`../rfcs/README.md`](../rfcs/README.md))
+- Proposal process (see [`../proposals/README.md`](../proposals/README.md))
 - Release cadence and semver policy
 - Maintainer roles and contributor ladder
 - Conflict resolution

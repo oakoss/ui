@@ -27,7 +27,7 @@ Complexity describes _how much judgment the work needs_, separate from status. U
 - `type:component` — new component proposal
 - `type:docs`
 - `type:chore`
-- `type:rfc` — discussion of an RFC filed in `docs/rfcs/`
+- `type:proposal` — discussion of a proposal filed in `docs/proposals/`
 
 ## Component labels (zero or more)
 
