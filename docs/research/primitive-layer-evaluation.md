@@ -3,7 +3,7 @@
 - **Status:** Decided — React Aria Components
 - **Date:** 2026-05-26
 - **Scope:** Headless React primitive library powering oakoss/ui's behavior and accessibility layer
-- **Related:** ADR-0001
+- **Related:** [decision 001](../decisions/001-react-aria-components-as-primitive-layer.md)
 
 ## Decision
 

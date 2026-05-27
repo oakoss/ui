@@ -1,4 +1,4 @@
-# ADR-0002: Registry-led hybrid distribution
+# Registry-led hybrid distribution
 
 - **Status:** Accepted
 - **Date:** 2026-05-26

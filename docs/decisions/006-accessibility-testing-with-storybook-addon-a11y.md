@@ -1,4 +1,4 @@
-# ADR-0006: Accessibility CI with eslint-plugin-jsx-a11y + @storybook/addon-a11y (axe-core/playwright post-v0.1)
+# Accessibility CI with eslint-plugin-jsx-a11y + @storybook/addon-a11y (axe-core/playwright post-v0.1)
 
 - **Status:** Accepted
 - **Date:** 2026-05-26

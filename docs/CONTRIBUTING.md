@@ -55,7 +55,7 @@ Use [Conventional Commits](https://www.conventionalcommits.org/). The easiest pa
 
 Anything that adds API surface, changes tokens, or affects multiple components needs an RFC first. See [`rfcs/`](rfcs/) and [`rfcs/_template.md`](rfcs/_template.md).
 
-Smaller architectural decisions (build pipeline, dependency choices, testing strategy) are captured as ADRs in [`adr/`](adr/).
+Smaller architectural decisions (build pipeline, dependency choices, testing strategy) are captured as decisions in [`decisions/`](decisions/).
 
 ## Accessibility
 

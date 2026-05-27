@@ -1,6 +1,6 @@
 # Implementation Specs
 
-Detailed implementation plans written AFTER a decision is made (RFC accepted or ADR recorded). One spec per significant feature or component.
+Detailed implementation plans written AFTER a decision is made (Proposal accepted or decision recorded). One spec per significant feature or component.
 
 ## When to write a spec
 

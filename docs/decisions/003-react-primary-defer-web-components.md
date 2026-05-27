@@ -1,4 +1,4 @@
-# ADR-0003: React-primary, tokens-shared, defer Web Components
+# React-primary, tokens-shared, defer Web Components
 
 - **Status:** Accepted
 - **Date:** 2026-05-26

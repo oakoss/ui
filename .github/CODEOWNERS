@@ -8,7 +8,7 @@
 *                               @oakoss/maintainer
 
 # Architectural direction is a core-team decision.
-/docs/adr/                      @oakoss/core
+/docs/decisions/                      @oakoss/core
 /docs/rfcs/                     @oakoss/core
 
 # Governance, licensing, and security policy: core-team only.

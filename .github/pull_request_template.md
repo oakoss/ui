@@ -48,5 +48,5 @@ Delete this section for docs-only or infrastructure PRs.
 ## Checklist
 
 - [ ] Self-reviewed the diff
-- [ ] Added or updated an ADR/RFC if this is an architectural change
+- [ ] Added or updated a decision or proposal if this is an architectural change
 - [ ] Updated relevant docs in `docs/`

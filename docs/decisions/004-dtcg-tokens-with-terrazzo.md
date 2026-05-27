@@ -1,4 +1,4 @@
-# ADR-0004: DTCG 2025.10 token authoring with Terrazzo build pipeline
+# DTCG 2025.10 token authoring with Terrazzo build pipeline
 
 - **Status:** Accepted
 - **Date:** 2026-05-26
@@ -6,7 +6,7 @@
 
 ## Context
 
-oakoss/ui needs a token format that survives a multi-framework future (see ADR-0003), enables Tokens Studio Figma round-trip with designers, and feeds Tailwind, CSS, Sass, JS/TS, and (eventually) Swift outputs from a single source.
+oakoss/ui needs a token format that survives a multi-framework future (see [decision 003](003-react-primary-defer-web-components.md)), enables Tokens Studio Figma round-trip with designers, and feeds Tailwind, CSS, Sass, JS/TS, and (eventually) Swift outputs from a single source.
 
 The Design Tokens Community Group (DTCG) shipped its first stable Format Module on 2025-10-28. The big-vendor token packages (Adobe Spectrum, Carbon, Polaris, shadcn/ui) are not DTCG-compliant; their JSON predates the spec and carries migration debt. DTCG adoption in 2026 shows up in tooling (Style Dictionary v4+, Terrazzo, Tokens Studio), not in legacy token JSON. oakoss/ui starts fresh with no debt to migrate.
 
@@ -27,5 +27,5 @@ New risks: DTCG is a W3C Community Group Final Report, not a Standards Track doc
 ## Alternatives considered
 
 - **Adobe Spectrum's `value`/`uuid` schema.** Strong tooling but locks us to Adobe's ecosystem and predates DTCG.
-- **Carbon's JS-exported theme files.** Composable in JS but loses the framework-agnostic JSON property that ADR-0003 depends on.
+- **Carbon's JS-exported theme files.** Composable in JS but loses the framework-agnostic JSON property that [decision 003](003-react-primary-defer-web-components.md) depends on.
 - **shadcn's flat `cssVars` map.** Sufficient for shadcn's surface area, but no `$type` system means losing the composite token types we'll want by v1.0 (typography, gradient, shadow).

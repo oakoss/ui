@@ -1,6 +1,6 @@
-# ADR-NNNN: <short title>
+# <short title>
 
-- **Status:** Proposed | Accepted | Superseded by ADR-NNNN | Deprecated
+- **Status:** Proposed | Accepted | Superseded by NNN | Deprecated
 - **Date:** YYYY-MM-DD
 - **Authors:** @handle
 

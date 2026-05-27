@@ -16,7 +16,7 @@ Take a GitHub Issue from read to PR.
 1. **Read the Issue** — `gh issue view $ARG --comments` to pull the title, body, labels, and discussion.
 2. **Triage** — if anything is unclear, ask in a comment (`gh issue comment $ARG --body "..."`) instead of guessing.
 3. **Identify scope** — check the Issue body for explicit file or component references, then search the codebase to confirm.
-4. **Implement** — branch as `issue/<number>-<short-slug>` and make the change. Follow `AGENTS.md` conventions, anything under `docs/governance/`, and relevant ADRs in `docs/adr/`.
+4. **Implement** — branch as `issue/<number>-<short-slug>` and make the change. Follow `AGENTS.md` conventions, anything under `docs/governance/`, and relevant decisions in `docs/decisions/`.
 5. **Test** — run `pnpm lint` and `pnpm lint:md`. A test runner and Storybook a11y addon are not yet wired up; verify a11y-affecting changes manually with browser tools.
 6. **Commit** — use Conventional Commits via `pnpm commit` (cz-git). Reference the Issue in the body with `closes #123`.
 7. **PR** — `gh pr create --fill --label "status:needs-review"` and include a short test plan in the body.

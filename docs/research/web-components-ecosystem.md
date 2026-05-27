@@ -3,7 +3,7 @@
 - **Status:** Decided. Multi-framework strategy is **React-primary + tokens-shared, defer WC implementation to post-v1.0**.
 - **Date:** 2026-05-26
 - **Scope:** Web Components landscape in 2026 + multi-framework architectural strategy
-- **Related:** ADR-0003
+- **Related:** [decision 003](../decisions/003-react-primary-defer-web-components.md)
 
 ## Decision
 

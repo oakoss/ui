@@ -3,7 +3,7 @@
 - **Status:** PENDING decision. Tailwind v4 recommended by research, awaiting confirmation.
 - **Date:** 2026-05-26
 - **Scope:** CSS framework / styling layer for oakoss/ui's styled components
-- **Related:** Future ADR
+- **Related:** Future decision
 
 ## TL;DR
 

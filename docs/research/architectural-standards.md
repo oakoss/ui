@@ -3,7 +3,7 @@
 - **Status:** Decided — DTCG 2025.10 + Terrazzo; shadcn registry + MCP server pattern; Mitosis dismissed
 - **Date:** 2026-05-26
 - **Scope:** Standards and integration protocols (tokens, AI assistants, cross-framework compilation)
-- **Related:** ADR-0004, ADR-0008
+- **Related:** [decision 004](../decisions/004-dtcg-tokens-with-terrazzo.md), [decision 008](../decisions/008-ai-integration-shadcn-registry-and-mcp.md)
 
 ## Decisions
 
