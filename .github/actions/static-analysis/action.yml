@@ -1,0 +1,15 @@
+name: Static analysis
+description: Run oxlint, format check, and markdown lint.
+
+runs:
+  using: composite
+  steps:
+    - name: oxlint
+      shell: bash
+      run: pnpm lint
+    - name: Format check
+      shell: bash
+      run: pnpm format:check
+    - name: Markdown lint
+      shell: bash
+      run: pnpm lint:md
