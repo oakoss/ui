@@ -51,7 +51,7 @@ gh api graphql -f query='
         }
       }
     }
-  }' -F owner=oakoss -F repo=ui -F pr=N --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false)'
+  }' -F owner=oakoss -F repo=ui -F pr=<N> --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false)'
 
 # Reply to a thread, then resolve it (use the thread's id from above)
 gh api graphql -f query='
