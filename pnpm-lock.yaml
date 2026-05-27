@@ -14,9 +14,6 @@ importers:
       commitlint:
         specifier: ^21.0.1
         version: 21.0.1(@types/node@25.9.1)(conventional-commits-parser@6.4.0)(typescript@6.0.3)
-      cz-git:
-        specifier: ^1.13.1
-        version: 1.13.1
       czg:
         specifier: ^1.13.1
         version: 1.13.1
@@ -486,10 +483,6 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
-
-  cz-git@1.13.1:
-    resolution: {integrity: sha512-xeMA5ci+gkBY6uKmqc6nzhG/Q4pmK1DKbVVUgByOTBgregoiYE0f3otEF0ADelyEWH4vNsO1W2o7QZYEe7Nwlw==}
-    engines: {node: '>=v12.20.0'}
 
   czg@1.13.1:
     resolution: {integrity: sha512-mCfY4bCAMAdaFSlrQwtUTChzFAv59kD/y2leX5+C7X9inu0mt/VkHT7gkbzwcToh26oJaOaYPA9lcXUX92/6cw==}
@@ -1316,8 +1309,6 @@ snapshots:
       parse-json: 5.2.0
     optionalDependencies:
       typescript: 6.0.3
-
-  cz-git@1.13.1: {}
 
   czg@1.13.1: {}
 
