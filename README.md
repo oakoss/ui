@@ -23,7 +23,7 @@ One pending decision: the styling layer (Tailwind v4 recommended; see [`docs/res
 | Component explorer   | Storybook 10 (also visual + a11y test target)                                                                        |
 | Visual regression CI | Chromatic (OSS tier) + Argos (MIT) as fallback                                                                       |
 | A11y CI              | `eslint-plugin-jsx-a11y` + `@storybook/addon-a11y`                                                                   |
-| AI integration       | shadcn `registry.json` + `@oakoss/mcp-server` (stdio)                                                                |
+| AI integration       | `@oakoss/mcp-server` (stdio); registry consumable by v0 / shadcn MCP transitively via the distribution choice        |
 
 ## Accessibility target
 

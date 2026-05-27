@@ -1,6 +1,6 @@
 # AI integration via shadcn registry + @oakoss/mcp-server
 
-- **Status:** Accepted
+- **Status:** Superseded by [010](010-mcp-server-narrowed-from-008.md) (for the shadcn registry-discovery half and the specific MCP tool list; the `@oakoss/mcp-server` existence, `AGENTS.md` / `llms.txt` convention, and `react-docgen` per-component manifest commitments still stand)
 - **Date:** 2026-05-26
 - **Authors:** @jbabin91
 

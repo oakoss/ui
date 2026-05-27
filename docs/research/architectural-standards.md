@@ -3,19 +3,19 @@
 - **Status:** Decided — DTCG 2025.10 + Terrazzo; shadcn registry + MCP server pattern; Mitosis dismissed
 - **Date:** 2026-05-26
 - **Scope:** Standards and integration protocols (tokens, AI assistants, cross-framework compilation)
-- **Related:** [decision 004](../decisions/004-dtcg-tokens-with-terrazzo.md), [decision 008](../decisions/008-ai-integration-shadcn-registry-and-mcp.md)
+- **Related:** [decision 004](../decisions/004-dtcg-tokens-with-terrazzo.md), [decision 008](../decisions/008-ai-integration-shadcn-registry-and-mcp.md), [decision 010](../decisions/010-mcp-server-narrowed-from-008.md)
 
 ## Decisions
 
-| Area                        | Decision                                                         | Rationale                                                                               |
-| --------------------------- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| Token authoring format      | DTCG 2025.10 (W3C Community Group, first stable Oct 2025)        | Forward-looking; Terrazzo first-party; Tokens Studio Figma round-trip                   |
-| Token build pipeline        | Terrazzo (`@terrazzo/parser` + plugins)                          | DTCG-native; plugins for Tailwind, CSS, Sass, JS/TS, vanilla-extract, Swift in one tool |
-| AI assistant contract       | shadcn-compliant `registry.json` + per-item `registry-item.json` | Free v0 / shadcn MCP / Cursor / Claude Code compatibility                               |
-| AI metadata server          | `@oakoss/mcp-server` (stdio, `npx -y`)                           | Modeled on `npx @ant-design/cli mcp` and `@ui5/mcp-server`                              |
-| Component metadata          | `react-docgen` JSON committed per component                      | De-facto React standard; Storybook + most doc generators consume it                     |
-| AI assistant entry points   | `AGENTS.md` + `llms.txt` at monorepo root                        | Adobe Spectrum pattern; becoming convention                                             |
-| Cross-framework compilation | Dismissed (Mitosis is RAC-incompatible; 2-person project)        | If multi-framework ever needed: per-framework rewrite on shared tokens                  |
+| Area                        | Decision                                                                                                                                                           | Rationale                                                                                                                                                                          |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Token authoring format      | DTCG 2025.10 (W3C Community Group, first stable Oct 2025)                                                                                                          | Forward-looking; Terrazzo first-party; Tokens Studio Figma round-trip                                                                                                              |
+| Token build pipeline        | Terrazzo (`@terrazzo/parser` + plugins)                                                                                                                            | DTCG-native; plugins for Tailwind, CSS, Sass, JS/TS, vanilla-extract, Swift in one tool                                                                                            |
+| AI ecosystem fit            | (transitive) shadcn registry per [decisions 002](../decisions/002-registry-led-hybrid-distribution.md) + [009](../decisions/009-tokens-and-themes-via-registry.md) | Consumable by v0 / shadcn MCP / Cursor / Claude Code by virtue of the distribution choice — not a separate AI commitment ([010](../decisions/010-mcp-server-narrowed-from-008.md)) |
+| AI metadata server          | `@oakoss/mcp-server` (stdio, `npx -y`)                                                                                                                             | Modeled on `npx @ant-design/cli mcp` and `@ui5/mcp-server`                                                                                                                         |
+| Component metadata          | `react-docgen` JSON committed per component                                                                                                                        | De-facto React standard; Storybook + most doc generators consume it                                                                                                                |
+| AI assistant entry points   | `AGENTS.md` + `llms.txt` at monorepo root                                                                                                                          | Adobe Spectrum pattern; becoming convention                                                                                                                                        |
+| Cross-framework compilation | Dismissed (Mitosis is RAC-incompatible; 2-person project)                                                                                                          | If multi-framework ever needed: per-framework rewrite on shared tokens                                                                                                             |
 
 ## DTCG (Design Tokens Format Module)
 
@@ -88,6 +88,8 @@ Convergent pattern from UI5 and Ant Design v6:
 
 ### `@oakoss/mcp-server` minimum tool surface for v0.1
 
+> Superseded by [decision 010](../decisions/010-mcp-server-narrowed-from-008.md): the specific tool list is no longer an ADR commitment and will be a proposal when the server is scaffolded. The list below is the initially proposed v0.1 surface, retained as historical input for that future proposal.
+
 - `oakoss_list_components`
 - `oakoss_component_props` (returns `react-docgen` JSON)
 - `oakoss_component_demo`
@@ -118,6 +120,8 @@ For oakoss/ui, **per-framework rewriting is cheaper than a Mitosis port** becaus
 Plasmic: open-sourced December 2023, MIT, still active (`plasmicapp/plasmic` last commit 2026-05-25, 6,827 stars, not acquired). Low public usage signal. **Defer.** Revisit if demand surfaces.
 
 ## What to ship in v0.1 (concrete deliverables)
+
+> Partially superseded by [decision 010](../decisions/010-mcp-server-narrowed-from-008.md). Item 2 (shadcn registry) is the distribution channel per [decisions 002](../decisions/002-registry-led-hybrid-distribution.md) + [009](../decisions/009-tokens-and-themes-via-registry.md), not a separate AI deliverable. Item 3's "minimum tool surface above" is no longer an ADR commitment and will be a proposal when the server is scaffolded.
 
 1. **DTCG 2025.10 authoring** for `@oakoss/tokens` with Terrazzo as the build pipeline
 2. **shadcn-compliant `registry.json` + per-item `registry-item.json`** at a stable public URL
