@@ -20,7 +20,7 @@ gh pr create --fill                 # Open a PR from the current branch
 2. Pick up: claim an Issue labeled `status:ready` (prefer `complexity:simple` for agent runs) and self-label `status:in-progress`.
 3. Branch: `issue/<number>-<short-slug>`.
 4. Commit: Conventional Commits via `pnpm commit`; reference the Issue with `closes #N`.
-5. Changeset: if the PR is consumer-visible (touches a published `@oakoss/*` package), run `pnpm changeset` and pick the appropriate bump magnitude. For docs-only / CI-only PRs, run `pnpm changeset --empty` to satisfy the `changeset-bot` reminder. Pre-1.0 semver: breaking changes bump minor, everything else bumps patch.
+5. Changeset: if the PR is consumer-visible (touches a published `@oakoss/*` package), run `pnpm changeset` and pick the appropriate bump magnitude. For docs-only / CI-only PRs, run `pnpm changeset --empty` (the [`changeset-bot`](https://github.com/apps/changeset-bot) GitHub App installed on the repo comments on PRs that lack one). Pre-1.0 semver: breaking changes bump minor, everything else bumps patch.
 6. PR: `gh pr create --fill --label "status:needs-review"`.
 7. Address review feedback: see [Handling PR reviews](#handling-pr-reviews) below.
 8. Merge: the Issue closes automatically when the PR merges. Any changeset accumulates in the auto-maintained "Version Packages" PR; merging that PR triggers npm publish.

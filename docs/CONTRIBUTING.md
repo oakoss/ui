@@ -68,7 +68,7 @@ For PRs that don't need a release (docs-only, CI changes, internal tooling):
 pnpm changeset --empty
 ```
 
-This satisfies the `changeset-bot` reminder without triggering a version bump. When you open the PR, the bot will comment confirming a changeset is present.
+This declares no packages need versioning. The [`changeset-bot`](https://github.com/apps/changeset-bot) GitHub App (installed on this repo at the app level) comments on PRs that lack any changeset — including empty ones — so the bot's presence is what reminds you, not an in-repo workflow.
 
 **Reviewing changesets:** verify the declared bump magnitude matches the actual changes. A `patch` that's actually breaking will mis-version the release and confuse consumers.
 
