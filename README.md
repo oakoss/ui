@@ -7,7 +7,7 @@ Enterprise OSS React design system built on [React Aria Components](https://reac
 
 ## Status
 
-**Foundation phase (pre-v0.1).** Architectural decisions are locked; component implementation has not started. See [`docs/roadmap.md`](docs/roadmap.md) for phase plans, [`docs/adr/`](docs/adr/) for accepted decisions, and [`docs/research/`](docs/research/) for the evidence behind each.
+**Foundation phase (pre-v0.1).** Architectural decisions are locked; component implementation has not started. See [`docs/roadmap.md`](docs/roadmap.md) for phase plans, [`docs/decisions/`](docs/decisions/) for accepted decisions, and [`docs/research/`](docs/research/) for the evidence behind each.
 
 One pending decision: the styling layer (Tailwind v4 recommended; see [`docs/research/styling-layer-evaluation.md`](docs/research/styling-layer-evaluation.md)).
 
@@ -40,7 +40,7 @@ pnpm dlx shadcn@latest add <component>
 ## Documentation
 
 - [Roadmap](docs/roadmap.md)
-- [Architecture Decision Records](docs/adr/)
+- [Decisions](docs/decisions/)
 - [Research notes](docs/research/)
 - [Glossary](docs/glossary.md)
 - [Accessibility](docs/accessibility/README.md)
@@ -49,7 +49,7 @@ pnpm dlx shadcn@latest add <component>
 
 ## Contributing
 
-See [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md). New components and significant changes go through the RFC process in [`docs/rfcs/`](docs/rfcs/).
+See [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md). New components and significant changes go through the proposal process in [`docs/proposals/`](docs/proposals/).
 
 ## Code of Conduct
 

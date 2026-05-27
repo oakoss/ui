@@ -3,7 +3,7 @@
 - **Status:** Decided. Chromatic with Argos fallback; jsx-a11y + addon-a11y; Fumadocs on Next.js + Storybook 10.
 - **Date:** 2026-05-26
 - **Scope:** Visual regression CI, accessibility CI, documentation site framework
-- **Related:** ADR-0005, ADR-0006, ADR-0007
+- **Related:** [decision 005](../decisions/005-visual-testing-with-chromatic.md), [decision 006](../decisions/006-accessibility-testing-with-storybook-addon-a11y.md), [decision 007](../decisions/007-fumadocs-on-nextjs-for-docs.md)
 
 ## Decisions
 

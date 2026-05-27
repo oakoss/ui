@@ -1,4 +1,4 @@
-# ADR-0007: Fumadocs on Next.js for the docs site, Storybook 10 as secondary explorer
+# Fumadocs on Next.js for the docs site, Storybook 10 as secondary explorer
 
 - **Status:** Accepted
 - **Date:** 2026-05-26

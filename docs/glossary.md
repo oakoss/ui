@@ -18,10 +18,10 @@ Terms used across the oakoss/ui project.
 
 ## Process
 
-- **ADR** — Architecture Decision Record. Point-in-time decision with context and consequences.
-- **RFC** — Request for Comment. Formal proposal awaiting community input.
+- **Decision** — Record of an architectural choice with context and consequences. Lives in [`decisions/`](decisions/).
+- **Proposal** — Written change request awaiting community input before implementation. Lives in [`proposals/`](proposals/).
 - **Spec** — Implementation plan written after a decision is made.
-- **FCP** — Final Comment Period. The last 3 days of an RFC's comment period; last call for objections before merge.
+- **FCP** — Final Comment Period. The last 3 days of a proposal's comment period; last call for objections before merge.
 - **Postmortem** — Blameless writeup of an incident, breaking change, or significant bug.
 
 ## Tooling

@@ -12,7 +12,7 @@ The primitive layer decision is locked (React Aria Components). None of the ente
 
 ### Governance (Carbon + GOV.UK + USWDS)
 
-- **Separate `oakoss/rfcs` repo** with documented RFC workflow, 3-day FCP, weekly review (Carbon's model)
+- **Separate `oakoss/proposals` repo** with documented proposal workflow, 3-day FCP, weekly review (Carbon's model)
 - **Separate `oakoss/roadmap` repo** with GitHub Projects board, Experimental → Alpha → Beta → RC → GA status labels (Carbon's model)
 - **Three-stage proposal flow** (propose → develop → review) with a named working group (GOV.UK's model)
 - **45-day public comment window** for new component proposals (USWDS's model)

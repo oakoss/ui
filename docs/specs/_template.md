@@ -3,7 +3,7 @@
 - **Status:** Draft | In progress | Shipped | Superseded
 - **Date:** YYYY-MM-DD
 - **Authors:** @handle
-- **Related:** RFC, ADR, GitHub Issue links
+- **Related:** Proposal, decision, GitHub Issue links
 
 ## Overview
 

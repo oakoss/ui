@@ -3,7 +3,7 @@
 - **Status:** Decided — Registry-led hybrid
 - **Date:** 2026-05-26
 - **Scope:** How oakoss/ui ships components, tokens, and tooling to consumers
-- **Related:** ADR-0002
+- **Related:** [decision 002](../decisions/002-registry-led-hybrid-distribution.md)
 
 ## Decision
 

@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        For substantial new surfaces, file an RFC in `docs/rfcs/` first. Use this template for additions whose shape is already clear.
+        For substantial new surfaces, file a proposal in `docs/proposals/` first. Use this template for additions whose shape is already clear.
   - type: input
     id: name
     attributes:

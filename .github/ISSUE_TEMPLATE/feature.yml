@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        For significant proposals (new public API, breaking changes), please file an RFC in `docs/rfcs/` instead.
+        For significant proposals (new public API, breaking changes), please file a proposal in `docs/proposals/` instead.
   - type: textarea
     id: problem
     attributes:

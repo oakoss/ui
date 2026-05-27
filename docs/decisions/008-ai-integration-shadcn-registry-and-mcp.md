@@ -1,4 +1,4 @@
-# ADR-0008: AI integration via shadcn registry + @oakoss/mcp-server
+# AI integration via shadcn registry + @oakoss/mcp-server
 
 - **Status:** Accepted
 - **Date:** 2026-05-26

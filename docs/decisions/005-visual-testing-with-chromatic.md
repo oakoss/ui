@@ -1,4 +1,4 @@
-# ADR-0005: Visual regression testing with Chromatic (Argos fallback)
+# Visual regression testing with Chromatic (Argos fallback)
 
 - **Status:** Accepted
 - **Date:** 2026-05-26

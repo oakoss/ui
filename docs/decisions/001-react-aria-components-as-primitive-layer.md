@@ -1,4 +1,4 @@
-# ADR-0001: React Aria Components as the primitive layer
+# React Aria Components as the primitive layer
 
 - **Status:** Accepted
 - **Date:** 2026-05-26
