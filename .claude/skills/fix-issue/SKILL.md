@@ -20,7 +20,8 @@ Take a GitHub Issue from read to PR.
 5. **Test** — run `pnpm lint` and `pnpm lint:md`. A test runner and Storybook a11y addon are not yet wired up; verify a11y-affecting changes manually with browser tools.
 6. **Commit** — use Conventional Commits via `pnpm commit` (cz-git). Reference the Issue in the body with `closes #123`.
 7. **PR** — `gh pr create --fill --label "status:needs-review"` and include a short test plan in the body.
-8. **Label transition** — leave `status:in-progress` in place; the maintainer flips it on merge.
+8. **Review feedback** — when Copilot or a human reviewer leaves comments, address each one and resolve the thread. See the "Handling PR reviews" section in [`AGENTS.md`](../../../AGENTS.md) for the `gh api graphql` pattern.
+9. **Label transition** — leave `status:in-progress` in place; the maintainer flips it on merge.
 
 ## Conventions
 

@@ -21,9 +21,51 @@ gh pr create --fill                 # Open a PR from the current branch
 3. Branch: `issue/<number>-<short-slug>`.
 4. Commit: Conventional Commits via `pnpm commit`; reference the Issue with `closes #N`.
 5. PR: `gh pr create --fill --label "status:needs-review"`.
-6. Merge: the Issue closes automatically when the PR merges.
+6. Address review feedback: see [Handling PR reviews](#handling-pr-reviews) below.
+7. Merge: the Issue closes automatically when the PR merges.
 
 See [`docs/governance/labels.md`](docs/governance/labels.md) for the full label state machine. The `/fix-issue` skill at `.claude/skills/fix-issue/SKILL.md` runs the view, implement, test, and PR loop.
+
+### Handling PR reviews
+
+When review comments arrive (from Copilot, a human reviewer, or any other source), each thread needs explicit closure — reviewers track what's pending by which threads are still open.
+
+For each comment:
+
+1. **Read it** — `gh api repos/oakoss/ui/pulls/<N>/comments` or `gh pr view <N> --comments`.
+2. **Address it** — fix in code, OR reply explaining why no change is needed, OR reply with reasoning if you disagree.
+3. **Push the fix** (if any) on the same branch.
+4. **Reply to the thread** with a one-liner pointing at the fix commit (e.g., `Fixed in abc1234 — <brief>`). For "no code change" comments, reply with the reasoning.
+5. **Resolve the thread** so reviewers know it's closed.
+
+Resolving threads via `gh` requires GraphQL (REST doesn't expose this). Pattern:
+
+```bash
+# List unresolved threads on PR N
+gh api graphql -f query='
+  query($owner:String!, $repo:String!, $pr:Int!) {
+    repository(owner:$owner, name:$repo) {
+      pullRequest(number:$pr) {
+        reviewThreads(first:100) {
+          nodes { id isResolved comments(first:1) { nodes { author { login } path line body } } }
+        }
+      }
+    }
+  }' -F owner=oakoss -F repo=ui -F pr=N --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false)'
+
+# Reply to a thread, then resolve it (use the thread's id from above)
+gh api graphql -f query='
+  mutation($id:ID!, $body:String!) {
+    addPullRequestReviewThreadReply(input:{pullRequestReviewThreadId:$id, body:$body}) { comment { id } }
+  }' -F id="<thread-id>" -F body="Fixed in <sha>."
+
+gh api graphql -f query='
+  mutation($id:ID!) {
+    resolveReviewThread(input:{threadId:$id}) { thread { isResolved } }
+  }' -F id="<thread-id>"
+```
+
+Don't resolve a thread you haven't actually addressed — closing it without a reply or a fix signals "I don't care" to the reviewer.
 
 ### Rules
 

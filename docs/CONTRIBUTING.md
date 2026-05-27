@@ -51,6 +51,16 @@ Use [Conventional Commits](https://www.conventionalcommits.org/). The easiest pa
 - One logical change per PR; split unrelated work
 - Self-label `status:needs-review` when ready
 
+### Addressing review feedback
+
+After each review comment, use **"Resolve conversation"** to close the thread once you've addressed it. Convention:
+
+- **Made a code change**: reply with a one-liner referencing the fix commit (e.g. `Fixed in abc1234`), then resolve
+- **No code change needed**: reply with the reasoning, then resolve
+- **Disagree with the comment**: reply with your reasoning and leave the thread open for further discussion
+
+Reviewers (and Copilot) track what's pending by which threads are still open. Resolving without addressing is worse than not resolving at all.
+
 ## New components and significant changes
 
 Anything that adds API surface, changes tokens, or affects multiple components needs a proposal first. See [`proposals/`](proposals/) and [`proposals/000-template.md`](proposals/000-template.md).
