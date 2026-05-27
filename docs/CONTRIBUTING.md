@@ -50,25 +50,22 @@ Use [Conventional Commits](https://www.conventionalcommits.org/). The easiest pa
 - Reference the Issue: `closes #N`
 - One logical change per PR; split unrelated work
 - Self-label `status:needs-review` when ready
-- Add a changeset if the change is consumer-visible (see [Changesets](#changesets) below)
+- Add a changeset for consumer-visible changes (see [Changesets](#changesets))
 
 ## Changesets
 
-We use [changesets](https://github.com/changesets/changesets) to manage versions and changelogs. Every PR that touches a published `@oakoss/*` package should include a changeset describing the change.
+We use [changesets](https://github.com/changesets/changesets) to manage versions and changelogs. The tooling is **dormant during foundation phase**: until the first `@oakoss/*` package lands, both `pnpm changeset` and `pnpm changeset --empty` error with "No versionable packages found" — no per-PR action needed yet.
+
+Once the first versionable package exists:
 
 ```bash
-pnpm changeset
+pnpm changeset           # consumer-visible change
+pnpm changeset --empty   # docs / CI / internal-only change
 ```
 
 The CLI prompts for affected packages and bump magnitude. Pre-1.0 semver: **breaking changes bump minor** (`0.1.x` → `0.2.0`), **everything else bumps patch**.
 
-For PRs that don't need a release (docs-only, CI changes, internal tooling):
-
-```bash
-pnpm changeset --empty
-```
-
-This declares no packages need versioning. The [`changeset-bot`](https://github.com/apps/changeset-bot) GitHub App (installed on this repo at the app level) comments on PRs that lack any changeset — including empty ones — so the bot's presence is what reminds you, not an in-repo workflow.
+The [`changeset-bot`](https://github.com/apps/changeset-bot) GitHub App (installed on this repo at the app level) comments on PRs that lack a changeset — including empty ones — so the bot's presence is what reminds you, not an in-repo workflow.
 
 **Reviewing changesets:** verify the declared bump magnitude matches the actual changes. A `patch` that's actually breaking will mis-version the release and confuse consumers.
 
