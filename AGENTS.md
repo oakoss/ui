@@ -20,9 +20,10 @@ gh pr create --fill                 # Open a PR from the current branch
 2. Pick up: claim an Issue labeled `status:ready` (prefer `complexity:simple` for agent runs) and self-label `status:in-progress`.
 3. Branch: `issue/<number>-<short-slug>`.
 4. Commit: Conventional Commits via `pnpm commit`; reference the Issue with `closes #N`.
-5. PR: `gh pr create --fill --label "status:needs-review"`.
-6. Address review feedback: see [Handling PR reviews](#handling-pr-reviews) below.
-7. Merge: the Issue closes automatically when the PR merges.
+5. Changeset: if the PR is consumer-visible (touches a published `@oakoss/*` package), run `pnpm changeset` and pick the appropriate bump magnitude. For docs-only / CI-only PRs, run `pnpm changeset --empty` to satisfy the `changeset-bot` reminder. Pre-1.0 semver: breaking changes bump minor, everything else bumps patch.
+6. PR: `gh pr create --fill --label "status:needs-review"`.
+7. Address review feedback: see [Handling PR reviews](#handling-pr-reviews) below.
+8. Merge: the Issue closes automatically when the PR merges. Any changeset accumulates in the auto-maintained "Version Packages" PR; merging that PR triggers npm publish.
 
 See [`docs/governance/labels.md`](docs/governance/labels.md) for the full label state machine. The `/fix-issue` skill at `.claude/skills/fix-issue/SKILL.md` runs the view, implement, test, and PR loop.
 
@@ -103,6 +104,23 @@ Lefthook's own `postinstall` script wires up hooks on `pnpm install` (allowed in
 - **commit-msg**: `commitlint` validates Conventional Commits
 
 If hooks ever drift out of sync (rare), reinstall with `pnpm exec lefthook install`. To skip hooks in an emergency: `LEFTHOOK=0 git commit ...`. Don't habitually use `--no-verify`.
+
+### Releases (changesets)
+
+We use [changesets](https://github.com/changesets/changesets) for versioning + publishing. Pre-1.0 semver: breaking changes bump minor (`0.1` → `0.2`), everything else bumps patch.
+
+**Per-PR:**
+
+- Consumer-visible change → `pnpm changeset` and pick the affected packages + bump magnitude
+- Docs/CI/internal-only change → `pnpm changeset --empty` (satisfies the `changeset-bot` reminder without triggering a release)
+
+**The release flow** is automated via `.github/workflows/release.yml`:
+
+1. Push to `main` triggers the workflow
+2. If pending changesets exist, the action opens/updates a "Version Packages" PR that bumps versions + writes `CHANGELOG.md`
+3. When that PR merges, the same workflow runs `pnpm release` (which calls `changeset publish`) to publish to npm via OIDC (no `NPM_TOKEN` needed — provenance is enabled via `.npmrc`)
+
+**Reviewing a changeset:** verify the declared bump magnitude matches the actual changes. A `patch` that's actually breaking will mis-version the release and confuse consumers.
 
 ## Architecture Overview
 

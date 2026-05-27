@@ -50,6 +50,27 @@ Use [Conventional Commits](https://www.conventionalcommits.org/). The easiest pa
 - Reference the Issue: `closes #N`
 - One logical change per PR; split unrelated work
 - Self-label `status:needs-review` when ready
+- Add a changeset if the change is consumer-visible (see [Changesets](#changesets) below)
+
+## Changesets
+
+We use [changesets](https://github.com/changesets/changesets) to manage versions and changelogs. Every PR that touches a published `@oakoss/*` package should include a changeset describing the change.
+
+```bash
+pnpm changeset
+```
+
+The CLI prompts for affected packages and bump magnitude. Pre-1.0 semver: **breaking changes bump minor** (`0.1.x` → `0.2.0`), **everything else bumps patch**.
+
+For PRs that don't need a release (docs-only, CI changes, internal tooling):
+
+```bash
+pnpm changeset --empty
+```
+
+This satisfies the `changeset-bot` reminder without triggering a version bump. When you open the PR, the bot will comment confirming a changeset is present.
+
+**Reviewing changesets:** verify the declared bump magnitude matches the actual changes. A `patch` that's actually breaking will mis-version the release and confuse consumers.
 
 ### Addressing review feedback
 
