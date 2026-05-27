@@ -15,6 +15,14 @@ Decisions are not commandments. Future evidence can override them. But the histo
 - Implementation details that can change without breaking consumers
 - Choices that come out of a Proposal (link the Proposal instead)
 - Temporary or experimental work
+- Internal tooling and vendor choices (visual regression tool, test framework, docs site framework) where the choice doesn't bind component code or consumers — these belong in [`../research/`](../research/) as recommendations, not in ADR space
+
+## Scope discipline
+
+Two disciplines apply to every decision:
+
+- **Scope tightly.** Decide what you are actually deciding. If a question depends on another decision that is still pending or TBD, defer that question to its own future decision and link to the pending source. Do not pre-commit to downstream choices implicitly. Example: a token-distribution decision should not also lock the styling layer.
+- **Verify external-system claims.** Any claim about how an external library, tool, registry, or API behaves (e.g. "shadcn rewrites imports through `aliases`") must be verified against current docs or source before being asserted as fact. Reasoning from training data alone is not sufficient. If a claim cannot be verified, soften it ("if shadcn supports a `tokens` alias…") or defer it.
 
 ## Format
 
@@ -25,3 +33,5 @@ Decisions are not commandments. Future evidence can override them. But the histo
 ## Lifecycle
 
 Decisions are immutable once accepted. To change one, write a new decision that supersedes it and update the old one's status to `Superseded by NNN`.
+
+During foundation phase (pre-v0.1), this lifecycle is softer: decisions are still forward commitments, but amending, relocating, or superseding them is cheap because no code yet depends on them. Tighten once the first components and packages exist.

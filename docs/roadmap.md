@@ -16,7 +16,7 @@ Foundation research and architectural decisions in progress. See [`research/`](r
 
 - `@oakoss/tokens` package (DTCG 2025.10 source, Terrazzo build pipeline)
 - First 10 components on React Aria Components
-- Docs site scaffold (Fumadocs + Next.js)
+- Docs site scaffold (Fumadocs on TanStack Start; see [`research/fumadocs-on-tanstack-start-for-docs.md`](research/fumadocs-on-tanstack-start-for-docs.md))
 - Storybook 10 as component explorer + visual/a11y test target
 - Initial registry (`registry.json` + per-item manifests)
 - `@oakoss/mcp-server` for AI assistant integration
