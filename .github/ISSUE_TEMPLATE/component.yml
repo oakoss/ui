@@ -33,10 +33,10 @@ body:
     id: rac-primitive
     attributes:
       label: React Aria primitive
-      description: Which `react-aria-components` primitive does this wrap?
+      description: Name the `react-aria-components` primitive if you know it; leave blank and a maintainer will map it during triage.
       placeholder: react-aria-components/RadioGroup
     validations:
-      required: true
+      required: false
   - type: dropdown
     id: scope
     attributes:
