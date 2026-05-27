@@ -25,6 +25,8 @@
     "dist/",
     "build/",
     "*.log",
-    "*.gen.ts"
+    "*.gen.ts",
+    "**/CHANGELOG.md",
+    ".changeset/*-*.md"
   ]
 }

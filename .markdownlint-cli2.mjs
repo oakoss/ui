@@ -18,6 +18,7 @@ export default {
     MD046: { style: 'fenced' },
     MD060: false,
   },
-  // Use .gitignore patterns automatically
   gitignore: true,
+  // Changesets-owned files; skip lint.
+  ignores: ['**/CHANGELOG.md', '.changeset/*-*.md'],
 };
