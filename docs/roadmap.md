@@ -6,10 +6,6 @@ High-level direction for oakoss/ui. Subject to change. Not a commitment.
 
 Foundation research and architectural decisions in progress. See [`research/`](research/) for the evidence behind each decision and [`decisions/`](decisions/) for the confirmed decisions themselves.
 
-## Pending decisions
-
-- **Styling layer** — Tailwind v4 recommended by research but not yet locked. See [`research/styling-layer-evaluation.md`](research/styling-layer-evaluation.md).
-
 ## Phases
 
 ### v0.1 — Foundation
