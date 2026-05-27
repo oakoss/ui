@@ -4,7 +4,7 @@ High-level direction for oakoss/ui. Subject to change. Not a commitment.
 
 ## Current
 
-Foundation research and architectural decisions in progress. See [`research/`](research/) for the evidence behind each decision and [`adr/`](adr/) for the confirmed decisions themselves.
+Foundation research and architectural decisions in progress. See [`research/`](research/) for the evidence behind each decision and [`decisions/`](decisions/) for the confirmed decisions themselves.
 
 ## Pending decisions
 
