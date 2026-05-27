@@ -35,3 +35,11 @@ New risks: TanStack Start itself is still pre-1.0 at the time of writing; its pl
 - **Nextra v4.** 13.8k stars, MIT, but slowing (last release 2025-12-04).
 - **Astro Starlight.** Content-heavy strength; no component playground OOTB.
 - **Mintlify / Zeroheight.** Proprietary SaaS; Mintlify $250/mo Pro is steep and creates lock-in concerns.
+
+## Sources
+
+- Fumadocs 15.2 framework-agnostic support (Next.js, TanStack Start, React Router, Waku), official Vite + TanStack Start template, and prerendering defaults — verified via context7 query against `/fuma-nama/fumadocs` (2026-05-27)
+- TanStack Start Vite plugin (`@tanstack/react-start/plugin/vite`) and Tailwind v4 integration (`@tailwindcss/vite`) — per the Fumadocs example fixture at `packages/create-app/test/fixtures/tanstack-vite-config.txt`
+- Production references on Fumadocs+Next.js (shadcn/ui v4, Mantine, Radix UI) — from decision 007 write-up (2026-05-26)
+- Backlight shutdown date (2025-06-01) — from decision 007 write-up; not re-verified
+- Alternatives table metadata (Vocs license + users, Nextra v4 stars + last release, Astro Starlight + Mintlify/Zeroheight characteristics) — from decision 007 write-up, cross-referenced against `tooling-evaluation.md`'s Sources; not re-verified

@@ -5,7 +5,7 @@
 - **Scope:** Visual regression CI, accessibility CI, documentation site framework
 - **Related:** [visual testing](visual-testing-with-chromatic.md), [accessibility testing](accessibility-testing-with-storybook-addon-a11y.md), [fumadocs on TanStack Start](fumadocs-on-tanstack-start-for-docs.md)
 
-## Decisions
+## Recommendations
 
 | Layer                            | Pick                                                                                                | Fallback                                                      |
 | -------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
