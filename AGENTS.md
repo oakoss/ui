@@ -109,7 +109,7 @@ If hooks ever drift out of sync (rare), reinstall with `pnpm exec lefthook insta
 
 We use [changesets](https://github.com/changesets/changesets) for versioning + publishing. Pre-1.0 semver: breaking changes bump minor (`0.1` → `0.2`), everything else bumps patch.
 
-**Foundation phase:** the tooling is dormant. Both `pnpm changeset` and `pnpm changeset --empty` error with "No versionable packages found" until the first `@oakoss/*` package lands. Skip the changeset step on PRs for now.
+**Foundation phase:** the tooling is dormant. Both `pnpm changeset` and `pnpm changeset --empty` error with "No versionable packages found" until the first **publishable** `@oakoss/*` package lands (e.g. `@oakoss/mcp-server`). Workspace-only packages like `@oakoss/tokens` and `@oakoss/themes` do not activate the changesets pipeline — see [decision 009](docs/decisions/009-tokens-and-themes-via-registry.md). Skip the changeset step on PRs for now.
 
 **Per-PR (once packages exist):**
 
@@ -128,12 +128,12 @@ We use [changesets](https://github.com/changesets/changesets) for versioning + p
 
 oakoss/ui is a layered React design system:
 
-- **`@oakoss/tokens`** — DTCG 2025.10 source tokens compiled by [Terrazzo](https://terrazzo.app) into CSS variables, JS constants, and Tailwind theme output. Framework-agnostic; the only npm-published surface in foundation phase.
+- **`@oakoss/tokens`** — DTCG 2025.10 source tokens compiled by [Terrazzo](https://terrazzo.app) into CSS variables, JS constants, and Tailwind theme output. Framework-agnostic. Workspace-only (never published to npm); external consumers receive the compiled outputs as registry-copied source files. See [decision 009](docs/decisions/009-tokens-and-themes-via-registry.md).
 - **Primitives** — thin wrappers over [React Aria Components](https://react-aria.adobe.com/) that bind tokens and expose unstyled, accessible behavior.
 - **Styled components** — opinionated compositions on top of primitives. Distributed as registry items (source files copied into the consumer's repo), not as a runtime npm dependency.
 - **Recipes** — multi-component patterns (e.g. data tables with virtualization, modal flows).
 
-Distribution is **registry-led hybrid**: components ship via a [shadcn-compatible registry](https://ui.shadcn.com/docs/registry) (`registry.json`), while tokens and shared utilities ship as small npm packages under `@oakoss/*`. See [decision 002](docs/decisions/002-registry-led-hybrid-distribution.md).
+Distribution is **registry-led**: components, tokens, and themes ship via a [shadcn-compatible registry](https://ui.shadcn.com/docs/registry) (`registry.json`); npm is reserved for runtime binaries like `@oakoss/mcp-server`. See [decision 002](docs/decisions/002-registry-led-hybrid-distribution.md) for the original hybrid framing and [decision 009](docs/decisions/009-tokens-and-themes-via-registry.md) for the current token/theme stance.
 
 Multi-framework is **React-primary**. Tokens are framework-agnostic by construction; Lit/Web Components targets are deferred to post-v1.0. See [decision 003](docs/decisions/003-react-primary-defer-web-components.md).
 

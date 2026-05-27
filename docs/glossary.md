@@ -14,7 +14,7 @@ Terms used across the oakoss/ui project.
 
 - **Registry** — A shadcn-compatible JSON manifest describing components consumers can install via CLI.
 - **Registry item** — A single installable unit (a component, a hook, a recipe).
-- **Registry-led hybrid** — Our distribution model: components ship via registry (copy/paste into consumer repos), tokens and shared utilities ship as small npm packages.
+- **Registry-led** — Our distribution model: components, tokens, and themes ship via the shadcn-compatible registry (copy/paste into consumer repos); npm is reserved for runtime binaries like `@oakoss/mcp-server`. See [decision 002](decisions/002-registry-led-hybrid-distribution.md) and [decision 009](decisions/009-tokens-and-themes-via-registry.md).
 
 ## Process
 

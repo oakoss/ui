@@ -54,7 +54,7 @@ Use [Conventional Commits](https://www.conventionalcommits.org/). The easiest pa
 
 ## Changesets
 
-We use [changesets](https://github.com/changesets/changesets) to manage versions and changelogs. The tooling is **dormant during foundation phase**: until the first `@oakoss/*` package lands, both `pnpm changeset` and `pnpm changeset --empty` error with "No versionable packages found" — no per-PR action needed yet.
+We use [changesets](https://github.com/changesets/changesets) to manage versions and changelogs. The tooling is **dormant during foundation phase**: until the first **publishable** `@oakoss/*` package lands (e.g. `@oakoss/mcp-server`), both `pnpm changeset` and `pnpm changeset --empty` error with "No versionable packages found" — no per-PR action needed yet. Workspace-only packages like `@oakoss/tokens` and `@oakoss/themes` do not activate the pipeline; see [decision 009](decisions/009-tokens-and-themes-via-registry.md).
 
 Once the first versionable package exists:
 

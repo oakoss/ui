@@ -1,6 +1,6 @@
 # Registry-led hybrid distribution
 
-- **Status:** Accepted
+- **Status:** Superseded by [009](009-tokens-and-themes-via-registry.md) (for tokens and themes; the broader hybrid model and the component-via-registry decision still stand)
 - **Date:** 2026-05-26
 - **Authors:** @jbabin91
 

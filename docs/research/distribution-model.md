@@ -1,16 +1,16 @@
 # Distribution Model
 
-- **Status:** Decided — Registry-led hybrid
+- **Status:** Partially superseded — see [decision 009](../decisions/009-tokens-and-themes-via-registry.md) for the current model. Tokens and themes now flow through the registry, not npm. The hybrid framing for components remains accurate.
 - **Date:** 2026-05-26
 - **Scope:** How oakoss/ui ships components, tokens, and tooling to consumers
-- **Related:** [decision 002](../decisions/002-registry-led-hybrid-distribution.md)
+- **Related:** [decision 002](../decisions/002-registry-led-hybrid-distribution.md), [decision 009](../decisions/009-tokens-and-themes-via-registry.md)
 
 ## Decision
 
 Registry-led hybrid distribution:
 
 - **Components, recipes, and patterns** ship via a shadcn-compatible registry. Consumers run a CLI to copy source files into their own repos.
-- **Tokens and shared utilities** (`@oakoss/tokens`, `@oakoss/mcp-server`, eventually `@oakoss/theme-*`) ship as small versioned npm packages.
+- ~~**Tokens and shared utilities** (`@oakoss/tokens`, `@oakoss/mcp-server`, eventually `@oakoss/theme-*`) ship as small versioned npm packages.~~ Superseded by [decision 009](../decisions/009-tokens-and-themes-via-registry.md): tokens and themes ship via the registry; `@oakoss/mcp-server` remains npm.
 - **Primitive layer** (`react-aria-components`) is consumed transitively. Consumers install it directly per the registry items' instructions.
 
 ## Context
@@ -39,14 +39,14 @@ Internal-first → OSS-later is exactly what the registry model solves and exact
 - **At OSS launch:** no distribution mechanic change. Flip auth on the namespace and submit to `registry.directory`.
 - **Openstatus's writeup** is the canonical proof. Every other approach (tsup bundling, webpack aliases, monorepo packages) failed; registry won.
 
-The hybrid layering accepts that some surfaces benefit from semver (tokens, MCP server, theme packages) and others benefit from consumer ownership (components, recipes).
+The hybrid layering accepts that some surfaces benefit from semver (~~tokens~~, MCP server, ~~theme packages~~) and others benefit from consumer ownership (components, recipes). (See [decision 009](../decisions/009-tokens-and-themes-via-registry.md) — tokens and themes joined the "consumer ownership" camp.)
 
 ## Hybrid specifics
 
 - Most surface area (components, recipes, patterns) ships via registry. Consumers own the source and can patch.
-- `@oakoss/tokens` ships as a versioned npm package. Semver makes sense for tokens because visual changes need to be coordinated across consumers.
+- ~~`@oakoss/tokens` ships as a versioned npm package. Semver makes sense for tokens because visual changes need to be coordinated across consumers.~~ Superseded by [decision 009](../decisions/009-tokens-and-themes-via-registry.md): workspace-only, distributed via registry.
 - `@oakoss/mcp-server` ships as a versioned npm package; the AI assistant tool surface needs to be installable.
-- `@oakoss/theme-default`, `@oakoss/theme-brand-x` ship as versioned npm packages for multi-brand theming.
+- ~~`@oakoss/theme-default`, `@oakoss/theme-brand-x` ship as versioned npm packages for multi-brand theming.~~ Superseded by [decision 009](../decisions/009-tokens-and-themes-via-registry.md): a single `@oakoss/themes` workspace package exposes multiple variants through the registry.
 - `react-aria-components` is the primitive layer; registry items list it as a peer dependency.
 
 ## Risks
