@@ -1,17 +1,17 @@
 # Tooling Evaluation — Testing & Docs
 
-- **Status:** Decided. Chromatic with Argos fallback; jsx-a11y + addon-a11y; Fumadocs on Next.js + Storybook 10.
+- **Status:** Recommendation. Chromatic with Argos fallback; jsx-a11y + addon-a11y; Fumadocs on TanStack Start + Storybook 10.
 - **Date:** 2026-05-26
 - **Scope:** Visual regression CI, accessibility CI, documentation site framework
-- **Related:** [decision 005](../decisions/005-visual-testing-with-chromatic.md), [decision 006](../decisions/006-accessibility-testing-with-storybook-addon-a11y.md), [decision 007](../decisions/007-fumadocs-on-nextjs-for-docs.md)
+- **Related:** [visual testing](visual-testing-with-chromatic.md), [accessibility testing](accessibility-testing-with-storybook-addon-a11y.md), [fumadocs on TanStack Start](fumadocs-on-tanstack-start-for-docs.md)
 
-## Decisions
+## Recommendations
 
 | Layer                            | Pick                                                                                                | Fallback                                                      |
 | -------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
 | Visual regression CI             | Chromatic free OSS tier (35k Chrome snapshots/mo)                                                   | Argos (MIT, 5k snapshots/mo) if Chromatic eligibility rejects |
 | A11y CI                          | `eslint-plugin-jsx-a11y` + `@storybook/addon-a11y` with test-runner `parameters.a11y.test: 'error'` | `@axe-core/playwright` for docs-site E2E once we have it      |
-| Docs framework                   | Fumadocs on Next.js                                                                                 | —                                                             |
+| Docs framework                   | Fumadocs on TanStack Start                                                                          | Fumadocs on Next.js (the original recommendation)             |
 | Component explorer + test target | Storybook 10                                                                                        | —                                                             |
 
 ## Visual regression CI
@@ -94,11 +94,11 @@ The pattern: mature React-first DSes overwhelmingly pick Next.js (shadcn, Mantin
 
 ### Reasoning
 
-**Fumadocs on Next.js** is the same stack the most relevant 2026 reference (shadcn/ui v4) chose, and it ships first-class component-playground support ("Fumadocs Story") that competing frameworks make you build yourself. Tailwind v4 plus React 19 plus Next.js App Router is the path of least resistance for a Tailwind-v4-based RAC DS.
+**Fumadocs on TanStack Start** ships first-class component-playground support ("Fumadocs Story") that competing frameworks make you build yourself, and stays aligned with the TanStack ecosystem we already use elsewhere. Fumadocs 15.2 made TanStack Start a first-class target (alongside Next.js, React Router, and Waku), so the "less mature adapter" caveat that drove the original Next.js recommendation no longer applies as of 2026-05-27.
 
 **Tradeoffs:**
 
-- Coupling to Next.js (Fumadocs has React Router / TanStack Start adapters but they're less mature)
+- Fewer "production DS docs sites on TanStack Start" reference points than the Next.js stack (shadcn/ui v4, Mantine, Radix UI all use Fumadocs-on-Next.js)
 - Heavier build than Vocs/Starlight (acceptable for ~100 components)
 - Less brand-distinct out of the box than a custom Next site (more flexible than Nextra)
 
@@ -111,7 +111,7 @@ The pattern: mature React-first DSes overwhelmingly pick Next.js (shadcn, Mantin
 - Add `@axe-core/playwright` once we have E2E coverage of the docs site
 - Watch Vitest browser-mode VRT. Could collapse "Storybook + Chromatic" into "Vitest + Argos" once the review-UI gap closes.
 - Re-check for `eslint-plugin-react-aria`. Plausible the Adobe team or community publishes one.
-- Fumadocs depends on Next.js's longevity; if TanStack Start matures, the Fumadocs TanStack adapter is the safer long-term bet
+- If TanStack Start regresses in stability or its plugin/SSR semantics shift painfully, fall back to Fumadocs on Next.js (the previous recommendation). Re-check at v1.0.
 
 ## Sources
 

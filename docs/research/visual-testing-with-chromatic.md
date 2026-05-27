@@ -1,8 +1,9 @@
 # Visual regression testing with Chromatic (Argos fallback)
 
-- **Status:** Accepted
+- **Status:** Recommendation
 - **Date:** 2026-05-26
-- **Authors:** @jbabin91
+- **Scope:** Visual regression CI vendor / framework
+- **Related:** [tooling evaluation](tooling-evaluation.md)
 
 ## Context
 
@@ -12,7 +13,7 @@ Chromatic's free OSS tier (35k Chrome snapshots/mo) is comfortable for a single-
 
 See [`../research/tooling-evaluation.md`](../research/tooling-evaluation.md) for the full options matrix.
 
-## Decision
+## Recommendation
 
 Visual regression CI runs on **Chromatic free OSS tier** as the primary. **Argos (MIT, OSS)** is the fallback if Chromatic eligibility is rejected. Both integrate first-class with Storybook 10.
 

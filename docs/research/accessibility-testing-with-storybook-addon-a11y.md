@@ -1,8 +1,9 @@
 # Accessibility CI with eslint-plugin-jsx-a11y + @storybook/addon-a11y (axe-core/playwright post-v0.1)
 
-- **Status:** Accepted
+- **Status:** Recommendation
 - **Date:** 2026-05-26
-- **Authors:** @jbabin91
+- **Scope:** Accessibility CI tooling
+- **Related:** [tooling evaluation](tooling-evaluation.md), [`../accessibility/README.md`](../accessibility/README.md)
 
 ## Context
 
@@ -12,7 +13,7 @@ The a11y target is WCAG 2.2 AA + EN 301 549 + Section 508 (see [`../accessibilit
 
 See [`../research/tooling-evaluation.md`](../research/tooling-evaluation.md) for the full tooling comparison.
 
-## Decision
+## Recommendation
 
 Layered defense for v0.1:
 
