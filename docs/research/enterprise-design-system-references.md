@@ -1,6 +1,6 @@
 # Enterprise Design System References
 
-- **Status:** Reference. None became a primitive layer for oakoss/ui; all are architectural, governance, or scope references.
+- **Status:** Reference. None became a primitive layer for oakoss/ui; all are architectural, governance, or scope references. Theming-distribution claims here are superseded by [decision 009](../decisions/009-tokens-and-themes-via-registry.md); see the inline note at "Theming distribution (Semi Design)" below.
 - **Date:** 2026-05-26
 - **Scope:** Patterns to borrow (and avoid) from 21 enterprise design systems surveyed
 
@@ -46,7 +46,7 @@ Textbook RAC-based DS pattern. Copy it.
 
 - Per-component subpath exports: `import { Button } from '@oakoss/ui/Button'`
 - `./private/*: null` exports guard so consumers can't reach into internals
-- Tokens published separately (`@oakoss/tokens` ships JSON; component packages consume)
+- Tokens live in a separate package (`@oakoss/tokens` ships DTCG JSON; component packages consume)
 - Multi-framework org structure (Carbon's `packages/react`, `packages/web-components`, etc. siblings under one monorepo with shared tokens). Model to copy if we ever go multi-framework.
 
 ### Token architecture
@@ -70,7 +70,7 @@ Solves the "how do I style the internals" problem cleanly. Ship from v0.1; retro
 
 ### Theming distribution (Semi Design)
 
-Themes ship as versioned npm packages (`@oakoss/theme-default`, `@oakoss/theme-brand-x`); tenants pin a theme version. Strong governance pattern for multi-brand enterprise.
+Semi Design ships themes as per-variant versioned npm packages; tenants pin a theme version. Strong governance pattern for multi-brand enterprise, but [decision 009](../decisions/009-tokens-and-themes-via-registry.md) takes the opposite path for oakoss/ui: a single `@oakoss/themes` workspace package exposes multiple variants through the shadcn registry instead.
 
 ### Foundation/Adapter pattern (Semi Design)
 

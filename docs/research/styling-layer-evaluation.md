@@ -1,9 +1,9 @@
 # Styling Layer Evaluation
 
-- **Status:** PENDING decision. Tailwind v4 recommended by research, awaiting confirmation.
+- **Status:** PENDING decision. Tailwind v4 recommended by research, awaiting confirmation. Distribution claims for tokens and themes are superseded by [decision 009](../decisions/009-tokens-and-themes-via-registry.md) — both flow through the registry, not npm.
 - **Date:** 2026-05-26
 - **Scope:** CSS framework / styling layer for oakoss/ui's styled components
-- **Related:** Future decision
+- **Related:** Future styling-layer decision; [decision 009](../decisions/009-tokens-and-themes-via-registry.md) for token/theme distribution
 
 ## TL;DR
 
@@ -43,7 +43,7 @@ Research recommends **Tailwind v4** as the only option simultaneously native to 
 Concrete enabling features:
 
 - `tailwindcss-react-aria-components` plugin provides shorter modifier syntax (`selected:bg-blue-400` vs `data-[selected]:bg-blue-400`) with autocomplete
-- v4's CSS-first `@theme` directive supports `@import` from external files, so `@oakoss/theme-default` ships as an npm package consumers `@import`
+- v4's CSS-first `@theme` directive supports `@import` from external files, so theme variants ship as registry items consumers `@import` after `shadcn add` (per [decision 009](../decisions/009-tokens-and-themes-via-registry.md))
 - `@terrazzo/plugin-tailwind` targets v4's `@theme` config and supports paired properties (`--text-xs--line-height`)
 - RSC-compatible (pure CSS output, zero runtime)
 - v0 Design Mode (Vercel) is Tailwind-only as of 2026

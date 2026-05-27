@@ -29,7 +29,7 @@ Foundation research and architectural decisions in progress. See [`research/`](r
 ### v1.0 — Public OSS launch
 
 - ~50 components at stable status
-- Multi-brand theming via separate `@oakoss/theme-*` packages
+- Multi-brand theming via `@oakoss/themes` (single workspace package exposing multiple registry-distributed variants — see [decision 009](decisions/009-tokens-and-themes-via-registry.md))
 - Public proposals and roadmap repos modeled on Carbon
 - WCAG 2.2 AA + EN 301 549 + Section 508 conformance documentation
 

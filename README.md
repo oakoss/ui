@@ -13,17 +13,17 @@ One pending decision: the styling layer (Tailwind v4 recommended; see [`docs/res
 
 ## Stack
 
-| Layer                | Decision                                                                              |
-| -------------------- | ------------------------------------------------------------------------------------- |
-| Primitive layer      | React Aria Components (best-in-class i18n, RTL, DnD, virtualization)                  |
-| Distribution         | Registry-led hybrid (shadcn-compatible registry + small `@oakoss/tokens` npm package) |
-| Multi-framework      | React-primary; tokens framework-agnostic; defer Lit/WC to post-v1.0                   |
-| Tokens               | DTCG 2025.10 source + Terrazzo build pipeline                                         |
-| Docs site            | Fumadocs on Next.js                                                                   |
-| Component explorer   | Storybook 10 (also visual + a11y test target)                                         |
-| Visual regression CI | Chromatic (OSS tier) + Argos (MIT) as fallback                                        |
-| A11y CI              | `eslint-plugin-jsx-a11y` + `@storybook/addon-a11y`                                    |
-| AI integration       | shadcn `registry.json` + `@oakoss/mcp-server` (stdio)                                 |
+| Layer                | Decision                                                                                                             |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Primitive layer      | React Aria Components (best-in-class i18n, RTL, DnD, virtualization)                                                 |
+| Distribution         | Shadcn-compatible registry for components, tokens, and themes; npm reserved for binaries (e.g. `@oakoss/mcp-server`) |
+| Multi-framework      | React-primary; tokens framework-agnostic; defer Lit/WC to post-v1.0                                                  |
+| Tokens               | DTCG 2025.10 source + Terrazzo build pipeline                                                                        |
+| Docs site            | Fumadocs on Next.js                                                                                                  |
+| Component explorer   | Storybook 10 (also visual + a11y test target)                                                                        |
+| Visual regression CI | Chromatic (OSS tier) + Argos (MIT) as fallback                                                                       |
+| A11y CI              | `eslint-plugin-jsx-a11y` + `@storybook/addon-a11y`                                                                   |
+| AI integration       | shadcn `registry.json` + `@oakoss/mcp-server` (stdio)                                                                |
 
 ## Accessibility target
 
