@@ -14,11 +14,11 @@ Bug, Feature, and Task are GitHub's org defaults; Epic and Proposal were added f
 
 ## Why types, not labels
 
-Issue Types are a first-class field: filterable in Issue lists with `is:issue type:Bug` (and in Projects views, if a board is added later), shared org-wide across every `oakoss` repo, and separate from the label namespace. Type-as-label (`type:bug`) duplicated this less cleanly, so the `type:*` labels were removed — see [`labels.md`](labels.md).
+Issue Types are a first-class field: filterable in Issue lists with `is:issue type:Bug` and in the [project board](projects.md) views, shared org-wide across every `oakoss` repo, and separate from the label namespace. Type-as-label (`type:bug`) duplicated this less cleanly, so the `type:*` labels were removed — see [`labels.md`](labels.md).
 
 ## Epics and sub-issues
 
-An **Epic** is a top-level Issue whose child work is modeled with native **sub-issues**, not a markdown checklist. Sub-issue progress rolls up to the parent automatically, and Issue lists can group by parent (as can Projects, if a board is added later). Foundation epics (tokens package, themes, first components, Storybook, docs site, MCP server) are filed as Epics with their tasks as sub-issues.
+An **Epic** is a top-level Issue whose child work is modeled with native **sub-issues**, not a markdown checklist. Sub-issue progress rolls up to the parent automatically, and both Issue lists and the [project board](projects.md) can group by parent. Foundation epics (tokens package, themes, first components, Storybook, docs site, MCP server) are filed as Epics with their tasks as sub-issues.
 
 ## Provisioning
 

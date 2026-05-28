@@ -10,6 +10,6 @@ The skills speak in terms of five canonical triage roles. In oakoss/ui these are
 | `ready-for-human`         | `ready-for-human` | Requires human implementation                |
 | `wontfix`                 | `wontfix`         | Will not be actioned                         |
 
-These five are oakoss/ui's readiness vocabulary — the single axis for "can this be picked up, and by whom?" There is no separate `status:*` lifecycle: in-progress, in-review, and blocked are read from native GitHub signals (assignee, open PR, open sub-issue or dependency).
+These five are oakoss/ui's readiness vocabulary — the intake axis for "can this be picked up, and by whom?" Work-status (Todo / In Progress / In Review / Done) is a separate axis tracked in the project board's Status field, not labels — see [`docs/governance/projects.md`](../governance/projects.md).
 
 See [`docs/governance/labels.md`](../governance/labels.md) for the full label model and [`issue-types.md`](../governance/issue-types.md) for the type axis.
