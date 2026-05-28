@@ -76,7 +76,7 @@ The product is the **mechanism**, not the catalog: a stable contract + a resolut
 
 "One contract, N resolutions (each with 1+ modes)" is what the **DTCG Resolver Module** expresses. Per [architectural-standards](architectural-standards.md), it is the spec mechanism [decision 009](../decisions/009-tokens-and-themes-via-registry.md)'s multi-theme commitment needs, it is **preview-draft** (`do-not-cite-directly`), and Terrazzo 2.x is adding support for it. Verify maturity when themes is actually built — do not lock themes on a moving spec.
 
-Terrazzo capability (verified 2026-05-28 via context7 against `/terrazzoapp/terrazzo`): `plugin-css` emits OKLCH and handles light/dark via `modeSelectors` (`:root`, `[data-mode="dark"]`, `@media prefers-color-scheme`) with per-mode `color-scheme`; `plugin-tailwind` maps DTCG tokens to Tailwind v4 theme categories and does dark mode via `modeVariants`. A single-mode theme is the degenerate N=1 case.
+Terrazzo capability (verified 2026-05-28 via context7 against `/terrazzoapp/terrazzo`): `plugin-css` emits OKLCH and handles light/dark via `modeSelectors` (`:root`, `[data-mode="dark"]`, `@media (prefers-color-scheme: dark)`) with per-mode `color-scheme`; `plugin-tailwind` maps DTCG tokens to Tailwind v4 theme categories and does dark mode via `modeVariants`. A single-mode theme is the degenerate N=1 case.
 
 ## Implication for the tokens scaffold
 
