@@ -9,8 +9,6 @@ Enterprise OSS React design system built on [React Aria Components](https://reac
 
 **Foundation phase (pre-v0.1).** Architectural decisions are locked; component implementation has not started. See [`docs/roadmap.md`](docs/roadmap.md) for phase plans, [`docs/decisions/`](docs/decisions/) for accepted decisions, and [`docs/research/`](docs/research/) for the evidence behind each.
 
-One pending decision: the styling layer (Tailwind v4 recommended; see [`docs/research/styling-layer-evaluation.md`](docs/research/styling-layer-evaluation.md)).
-
 ## Stack
 
 | Layer                | Choice                                                                                                               |
@@ -19,6 +17,7 @@ One pending decision: the styling layer (Tailwind v4 recommended; see [`docs/res
 | Distribution         | Shadcn-compatible registry for components, tokens, and themes; npm reserved for binaries (e.g. `@oakoss/mcp-server`) |
 | Multi-framework      | React-primary; tokens framework-agnostic; defer Lit/WC to post-v1.0                                                  |
 | Tokens               | DTCG 2025.10 source + Terrazzo build pipeline                                                                        |
+| Styling layer        | Tailwind v4 (CSS-first `@theme`) + `tailwind-variants` + `eslint-plugin-better-tailwindcss`                          |
 | Docs site            | Fumadocs on TanStack Start (Next.js as the fallback host)                                                            |
 | Component explorer   | Storybook 10 (also visual + a11y test target)                                                                        |
 | Visual regression CI | Chromatic (OSS tier) + Argos (MIT) as fallback                                                                       |

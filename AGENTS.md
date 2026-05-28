@@ -137,6 +137,8 @@ Distribution is **registry-led**: components, tokens, and themes ship via a [sha
 
 Multi-framework is **React-primary**. Tokens are framework-agnostic by construction; Lit/Web Components targets are deferred to post-v1.0. See [decision 003](docs/decisions/003-react-primary-defer-web-components.md).
 
+Styled components and recipes are authored in **Tailwind v4** (CSS-first `@theme`; no `tailwind.config.ts`) with **`tailwind-variants`** for variant APIs (not CVA — TV provides native slots, compoundSlots, `extend`, and built-in `tailwind-merge`) and **`eslint-plugin-better-tailwindcss`** for class validation (`no-unknown-classes` catches token typos at lint time). See [decision 011](docs/decisions/011-styling-layer-tailwind-v4.md).
+
 AI integration: the shadcn-shaped registry (per [decisions 002](docs/decisions/002-registry-led-hybrid-distribution.md) + [009](docs/decisions/009-tokens-and-themes-via-registry.md)) is consumable by AI clients (v0, shadcn MCP, Cursor, Claude Code) by virtue of the distribution choice. `@oakoss/mcp-server` provides a richer stdio tool surface for tool-use-capable clients; the specific tool list will be a proposal when the server is scaffolded. See [decision 010](docs/decisions/010-mcp-server-narrowed-from-008.md) (which narrows the original [decision 008](docs/decisions/008-ai-integration-shadcn-registry-and-mcp.md)).
 
 ## Conventions & Patterns

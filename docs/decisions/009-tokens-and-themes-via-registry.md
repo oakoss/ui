@@ -13,13 +13,13 @@ Two assumptions inside that decision did not hold up on re-examination:
 1. **Tokens are brand identity.** They are exactly the surface consumers want to fork, not depend on. Every adopting team swaps the default palette for theirs, retunes the spacing scale, or renames semantic tokens. The "you own the source" philosophy that justifies registry distribution for components applies even more strongly to tokens.
 2. **A per-variant package proliferation (`@oakoss/theme-default`, `@oakoss/theme-brand-x`, …) prices each new theme at a published package boundary.** That overhead is wrong for a project where themes are content, not code, and where consumers want to lift a theme into their own repo and modify it freely.
 
-The shadcn registry already supports the distribution we need for both: source files (CSS variables, JS/TS constants, and any styling-layer-specific outputs once that decision is locked) are copied into the consumer's repo when they run `shadcn add @oakoss/tokens` or `shadcn add @oakoss/themes/<variant>`. Raw token access (for charts, canvas, PDF, email — the legitimate "I need JS values" cases) is fully served by shipping a `tokens.ts` file alongside the CSS. Workspace consumers inside this monorepo (mcp-server, registry build script, future internal tools) resolve `@oakoss/tokens` via pnpm's `workspace:*` protocol — no publish required for internal use.
+The shadcn registry already supports the distribution we need for both: source files (CSS variables, JS/TS constants, and the Tailwind v4 `@theme` block emitted by `@terrazzo/plugin-tailwind` per [decision 011](011-styling-layer-tailwind-v4.md)) are copied into the consumer's repo when they run `shadcn add @oakoss/tokens` or `shadcn add @oakoss/themes/<variant>`. Raw token access (for charts, canvas, PDF, email — the legitimate "I need JS values" cases) is fully served by shipping a `tokens.ts` file alongside the CSS. Workspace consumers inside this monorepo (mcp-server, registry build script, future internal tools) resolve `@oakoss/tokens` via pnpm's `workspace:*` protocol — no publish required for internal use.
 
 The only true "must publish" trigger is a third-party package needing to peer-depend on tokens. That is not a foundation-phase concern.
 
 ## Decision
 
-- `@oakoss/tokens` is a **workspace-only package**. It is never published to npm. Internal `@oakoss/*` packages resolve it via `workspace:*`. External consumers receive it via the shadcn-compatible registry, which ships the compiled outputs (CSS variables, JS/TS constants, and any styling-layer-specific artifacts once the pending styling-layer decision is locked — see [`../research/styling-layer-evaluation.md`](../research/styling-layer-evaluation.md)) as source files copied into the consumer's repo.
+- `@oakoss/tokens` is a **workspace-only package**. It is never published to npm. Internal `@oakoss/*` packages resolve it via `workspace:*`. External consumers receive it via the shadcn-compatible registry, which ships the compiled outputs (CSS variables, JS/TS constants, and the Tailwind v4 `@theme` block emitted by `@terrazzo/plugin-tailwind` per [decision 011](011-styling-layer-tailwind-v4.md)) as source files copied into the consumer's repo.
 - Theming lives in a **single workspace package — `@oakoss/themes`** — containing multiple theme variants (default, dark, and any future brand variants) as DTCG source files. Each variant is exposed as its own registry item. We do not publish `@oakoss/theme-default`, `@oakoss/theme-brand-x`, or any per-variant npm package.
 - `@oakoss/mcp-server` and any other binary or runtime package may still be published to npm. This decision narrows decision 002 only for tokens and themes, not for the broader distribution model.
 
@@ -29,7 +29,7 @@ This decision supersedes the "tokens and shared utilities ship as small npm pack
 
 `pnpm`'s `workspace:*` protocol resolves `@oakoss/tokens` to the local workspace package. Sibling packages (`@oakoss/mcp-server`, registry build scripts, internal tools) `import { ... } from '@oakoss/tokens'` exactly as if it were a published dependency.
 
-Consumer-side resolution — how registry-copied component source references tokens in a consumer's tree, and whether components should JS-import tokens at all or reference them only as CSS variables — depends on the styling-layer decision (pending; see [`../research/styling-layer-evaluation.md`](../research/styling-layer-evaluation.md)) and the registry build pipeline implementation. Those concerns will be addressed in their own decisions once the styling layer is locked.
+Consumer-side resolution is partially resolved by [decision 011](011-styling-layer-tailwind-v4.md) — see that decision for the styling-layer specifics. The registry build pipeline implementation (how authored workspace imports get rewritten to consumer-side paths, if at all) is TBD; specifics will be addressed in their own decisions.
 
 ## Consequences
 
