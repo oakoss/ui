@@ -44,7 +44,8 @@ pnpm dlx shadcn@latest add <component>
 - [Glossary](docs/glossary.md)
 - [Accessibility](docs/accessibility/README.md)
 - [Governance](docs/governance/README.md)
-- [Label state machine](docs/governance/labels.md)
+- [Labels](docs/governance/labels.md)
+- [Issue Types](docs/governance/issue-types.md)
 
 ## Contributing
 

@@ -2,7 +2,7 @@
 
 ## Issue Tracking
 
-This project uses **GitHub Issues** as the source of truth and **GitHub Projects v2** for the roadmap view.
+This project uses **GitHub Issues** as the source of truth — classified by **Issue Types** (Bug / Feature / Task / Epic / Proposal) with a small **readiness-label** set for triage state. There's no Projects v2 board yet; the milestones (`v0.1` / `v0.2` / `v1.0`) carry the roadmap.
 
 ### Quick reference
 
@@ -16,16 +16,16 @@ gh pr create --fill                 # Open a PR from the current branch
 
 ### Workflow
 
-1. Triage: a maintainer moves new Issues from `status:needs-triage` to `status:ready` and applies `priority:*`, `complexity:*`, and `area:*` labels.
-2. Pick up: claim an Issue labeled `status:ready` (prefer `complexity:simple` for agent runs) and self-label `status:in-progress`.
+1. Triage: a maintainer moves a new Issue from `needs-triage` to `ready-for-agent` or `ready-for-human` (or `needs-info` / `wontfix`), confirms its Issue Type, and applies any `area:*` labels.
+2. Pick up: claim a `ready-for-agent` Issue (agent runs) or a `ready-for-human` Issue, and assign yourself — the assignee signals in-progress.
 3. Branch: `issue/<number>-<short-slug>`.
 4. Commit: Conventional Commits via `pnpm commit`; reference the Issue with `closes #N`.
 5. Changeset: skip during foundation phase (see [Releases (changesets)](#releases-changesets) for commands and bump policy).
-6. PR: `gh pr create --fill --label "status:needs-review"`.
+6. PR: `gh pr create --fill` — the open PR signals in-review; no status label needed.
 7. Address review feedback: see [Handling PR reviews](#handling-pr-reviews) below.
 8. Merge: the Issue closes automatically when the PR merges. Any changeset accumulates in the auto-maintained release PR (titled `chore(release): version packages`); merging that PR triggers npm publish.
 
-See [`docs/governance/labels.md`](docs/governance/labels.md) for the full label state machine. The `/fix-issue` skill at `.claude/skills/fix-issue/SKILL.md` runs the view, implement, test, and PR loop.
+See [`docs/governance/labels.md`](docs/governance/labels.md) for the label model and [`docs/governance/issue-types.md`](docs/governance/issue-types.md) for the type axis. The `/fix-issue` skill at `.claude/skills/fix-issue/SKILL.md` runs the view, implement, test, and PR loop.
 
 ### Handling PR reviews
 
@@ -70,7 +70,7 @@ Don't resolve a thread you haven't actually addressed — closing it without a r
 
 ### Rules
 
-- Use `gh` CLI for all GitHub interactions. Reach for an MCP server only when you need Projects v2 mutations.
+- Use `gh` CLI for all GitHub interactions; reach for `gh api` for endpoints `gh` doesn't wrap directly (e.g. Issue Types).
 - GitHub Issues are the source of truth. Don't track work in TodoWrite, markdown TODOs, or local notes.
 - Decisions live in `docs/decisions/`; investigations live in `docs/research/`. Don't create MEMORY.md files.
 
@@ -94,7 +94,7 @@ Single-context. Glossary at `docs/glossary.md`; ADRs in `docs/decisions/` (not t
 
 When ending a work session:
 
-1. **Update Issue status** — close completed Issues; move in-progress ones to `status:needs-review`.
+1. **Update Issue state** — close completed Issues; make sure in-progress work has an open PR (the in-review signal).
 2. **Pass quality gates** — `pnpm lint`, `pnpm lint:md`, and any component tests.
 3. **Push PRs to remote** — `git push` must succeed before the session ends.
 4. **Hand off** — drop context for the next session in a PR comment or a fresh Issue.

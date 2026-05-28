@@ -1,7 +1,8 @@
 name: Bug Report
 description: A bug in an existing component or behavior
 title: '[bug] '
-labels: ['type:bug', 'status:needs-triage']
+type: Bug
+labels: ['needs-triage']
 body:
   - type: markdown
     attributes:
