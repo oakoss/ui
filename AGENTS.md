@@ -74,6 +74,22 @@ Don't resolve a thread you haven't actually addressed — closing it without a r
 - GitHub Issues are the source of truth. Don't track work in TodoWrite, markdown TODOs, or local notes.
 - Decisions live in `docs/decisions/`; investigations live in `docs/research/`. Don't create MEMORY.md files.
 
+## Agent skills
+
+Per-repo configuration consumed by the [mattpocock/skills](https://github.com/mattpocock/skills) engineering skills (`to-issues`, `triage`, `to-prd`, `tdd`, `diagnose`, `improve-codebase-architecture`).
+
+### Issue tracker
+
+Issues live in GitHub Issues (`gh` CLI). See [`docs/agents/issue-tracker.md`](docs/agents/issue-tracker.md).
+
+### Triage labels
+
+Five canonical triage roles (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`), identity-mapped. See [`docs/agents/triage-labels.md`](docs/agents/triage-labels.md).
+
+### Domain docs
+
+Single-context. Glossary at `docs/glossary.md`; ADRs in `docs/decisions/` (not the conventional `docs/adr/`). See [`docs/agents/domain.md`](docs/agents/domain.md).
+
 ## Session Completion
 
 When ending a work session:
