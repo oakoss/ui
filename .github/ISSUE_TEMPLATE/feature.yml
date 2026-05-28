@@ -1,7 +1,8 @@
 name: Feature Request
 description: A new capability, recipe, or enhancement to an existing component
 title: '[feature] '
-labels: ['type:feature', 'status:needs-triage']
+type: Feature
+labels: ['needs-triage']
 body:
   - type: markdown
     attributes:

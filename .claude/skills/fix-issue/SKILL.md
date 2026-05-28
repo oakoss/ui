@@ -19,7 +19,7 @@ Take a GitHub Issue from read to PR.
 4. **Implement** — branch as `issue/<number>-<short-slug>` and make the change. Follow `AGENTS.md` conventions, anything under `docs/governance/`, and relevant decisions in `docs/decisions/`.
 5. **Test** — run `pnpm lint` and `pnpm lint:md`. A test runner and Storybook a11y addon are not yet wired up; verify a11y-affecting changes manually with browser tools.
 6. **Commit** — use Conventional Commits via `pnpm commit` (cz-git). Reference the Issue in the body with `closes #123`.
-7. **PR** — `gh pr create --fill --label "status:needs-review"` and include a short test plan in the body. The body must reference the Issue with `closes #N` so the Issue auto-closes on merge.
+7. **PR** — `gh pr create --fill` and include a short test plan in the body. The body must reference the Issue with `closes #N` so the Issue auto-closes on merge. The open PR is the in-review signal; no status label needed.
 8. **Review feedback** — when Copilot or a human reviewer leaves comments, address each one and resolve the thread. See the "Handling PR reviews" section in [`AGENTS.md`](../../../AGENTS.md) for the `gh api graphql` pattern.
 
 ## Conventions

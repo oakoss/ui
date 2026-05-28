@@ -33,7 +33,7 @@ Terms used across the oakoss/ui project.
 
 ## Workflow
 
-- **`gh` CLI** — GitHub's command-line tool; the primary interface agents use for Issues, PRs, and Projects.
-- **Issue template** — YAML schema in `.github/ISSUE_TEMPLATE/` that structures new Issues for humans and agents alike.
-- **Label state-machine** — Status labels (`status:ready`, `status:in-progress`, `status:needs-review`, etc.) that an Issue moves through, plus an orthogonal `complexity:*` axis that signals which work is agent-suitable. See [`governance/labels.md`](governance/labels.md).
-- **GitHub Projects v2** — Project board for the roadmap view; one project per release phase.
+- **`gh` CLI** — GitHub's command-line tool; the primary interface agents use for Issues and PRs.
+- **Issue template** — YAML schema in `.github/ISSUE_TEMPLATE/` that structures new Issues and sets their Issue Type for humans and agents alike.
+- **Issue Type** — First-class GitHub classification (Bug, Feature, Task, Epic, Proposal) replacing the old `type:*` labels. See [`governance/issue-types.md`](governance/issue-types.md).
+- **Readiness labels** — The single triage axis (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`) for "can this be picked up, and by whom?" Lifecycle state (in-progress, in-review, blocked) is read from native GitHub signals, not labels. See [`governance/labels.md`](governance/labels.md).

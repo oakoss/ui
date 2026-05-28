@@ -19,10 +19,10 @@ Required tooling:
 
 ## Issue tracking
 
-GitHub Issues is the source of truth. The full label state machine and triage flow lives in [`governance/labels.md`](governance/labels.md).
+GitHub Issues is the source of truth. The label model and triage flow live in [`governance/labels.md`](governance/labels.md); the type axis is in [`governance/issue-types.md`](governance/issue-types.md).
 
-1. Browse Issues labeled `status:ready` (filter by `complexity:simple` or `good-first-issue` for a gentler entry point)
-2. Comment to claim, then self-label `status:in-progress`
+1. Browse Issues labeled `ready-for-human` or `ready-for-agent` (or `good first issue` for a gentler entry point)
+2. Comment to claim, then assign yourself — the assignee signals in-progress
 3. Branch from `main`: `issue/<number>-<short-slug>`
 4. Open a PR with `closes #N` in the description
 
@@ -49,7 +49,7 @@ Use [Conventional Commits](https://www.conventionalcommits.org/). The easiest pa
 - Title follows Conventional Commits (e.g. `feat(button): add loading state`)
 - Reference the Issue: `closes #N`
 - One logical change per PR; split unrelated work
-- Self-label `status:needs-review` when ready
+- Mark the PR ready for review (out of draft) when it's done — the open PR is the in-review signal
 - Add a changeset for consumer-visible changes (see [Changesets](#changesets))
 
 ## Changesets

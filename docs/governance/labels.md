@@ -1,88 +1,77 @@
-# Label State Machine
+# Labels
 
-Issues and PRs progress through a label-driven state machine. Agents and humans both read these labels to decide what to pick up and where each piece of work stands.
+oakoss/ui classifies work with **GitHub Issue Types** (the type axis) plus a small set of **labels** (readiness, area, and a few special/automation flags). Issue lifecycle state is read from native GitHub signals, not labels — see [Readiness vs. status](#readiness-vs-status).
 
-## Status labels (mutually exclusive)
+For the type axis (Bug, Feature, Epic, Proposal, Task), see [`issue-types.md`](issue-types.md).
 
-Status describes _where the work is_, not _who picks it up_. Both humans and agents transition Issues through these.
+## Readiness labels (one)
 
-- `status:needs-triage` — newly filed; awaiting maintainer review
-- `status:ready` — triaged and free to claim
-- `status:in-progress` — actively being worked on
-- `status:needs-review` — work is done; awaiting maintainer review
-- `status:blocked` — depends on something else; link the blocker in a comment
+Readiness answers "can this be picked up, and by whom?" Every Issue carries exactly one at a time.
 
-## Complexity labels (one)
+- `needs-triage` — newly filed; awaiting maintainer evaluation
+- `needs-info` — waiting on the reporter for more information
+- `ready-for-agent` — fully specified; an AFK agent can pick it up with no extra context
+- `ready-for-human` — ready to implement; needs a human (design judgment or cross-cutting work)
+- `wontfix` — will not be actioned
 
-Complexity describes _how much judgment the work needs_, separate from status. Use these to signal which Issues are agent-suitable and which need a senior contributor.
+This is the vocabulary the [`triage` skill](../agents/triage-labels.md) applies.
 
-- `complexity:simple` — well-scoped, mechanical, agent-suitable
-- `complexity:moderate` — needs some design judgment; agent + maintainer review works well
-- `complexity:complex` — architectural impact or cross-cutting; prefer a human contributor
+## Readiness vs. status
 
-## Type labels (one per Issue)
+We deliberately do **not** track a `status:*` lifecycle (in-progress, in-review, blocked). Those states are already legible from native GitHub signals:
 
-- `type:bug`
-- `type:feature`
-- `type:component` — new component proposal
-- `type:docs`
-- `type:chore`
-- `type:proposal` — discussion of a proposal filed in `docs/proposals/`
+- **In progress** → the Issue has an assignee
+- **In review** → a linked PR is open
+- **Blocked** → an open sub-issue or tracked dependency
 
-## Component labels (zero or more)
+Labels for them would duplicate signals GitHub already maintains.
 
-One per affected component (`component:button`, `component:dialog`, `component:combobox`, etc.) plus cross-cutting areas:
+## Area labels (zero or more)
 
-- `area:tokens`
-- `area:registry`
-- `area:docs-site`
-- `area:mcp-server`
-- `area:a11y`
+Cross-cutting areas, for filtering:
 
-## Priority labels (one)
+- `area:tokens` — tokens package and token pipeline
+- `area:registry` — registry distribution
+- `area:docs-site` — documentation site
+- `area:mcp-server` — MCP server
+- `area:a11y` — cross-cutting accessibility
 
-- `priority:critical` — production-affecting; ship within 24h
-- `priority:high` — ship in the current week
-- `priority:normal` — default; ship in the current milestone
-- `priority:low` — nice to have; ship when convenient
-
-## Accessibility labels (zero or more)
-
-- `a11y:wcag-blocker` — blocks WCAG 2.2 AA conformance
-- `a11y:i18n` — internationalization concern
-- `a11y:rtl` — right-to-left support concern
-- `a11y:screen-reader` — screen reader behavior issue
-- `a11y:keyboard` — keyboard navigation issue
+Per-component labels (`component:button`, …) are added lazily as components ship, not pre-created.
 
 ## Special labels
 
-- `good-first-issue` — accessible to new contributors
-- `help-wanted` — actively seeking community contributions
-- `breaking-change` — requires a major version bump per semver
+- `good first issue` — accessible to new contributors
+- `help wanted` — actively seeking community contributions
+- `breaking-change` — requires a version bump (pre-1.0: minor; 1.0+: major)
 
-## Automation labels (applied by bots)
-
-These live in a separate namespace from the status/type/component labels above. Bots own these; humans don't apply them.
+## Automation labels (bot-owned)
 
 - `dependencies` — Renovate dependency-update PR
-- `security` — Renovate security vulnerability alert
+- `security` — security vulnerability (Renovate or advisory)
 - `lockfile` — Renovate lockfile maintenance PR
-- Renovate's Dependency Dashboard Issue carries `dependencies` by convention
 
-## Creating labels
+## Deferred until code exists
 
-Use `gh label create` to create labels. The status labels are shown below as a starting template; extend the same pattern for type, component, area, priority, a11y, special, and automation labels:
+Specialized accessibility labels (`a11y:wcag-blocker`, `a11y:i18n`, `a11y:rtl`, `a11y:screen-reader`, `a11y:keyboard`) and per-component labels are provisioned once there's component code to apply them to.
+
+## Provisioning
+
+Labels are created with `gh label create`. The current set was provisioned directly; recreate with `--force` if it drifts:
 
 ```bash
-gh label create "status:needs-triage" --color "ededed" --description "Newly filed; awaiting maintainer review"
-gh label create "status:ready" --color "0e8a16" --description "Triaged and free to claim"
-gh label create "status:in-progress" --color "fbca04" --description "Actively being worked on"
-gh label create "status:needs-review" --color "1d76db" --description "Work done; awaiting maintainer review"
-gh label create "status:blocked" --color "b60205" --description "Depends on something else"
-
-gh label create "complexity:simple" --color "c2e0c6" --description "Well-scoped, mechanical, agent-suitable"
-gh label create "complexity:moderate" --color "fef2c0" --description "Needs some design judgment"
-gh label create "complexity:complex" --color "f9d0c4" --description "Architectural impact; prefer a human contributor"
+gh label create "needs-triage"    --color ededed --description "Newly filed; awaiting maintainer evaluation" --force
+gh label create "needs-info"      --color fbca04 --description "Waiting on the reporter for more information" --force
+gh label create "ready-for-agent" --color 0e8a16 --description "Fully specified; an AFK agent can pick it up" --force
+gh label create "ready-for-human" --color 1d76db --description "Ready to implement; needs a human" --force
+gh label create "area:tokens"     --color c5def5 --description "Tokens package and token pipeline" --force
+gh label create "area:registry"   --color c5def5 --description "Registry distribution" --force
+gh label create "area:docs-site"  --color c5def5 --description "Documentation site" --force
+gh label create "area:mcp-server" --color c5def5 --description "MCP server" --force
+gh label create "area:a11y"       --color c5def5 --description "Cross-cutting accessibility" --force
+gh label create "breaking-change" --color b60205 --description "Breaking change requiring a version bump" --force
+gh label create "security"        --color d93f0b --description "Security vulnerability (Renovate or advisory)" --force
 ```
 
-A labeler GitHub Action can keep the label set in sync with this file.
+`wontfix`, `good first issue`, and `help wanted` (GitHub repo defaults) plus `dependencies`/`lockfile` (Renovate-managed) are kept as-is and aren't recreated here.
+
+A declarative label-sync GitHub Action could keep the repo in sync with this file later.
