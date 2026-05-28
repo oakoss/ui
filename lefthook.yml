@@ -11,15 +11,20 @@ pre-commit:
       glob: '*.{js,jsx,ts,tsx,mjs,cjs}'
       run: pnpm exec oxlint {staged_files}
 
-    - name: oxfmt
-      glob: '*.{js,jsx,ts,tsx,mjs,cjs,json,jsonc,css,html}'
-      run: pnpm exec oxfmt {staged_files}
-      stage_fixed: true
+    # Sequential (piped) to avoid racing .md writes; oxfmt last so output matches CI's oxfmt --check.
+    - name: format
+      group:
+        piped: true
+        jobs:
+          - name: markdownlint
+            glob: '*.md'
+            run: pnpm exec markdownlint-cli2 --fix {staged_files}
+            stage_fixed: true
 
-    - name: markdownlint
-      glob: '*.md'
-      run: pnpm exec markdownlint-cli2 --fix {staged_files}
-      stage_fixed: true
+          - name: oxfmt
+            glob: '*.{js,jsx,ts,tsx,mjs,cjs,json,jsonc,css,html,md}'
+            run: pnpm exec oxfmt {staged_files}
+            stage_fixed: true
 
 commit-msg:
   jobs:
