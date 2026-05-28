@@ -1,2 +1,17 @@
+packages:
+  - 'packages/*'
+  - 'apps/*'
+
 allowBuilds:
   lefthook: true
+
+# turbo's platform binaries bypass any minimum-release-age gate so a turbo bump installs immediately.
+# Bump these versions in lockstep with turbo in package.json.
+minimumReleaseAgeExclude:
+  - '@turbo/darwin-64@2.9.16'
+  - '@turbo/darwin-arm64@2.9.16'
+  - '@turbo/linux-64@2.9.16'
+  - '@turbo/linux-arm64@2.9.16'
+  - '@turbo/windows-64@2.9.16'
+  - '@turbo/windows-arm64@2.9.16'
+  - turbo@2.9.16

@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "@oakoss node",
+  "extends": "./base.json",
+  "compilerOptions": { "module": "nodenext", "moduleResolution": "nodenext" }
+}

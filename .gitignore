@@ -2,6 +2,14 @@
 node_modules/
 *.log
 
+# Build / generated outputs (Terrazzo tokens, tsdown bundles)
+dist/
+build/
+coverage/
+
+.turbo
+storybook-static/
+
 # macOS
 .DS_Store
 

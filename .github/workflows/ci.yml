@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  lint:
+  static-analysis:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -28,6 +28,30 @@ jobs:
         uses: ./.github/actions/setup
       - name: Static analysis
         uses: ./.github/actions/static-analysis
+
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - name: Setup
+        uses: ./.github/actions/setup
+      # No-op until a package defines a build script; validates builds once packages exist.
+      - name: Build
+        run: pnpm build
+
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - name: Setup
+        uses: ./.github/actions/setup
+      # No-op until a package defines a test script; validates tests once packages exist.
+      - name: Test
+        run: pnpm test
 
   commitlint:
     runs-on: ubuntu-latest
@@ -42,3 +66,41 @@ jobs:
         uses: ./.github/actions/setup
       - name: Validate commit messages
         run: pnpm exec commitlint --from=${{ github.event.pull_request.base.sha }} --to=${{ github.event.pull_request.head.sha }} --verbose
+
+  # Single required status check: aggregates every job above so branch protection
+  # only needs `CI Summary`, and the required-checks list never changes as jobs do.
+  ci-summary:
+    name: CI Summary
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [static-analysis, build, test, commitlint]
+    steps:
+      - name: Summarize results
+        run: |
+          {
+            echo "## CI Summary"
+            echo ""
+            echo "| Job | Status | Required |"
+            echo "| --- | --- | --- |"
+            echo "| Static analysis | \`${{ needs.static-analysis.result }}\` | ✅ Yes |"
+            echo "| Build | \`${{ needs.build.result }}\` | ✅ Yes |"
+            echo "| Test | \`${{ needs.test.result }}\` | ✅ Yes |"
+            echo "| Commitlint | \`${{ needs.commitlint.result }}\` | ⚠️ PR only |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          # skipped counts as failure here — jobs that never ran must not pass the gate.
+          require_success() {
+            if [ "$2" != "success" ]; then
+              echo "Required job '$1' did not succeed (result: $2)"
+              exit 1
+            fi
+          }
+
+          require_success "static-analysis" "${{ needs.static-analysis.result }}"
+          require_success "build" "${{ needs.build.result }}"
+          require_success "test" "${{ needs.test.result }}"
+
+          # commitlint runs on pull_request only; tolerate skipped on push/merge_group.
+          if [ "${{ needs.commitlint.result }}" != "skipped" ]; then
+            require_success "commitlint" "${{ needs.commitlint.result }}"
+          fi
