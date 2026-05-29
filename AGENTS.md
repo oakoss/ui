@@ -2,7 +2,7 @@
 
 ## Issue Tracking
 
-This project uses **GitHub Issues** as the source of truth — classified by **Issue Types** (Bug / Feature / Task / Epic / Proposal) with a small **readiness-label** set for triage state. There's no Projects v2 board yet; the milestones (`v0.1` / `v0.2` / `v1.0`) carry the roadmap.
+This project uses **GitHub Issues** as the source of truth — classified by **Issue Types** (Bug / Feature / Task / Epic / Proposal), a small **readiness-label** set for triage state, and the **[Projects v2 board](https://github.com/orgs/oakoss/projects/1)** for work-status and the roadmap (milestones `v0.1` / `v0.2` / `v1.0`). See [`docs/governance/projects.md`](docs/governance/projects.md).
 
 ### Quick reference
 
@@ -17,11 +17,11 @@ gh pr create --fill                 # Open a PR from the current branch
 ### Workflow
 
 1. Triage: a maintainer moves a new Issue from `needs-triage` to `ready-for-agent` or `ready-for-human` (or `needs-info` / `wontfix`), confirms its Issue Type, and applies any `area:*` labels.
-2. Pick up: claim a `ready-for-agent` Issue (agent runs) or a `ready-for-human` Issue, and assign yourself — the assignee signals in-progress.
+2. Pick up: claim a `ready-for-agent` Issue (agent runs) or a `ready-for-human` Issue, assign yourself, and move its board **Status** to **In Progress**.
 3. Branch: `issue/<number>-<short-slug>`.
 4. Commit: Conventional Commits via `pnpm commit`; reference the Issue with `closes #N`.
 5. Changeset: skip during foundation phase (see [Releases (changesets)](#releases-changesets) for commands and bump policy).
-6. PR: `gh pr create --fill` — the open PR signals in-review; no status label needed.
+6. PR: `gh pr create --fill`, and move the issue's board **Status** to **In Review** (Done sets itself when the PR merges or the issue closes).
 7. Address review feedback: see [Handling PR reviews](#handling-pr-reviews) below.
 8. Merge: the Issue closes automatically when the PR merges. Any changeset accumulates in the auto-maintained release PR (titled `chore(release): version packages`); merging that PR triggers npm publish.
 
@@ -94,7 +94,7 @@ Single-context. Glossary at `docs/glossary.md`; ADRs in `docs/decisions/` (not t
 
 When ending a work session:
 
-1. **Update Issue state** — close completed Issues; make sure in-progress work has an open PR (the in-review signal).
+1. **Update board state** — close completed Issues (Status auto-moves to Done); make sure in-progress work has an open PR and its board Status reflects reality (In Progress / In Review).
 2. **Pass quality gates** — `pnpm lint`, `pnpm lint:md`, and any component tests.
 3. **Push PRs to remote** — `git push` must succeed before the session ends.
 4. **Hand off** — drop context for the next session in a PR comment or a fresh Issue.

@@ -4,6 +4,14 @@ How the project is run, decided, and maintained.
 
 **Status:** Stub. Each item below ships as its own file before OSS launch (see [`../roadmap.md`](../roadmap.md)).
 
+## In effect now
+
+Operational tracking docs that already ship:
+
+- [`labels.md`](labels.md) — label model (readiness, area, special, automation)
+- [`issue-types.md`](issue-types.md) — Issue Type axis (Bug / Feature / Task / Epic / Proposal)
+- [`projects.md`](projects.md) — the Projects v2 board (views, fields, work-status)
+
 ## Contents
 
 - Working group charter (who decides what, how seats rotate)
@@ -24,11 +32,9 @@ Enterprise consumers need to know how decisions get made before they adopt. Gove
 - USWDS: 45-day public comment window for new component proposals
 - TDesign: contributor-ladder language ("personal projects → first issue → first MR → reviewer")
 
-## Branch protection (main)
+## Branch protection (rulesets)
 
-Configure via repo settings → Branches → Branch protection rules:
+`main` is protected by GitHub **rulesets** (not classic branch protection):
 
-- Required status checks: `lint` (always), `commitlint` (PRs). These are defined in [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml). Without them marked as required, Renovate's `platformAutomerge` can merge unverified PRs.
-- Required reviews: 1 (maintainer)
-- Require signed commits: optional but recommended
-- Restrict force-pushes and branch deletion
+- **Required CI Checks** (repo ruleset) — requires the `CI Summary` and `Analyze (CodeQL)` status checks, strict (branches must be up to date before merge). `CI Summary` is an aggregate gate that `needs` every CI job (static-analysis, build, test, commitlint), so it transitively requires them and the required-checks list never changes as jobs are added. Defined in [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml).
+- **Main Branch - Org** (org ruleset) — required pull request before merge, required signatures, linear history, Copilot code review, and blocks deletion + non-fast-forward pushes.

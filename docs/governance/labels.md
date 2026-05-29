@@ -1,6 +1,6 @@
 # Labels
 
-oakoss/ui classifies work with **GitHub Issue Types** (the type axis) plus a small set of **labels** (readiness, area, and a few special/automation flags). Issue lifecycle state is read from native GitHub signals, not labels — see [Readiness vs. status](#readiness-vs-status).
+oakoss/ui classifies work with **GitHub Issue Types** (the type axis) plus a small set of **labels** (readiness, area, and a few special/automation flags). Work-status lives in the project board's Status field, not labels — see [Readiness vs. status](#readiness-vs-status).
 
 For the type axis (Bug, Feature, Epic, Proposal, Task), see [`issue-types.md`](issue-types.md).
 
@@ -18,13 +18,12 @@ This is the vocabulary the [`triage` skill](../agents/triage-labels.md) applies.
 
 ## Readiness vs. status
 
-We deliberately do **not** track a `status:*` lifecycle (in-progress, in-review, blocked). Those states are already legible from native GitHub signals:
+Readiness and work-status are two separate axes:
 
-- **In progress** → the Issue has an assignee
-- **In review** → a linked PR is open
-- **Blocked** → an open sub-issue or tracked dependency
+- **Readiness** (these labels) — the _intake_ question: "can this be picked up, and by whom?"
+- **Work-status** — the _pipeline_ question: "where is it?" This lives in the project board's **Status** field (Todo / In Progress / In Review / Done), not in labels. See [`projects.md`](projects.md).
 
-Labels for them would duplicate signals GitHub already maintains.
+There is deliberately no `status:*` label set — the board's Status field is the single source of truth for pipeline state, so status labels would duplicate it.
 
 ## Area labels (zero or more)
 
