@@ -7,7 +7,7 @@
 
 ## Summary
 
-Define the token taxonomy for `@oakoss/tokens` — the tier structure, naming, scales, and the semantic contract that themes resolve against. This is the "B" track of the A→B-parallel plan: the [`@oakoss/tokens` scaffold (epic #21)](../research/tokens-and-themes-architecture.md) proves the Terrazzo→Tailwind pipeline now with a placeholder Mauve primitive ramp; this proposal decides the real system that replaces it.
+Define the token taxonomy for `@oakoss/tokens` — the tier structure, naming, scales, and the semantic contract that themes resolve against. This is the "B" track of the A→B-parallel plan: the `@oakoss/tokens` scaffold ([epic #21](https://github.com/oakoss/ui/issues/21)) proves the Terrazzo→Tailwind pipeline now with a placeholder Mauve primitive ramp; this proposal decides the real system that replaces it.
 
 ## Motivation
 
