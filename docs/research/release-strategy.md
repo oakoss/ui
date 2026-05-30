@@ -7,7 +7,7 @@
 
 ## Why this is research, not a decision
 
-Internal release tooling does not bind component code or external consumers — they see published artifacts, not the pipeline that produced them. By the rule codified in [`../decisions/README.md`](../decisions/README.md) (`When NOT to write a decision`: internal tooling and vendor choices), the release pipeline belongs here as a recommendation/recording, not as an ADR. Decisions like Chromatic ([005](visual-testing-with-chromatic.md)), Storybook addon-a11y ([006](accessibility-testing-with-storybook-addon-a11y.md)), and Fumadocs ([007](fumadocs-on-tanstack-start-for-docs.md)) were demoted on the same grounds.
+Internal release tooling does not bind component code or external consumers — they see published artifacts, not the pipeline that produced them. By the rule codified in [`../decisions/README.md`](../decisions/README.md) (`When NOT to write a decision`: internal tooling and vendor choices), the release pipeline belongs here as a recommendation/recording, not as an ADR. Recommendations like [visual regression](visual-regression-testing.md), [Storybook addon-a11y](accessibility-testing-with-storybook-addon-a11y.md), and [Fumadocs](fumadocs-on-tanstack-start-for-docs.md) were demoted on the same grounds.
 
 ## Pipeline overview
 

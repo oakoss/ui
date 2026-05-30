@@ -20,8 +20,8 @@ Enterprise OSS React design system built on [React Aria Components](https://reac
 | Styling layer        | Tailwind v4 (CSS-first `@theme`) + `tailwind-variants` + `eslint-plugin-better-tailwindcss`                          |
 | Docs site            | Fumadocs on TanStack Start (Next.js as the fallback host)                                                            |
 | Component explorer   | Storybook 10 (also visual + a11y test target)                                                                        |
-| Visual regression CI | Chromatic (OSS tier) + Argos (MIT) as fallback                                                                       |
-| A11y CI              | `eslint-plugin-jsx-a11y` + `@storybook/addon-a11y`                                                                   |
+| Visual regression CI | Self-hosted Playwright Test (`toHaveScreenshot`, $0 / no limits) against built Storybook stories                     |
+| A11y CI              | `eslint-plugin-jsx-a11y` + `@storybook/addon-a11y` via the Storybook Vitest addon                                    |
 | AI integration       | `@oakoss/mcp-server` (stdio); registry consumable by v0 / shadcn MCP transitively via the distribution choice        |
 
 ## Accessibility target
