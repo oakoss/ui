@@ -18,7 +18,7 @@ See [`../research/tooling-evaluation.md`](../research/tooling-evaluation.md) for
 Layered defense for v0.1:
 
 1. **`eslint-plugin-jsx-a11y`** — static lint baseline on every PR.
-2. **`@storybook/addon-a11y`** with test-runner `parameters.a11y.test: 'error'` — component-level runtime axe in CI, fails the build on violations.
+2. **`@storybook/addon-a11y`** via the Storybook Vitest addon (`parameters.a11y.test: 'error'`) — component-level runtime axe in CI, fails the build on violations.
 3. **`@axe-core/playwright`** — added post-v0.1 once we have E2E coverage of the docs site.
 
 ## Consequences

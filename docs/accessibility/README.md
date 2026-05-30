@@ -13,7 +13,7 @@ Each shipped component is tested against these targets.
 ## Testing methodology
 
 - **Static**: `eslint-plugin-jsx-a11y` on every PR
-- **Component-level runtime**: `@storybook/addon-a11y` with test-runner set to `parameters.a11y.test: 'error'` (axe-core engine)
+- **Component-level runtime**: `@storybook/addon-a11y` via the Storybook Vitest addon (`parameters.a11y.test: 'error'`, axe-core engine)
 - **Integration**: `@axe-core/playwright` against the docs site
 - **Manual**: VoiceOver (macOS, iOS), NVDA + JAWS (Windows), TalkBack (Android)
 
