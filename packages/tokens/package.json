@@ -1,0 +1,14 @@
+{
+  "name": "@oakoss/tokens",
+  "version": "0.0.0",
+  "private": true,
+  "description": "DTCG source tokens compiled by Terrazzo into Tailwind v4 @theme output. Workspace-only; distributed via the registry.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "./theme": "./dist/theme.css"
+  },
+  "scripts": {
+    "build": "mkdir -p dist && echo '/* placeholder: Terrazzo @theme output lands in #23 */' > dist/theme.css"
+  }
+}
