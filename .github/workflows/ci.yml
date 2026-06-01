@@ -37,9 +37,17 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Setup
         uses: ./.github/actions/setup
-      # No-op until a package defines a build script; validates builds once packages exist.
       - name: Build
         run: pnpm build
+      - name: Assert tokens @theme output
+        run: |
+          THEME="packages/tokens/dist/theme.css"
+          test -f "$THEME" || { echo "::error::$THEME not emitted by terrazzo build"; exit 1; }
+          grep -q '@theme' "$THEME"          || { echo "::error::$THEME missing @theme block"; exit 1; }
+          COUNT=$(grep -c -- '--color-mauve-[0-9]\+:' "$THEME")
+          [ "$COUNT" -eq 12 ] || { echo "::error::$THEME has $COUNT mauve steps, expected 12"; exit 1; }
+          grep -q -- '--color-mauve-1:.*oklch(' "$THEME" || { echo "::error::$THEME mauve values not emitted as oklch()"; exit 1; }
+          echo "tokens @theme assertion passed"
 
   test:
     runs-on: ubuntu-latest

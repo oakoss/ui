@@ -9,6 +9,12 @@
     "./theme": "./dist/theme.css"
   },
   "scripts": {
-    "build": "node -e \"require('fs').mkdirSync('dist',{recursive:true});require('fs').writeFileSync('dist/theme.css','/* placeholder: Terrazzo @theme output lands in #23 */')\""
+    "build": "terrazzo build"
+  },
+  "devDependencies": {
+    "@terrazzo/cli": "2.2.0",
+    "@terrazzo/plugin-css": "2.2.0",
+    "@terrazzo/plugin-tailwind": "2.2.0",
+    "tailwindcss": "4.3.0"
   }
 }

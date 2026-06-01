@@ -3,6 +3,7 @@ packages:
   - 'apps/*'
 
 allowBuilds:
+  esbuild: true
   lefthook: true
 
 # turbo's platform binaries bypass any minimum-release-age gate so a turbo bump installs immediately.
