@@ -1,6 +1,6 @@
 # Tokens and themes architecture (design exploration)
 
-- **Status:** Exploration — input to the future token-taxonomy Proposal and a themes Proposal. Not ratified. No code depends on this yet.
+- **Status:** Exploration — input to the token-taxonomy Proposal ([proposals/001](../proposals/001-token-taxonomy.md), which ratifies and in places supersedes this note) and a future themes Proposal. Not ratified itself. No code depends on this directly.
 - **Date:** 2026-05-28
 - **Scope:** How `@oakoss/tokens` and `@oakoss/themes` relate — tiering, the semantic contract, theme/mode modeling, and community-palette support.
 - **Related:** [decision 004](../decisions/004-dtcg-tokens-with-terrazzo.md), [decision 009](../decisions/009-tokens-and-themes-via-registry.md), [decision 011](../decisions/011-styling-layer-tailwind-v4.md), [architectural-standards](architectural-standards.md)
