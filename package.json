@@ -1,0 +1,62 @@
+{
+  "name": "@oakoss/ui",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "license": "MIT",
+  "author": "",
+  "type": "module",
+  "scripts": {
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "lint": "pnpm run lint:oxlint && pnpm run lint:eslint && pnpm run lint:md",
+    "lint:eslint": "eslint --max-warnings 0 --cache --cache-location node_modules/.cache/eslint/.eslintcache .",
+    "lint:eslint:fix": "eslint --max-warnings 0 --fix --cache --cache-location node_modules/.cache/eslint/.eslintcache .",
+    "lint:fix": "pnpm run lint:oxlint:fix && pnpm run lint:eslint:fix && pnpm run lint:md:fix",
+    "lint:md": "markdownlint-cli2 '**/*.md'",
+    "lint:md:fix": "markdownlint-cli2 --fix '**/*.md'",
+    "lint:oxlint": "oxlint",
+    "lint:oxlint:fix": "oxlint --fix",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.0.2",
+    "@commitlint/config-conventional": "^21.0.2",
+    "@eslint-react/eslint-plugin": "^5.9.2",
+    "@types/eslint-plugin-jsx-a11y": "^6.10.1",
+    "@types/node": "^26.0.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitest/eslint-plugin": "^1.6.20",
+    "czg": "^1.13.1",
+    "eslint": "^10.5.0",
+    "eslint-plugin-better-tailwindcss": "^4.6.0",
+    "eslint-plugin-import-x": "^4.17.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-oxlint": "^1.71.0",
+    "eslint-plugin-perfectionist": "^5.9.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-unicorn": "^68.0.0",
+    "globals": "^17.7.0",
+    "lefthook": "^2.1.9",
+    "markdownlint-cli2": "^0.22.1",
+    "oxfmt": "^0.56.0",
+    "oxlint": "^1.71.0",
+    "oxlint-tsgolint": "^0.23.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.62.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.9.0",
+      "onFail": "download"
+    }
+  }
+}

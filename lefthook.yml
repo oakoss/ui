@@ -1,0 +1,40 @@
+output:
+  - failure # Only show failed steps
+  - execution_out # Show command output for failures
+
+pre-commit:
+  # Top level runs sequentially: all checks first, then format last so oxfmt
+  # normalizes whatever the linters fixed.
+  jobs:
+    - name: checks
+      group:
+        parallel: true
+        jobs:
+          - name: typecheck
+            glob: '*.{ts,tsx}'
+            run: pnpm typecheck --pretty false
+          - name: lint-md
+            glob: '*.md'
+            run: pnpm markdownlint-cli2 --fix {staged_files}
+            stage_fixed: true
+          - name: lint
+            glob: '*.{ts,tsx,js,jsx,cjs,mjs}'
+            group:
+              # oxlint and eslint both --fix the same files; run them in
+              # sequence so their writes can't race.
+              piped: true
+              jobs:
+                - name: oxlint
+                  run: pnpm oxlint -c .oxlintrc.json --fix {staged_files}
+                  stage_fixed: true
+                - name: eslint
+                  run: pnpm eslint {staged_files} --max-warnings 0 --fix --cache --cache-location node_modules/.cache/eslint/.eslintcache
+                  stage_fixed: true
+    - name: format
+      run: pnpm oxfmt --no-error-on-unmatched-pattern {staged_files}
+      stage_fixed: true
+
+commit-msg:
+  commands:
+    commitlint:
+      run: pnpm commitlint --edit "$1"

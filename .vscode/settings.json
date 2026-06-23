@@ -1,0 +1,37 @@
+{
+  "[css]": { "editor.defaultFormatter": "oxc.oxc-vscode" },
+  "[javascript]": { "editor.defaultFormatter": "oxc.oxc-vscode" },
+  "[javascriptreact]": { "editor.defaultFormatter": "oxc.oxc-vscode" },
+  "[json]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "[markdown]": { "editor.defaultFormatter": "oxc.oxc-vscode" },
+  "[typescript]": { "editor.defaultFormatter": "oxc.oxc-vscode" },
+  "[typescriptreact]": { "editor.defaultFormatter": "oxc.oxc-vscode" },
+  "[yaml]": { "editor.defaultFormatter": "oxc.oxc-vscode" },
+  "biome.enabled": false,
+  "editor.codeActionsOnSave": { "source.fixAll.oxc": "always" },
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "file",
+  "editor.quickSuggestions": { "strings": "on" },
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+  "files.readonlyInclude": { "pnpm-lock.yaml": true },
+  "files.watcherExclude": { "pnpm-lock.yaml": true },
+  "js/ts.preferences.autoImportFileExcludePatterns": [],
+  "js/ts.preferences.autoImportSpecifierExcludeRegexes": ["^(node:)?os$"],
+  "js/ts.preferences.importModuleSpecifier": "non-relative",
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
+  "oxc.configPath": ".oxlintrc.json",
+  "oxc.fmt.configPath": ".oxfmtrc.json",
+  "oxc.path.oxfmt": "./node_modules/.bin/oxfmt",
+  "oxc.typeAware": true,
+  "prettier.enable": false,
+  "search.exclude": { "pnpm-lock.yaml": true }
+}

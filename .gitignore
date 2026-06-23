@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Test & coverage
+coverage/
+test-results/
+
+# Storybook
+storybook-static/
+
+# Logs
+*.log
+pnpm-debug.log*
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+
+# Local Claude Code settings (machine-specific)
+.claude/settings.local.json
+
+# review-cycle gate state (local-only)
+.claude/.review-mark
+.claude/.no-review-gate
