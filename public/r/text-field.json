@@ -1,0 +1,27 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "text-field",
+  "title": "Text Field",
+  "description": "Labeled text input with description and validation, built on React Aria Components.",
+  "dependencies": [
+    "react-aria-components",
+    "tailwind-variants",
+    "tailwind-merge"
+  ],
+  "registryDependencies": ["@oakoss/theme"],
+  "files": [
+    {
+      "path": "src/components/ui/inputs/text-field.tsx",
+      "content": "import type { ReactNode } from 'react';\n\nimport {\n  FieldError as AriaFieldError,\n  Input as AriaInput,\n  Label as AriaLabel,\n  Text as AriaText,\n  TextField as AriaTextField,\n  type TextFieldProps as AriaTextFieldProps,\n  type ValidationResult,\n} from 'react-aria-components';\nimport { tv } from 'tailwind-variants';\n\nimport { cx } from '#/lib/cx';\n\nexport const textFieldStyles = tv({\n  slots: {\n    description: 'text-xs text-muted-foreground',\n    error: 'text-xs text-destructive',\n    input:\n      'flex h-9 w-full rounded-md border border-border bg-background px-3 py-1 text-sm transition-colors outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[invalid]:border-destructive data-[invalid]:focus-visible:ring-destructive',\n    label: 'text-sm font-medium text-foreground',\n    root: 'flex flex-col gap-1.5',\n  },\n});\n\nexport type TextFieldProps = {\n  description?: string;\n  errorMessage?: ((validation: ValidationResult) => ReactNode) | ReactNode;\n  label?: string;\n  placeholder?: string;\n} & Omit<AriaTextFieldProps, 'children'>;\n\nexport function TextField({\n  className,\n  description,\n  errorMessage,\n  label,\n  placeholder,\n  ...props\n}: TextFieldProps) {\n  const styles = textFieldStyles();\n  const hasLabel = label !== undefined && label !== '';\n  const hasDescription = description !== undefined && description !== '';\n  return (\n    <AriaTextField {...props} className={cx(styles.root(), className)}>\n      {hasLabel ? (\n        <AriaLabel className={styles.label()}>{label}</AriaLabel>\n      ) : null}\n      <AriaInput className={styles.input()} placeholder={placeholder} />\n      {hasDescription ? (\n        <AriaText className={styles.description()} slot=\"description\">\n          {description}\n        </AriaText>\n      ) : null}\n      <AriaFieldError className={styles.error()}>{errorMessage}</AriaFieldError>\n    </AriaTextField>\n  );\n}\n",
+      "type": "registry:ui",
+      "target": "@ui/inputs/text-field.tsx"
+    },
+    {
+      "path": "src/lib/cx.ts",
+      "content": "import { composeRenderProps } from 'react-aria-components';\nimport { type ClassNameValue, twMerge } from 'tailwind-merge';\n\ntype Render<T> = ((values: T) => string) | string | undefined;\n\n/**\n * Merge Tailwind classes and compose with React Aria's render-prop `className`.\n * `base` is the component's own classes (a string or array); `className` is the\n * consumer's override — a string, a render function, or undefined.\n */\nexport function cx<T = unknown>(\n  base: ClassNameValue,\n  className?: Render<T>,\n): (values: T) => string {\n  return composeRenderProps(className, (resolved) => twMerge(base, resolved));\n}\n",
+      "type": "registry:lib",
+      "target": "@lib/cx.ts"
+    }
+  ],
+  "type": "registry:ui"
+}

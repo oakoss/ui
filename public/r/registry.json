@@ -18,6 +18,8 @@
           "secondary-foreground": "oklch(0.205 0 0)",
           "accent": "oklch(0.97 0 0)",
           "accent-foreground": "oklch(0.205 0 0)",
+          "muted": "oklch(0.97 0 0)",
+          "muted-foreground": "oklch(0.556 0 0)",
           "destructive": "oklch(0.577 0.245 27.325)",
           "destructive-foreground": "oklch(0.985 0 0)",
           "border": "oklch(0.922 0 0)",
@@ -32,6 +34,8 @@
           "secondary-foreground": "oklch(0.985 0 0)",
           "accent": "oklch(0.269 0 0)",
           "accent-foreground": "oklch(0.985 0 0)",
+          "muted": "oklch(0.269 0 0)",
+          "muted-foreground": "oklch(0.708 0 0)",
           "destructive": "oklch(0.5 0.2 27)",
           "destructive-foreground": "oklch(0.985 0 0)",
           "border": "oklch(1 0 0 / 10%)",
@@ -55,6 +59,30 @@
           "path": "src/components/ui/inputs/button.tsx",
           "type": "registry:ui",
           "target": "@ui/inputs/button.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        }
+      ]
+    },
+    {
+      "name": "text-field",
+      "type": "registry:ui",
+      "title": "Text Field",
+      "description": "Labeled text input with description and validation, built on React Aria Components.",
+      "registryDependencies": ["@oakoss/theme"],
+      "dependencies": [
+        "react-aria-components",
+        "tailwind-variants",
+        "tailwind-merge"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/text-field.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/text-field.tsx"
         },
         {
           "path": "src/lib/cx.ts",
