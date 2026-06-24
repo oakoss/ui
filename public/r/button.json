@@ -1,0 +1,27 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "button",
+  "title": "Button",
+  "description": "Accessible button built on React Aria Components.",
+  "dependencies": [
+    "react-aria-components",
+    "tailwind-variants",
+    "tailwind-merge"
+  ],
+  "registryDependencies": ["@oakoss/theme"],
+  "files": [
+    {
+      "path": "src/components/ui/inputs/button.tsx",
+      "content": "import {\n  Button as AriaButton,\n  type ButtonProps as AriaButtonProps,\n} from 'react-aria-components';\nimport { tv, type VariantProps } from 'tailwind-variants';\n\nimport { cx } from '#/lib/cx';\n\nexport const buttonStyles = tv({\n  base: 'inline-flex cursor-pointer items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',\n  defaultVariants: { intent: 'primary', size: 'md' },\n  variants: {\n    intent: {\n      destructive:\n        'bg-destructive text-destructive-foreground hover:bg-destructive/90',\n      ghost: 'hover:bg-accent hover:text-accent-foreground',\n      outline:\n        'border border-border bg-background hover:bg-accent hover:text-accent-foreground',\n      primary: 'bg-primary text-primary-foreground hover:bg-primary/90',\n      secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',\n    },\n    size: {\n      icon: 'size-9',\n      lg: 'h-10 px-6',\n      md: 'h-9 px-4',\n      sm: 'h-8 px-3 text-xs',\n    },\n  },\n});\n\nexport type ButtonProps = AriaButtonProps & VariantProps<typeof buttonStyles>;\n\nexport function Button({ className, intent, size, ...props }: ButtonProps) {\n  return (\n    <AriaButton\n      {...props}\n      className={cx(buttonStyles({ intent, size }), className)}\n    />\n  );\n}\n",
+      "type": "registry:ui",
+      "target": "@ui/inputs/button.tsx"
+    },
+    {
+      "path": "src/lib/cx.ts",
+      "content": "import { composeRenderProps } from 'react-aria-components';\nimport { type ClassNameValue, twMerge } from 'tailwind-merge';\n\ntype Render<T> = ((values: T) => string) | string | undefined;\n\n/**\n * Merge Tailwind classes and compose with React Aria's render-prop `className`.\n * `base` is the component's own classes (a string or array); `className` is the\n * consumer's override — a string, a render function, or undefined.\n */\nexport function cx<T = unknown>(\n  base: ClassNameValue,\n  className?: Render<T>,\n): (values: T) => string {\n  return composeRenderProps(className, (resolved) => twMerge(base, resolved));\n}\n",
+      "type": "registry:lib",
+      "target": "@lib/cx.ts"
+    }
+  ],
+  "type": "registry:ui"
+}
