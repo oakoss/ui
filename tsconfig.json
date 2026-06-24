@@ -17,10 +17,15 @@
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
-    "types": ["node"]
+    "types": ["node"],
+    "resolvePackageJsonImports": true
   },
   "include": [
     "src",
+    ".storybook/**/*.ts",
+    ".storybook/**/*.tsx",
+    "vitest.config.ts",
+    "vitest.shims.d.ts",
     "eslint.config.js",
     ".commitlintrc.js",
     ".markdownlint-cli2.mjs"

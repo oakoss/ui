@@ -194,12 +194,17 @@
         "**/*.stories.*",
         "**/*.test.*",
         "**/*.spec.*",
-        "**/*.integration.*"
+        "**/*.integration.*",
+        ".storybook/**/*",
+        "vite.config.ts",
+        "vitest.config.ts"
       ],
       "rules": {
         "no-console": "off",
         "no-empty-function": "off",
         "no-empty-pattern": "off",
+        "import/no-relative-parent-imports": "off",
+        "import/no-unassigned-import": "off",
         "unicorn/no-process-exit": "off",
         "unicorn/no-useless-undefined": "off",
         "unicorn/prefer-top-level-await": "off"

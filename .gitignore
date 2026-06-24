@@ -12,6 +12,7 @@ test-results/
 
 # Storybook
 storybook-static/
+*storybook.log
 
 # Logs
 *.log

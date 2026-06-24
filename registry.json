@@ -1,0 +1,30 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "oakoss-ui",
+  "homepage": "https://github.com/oakoss/ui",
+  "items": [
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "Accessible button built on React Aria Components.",
+      "dependencies": [
+        "react-aria-components",
+        "tailwind-variants",
+        "tailwind-merge"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/button.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/button.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        }
+      ]
+    }
+  ]
+}

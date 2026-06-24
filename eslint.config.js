@@ -1,5 +1,3 @@
-//  @ts-check
-
 import pluginReact from '@eslint-react/eslint-plugin';
 import vitest from '@vitest/eslint-plugin';
 import betterTailwindcss from 'eslint-plugin-better-tailwindcss';
@@ -8,6 +6,7 @@ import jsxA11y from 'eslint-plugin-jsx-a11y';
 import oxlint from 'eslint-plugin-oxlint';
 import perfectionist from 'eslint-plugin-perfectionist';
 import reactHooks from 'eslint-plugin-react-hooks';
+import storybook from 'eslint-plugin-storybook';
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
@@ -23,6 +22,7 @@ export default defineConfig(
     '.env*',
   ]),
   { languageOptions: { ecmaVersion: 'latest', globals: globals.browser } },
+  ...storybook.configs['flat/recommended'],
 
   // TypeScript, type-aware. oxlint owns the syntactic TS rules (disabled below
   // by buildFromOxlint); ESLint keeps the type-aware ones.

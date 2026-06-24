@@ -22,7 +22,7 @@
   },
   "sortTailwindcss": {
     "stylesheet": "./src/styles/globals.css",
-    "functions": ["cn", "clsx", "cva", "cx"]
+    "functions": ["cn", "clsx", "cva", "cx", "tv"]
   },
   "ignorePatterns": [
     "package-lock.json",
