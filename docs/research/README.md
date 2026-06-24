@@ -1,0 +1,14 @@
+# Research
+
+Research notes that inform ideas, specs, and decisions. Each note captures what was investigated, what was found, and the sources — so a decision can cite the research behind it rather than re-deriving it.
+
+## Adding a note
+
+1. Copy [`0000-template.md`](./0000-template.md) to `NNNN-kebab-title.md`, using the next free number.
+2. Fill in the summary, findings, and sources. Link related ideas or specs in `Related:`.
+
+## Index
+
+<!-- Add newest first: - [NNNN — Title](./NNNN-kebab-title.md) — one-line hook -->
+
+- [0001 — Design System Foundations & Token Architecture](./0001-design-system.md) — semantic-tier tokens, CSS-var theming, functional folders over atomic, and a generator to kill the token hand-sync.
