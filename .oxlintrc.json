@@ -17,6 +17,8 @@
   "rules": {
     "no-console": "warn",
     "react/exhaustive-deps": "off",
+    "react/exhaustive-effect-dependencies": "off",
+    "react/memo-dependencies": "off",
     "no-unused-vars": [
       "error",
       { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }

@@ -1,7 +1,7 @@
 import pluginReact from '@eslint-react/eslint-plugin';
 import vitest from '@vitest/eslint-plugin';
 import betterTailwindcss from 'eslint-plugin-better-tailwindcss';
-import importX from 'eslint-plugin-import-x';
+import { importX } from 'eslint-plugin-import-x';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import oxlint from 'eslint-plugin-oxlint';
 import perfectionist from 'eslint-plugin-perfectionist';
@@ -43,7 +43,7 @@ export default defineConfig(
   // @eslint-react contributes ONLY the rules oxlint's react plugin can't do
   // (type-aware leak detection, modern footguns, naming). oxlint owns the rest;
   // this list shrinks as oxlint gains react coverage. Hooks/compiler rules are
-  // left to eslint-plugin-react-hooks below.
+  // split with eslint-plugin-react-hooks below.
   {
     files: ['**/*.tsx'],
     languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } },
@@ -91,9 +91,11 @@ export default defineConfig(
     },
   },
 
-  // Official React Compiler + hooks rules. buildFromOxlint disables both
-  // react-hooks rules from its static map; oxlint owns rules-of-hooks, and
-  // exhaustive-deps is re-enabled below as a warning (oxlint doesn't run it).
+  // Official React Compiler + hooks rules. buildFromOxlint disables the ones
+  // oxlint enables (by category or rule); an oxlint `off` on one of them
+  // (spelled react/* in oxlint) doesn't undo that. Left here: config and
+  // gating (no oxlint port) and unsupported-syntax (oxlint's restriction
+  // category is off); exhaustive-deps is re-enabled below as a warning.
   {
     extends: [reactHooks.configs.flat['recommended-latest']],
     files: ['**/*.{ts,tsx}'],
