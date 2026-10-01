@@ -25,7 +25,7 @@ pre-commit:
               piped: true
               jobs:
                 - name: oxlint
-                  run: pnpm oxlint -c .oxlintrc.json --fix {staged_files}
+                  run: pnpm oxlint --fix {staged_files}
                   stage_fixed: true
                 - name: eslint
                   run: pnpm eslint {staged_files} --max-warnings 0 --fix --cache --cache-location node_modules/.cache/eslint/.eslintcache

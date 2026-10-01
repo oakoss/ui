@@ -11,6 +11,8 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
+import oxlintConfig from './oxlint.config.ts';
+
 export default defineConfig(
   globalIgnores([
     'node_modules',
@@ -140,9 +142,7 @@ export default defineConfig(
   },
 
   // Must be after every recommended extend: turns off the rules oxlint owns.
-  ...oxlint.buildFromOxlintConfigFile('./.oxlintrc.json', {
-    withNursery: true,
-  }),
+  ...oxlint.buildFromOxlintConfig(oxlintConfig, { withNursery: true }),
 
   // Override layer: our deliberate exceptions, after the oxlint dedup. These
   // also mirror oxlint `off` settings that the ESLint recommended configs would
