@@ -32,6 +32,6 @@ export default defineConfig({
   sortPackageJson: { sortScripts: true },
   sortTailwindcss: {
     functions: ['cn', 'clsx', 'cva', 'cx', 'tv'],
-    stylesheet: './src/styles/globals.css',
+    stylesheet: './packages/ui/src/styles/globals.css',
   },
 });

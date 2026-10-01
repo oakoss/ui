@@ -13,10 +13,7 @@ const config: StorybookConfig = {
   async viteFinal(viteConfig) {
     const { mergeConfig } = await import('vite');
     const { default: tailwindcss } = await import('@tailwindcss/vite');
-    return mergeConfig(viteConfig, {
-      plugins: [tailwindcss()],
-      resolve: { tsconfigPaths: true },
-    });
+    return mergeConfig(viteConfig, { plugins: [tailwindcss()] });
   },
 };
 

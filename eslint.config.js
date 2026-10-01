@@ -9,21 +9,36 @@ import storybook from 'eslint-plugin-storybook';
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
+import path from 'node:path';
 import tseslint from 'typescript-eslint';
 
 import oxlintConfig from './oxlint.config.ts';
 
 export default defineConfig(
   globalIgnores([
-    'node_modules',
-    'dist',
-    'coverage',
-    'test-results',
-    'storybook-static',
-    '.env*',
+    '**/node_modules',
+    '**/dist',
+    '**/coverage',
+    '**/test-results',
+    '**/storybook-static',
+    '**/.env*',
   ]),
   { languageOptions: { ecmaVersion: 'latest', globals: globals.browser } },
   ...storybook.configs['flat/recommended'],
+  {
+    files: ['apps/storybook/.storybook/main.@(js|cjs|mjs|ts)'],
+    rules: {
+      'storybook/no-uninstalled-addons': [
+        'error',
+        {
+          packageJsonLocation: path.join(
+            import.meta.dirname,
+            'apps/storybook/package.json',
+          ),
+        },
+      ],
+    },
+  },
 
   // TypeScript, type-aware. oxlint owns the TS rules it implements (disabled
   // below by buildFromOxlint); ESLint keeps the rest.
@@ -119,15 +134,18 @@ export default defineConfig(
     },
     settings: {
       'better-tailwindcss': {
-        entryPoint: 'src/styles/globals.css',
+        entryPoint: path.join(
+          import.meta.dirname,
+          'packages/ui/src/styles/globals.css',
+        ),
         rootFontSize: 16,
-        tsconfig: './tsconfig.json',
+        tsconfig: path.join(import.meta.dirname, 'packages/ui/tsconfig.json'),
       },
     },
   },
 
   {
-    files: ['src/**/*.{ts,tsx}'],
+    files: ['**/src/**/*.{ts,tsx}'],
     // Test files use dynamic imports intentionally (vi.mock factories).
     ignores: ['**/*.{test,spec}.{ts,tsx}', '**/*.integration.{ts,tsx}'],
     rules: {

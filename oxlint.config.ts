@@ -166,9 +166,9 @@ export default defineConfig({
         '**/*.test.*',
         '**/*.spec.*',
         '**/*.integration.*',
-        '.storybook/**/*',
+        '**/.storybook/**/*',
         'vite.config.ts',
-        'vitest.config.ts',
+        '**/vitest.config.ts',
       ],
       rules: {
         'import/no-relative-parent-imports': 'off',

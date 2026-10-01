@@ -32,3 +32,6 @@ pnpm-debug.log*
 # review-cycle gate state (local-only)
 .claude/.review-mark
 .claude/.no-review-gate
+
+# Turborepo
+.turbo/
