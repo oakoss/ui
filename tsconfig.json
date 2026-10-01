@@ -25,6 +25,8 @@
     ".storybook/**/*.ts",
     ".storybook/**/*.tsx",
     "vitest.config.ts",
+    "oxlint.config.ts",
+    "oxfmt.config.ts",
     "vitest.shims.d.ts",
     "eslint.config.js",
     ".commitlintrc.js",
