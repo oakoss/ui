@@ -2,6 +2,12 @@ output:
   - failure # Only show failed steps
   - execution_out # Show command output for failures
 
+# Beads jobs call the generated .beads/hooks/* shims directly; they already
+# handle a missing `bd` and an uninitialized database. Their timeout works only
+# under GNU coreutils `timeout`; the perl fallback does not stop a hung `bd`.
+# `core.hooksPath` must stay unset: `bd init` sets it to .beads/hooks, which
+# makes git bypass lefthook (and commitlint) silently. Use `bd bootstrap`.
+
 pre-commit:
   # Top level runs sequentially: all checks first, then format last so oxfmt
   # normalizes whatever the linters fixed.
@@ -33,8 +39,42 @@ pre-commit:
     - name: format
       run: pnpm oxfmt --no-error-on-unmatched-pattern {staged_files}
       stage_fixed: true
+    - name: beads
+      env:
+        TERM: dumb
+      run: .beads/hooks/pre-commit
 
 commit-msg:
   commands:
     commitlint:
       run: pnpm commitlint --edit "$1"
+
+prepare-commit-msg:
+  commands:
+    beads:
+      env:
+        TERM: dumb
+      # Only {1}: lefthook passes an unfilled positional as the literal "{2}",
+      # which beads would read as git's commit-source argument.
+      run: .beads/hooks/prepare-commit-msg {1}
+
+post-merge:
+  commands:
+    beads:
+      env:
+        TERM: dumb
+      run: .beads/hooks/post-merge {1}
+
+post-checkout:
+  commands:
+    beads:
+      env:
+        TERM: dumb
+      run: .beads/hooks/post-checkout {1} {2} {3}
+
+pre-push:
+  commands:
+    beads:
+      env:
+        TERM: dumb
+      run: .beads/hooks/pre-push {1} {2}

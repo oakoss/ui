@@ -35,3 +35,13 @@ Default to fixing inline. Defer to a follow-up only if:
 If you can describe the fix in one sentence, just do the fix.
 
 When deferring, briefly state which criterion above applies.
+
+# Task tracking
+
+Use `bd` (beads). Run `bd prime` for the command reference and session protocol.
+
+Run `pnpm run setup` after cloning. It runs `bd bootstrap`, which clones the task graph from `BD_SYNC_REMOTE` in `.beads/.env`. That file is gitignored because it names a private host; without it, bootstrap creates a fresh local database. Until setup runs, the `.beads/hooks/*` shims skip themselves.
+
+- **Prefer `bd bootstrap` to `bd init`.** `bd init` and `bd hooks install --beads` set `core.hooksPath`, which makes git bypass lefthook and commitlint silently. If one gets set, unset it.
+- **`git push` does not sync tasks.** Run `bd dolt push` explicitly.
+- **Don't commit the host.** On bd 1.3.1, `bd dolt remote add` writes `sync.remote` into `.beads/config.yaml` and commits it (`bd: update sync.remote`). Undo that commit before pushing, and strip the `sync:` block.
