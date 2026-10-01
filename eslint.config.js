@@ -129,7 +129,7 @@ export default defineConfig(
   {
     files: ['src/**/*.{ts,tsx}'],
     // Test files use dynamic imports intentionally (vi.mock factories).
-    ignores: ['**/*.test.{ts,tsx}', '**/*.integration.{ts,tsx}'],
+    ignores: ['**/*.{test,spec}.{ts,tsx}', '**/*.integration.{ts,tsx}'],
     rules: {
       'no-restricted-syntax': [
         'error',
