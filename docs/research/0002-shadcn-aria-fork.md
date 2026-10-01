@@ -20,7 +20,8 @@ Every claim below comes from shadcn's source at commit `d75a96a` (2026-10-01) or
 | Decision        | Choice                                                                                                        |
 | --------------- | ------------------------------------------------------------------------------------------------------------- |
 | Components      | Fork shadcn's React Aria base (`apps/v4/registry/bases/aria/ui`) and convert it to `tv`                       |
-| Variant library | Keep tailwind-variants: slots, built-in merging, `extend`                                                     |
+| Variant library | Keep tailwind-variants (slots, `extend`), using its `lite` build                                              |
+| Class merging   | The `cn` package, through `cx`, replacing `tailwind-merge`; configured with our custom token names            |
 | Styles          | Built from tokens. No `cva`, no `cn-*` hook CSS, no registry build step; shadcn's styles are reference values |
 | Themes          | Family × flavor × accent, with a primitive palette tier from the start                                        |
 | Typography      | Font roles and a type scale as tokens; presets ship as `registry:font` items                                  |
@@ -81,6 +82,17 @@ Two Tailwind behaviors make this workable. We confirmed both with Tailwind 4.3.3
 - **Tokens in `@theme` namespaces generate normal classes.** `--spacing-control` produced `.h-control { height: var(--spacing-control) }` and `.px-control`, and `--radius-control` produced `.rounded-control`.
 - **tailwind-merge has to be told about custom names.** By default, `twMerge('h-control h-9')` returned both classes, so a user's override wouldn't reliably win. With `extendTailwindMerge({ extend: { theme: { spacing: ['control'], radius: ['control'] } } })`, it returned `h-9`.
 
+### Class merging with `cn`
+
+In September 2026 shadcn moved its components to the `cn` package, a replacement for `clsx` plus `tailwind-merge`. We tested `cn` 0.4.0 with tailwind-variants 3.3.1 and tailwind-merge 3.7.0:
+
+- **Same output:** on 9 typical class sets (variant conflicts, state prefixes, arbitrary values, conditional objects), `cn(...)` matched `twMerge(clsx(...))` in all 9.
+- **Custom tokens:** `createCn({ extend: { theme: { spacing: ['control'], radius: ['control'] } } })` from `cn/config` resolved `h-control h-9` to `h-9`, the same as `extendTailwindMerge`.
+- **tailwind-variants bundles its own merger:** `tv` 3.3.1 includes a copy of the tailwind-merge engine, so full `tv` plus `cn` would run two merge engines, each needing the token config.
+- **`tailwind-variants/lite` doesn't merge:** on its own it returned `inline-flex px-2 h-9 rounded-md px-4 h-8`. Passed through `cn` with a `rounded-none` override, it returned `inline-flex px-4 h-8 rounded-none`, the same as full `tv` plus `cn`. Slot functions behave the same way.
+
+So components use lite `tv`, and `cx` does all merging with a `cn` instance built from the generated token config. Every `tv` result has to pass through `cx`; one that skips it ships unresolved conflicts, so the foundations step adds a lint rule or test for it.
+
 Why tokens rather than shadcn's hook CSS:
 
 - every class stays visible and autocompletes in the component file;
@@ -136,12 +148,13 @@ Our approach:
 1. **Docs app (PR 3)**, so later work can be shown live.
 2. **Token generator:**
    - families, flavors, accents and style tokens in `@theme` namespaces;
-   - the tailwind-merge config;
+   - the `cn` merge config for custom token names;
    - the contrast test;
    - Catppuccin and our default as the first two families.
 3. **Foundations:**
    - `icons.tsx` with a runtime `IconPlaceholder` and the icon-name test;
    - the `oakoss/ui/base` item;
+   - `cx` on `cn`, with a lint rule or test that every `tv` result passes through it;
    - Button and TextField re-ported as the reference conversions.
 4. **Component migration** in batches by category, starting with overlays (Dialog first). Each component records the shadcn commit it was forked from, so upstream fixes can be found by diffing.
 
@@ -154,7 +167,8 @@ Our approach:
 ## Sources
 
 - [shadcn changelog: React Aria (July 2026)](https://ui.shadcn.com/docs/changelog/2026-07-react-aria)
-- [shadcn-ui/ui source](https://github.com/shadcn-ui/ui) at `d75a96a`: `apps/v4/registry/bases/aria`, `apps/v4/examples/aria`, `apps/v4/registry/styles`, `packages/shadcn/src/styles`, `packages/registry/src/utils/transformers/transform-icons.ts`, `packages/registry/src/registry/schema.ts`
+- [shadcn-ui/ui source](https://github.com/shadcn-ui/ui) at `d75a96a`: `apps/v4/registry/bases/aria`, `apps/v4/examples/aria`, `apps/v4/registry/styles`, `apps/v4/content/docs/changelog/2026-09-cn.mdx`, `packages/shadcn/src/styles`, `packages/registry/src/utils/transformers/transform-icons.ts`, `packages/registry/src/registry/schema.ts`
+- [cn package](https://github.com/shadcn-ui/cn) (0.4.0 README: `cn/config`, tailwind-merge parity)
 - [shadcn registry item types](https://ui.shadcn.com/docs/registry/registry-item-json)
 - [shadcn-ui/ui discussion #10269: presets and custom registries](https://github.com/shadcn-ui/ui/discussions/10269)
 - [deanjstone/design-system PR #49: shipped `IconPlaceholder` without its file](https://github.com/deanjstone/design-system/pull/49)
