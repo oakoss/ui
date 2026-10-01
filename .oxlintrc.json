@@ -16,9 +16,10 @@
   ],
   "rules": {
     "no-console": "warn",
-    "react/exhaustive-deps": "off",
+    "react/exhaustive-deps": "warn",
     "react/exhaustive-effect-dependencies": "off",
     "react/memo-dependencies": "off",
+    "import/newline-after-import": "error",
     "no-unused-vars": [
       "error",
       { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
@@ -52,6 +53,9 @@
     "unicorn/consistent-template-literal-escape": "error",
     "unicorn/empty-brace-spaces": "error",
     "unicorn/error-message": "error",
+    "unicorn/explicit-timer-delay": ["error", "always"],
+    "unicorn/import-style": "error",
+    "unicorn/max-nested-calls": ["error", { "max": 3 }],
     "unicorn/no-abusive-eslint-disable": "error",
     "unicorn/no-anonymous-default-export": "error",
     "unicorn/no-array-for-each": "error",
@@ -68,6 +72,7 @@
     "unicorn/no-unreadable-array-destructuring": "error",
     "unicorn/no-useless-collection-argument": "error",
     "unicorn/no-useless-error-capture-stack-trace": "error",
+    "unicorn/no-useless-iterator-to-array": "error",
     "unicorn/no-zero-fractions": "error",
     "unicorn/number-literal-case": "error",
     "unicorn/numeric-separators-style": "error",
@@ -77,6 +82,7 @@
     "unicorn/prefer-classlist-toggle": "error",
     "unicorn/prefer-default-parameters": "error",
     "unicorn/prefer-dom-node-text-content": "error",
+    "unicorn/prefer-export-from": ["error", { "checkUsedVariables": true }],
     "unicorn/prefer-global-this": "error",
     "unicorn/prefer-includes": "error",
     "unicorn/prefer-keyboard-event-key": "error",
@@ -100,6 +106,7 @@
     "unicorn/require-array-join-separator": "error",
     "unicorn/require-module-attributes": "error",
     "unicorn/switch-case-braces": "error",
+    "unicorn/switch-case-break-position": "error",
     "unicorn/text-encoding-identifier-case": "error",
     "unicorn/throw-new-error": "error"
   },
@@ -128,17 +135,20 @@
           "error",
           { "ignoreArrowShorthand": true }
         ],
+        "typescript/no-dynamic-delete": "error",
         "typescript/no-empty-object-type": "error",
         "typescript/no-explicit-any": "error",
         "typescript/no-inferrable-types": "error",
+        "typescript/no-invalid-void-type": "error",
         "typescript/no-namespace": "error",
         "typescript/no-non-null-asserted-nullish-coalescing": "error",
+        "typescript/no-non-null-assertion": "error",
         "typescript/no-misused-promises": [
           "error",
           { "checksVoidReturn": { "attributes": false } }
         ],
         "typescript/no-require-imports": "error",
-        "typescript/no-unnecessary-condition": "off",
+        "typescript/no-unnecessary-condition": "error",
         "typescript/no-unsafe-argument": "off",
         "typescript/no-unsafe-assignment": "off",
         "typescript/no-unsafe-call": "off",
@@ -149,13 +159,21 @@
         "typescript/prefer-find": "error",
         "typescript/prefer-for-of": "error",
         "typescript/prefer-function-type": "error",
+        "typescript/prefer-literal-enum-member": "error",
         "typescript/prefer-optional-chain": "error",
         "typescript/prefer-readonly-parameter-types": "off",
+        "typescript/prefer-reduce-type-parameter": "error",
         "typescript/prefer-regexp-exec": "error",
         "typescript/prefer-return-this-type": "error",
         "typescript/prefer-string-starts-ends-with": "error",
         "typescript/restrict-template-expressions": "off",
-        "typescript/unified-signatures": "error"
+        "typescript/strict-boolean-expressions": [
+          "error",
+          { "allowNumber": false }
+        ],
+        "typescript/unified-signatures": "error",
+        "typescript/use-unknown-in-catch-callback-variable": "error",
+        "react/unsupported-syntax": "warn"
       }
     },
     {
@@ -170,9 +188,8 @@
           "error",
           { "roles": [], "tags": [] }
         ],
-        // oxlint flags these regardless of context (--fix strips the role): td/th
-        // implicit roles depend on the table's role, <a>'s on href, which may be
-        // absent or hidden by a spread.
+        // Context-dependent implicit roles; oxlint ignores context and --fix
+        // would strip them.
         "jsx-a11y/no-redundant-roles": [
           "error",
           {
@@ -213,12 +230,15 @@
           }
         ],
         "jsx-a11y/prefer-tag-over-role": "off",
+        "react/button-has-type": "error",
+        "react/hook-use-state": "error",
         "react/jsx-no-constructed-context-values": "off",
         "react/jsx-no-useless-fragment": "off",
         "react/no-clone-element": "error",
         "react/no-danger": "off",
         "react/no-react-children": "error",
         "react/no-unsafe": "off",
+        "react/prefer-function-component": "error",
         "react/react-in-jsx-scope": "off",
         "react/self-closing-comp": "error"
       }

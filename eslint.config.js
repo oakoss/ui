@@ -23,8 +23,8 @@ export default defineConfig(
   { languageOptions: { ecmaVersion: 'latest', globals: globals.browser } },
   ...storybook.configs['flat/recommended'],
 
-  // TypeScript, type-aware. oxlint owns the syntactic TS rules (disabled below
-  // by buildFromOxlint); ESLint keeps the type-aware ones.
+  // TypeScript, type-aware. oxlint owns the TS rules it implements (disabled
+  // below by buildFromOxlint); ESLint keeps the rest.
   {
     extends: [
       tseslint.configs.strictTypeChecked,
@@ -39,10 +39,7 @@ export default defineConfig(
     },
   },
 
-  // @eslint-react contributes ONLY the rules oxlint's react plugin can't do
-  // (type-aware leak detection, modern footguns, naming). oxlint owns the rest;
-  // this list shrinks as oxlint gains react coverage. Hooks/compiler rules are
-  // split with eslint-plugin-react-hooks below.
+  // @eslint-react contributes ONLY the rules oxlint's react plugin can't do.
   {
     files: ['**/*.tsx'],
     languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } },
@@ -50,30 +47,24 @@ export default defineConfig(
     rules: {
       '@eslint-react/dom-no-flush-sync': 'error',
       '@eslint-react/dom-no-hydrate': 'error',
-      '@eslint-react/dom-no-missing-button-type': 'error',
       '@eslint-react/dom-no-render': 'error',
-      '@eslint-react/dom-no-unsafe-iframe-sandbox': 'error',
       '@eslint-react/dom-no-use-form-state': 'error',
-      '@eslint-react/jsx-no-children-prop-with-children': 'error',
       '@eslint-react/jsx-no-key-after-spread': 'error',
       '@eslint-react/jsx-no-leaked-dollar': 'error',
       '@eslint-react/jsx-no-leaked-semicolon': 'error',
-      '@eslint-react/jsx-no-namespace': 'error',
       '@eslint-react/naming-convention-context-name': 'error',
       '@eslint-react/naming-convention-id-name': 'error',
       '@eslint-react/naming-convention-ref-name': 'error',
       '@eslint-react/no-access-state-in-setstate': 'error',
-      '@eslint-react/no-class-component': 'error',
       '@eslint-react/no-context-provider': 'error',
       '@eslint-react/no-create-ref': 'error',
       '@eslint-react/no-forward-ref': 'error',
-      '@eslint-react/no-leaked-conditional-rendering': 'error',
       '@eslint-react/no-misused-capture-owner-stack': 'error',
       '@eslint-react/no-nested-lazy-component-declarations': 'error',
       '@eslint-react/no-unnecessary-use-prefix': 'error',
       '@eslint-react/no-unused-props': 'error',
       '@eslint-react/no-use-context': 'error',
-      '@eslint-react/use-state': 'error',
+      '@eslint-react/use-state': ['error', { enforceSetterName: false }],
       '@eslint-react/web-api-no-leaked-event-listener': 'error',
       '@eslint-react/web-api-no-leaked-fetch': 'error',
       '@eslint-react/web-api-no-leaked-intersection-observer': 'error',
@@ -90,18 +81,14 @@ export default defineConfig(
     },
   },
 
-  // Official React Compiler + hooks rules. buildFromOxlint disables the ones
-  // oxlint enables (by category or rule); an oxlint `off` on one of them
-  // (spelled react/* in oxlint) doesn't undo that. Left here: config and
-  // gating (no oxlint port) and unsupported-syntax (oxlint's restriction
-  // category is off); exhaustive-deps is re-enabled below as a warning.
+  // Official React Compiler + hooks rules; oxlint owns all but config/gating.
   {
     extends: [reactHooks.configs.flat['recommended-latest']],
     files: ['**/*.{ts,tsx}'],
   },
 
-  // unicorn / vitest: oxlint runs the rules it supports; buildFromOxlint
-  // (last) disables those here. jsx-a11y runs in oxlint only.
+  // unicorn / vitest: oxlint runs the rules it enables; buildFromOxlint
+  // (last) disables those here.
   eslintPluginUnicorn.configs.recommended,
   {
     extends: [vitest.configs.recommended],
@@ -117,10 +104,7 @@ export default defineConfig(
   // until an import style + resolver are chosen.
   {
     plugins: { 'import-x': importX },
-    rules: {
-      'import-x/newline-after-import': 'error',
-      'import-x/no-useless-path-segments': 'error',
-    },
+    rules: { 'import-x/no-useless-path-segments': 'error' },
   },
 
   // better-tailwindcss: held pending the Tailwind decision.
@@ -156,7 +140,9 @@ export default defineConfig(
   },
 
   // Must be after every recommended extend: turns off the rules oxlint owns.
-  ...oxlint.buildFromOxlintConfigFile('./.oxlintrc.json'),
+  ...oxlint.buildFromOxlintConfigFile('./.oxlintrc.json', {
+    withNursery: true,
+  }),
 
   // Override layer: our deliberate exceptions, after the oxlint dedup. These
   // also mirror oxlint `off` settings that the ESLint recommended configs would
@@ -175,12 +161,6 @@ export default defineConfig(
       // graph onto every consumer.
       'unicorn/prefer-top-level-await': 'off',
     },
-  },
-  // react-hooks is only registered for TS/TSX, so its re-enable must be scoped
-  // there (buildFromOxlint turns exhaustive-deps off; we want it as a warning).
-  {
-    files: ['**/*.{ts,tsx}'],
-    rules: { 'react-hooks/exhaustive-deps': 'warn' },
   },
 
   // JS config files aren't in the type-aware program — drop type-checked rules.
