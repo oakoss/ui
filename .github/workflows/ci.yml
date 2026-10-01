@@ -65,3 +65,75 @@ jobs:
           fi
 
       - run: pnpm test
+
+  ci-summary:
+    name: CI Summary
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: always()
+    needs: [check]
+    steps:
+      # Gates every job in `needs`; a job left out of `needs` is not gated.
+      - name: Gate on all required jobs
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          set -euo pipefail
+
+          # A gate that dies before its verdict must not read as a pass.
+          verdict=
+          trap 'rc=$?
+            if [ -z "$verdict" ]; then
+              verdict=aborted
+              [ "$rc" -ne 0 ] || rc=1
+              echo "::error title=CI gate::gate aborted (exit $rc) before reaching a verdict"
+              exit "$rc"
+            fi' EXIT INT TERM HUP
+
+          summary=${GITHUB_STEP_SUMMARY:-/dev/null}
+          results="$(mktemp)"
+
+          expected=$(printf '%s' "$NEEDS" | jq -r 'if type == "object" then length else error("needs is not an object") end')
+          case "$expected" in
+            ''|*[!0-9]*)
+              echo "::error title=CI gate::could not read the job count from needs"
+              verdict=reached
+              exit 1
+              ;;
+          esac
+          if [ "$expected" -eq 0 ]; then
+            echo "::error title=CI gate::needs is empty"
+            verdict=reached
+            exit 1
+          fi
+
+          printf '%s' "$NEEDS" | jq -r 'to_entries[] | [.key, .value.result] | @tsv' > "$results"
+
+          {
+            echo "## CI Summary"
+            echo ""
+            echo "| Job | Result |"
+            echo "| --- | --- |"
+          } >> "$summary" ||
+            echo "::warning title=CI gate::step summary unwritable; the verdict is unaffected"
+
+          seen=0
+          failed=0
+          while IFS=$'\t' read -r job result; do
+            seen=$((seen + 1))
+            # shellcheck disable=SC2016 # the backticks are markdown, not a subshell
+            printf '| %s | `%s` |\n' "$job" "$result" >> "$summary" || :
+            if [ "$result" != "success" ]; then
+              echo "::error title=CI gate::Job '${job:-<empty>}' did not succeed (result: $result)"
+              failed=1
+            fi
+          done < "$results"
+
+          if [ "$seen" -ne "$expected" ]; then
+            echo "::error title=CI gate::read $seen of $expected jobs — results were truncated"
+            verdict=reached
+            exit 1
+          fi
+
+          verdict=reached
+          exit "$failed"
