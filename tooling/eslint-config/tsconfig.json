@@ -1,0 +1,4 @@
+{
+  "extends": ["@oakoss/tsconfig/base.json", "@oakoss/tsconfig/node.json"],
+  "include": ["src"]
+}

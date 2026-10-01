@@ -28,8 +28,6 @@
   "js/ts.preferences.importModuleSpecifier": "non-relative",
   "js/ts.tsdk.path": "node_modules/typescript/lib",
   "js/ts.tsdk.promptToUseWorkspaceVersion": true,
-  "oxc.configPath": "oxlint.config.ts",
-  "oxc.fmt.configPath": "oxfmt.config.ts",
   "oxc.path.oxfmt": "./node_modules/.bin/oxfmt",
   "oxc.typeAware": true,
   "prettier.enable": false,

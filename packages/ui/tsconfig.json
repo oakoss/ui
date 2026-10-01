@@ -1,9 +1,9 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "types": ["node"]
-  },
-  "include": ["src", "vitest.config.ts"]
+  "extends": [
+    "@oakoss/tsconfig/base.json",
+    "@oakoss/tsconfig/dom.json",
+    "@oakoss/tsconfig/react.json",
+    "@oakoss/tsconfig/node.json"
+  ],
+  "include": ["src", "vitest.config.ts", "eslint.config.js", "oxlint.config.ts"]
 }

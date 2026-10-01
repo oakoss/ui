@@ -34,14 +34,29 @@ jobs:
       - run: pnpm format:check
       - run: pnpm exec shadcn registry validate
 
-      - name: Check every package has a test script
+      - name: Check every package has a test script and lint configs
         run: |
           set -euo pipefail
-          pnpm ls -r --depth -1 --json | jq -e '
-            [.[] | select(.name == null) | .path]
-            | if length > 0 then error("workspace packages without a name: \(join(" "))") else true end' >/dev/null
-          missing="$(pnpm turbo run test --dry=json | jq -er '
+          workspace="$(pnpm ls -r --depth -1 --json | jq -e '
+            (map(.path) | min_by(length)) as $root
+            | map(. + {dir: (.path | ltrimstr($root) | ltrimstr("/"))})
+            | map(select(.dir != ""))
+            | if length == 0 then error("pnpm found no workspace packages") else . end')"
+          jq -e '
+            [.[] | select(.name == null) | .dir]
+            | if length > 0 then error("workspace packages without a name: \(join(" "))") else true end' <<<"$workspace" >/dev/null
+          no_lint="$(jq -r '.[] | select(.dir | startswith("tooling/") | not) | .dir' <<<"$workspace" | while IFS= read -r dir; do
+            [ -f "$dir/oxlint.config.ts" ] && [ -f "$dir/eslint.config.js" ] || echo "$dir"
+          done)"
+          if [ -n "$no_lint" ]; then
+            echo "Missing oxlint.config.ts or eslint.config.js in: $no_lint"
+            exit 1
+          fi
+          # Config-only tooling packages are covered by typecheck and lint.
+          exempt="$(jq -c '[.[] | select(.dir | startswith("tooling/")) | .name]' <<<"$workspace")"
+          missing="$(pnpm turbo run test --dry=json | jq -er --argjson exempt "$exempt" '
             (.packages | if length == 0 then error("turbo found no workspace packages") else . end)
+            - $exempt
             - [.tasks[] | select(.task == "test" and (.command | type) == "string" and .command != "<NONEXISTENT>") | .package]
             | join(" ")')"
           if [ -n "$missing" ]; then
@@ -50,3 +65,75 @@ jobs:
           fi
 
       - run: pnpm test
+
+  ci-summary:
+    name: CI Summary
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: always()
+    needs: [check]
+    steps:
+      # Gates every job in `needs`; a job left out of `needs` is not gated.
+      - name: Gate on all required jobs
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          set -euo pipefail
+
+          # A gate that dies before its verdict must not read as a pass.
+          verdict=
+          trap 'rc=$?
+            if [ -z "$verdict" ]; then
+              verdict=aborted
+              [ "$rc" -ne 0 ] || rc=1
+              echo "::error title=CI gate::gate aborted (exit $rc) before reaching a verdict"
+              exit "$rc"
+            fi' EXIT INT TERM HUP
+
+          summary=${GITHUB_STEP_SUMMARY:-/dev/null}
+          results="$(mktemp)"
+
+          expected=$(printf '%s' "$NEEDS" | jq -r 'if type == "object" then length else error("needs is not an object") end')
+          case "$expected" in
+            ''|*[!0-9]*)
+              echo "::error title=CI gate::could not read the job count from needs"
+              verdict=reached
+              exit 1
+              ;;
+          esac
+          if [ "$expected" -eq 0 ]; then
+            echo "::error title=CI gate::needs is empty"
+            verdict=reached
+            exit 1
+          fi
+
+          printf '%s' "$NEEDS" | jq -r 'to_entries[] | [.key, .value.result] | @tsv' > "$results"
+
+          {
+            echo "## CI Summary"
+            echo ""
+            echo "| Job | Result |"
+            echo "| --- | --- |"
+          } >> "$summary" ||
+            echo "::warning title=CI gate::step summary unwritable; the verdict is unaffected"
+
+          seen=0
+          failed=0
+          while IFS=$'\t' read -r job result; do
+            seen=$((seen + 1))
+            # shellcheck disable=SC2016 # the backticks are markdown, not a subshell
+            printf '| %s | `%s` |\n' "$job" "$result" >> "$summary" || :
+            if [ "$result" != "success" ]; then
+              echo "::error title=CI gate::Job '${job:-<empty>}' did not succeed (result: $result)"
+              failed=1
+            fi
+          done < "$results"
+
+          if [ "$seen" -ne "$expected" ]; then
+            echo "::error title=CI gate::read $seen of $expected jobs — results were truncated"
+            verdict=reached
+            exit 1
+          fi
+
+          verdict=reached
+          exit "$failed"

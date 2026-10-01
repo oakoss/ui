@@ -1,6 +1,5 @@
 {
-  "extends": "./tsconfig.base.json",
-  "compilerOptions": { "types": ["node"] },
+  "extends": ["@oakoss/tsconfig/base.json", "@oakoss/tsconfig/node.json"],
   "include": [
     "eslint.config.js",
     "oxlint.config.ts",

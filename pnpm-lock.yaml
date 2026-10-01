@@ -173,6 +173,12 @@ catalogs:
     '@types/react-dom':
       specifier: ^19.3.0
       version: 19.3.0
+    eslint:
+      specifier: ^10.11.0
+      version: 10.11.0
+    oxlint:
+      specifier: ^1.86.0
+      version: 1.86.0
     react:
       specifier: ^19.3.0
       version: 19.3.0
@@ -214,45 +220,24 @@ importers:
       '@commitlint/config-conventional':
         specifier: ^21.2.3
         version: 21.2.3
-      '@eslint-react/eslint-plugin':
-        specifier: ^5.23.1
-        version: 5.23.1(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
+      '@oakoss/eslint-config':
+        specifier: workspace:*
+        version: link:tooling/eslint-config
+      '@oakoss/oxlint-config':
+        specifier: workspace:*
+        version: link:tooling/oxlint-config
+      '@oakoss/tsconfig':
+        specifier: workspace:*
+        version: link:tooling/tsconfig
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.3
-      '@vitest/eslint-plugin':
-        specifier: ^1.6.27
-        version: 1.6.27(@typescript-eslint/eslint-plugin@8.71.0(@typescript-eslint/parser@8.71.0(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3))(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3))(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)(vitest@5.0.2)
       czg:
         specifier: ^1.14.0
         version: 1.14.0
       eslint:
-        specifier: ^10.11.0
+        specifier: 'catalog:'
         version: 10.11.0(jiti@2.7.0)(supports-color@7.2.0)
-      eslint-plugin-better-tailwindcss:
-        specifier: ^4.7.0
-        version: 4.7.0(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(oxlint@1.86.0(oxlint-tsgolint@7.0.2003))(tailwindcss@4.3.3)(typescript@6.0.3)
-      eslint-plugin-import-x:
-        specifier: ^4.17.1
-        version: 4.17.1(@typescript-eslint/utils@8.71.0(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3))(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)
-      eslint-plugin-oxlint:
-        specifier: ^1.86.0
-        version: 1.86.0(oxlint@1.86.0(oxlint-tsgolint@7.0.2003))
-      eslint-plugin-perfectionist:
-        specifier: ^5.12.1
-        version: 5.12.1(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
-      eslint-plugin-react-hooks:
-        specifier: ^7.1.1
-        version: 7.1.1(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)
-      eslint-plugin-storybook:
-        specifier: ^10.6.1
-        version: 10.6.1(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
-      eslint-plugin-unicorn:
-        specifier: ^76.0.0
-        version: 76.0.0(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))
-      globals:
-        specifier: ^17.12.0
-        version: 17.12.0
       lefthook:
         specifier: ^2.1.15
         version: 2.1.15
@@ -263,7 +248,7 @@ importers:
         specifier: ^0.71.0
         version: 0.71.0
       oxlint:
-        specifier: ^1.86.0
+        specifier: 'catalog:'
         version: 1.86.0(oxlint-tsgolint@7.0.2003)
       oxlint-tsgolint:
         specifier: ^7.0.2003
@@ -280,12 +265,6 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
-      typescript-eslint:
-        specifier: ^8.71.0
-        version: 8.71.0(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
-      vitest:
-        specifier: 'catalog:'
-        version: 5.0.2(@types/node@26.6.3)(@vitest/browser-playwright@5.0.2)(@vitest/coverage-v8@5.0.2)(@vitest/ui@5.0.2)(vite@8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
 
   apps/storybook:
     dependencies:
@@ -302,6 +281,15 @@ importers:
       '@chromatic-com/storybook':
         specifier: ^5.3.1
         version: 5.3.1(storybook@10.6.1(@types/react@19.3.0)(prettier@2.8.8)(react@19.3.0))
+      '@oakoss/eslint-config':
+        specifier: workspace:*
+        version: link:../../tooling/eslint-config
+      '@oakoss/oxlint-config':
+        specifier: workspace:*
+        version: link:../../tooling/oxlint-config
+      '@oakoss/tsconfig':
+        specifier: workspace:*
+        version: link:../../tooling/tsconfig
       '@storybook/addon-a11y':
         specifier: ^10.6.1
         version: 10.6.1(storybook@10.6.1(@types/react@19.3.0)(prettier@2.8.8)(react@19.3.0))
@@ -335,6 +323,12 @@ importers:
       '@vitest/coverage-v8':
         specifier: 5.0.2
         version: 5.0.2(@vitest/browser@5.0.2)(vitest@5.0.2)
+      eslint:
+        specifier: 'catalog:'
+        version: 10.11.0(jiti@2.7.0)(supports-color@7.2.0)
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.86.0(oxlint-tsgolint@7.0.2003)
       playwright:
         specifier: ^1.63.0
         version: 1.63.0
@@ -366,6 +360,15 @@ importers:
         specifier: 'catalog:'
         version: 3.3.1(tailwind-merge@3.7.0)(tailwindcss@4.3.3)
     devDependencies:
+      '@oakoss/eslint-config':
+        specifier: workspace:*
+        version: link:../../tooling/eslint-config
+      '@oakoss/oxlint-config':
+        specifier: workspace:*
+        version: link:../../tooling/oxlint-config
+      '@oakoss/tsconfig':
+        specifier: workspace:*
+        version: link:../../tooling/tsconfig
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.3
@@ -375,6 +378,12 @@ importers:
       '@types/react-dom':
         specifier: 'catalog:'
         version: 19.3.0(@types/react@19.3.0)
+      eslint:
+        specifier: 'catalog:'
+        version: 10.11.0(jiti@2.7.0)(supports-color@7.2.0)
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.86.0(oxlint-tsgolint@7.0.2003)
       react:
         specifier: 'catalog:'
         version: 19.3.0
@@ -393,6 +402,78 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 5.0.2(@types/node@26.6.3)(@vitest/browser-playwright@5.0.2)(@vitest/coverage-v8@5.0.2)(@vitest/ui@5.0.2)(vite@8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
+
+  tooling/eslint-config:
+    dependencies:
+      '@eslint-react/eslint-plugin':
+        specifier: ^5.23.1
+        version: 5.23.1(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
+      '@vitest/eslint-plugin':
+        specifier: ^1.6.27
+        version: 1.6.27(@typescript-eslint/eslint-plugin@8.71.0(@typescript-eslint/parser@8.71.0(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3))(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3))(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)(vitest@5.0.2)
+      eslint-plugin-better-tailwindcss:
+        specifier: ^4.7.0
+        version: 4.7.0(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(oxlint@1.86.0(oxlint-tsgolint@7.0.2003))(tailwindcss@4.3.3)(typescript@6.0.3)
+      eslint-plugin-import-x:
+        specifier: ^4.17.1
+        version: 4.17.1(@typescript-eslint/utils@8.71.0(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3))(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)
+      eslint-plugin-oxlint:
+        specifier: ^1.86.0
+        version: 1.86.0(oxlint@1.86.0(oxlint-tsgolint@7.0.2003))
+      eslint-plugin-perfectionist:
+        specifier: ^5.12.1
+        version: 5.12.1(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
+      eslint-plugin-react-hooks:
+        specifier: ^7.1.1
+        version: 7.1.1(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)
+      eslint-plugin-storybook:
+        specifier: ^10.6.1
+        version: 10.6.1(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
+      eslint-plugin-unicorn:
+        specifier: ^76.0.0
+        version: 76.0.0(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))
+      globals:
+        specifier: ^17.12.0
+        version: 17.12.0
+      typescript-eslint:
+        specifier: ^8.71.0
+        version: 8.71.0(eslint@10.11.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
+    devDependencies:
+      '@oakoss/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.6.3
+      eslint:
+        specifier: 'catalog:'
+        version: 10.11.0(jiti@2.7.0)(supports-color@7.2.0)
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.3.3
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+
+  tooling/oxlint-config:
+    devDependencies:
+      '@oakoss/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.6.3
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.86.0(oxlint-tsgolint@7.0.2003)
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.2(@types/node@26.6.3)(@vitest/browser-playwright@5.0.2)(@vitest/coverage-v8@5.0.2)(@vitest/ui@5.0.2)(vite@8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
+
+  tooling/tsconfig: {}
 
 packages:
 
