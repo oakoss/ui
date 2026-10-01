@@ -9,6 +9,8 @@ export default defineConfig({
     'dist/',
     'build/',
     '*.log',
+    // Generated and rewritten by beads.
+    '.beads/',
   ],
   objectWrap: 'collapse',
   printWidth: 80,

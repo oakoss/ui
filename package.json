@@ -28,6 +28,7 @@
     "lint:oxlint:fix": "oxlint --fix",
     "release:tag": "changeset git-tag",
     "release:version": "changeset version",
+    "setup": "bd bootstrap --yes",
     "storybook": "pnpm --filter @oakoss/storybook storybook",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck && tsc --noEmit"
