@@ -1,0 +1,13 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "agentGuidance": false,
+  "globalDependencies": [".gitignore", "registry.json", "tsconfig.base.json"],
+  "tasks": {
+    "build-storybook": {
+      "dependsOn": ["^typecheck"],
+      "outputs": ["storybook-static/**"]
+    },
+    "test": { "dependsOn": ["^typecheck"] },
+    "typecheck": { "dependsOn": ["^typecheck"] }
+  }
+}

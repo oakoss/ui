@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+import { Button } from '@oakoss/ui/components/ui/inputs/button';
 import { expect } from 'storybook/test';
-
-import { Button } from '#/components/ui/inputs/button';
 
 const meta = {
   args: { children: 'Button' },
@@ -23,12 +22,15 @@ export const Destructive: Story = { args: { intent: 'destructive' } };
 export const Small: Story = { args: { size: 'sm' } };
 export const Large: Story = { args: { size: 'lg' } };
 
-// Proves the global stylesheet actually loaded: `inline-flex` is from the base
-// styles, whereas an unstyled <button> computes to `inline-block`.
+// The utilities behind these values appear only in packages/ui, so this fails
+// if Tailwind stops scanning the package. Keep their class names out of stories.
 export const CssCheck: Story = {
   play: async ({ canvas }) => {
-    const button = canvas.getByRole('button', { name: /button/iu });
-    await expect(getComputedStyle(button).display).toBe('inline-flex');
+    const style = getComputedStyle(
+      canvas.getByRole('button', { name: /button/iu }),
+    );
+    await expect(style.whiteSpace).toBe('nowrap');
+    await expect(style.cursor).toBe('pointer');
   },
 };
 

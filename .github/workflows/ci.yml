@@ -12,6 +12,9 @@ concurrency:
   group: ci-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
   cancel-in-progress: true
 
+env:
+  TURBO_TELEMETRY_DISABLED: '1'
+
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -30,4 +33,20 @@ jobs:
       - run: pnpm lint
       - run: pnpm format:check
       - run: pnpm exec shadcn registry validate
+
+      - name: Check every package has a test script
+        run: |
+          set -euo pipefail
+          pnpm ls -r --depth -1 --json | jq -e '
+            [.[] | select(.name == null) | .path]
+            | if length > 0 then error("workspace packages without a name: \(join(" "))") else true end' >/dev/null
+          missing="$(pnpm turbo run test --dry=json | jq -er '
+            (.packages | if length == 0 then error("turbo found no workspace packages") else . end)
+            - [.tasks[] | select(.task == "test" and (.command | type) == "string" and .command != "<NONEXISTENT>") | .package]
+            | join(" ")')"
+          if [ -n "$missing" ]; then
+            echo "No test script in: $missing"
+            exit 1
+          fi
+
       - run: pnpm test

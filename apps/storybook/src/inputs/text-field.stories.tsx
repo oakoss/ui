@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+import { TextField } from '@oakoss/ui/components/ui/inputs/text-field';
 import { expect, userEvent } from 'storybook/test';
-
-import { TextField } from '#/components/ui/inputs/text-field';
 
 const meta = {
   args: { label: 'Email', placeholder: 'you@example.com' },
@@ -31,12 +30,15 @@ export const WithDescription: Story = {
   },
 };
 
-// Proves the global stylesheet loaded for this component: `flex` is from the
-// input's base styles, whereas an unstyled <input> computes to `inline-block`.
+// The utilities behind these values appear only in packages/ui, so this fails
+// if Tailwind stops scanning the package. Keep their class names out of stories.
 export const CssCheck: Story = {
   play: async ({ canvas }) => {
-    const input = canvas.getByRole('textbox', { name: 'Email' });
-    await expect(getComputedStyle(input).display).toBe('flex');
+    const style = getComputedStyle(
+      canvas.getByRole('textbox', { name: 'Email' }),
+    );
+    await expect(style.paddingLeft).toBe('12px');
+    await expect(style.borderTopWidth).toBe('1px');
   },
 };
 
