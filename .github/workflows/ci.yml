@@ -34,14 +34,29 @@ jobs:
       - run: pnpm format:check
       - run: pnpm exec shadcn registry validate
 
-      - name: Check every package has a test script
+      - name: Check every package has a test script and lint configs
         run: |
           set -euo pipefail
-          pnpm ls -r --depth -1 --json | jq -e '
-            [.[] | select(.name == null) | .path]
-            | if length > 0 then error("workspace packages without a name: \(join(" "))") else true end' >/dev/null
-          missing="$(pnpm turbo run test --dry=json | jq -er '
+          workspace="$(pnpm ls -r --depth -1 --json | jq -e '
+            (map(.path) | min_by(length)) as $root
+            | map(. + {dir: (.path | ltrimstr($root) | ltrimstr("/"))})
+            | map(select(.dir != ""))
+            | if length == 0 then error("pnpm found no workspace packages") else . end')"
+          jq -e '
+            [.[] | select(.name == null) | .dir]
+            | if length > 0 then error("workspace packages without a name: \(join(" "))") else true end' <<<"$workspace" >/dev/null
+          no_lint="$(jq -r '.[] | select(.dir | startswith("tooling/") | not) | .dir' <<<"$workspace" | while IFS= read -r dir; do
+            [ -f "$dir/oxlint.config.ts" ] && [ -f "$dir/eslint.config.js" ] || echo "$dir"
+          done)"
+          if [ -n "$no_lint" ]; then
+            echo "Missing oxlint.config.ts or eslint.config.js in: $no_lint"
+            exit 1
+          fi
+          # Config-only tooling packages are covered by typecheck and lint.
+          exempt="$(jq -c '[.[] | select(.dir | startswith("tooling/")) | .name]' <<<"$workspace")"
+          missing="$(pnpm turbo run test --dry=json | jq -er --argjson exempt "$exempt" '
             (.packages | if length == 0 then error("turbo found no workspace packages") else . end)
+            - $exempt
             - [.tasks[] | select(.task == "test" and (.command | type) == "string" and .command != "<NONEXISTENT>") | .package]
             | join(" ")')"
           if [ -n "$missing" ]; then

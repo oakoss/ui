@@ -1,7 +1,7 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "agentGuidance": false,
-  "globalDependencies": [".gitignore", "registry.json", "tsconfig.base.json"],
+  "globalDependencies": [".gitignore", "registry.json"],
   "tasks": {
     "build-storybook": {
       "dependsOn": ["^typecheck"],

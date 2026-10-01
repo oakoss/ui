@@ -1,15 +1,17 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "types": ["node", "vite/client"]
-  },
+  "extends": [
+    "@oakoss/tsconfig/base.json",
+    "@oakoss/tsconfig/dom.json",
+    "@oakoss/tsconfig/react.json"
+  ],
+  "compilerOptions": { "types": ["node", "vite/client"] },
   "include": [
     ".storybook/**/*.ts",
     ".storybook/**/*.tsx",
     "src",
     "vitest.config.ts",
-    "vitest.shims.d.ts"
+    "vitest.shims.d.ts",
+    "eslint.config.js",
+    "oxlint.config.ts"
   ]
 }

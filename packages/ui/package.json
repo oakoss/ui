@@ -21,9 +21,14 @@
     "tailwind-variants": "catalog:"
   },
   "devDependencies": {
+    "@oakoss/eslint-config": "workspace:*",
+    "@oakoss/oxlint-config": "workspace:*",
+    "@oakoss/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "eslint": "catalog:",
+    "oxlint": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "tailwindcss": "catalog:",
