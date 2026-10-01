@@ -48,7 +48,7 @@
       "type": "registry:ui",
       "title": "Button",
       "description": "Accessible button built on React Aria Components.",
-      "registryDependencies": ["@oakoss/theme"],
+      "registryDependencies": ["oakoss/ui/theme"],
       "dependencies": [
         "react-aria-components",
         "tailwind-variants",
@@ -72,7 +72,7 @@
       "type": "registry:ui",
       "title": "Text Field",
       "description": "Labeled text input with description and validation, built on React Aria Components.",
-      "registryDependencies": ["@oakoss/theme"],
+      "registryDependencies": ["oakoss/ui/theme"],
       "dependencies": [
         "react-aria-components",
         "tailwind-variants",
