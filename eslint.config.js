@@ -2,7 +2,6 @@ import pluginReact from '@eslint-react/eslint-plugin';
 import vitest from '@vitest/eslint-plugin';
 import betterTailwindcss from 'eslint-plugin-better-tailwindcss';
 import { importX } from 'eslint-plugin-import-x';
-import jsxA11y from 'eslint-plugin-jsx-a11y';
 import oxlint from 'eslint-plugin-oxlint';
 import perfectionist from 'eslint-plugin-perfectionist';
 import reactHooks from 'eslint-plugin-react-hooks';
@@ -101,11 +100,9 @@ export default defineConfig(
     files: ['**/*.{ts,tsx}'],
   },
 
-  // unicorn / jsx-a11y / vitest: oxlint runs the rules it supports;
-  // buildFromOxlint (last) disables those here. jsx-a11y coverage in oxlint
-  // is near-complete; only ~1 rule survives to ESLint.
+  // unicorn / vitest: oxlint runs the rules it supports; buildFromOxlint
+  // (last) disables those here. jsx-a11y runs in oxlint only.
   eslintPluginUnicorn.configs.recommended,
-  { extends: [jsxA11y.flatConfigs.strict], files: ['**/*.tsx'] },
   {
     extends: [vitest.configs.recommended],
     files: ['**/*.{test,spec}.{ts,tsx}', '**/*.integration.{ts,tsx}'],
