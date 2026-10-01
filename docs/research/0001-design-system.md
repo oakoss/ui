@@ -2,6 +2,7 @@
 
 Date: 2026-06-23
 Related: token architecture · component organization · registry distribution
+Superseded in part by: [0002 — Forking shadcn's React Aria Base](./0002-shadcn-aria-fork.md)
 
 ## Summary
 
