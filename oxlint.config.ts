@@ -186,8 +186,6 @@ export default defineConfig({
       plugins: ['vitest'],
       rules: {
         'vitest/consistent-each-for': 'error',
-        'vitest/hoisted-apis-on-top': 'error',
-        'vitest/no-conditional-tests': 'error',
         'vitest/no-identical-title': 'error',
         'vitest/no-import-node-test': 'error',
         'vitest/no-interpolation-in-snapshots': 'error',
