@@ -18,10 +18,12 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "types": ["node"],
-    "resolvePackageJsonImports": true
+    "paths": { "#/*": ["./src/*"] }
   },
   "include": [
     "src",
+    "src/**/*.mdx",
+    "src/**/*.css",
     ".storybook/**/*.ts",
     ".storybook/**/*.tsx",
     "vitest.config.ts",
