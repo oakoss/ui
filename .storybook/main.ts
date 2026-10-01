@@ -1,7 +1,5 @@
 import type { StorybookConfig } from '@storybook/react-vite';
 
-import path from 'node:path';
-
 const config: StorybookConfig = {
   addons: [
     '@chromatic-com/storybook',
@@ -17,9 +15,7 @@ const config: StorybookConfig = {
     const { default: tailwindcss } = await import('@tailwindcss/vite');
     return mergeConfig(viteConfig, {
       plugins: [tailwindcss()],
-      // Vite resolves package.json `imports` first but can't follow its array
-      // fallback, so `.ts`-only `#/` imports need this alias to override.
-      resolve: { alias: { '#': path.resolve(import.meta.dirname, '../src') } },
+      resolve: { tsconfigPaths: true },
     });
   },
 };

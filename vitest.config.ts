@@ -23,6 +23,14 @@ export default defineConfig({
           name: 'storybook',
         },
       },
+      {
+        extends: true,
+        resolve: { tsconfigPaths: true },
+        test: {
+          include: ['src/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
+          name: 'unit',
+        },
+      },
     ],
   },
 });

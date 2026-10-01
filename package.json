@@ -13,12 +13,6 @@
     "url": "git+https://github.com/oakoss/ui.git"
   },
   "type": "module",
-  "imports": {
-    "#/*": [
-      "./src/*.tsx",
-      "./src/*.ts"
-    ]
-  },
   "scripts": {
     "build-storybook": "storybook build",
     "changeset": "changeset",
@@ -37,7 +31,7 @@
     "release:tag": "changeset git-tag",
     "release:version": "changeset version && pnpm registry:build",
     "storybook": "storybook dev -p 6006",
-    "test": "vitest run",
+    "test": "vitest run --project storybook && vitest run --project unit",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
@@ -98,7 +92,7 @@
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
-      "version": "^12.8.1",
+      "version": "12.8.1",
       "onFail": "download"
     },
     "runtime": {
