@@ -11,6 +11,7 @@ Research notes that inform ideas, specs, and decisions. Each note captures what 
 
 <!-- Add newest first: - [NNNN — Title](./NNNN-kebab-title.md) — one-line hook -->
 
+- [0004 — Token Data Model](./0004-token-model-research.md) — component libraries, design systems, token formats and theme families checked against the proposed model: lightness scales with named roles, typed contrast pairs, axes as modifiers.
 - [0003 — Docs Site Inspiration](./0003-docs-site-inspiration.md) — what 22 docs sites do best, ranked by fit for our static Fumadocs site, and the beads filed from them.
 - [0002 — Forking shadcn's React Aria Base](./0002-shadcn-aria-fork.md) — fork shadcn's React Aria base into tv, styles as tokens, theme families, and swappable fonts and icons.
 - [0001 — Design System Foundations & Token Architecture](./0001-design-system.md) — semantic-tier tokens, CSS-var theming, functional folders over atomic, and a generator to kill the token hand-sync.
