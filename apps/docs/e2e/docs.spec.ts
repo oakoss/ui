@@ -26,6 +26,36 @@ test('sidebar links navigate without a full page load', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('data-e2e-marker', 'kept');
 });
 
+test('the sidebar keeps its width on a wide screen', async ({ page }) => {
+  // Any layout width below 2560px fails here, not only a missing one.
+  await page.setViewportSize({ height: 1080, width: 2560 });
+  await page.goto('/docs/components/button');
+  const box = await page.locator('#nd-sidebar').boundingBox();
+  expect(box).toMatchObject({ width: 268, x: 0 });
+});
+
+test('collapsing the sidebar keeps the full content width', async ({
+  page,
+}) => {
+  await page.setViewportSize({ height: 800, width: 1024 });
+  await page.goto('/docs/components/button');
+  await page
+    .locator('#nd-sidebar')
+    .getByRole('button', { name: 'Collapse Sidebar' })
+    .click();
+  await expect(page.locator('#nd-sidebar')).toHaveAttribute(
+    'data-collapsed',
+    'true',
+  );
+  // The grid animates its columns on collapse.
+  await expect
+    .poll(async () => {
+      const box = await page.locator('#nd-page').boundingBox();
+      return box?.width;
+    })
+    .toBe(900);
+});
+
 test('search finds a component page', async ({ page }) => {
   await page.goto('/docs');
   await page
