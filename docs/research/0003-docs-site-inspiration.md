@@ -109,7 +109,7 @@ Other patterns:
   - The own-props approach matches our decision, and HeroUI's shows how long the alternative gets.
 - **Composed parts:** Jolly UI links each component to the parts it is built from (Select → Label, Button, Popover, ListBox). It also shows a ready-made wrapper.
 
-### Navigation (feeds `ui-dqp.8`)
+### Navigation (feeds `ui-dqp.12`)
 
 - **Grouping:**
   - Category groups are the norm: Park UI, Intent UI, Chakra, Mantine and Radix all use them.
@@ -240,20 +240,23 @@ The `.md` output can be messy. shadcn's and Intent UI's leak raw JSX (`<CodeTabs
 - Whether `lastModified` shows real dates in the CI build. What we measured: in a depth-1 clone, the `git log` command fumadocs-mdx runs dates every file to the one commit in the clone. `docs.yml` checks out without `fetch-depth`, so it would need `fetch-depth: 0`. We have not run the full build on CI.
 - Whether search tags and a custom `Item` renderer work with `staticClient` in our build. The source supports both; we didn't build it.
 
-## Candidate beads
+## Filed beads
 
-Not filed. They would get `needs-triage` once approved.
+Filed on 2026-10-02 with `needs-triage`:
 
-1. **Group the docs sidebar by category with `meta.json`** (idea 1 with separators and status badges, plus the Edit on GitHub half of idea 9). Related to `ui-dqp.8`, which may be a layout bug rather than grouping.
-2. **Write the component page template and persist package-manager tabs** (ideas 2 and 3). Apply it to Button and TextField.
-3. **Show category and snippet in search results, and add filter tags** (idea 4).
-4. **Add a site-wide theme panel with a shareable URL and an install-command export** (idea 5). Blocked by `ui-2mi`; related to `ui-dqp.6`.
-5. **Decide whether examples become registry items, then add a copy-install-command button** (idea 6). Touches the registry design in `ui-o2f`.
-6. **Add per-part API blocks with Props, Data attributes and CSS variables** (idea 7).
-7. **Add agent instructions to `llms.txt`, split it by area, and add an authoritative preamble to each `.md`** (idea 8).
-8. **Show last-updated dates, with a full-history checkout in the docs workflow** (the Last updated half of idea 9).
-9. **Generate token reference pages and a naming page from token data** (ideas 13 and 14). Blocked by `ui-2mi`.
-10. **Add an accessibility section to the component page template** (idea 15). Related to `ui-m92`.
+| Bead        | Covers                                                                                                                                                     | Ideas                  |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| `ui-dqp.9`  | The component page template: layout, remembered package-manager tab, per-part API blocks, accessibility section (related to `ui-m92`), Edit on GitHub link | 2, 3, 7, 15, half of 9 |
+| `ui-dqp.10` | Token reference pages and a naming page, generated from token data (blocked by `ui-2mi`)                                                                   | 13, 14                 |
+| `ui-dqp.11` | A site-wide theme panel with a shareable URL and an install-command export (blocked by `ui-2mi`)                                                           | 5                      |
+| `ui-o2f.2`  | Decide whether examples become registry items                                                                                                              | 6                      |
+| `ui-dqp.12` | Group the sidebar by category with `meta.json`                                                                                                             | 1                      |
+| `ui-dqp.13` | Category and snippet in search results, with filter tags                                                                                                   | 4                      |
+| `ui-dqp.14` | Agent instructions in `llms.txt` and an authoritative preamble on each `.md`                                                                               | 8                      |
+
+Not filed: last-updated dates (the other half of idea 9). There are too few pages for it to matter yet, and CI would need `fetch-depth: 0`. Ideas 10–12 and 16 are later work with no bead yet.
+
+`ui-dqp.8` turned out to be the sidebar's width, not its grouping. Fumadocs stretched the sidebar across its centering gutter, and `--fd-layout-width` fixes it.
 
 ## Sources
 
