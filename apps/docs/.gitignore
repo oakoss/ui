@@ -1,3 +1,5 @@
 .source
 .tanstack
 .wrangler
+/playwright-report/
+/test-results/

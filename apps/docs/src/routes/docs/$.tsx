@@ -22,6 +22,9 @@ export const Route = createFileRoute('/docs/$')({
   component: Page,
   loader: async ({ params }) => {
     const slugs = params._splat?.split('/') ?? [];
+    // The 404 page hydrates on unknown URLs; with no baked data for them, the
+    // static loader fetch would fail and replace it with an error.
+    if (source.getPage(slugs) === undefined) throw notFound();
     const data = await serverLoader({ data: slugs });
     await docs.getPage(data.path)?.preload();
     return data;

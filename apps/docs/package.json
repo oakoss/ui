@@ -12,8 +12,9 @@
     "build": "vite build",
     "deploy": "wrangler deploy",
     "dev": "vite dev",
+    "pretest": "playwright install chromium",
     "preview": "vite preview",
-    "test": "vitest run",
+    "test": "vitest run && playwright test",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -32,6 +33,7 @@
     "@oakoss/eslint-config": "workspace:*",
     "@oakoss/oxlint-config": "workspace:*",
     "@oakoss/tsconfig": "workspace:*",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/mdx": "^2.0.14",
     "@types/node": "catalog:",
