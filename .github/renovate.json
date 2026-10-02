@@ -1,0 +1,33 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "automerge": true,
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigestsToSemver",
+    "schedule:monthly",
+    ":maintainLockFilesMonthly",
+    ":semanticCommits",
+    ":semanticCommitTypeAll(chore)"
+  ],
+  "labels": ["dependencies"],
+  "minimumReleaseAge": "2 days",
+  "packageRules": [
+    {
+      "description": "Reimplements group:allNonMajor plus digest updates, since the preset's minor/patch match misses digests",
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-minor-patch",
+      "matchPackageNames": ["*"],
+      "matchUpdateTypes": ["minor", "patch", "digest", "pinDigest"]
+    },
+    { "automerge": false, "matchUpdateTypes": ["major"] },
+    {
+      "allowedVersions": "<7",
+      "description": "TypeScript 7 crashes the ESLint config load until typescript-eslint supports it (typescript-eslint#10940).",
+      "matchPackageNames": ["typescript"]
+    }
+  ],
+  "platformAutomerge": false,
+  "platformCommit": "enabled",
+  "prConcurrentLimit": 5,
+  "vulnerabilityAlerts": { "labels": ["security"] }
+}
