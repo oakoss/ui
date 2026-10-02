@@ -1,0 +1,213 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`roles > pins the contrast pairs and minimums 1`] = `
+{
+  "contrastMinimum": {
+    "decorative": 0,
+    "non-text": 3,
+    "text": 4.5,
+  },
+  "contrastPairs": [
+    {
+      "background": "background",
+      "foreground": "foreground",
+      "kind": "text",
+    },
+    {
+      "background": "card",
+      "foreground": "card-foreground",
+      "kind": "text",
+    },
+    {
+      "background": "popover",
+      "foreground": "popover-foreground",
+      "kind": "text",
+    },
+    {
+      "background": "secondary",
+      "foreground": "secondary-foreground",
+      "kind": "text",
+    },
+    {
+      "background": "muted",
+      "foreground": "muted-foreground",
+      "kind": "text",
+    },
+    {
+      "background": "background",
+      "foreground": "muted-foreground",
+      "kind": "text",
+    },
+    {
+      "background": "accent",
+      "foreground": "accent-foreground",
+      "kind": "text",
+    },
+    {
+      "background": "sidebar",
+      "foreground": "sidebar-foreground",
+      "kind": "text",
+    },
+    {
+      "background": "sidebar-accent",
+      "foreground": "sidebar-accent-foreground",
+      "kind": "text",
+    },
+    {
+      "background": "primary",
+      "foreground": "primary-foreground",
+      "kind": "text",
+    },
+    {
+      "background": "primary-hover",
+      "foreground": "primary-foreground",
+      "kind": "text",
+    },
+    {
+      "background": "background",
+      "foreground": "primary-text",
+      "kind": "text",
+    },
+    {
+      "background": "primary-subtle",
+      "foreground": "primary-text",
+      "kind": "text",
+    },
+    {
+      "background": "background",
+      "foreground": "primary",
+      "kind": "non-text",
+    },
+    {
+      "background": "background",
+      "foreground": "primary-border",
+      "kind": "decorative",
+    },
+    {
+      "background": "destructive",
+      "foreground": "destructive-foreground",
+      "kind": "text",
+    },
+    {
+      "background": "destructive-hover",
+      "foreground": "destructive-foreground",
+      "kind": "text",
+    },
+    {
+      "background": "background",
+      "foreground": "destructive-text",
+      "kind": "text",
+    },
+    {
+      "background": "destructive-subtle",
+      "foreground": "destructive-text",
+      "kind": "text",
+    },
+    {
+      "background": "background",
+      "foreground": "destructive",
+      "kind": "non-text",
+    },
+    {
+      "background": "background",
+      "foreground": "destructive-border",
+      "kind": "decorative",
+    },
+    {
+      "background": "success",
+      "foreground": "success-foreground",
+      "kind": "text",
+    },
+    {
+      "background": "success-hover",
+      "foreground": "success-foreground",
+      "kind": "text",
+    },
+    {
+      "background": "background",
+      "foreground": "success-text",
+      "kind": "text",
+    },
+    {
+      "background": "success-subtle",
+      "foreground": "success-text",
+      "kind": "text",
+    },
+    {
+      "background": "background",
+      "foreground": "success",
+      "kind": "non-text",
+    },
+    {
+      "background": "background",
+      "foreground": "success-border",
+      "kind": "decorative",
+    },
+    {
+      "background": "warning",
+      "foreground": "warning-foreground",
+      "kind": "text",
+    },
+    {
+      "background": "warning-hover",
+      "foreground": "warning-foreground",
+      "kind": "text",
+    },
+    {
+      "background": "background",
+      "foreground": "warning-text",
+      "kind": "text",
+    },
+    {
+      "background": "warning-subtle",
+      "foreground": "warning-text",
+      "kind": "text",
+    },
+    {
+      "background": "background",
+      "foreground": "warning",
+      "kind": "non-text",
+    },
+    {
+      "background": "background",
+      "foreground": "warning-border",
+      "kind": "decorative",
+    },
+    {
+      "background": "info",
+      "foreground": "info-foreground",
+      "kind": "text",
+    },
+    {
+      "background": "info-hover",
+      "foreground": "info-foreground",
+      "kind": "text",
+    },
+    {
+      "background": "background",
+      "foreground": "info-text",
+      "kind": "text",
+    },
+    {
+      "background": "info-subtle",
+      "foreground": "info-text",
+      "kind": "text",
+    },
+    {
+      "background": "background",
+      "foreground": "info",
+      "kind": "non-text",
+    },
+    {
+      "background": "background",
+      "foreground": "info-border",
+      "kind": "decorative",
+    },
+    {
+      "background": "background",
+      "foreground": "border",
+      "kind": "decorative",
+    },
+  ],
+}
+`;

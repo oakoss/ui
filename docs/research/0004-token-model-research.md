@@ -59,7 +59,7 @@ Agreed on 2026-10-02. They revise the proposal agreed before this research; rows
 
 Still agreed and unchanged:
 
-- **Data:** typed TypeScript with `satisfies`, in a private `packages/tokens`.
+- **Data:** typed TypeScript in a private `packages/tokens`, written through `defineFamily`-style helpers. A plain `satisfies Family` widens the names to `string` and drops the reference checks.
 - **Field name:** `primary` in the model.
 - **Roles:** shadcn's 31 color names (32 cssVars with `radius`, as 0002 counts), plus `destructive-foreground` and the three status roles. The intent roles (`-hover`, `-subtle`, `-border`, `-text` for each intent) are new; see the table.
 - **Style and typography:** separate axes, with Vega's values as the default style.
