@@ -2,3 +2,8 @@
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
 @source '../../content';
+
+/* Stops the sidebar stretching across Fumadocs' centering gutter; 100vw would shrink content when it collapses. */
+:root {
+  --fd-layout-width: 9999px;
+}
