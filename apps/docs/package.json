@@ -1,0 +1,52 @@
+{
+  "name": "@oakoss/docs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#/components/*": "./src/components/*.tsx",
+    "#/lib/*": "./src/lib/*.ts",
+    "#/styles/*": "./src/styles/*"
+  },
+  "scripts": {
+    "build": "vite build",
+    "deploy": "wrangler deploy",
+    "dev": "vite dev",
+    "pretest": "playwright install chromium",
+    "preview": "vite preview",
+    "test": "vitest run && playwright test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@oakoss/ui": "workspace:*",
+    "@tanstack/react-router": "^1.170.38",
+    "@tanstack/react-start": "^1.168.56",
+    "@tanstack/start-static-server-functions": "^1.167.39",
+    "fumadocs-core": "^16.15.17",
+    "fumadocs-mdx": "^15.4.5",
+    "fumadocs-ui": "^16.15.17",
+    "lucide-react": "^1.47.0",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@oakoss/eslint-config": "workspace:*",
+    "@oakoss/oxlint-config": "workspace:*",
+    "@oakoss/tsconfig": "workspace:*",
+    "@playwright/test": "^1.63.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/mdx": "^2.0.14",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "^6.1.1",
+    "eslint": "catalog:",
+    "fumadocs-typescript": "^5.4.1",
+    "oxlint": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
+    "vite": "^8.3.1",
+    "vitest": "catalog:",
+    "wrangler": "^4.145.0"
+  }
+}

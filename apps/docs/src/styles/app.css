@@ -1,0 +1,4 @@
+@import '@oakoss/ui/styles.css';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+@source '../../content';

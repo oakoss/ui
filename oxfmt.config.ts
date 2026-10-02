@@ -9,6 +9,7 @@ export default defineConfig({
     'dist/',
     'build/',
     '*.log',
+    '**/routeTree.gen.ts',
     // Generated and rewritten by beads.
     '.beads/',
   ],

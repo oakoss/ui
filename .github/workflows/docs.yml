@@ -1,0 +1,62 @@
+name: Docs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  TURBO_TELEMETRY_DISABLED: '1'
+  WRANGLER_SEND_METRICS: 'false'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Fork PRs get no secrets, so they cannot deploy a preview.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/setup@fbda4c85fc2e1e08721cd8763afea8f48d60f024 # v3.0.0
+        with:
+          cache: true
+          require-lockfile: true
+
+      # Builds first; the tests catch pages that prerender with missing content.
+      - run: pnpm turbo run test --filter=@oakoss/docs
+
+      - name: Deploy to ui.oakoss.dev
+        if: github.event_name == 'push'
+        working-directory: apps/docs
+        run: pnpm exec wrangler deploy
+
+      - name: Upload a preview version
+        if: github.event_name == 'pull_request'
+        working-directory: apps/docs
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          WRANGLER_OUTPUT_FILE_PATH: ${{ runner.temp }}/wrangler-output.ndjson
+        # wrangler exits 0 without a URL when previews are disabled, so read
+        # the alias URL from its machine-readable output and fail if absent.
+        run: |
+          set -euo pipefail
+          pnpm exec wrangler versions upload --preview-alias "pr-$PR_NUMBER"
+          url="$(jq -r 'select(.type == "version-upload") | .preview_alias_url // empty' "$WRANGLER_OUTPUT_FILE_PATH")"
+          if [ -z "$url" ]; then
+            echo "::error title=Docs preview::wrangler reported no preview alias URL"
+            exit 1
+          fi
+          echo "Preview: $url" >> "$GITHUB_STEP_SUMMARY"

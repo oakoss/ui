@@ -34,7 +34,9 @@ pre-commit:
                   run: pnpm oxlint --fix {staged_files}
                   stage_fixed: true
                 - name: eslint
-                  run: pnpm eslint {staged_files} --max-warnings 0 --fix --cache --cache-location node_modules/.cache/eslint/.eslintcache
+                  # Staged generated files are ignored by the config; without
+                  # --no-warn-ignored each one counts against --max-warnings.
+                  run: pnpm eslint {staged_files} --max-warnings 0 --no-warn-ignored --fix --cache --cache-location node_modules/.cache/eslint/.eslintcache
                   stage_fixed: true
     - name: format
       run: pnpm oxfmt --no-error-on-unmatched-pattern {staged_files}
