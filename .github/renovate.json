@@ -10,7 +10,7 @@
     ":semanticCommitTypeAll(chore)"
   ],
   "labels": ["dependencies"],
-  "minimumReleaseAge": "3 days",
+  "minimumReleaseAge": "2 days",
   "packageRules": [
     {
       "description": "Reimplements group:allNonMajor plus digest updates, since the preset's minor/patch match misses digests",
