@@ -2,9 +2,7 @@ export const fontRoles = ['sans', 'mono', 'heading'] as const;
 
 export type FontRole = (typeof fontRoles)[number];
 
-/**
- * A composite type style, emitted as `--text-x` plus its line height.
- */
+// Each field maps to Tailwind's `--text-x` / `--text-x--{line-height,letter-spacing,font-weight}`.
 export type TextStyle = {
   letterSpacing?: string;
   lineHeight: string;
