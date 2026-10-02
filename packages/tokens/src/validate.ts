@@ -1,6 +1,7 @@
 import type { ColorRef, Family, Palette } from '#/family';
 
 import { type Color, isUnitInterval, isValidColor } from '#/color';
+import { parseColorPath } from '#/color-path';
 import { resolveFlavor } from '#/resolve';
 import { allRoles, neutralRoles } from '#/roles';
 import { isStep, orderedSteps, type Scale, steps } from '#/scale';
@@ -201,11 +202,9 @@ function refError(
   if (ref.alpha !== undefined && !isUnitInterval(ref.alpha)) {
     return `alpha ${ref.alpha} is outside 0–1`;
   }
-  const parts = ref.ref.split('.');
-  const [prefix, name, step] = parts;
-  if (prefix !== 'color' || name === undefined || parts.length > 3) {
-    return `"${ref.ref}" is not a color path`;
-  }
+  const parsed = parseColorPath(ref.ref);
+  if (parsed === undefined) return `"${ref.ref}" is not a color path`;
+  const { name, step } = parsed;
   if (step === undefined) {
     return Object.hasOwn(palette.neutrals, name)
       ? undefined
