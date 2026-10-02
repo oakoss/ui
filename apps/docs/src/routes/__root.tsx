@@ -13,7 +13,12 @@ import appCss from '#/styles/app.css?url';
 export const Route = createRootRoute({
   component: RootComponent,
   head: () => ({
-    links: [{ href: appCss, rel: 'stylesheet' }],
+    links: [
+      { href: appCss, rel: 'stylesheet' },
+      { href: '/favicon.ico', rel: 'icon', sizes: '32x32' },
+      { href: '/favicon.svg', rel: 'icon', type: 'image/svg+xml' },
+      { href: '/apple-touch-icon.png', rel: 'apple-touch-icon' },
+    ],
     meta: [
       {
         // HTML requires the `utf-8` label.

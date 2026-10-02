@@ -123,3 +123,30 @@ describe('prerendered site files', () => {
     expect(section).not.toContain(INHERITED_PREFIX);
   });
 });
+
+describe('site icons', () => {
+  const links = read('index.html')
+    .matchAll(/<link[^>]+rel="(?:icon|apple-touch-icon)"[^>]*>/gu)
+    .map(([tag]) =>
+      Object.fromEntries(
+        tag
+          .matchAll(/([\w-]+)="([^"]*)"/gu)
+          .map(([, name, value]) => [name, value]),
+      ),
+    )
+    .toArray();
+
+  it('links the ico, then the svg, then the touch icon', () => {
+    // `sizes` on the ico keeps SVG-capable browsers on the SVG.
+    expect(links).toEqual([
+      { href: '/favicon.ico', rel: 'icon', sizes: '32x32' },
+      { href: '/favicon.svg', rel: 'icon', type: 'image/svg+xml' },
+      { href: '/apple-touch-icon.png', rel: 'apple-touch-icon' },
+    ]);
+  });
+
+  it.each(links)('ships $href', ({ href }) => {
+    const file = path.join(client, String(href));
+    expect(existsSync(file)).toBe(true);
+  });
+});
