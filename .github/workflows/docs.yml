@@ -48,18 +48,15 @@ jobs:
         working-directory: apps/docs
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
-        # wrangler exits 0 without a URL when previews are disabled.
+          WRANGLER_OUTPUT_FILE_PATH: ${{ runner.temp }}/wrangler-output.ndjson
+        # wrangler exits 0 without a URL when previews are disabled, so read
+        # the alias URL from its machine-readable output and fail if absent.
         run: |
           set -euo pipefail
-          output="$(pnpm exec wrangler versions upload --preview-alias "pr-$PR_NUMBER" 2>&1)" || {
-            status=$?
-            printf '%s\n' "$output"
-            exit "$status"
-          }
-          printf '%s\n' "$output"
-          url="$(printf '%s\n' "$output" | sed -n 's/.*Version Preview Alias URL: *\(https:[^ ]*\).*/\1/p' | head -n 1)"
+          pnpm exec wrangler versions upload --preview-alias "pr-$PR_NUMBER"
+          url="$(jq -r 'select(.type == "version-upload") | .preview_alias_url // empty' "$WRANGLER_OUTPUT_FILE_PATH")"
           if [ -z "$url" ]; then
-            echo "::error title=Docs preview::wrangler printed no preview alias URL"
+            echo "::error title=Docs preview::wrangler reported no preview alias URL"
             exit 1
           fi
           echo "Preview: $url" >> "$GITHUB_STEP_SUMMARY"

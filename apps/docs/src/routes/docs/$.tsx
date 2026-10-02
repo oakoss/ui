@@ -15,7 +15,7 @@ import { Suspense, use } from 'react';
 
 import { baseOptions } from '#/components/layout';
 import { useMDXComponents } from '#/components/mdx';
-import { getPageMarkdownUrl, gitConfig } from '#/lib/shared';
+import { githubSourceUrl, markdownUrl } from '#/lib/site';
 import { docs, source } from '#/lib/source';
 
 export const Route = createFileRoute('/docs/$')({
@@ -38,7 +38,7 @@ const serverLoader = createServerFn({ method: 'GET' })
     if (!page) throw notFound();
 
     return {
-      markdownUrl: getPageMarkdownUrl(page).url,
+      markdownUrl: markdownUrl(page.slugs),
       pageTree: await source.serializePageTree(source.getPageTree()),
       path: page.path,
     };
@@ -58,7 +58,7 @@ function Content({ markdownUrl, path }: { markdownUrl: string; path: string }) {
       <div className="-mt-4 flex flex-row items-center gap-2 border-b pb-6">
         <MarkdownCopyButton markdownUrl={markdownUrl} />
         <ViewOptionsPopover
-          githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/${gitConfig.contentDir}/${path}`}
+          githubUrl={githubSourceUrl(path)}
           markdownUrl={markdownUrl}
         />
       </div>

@@ -7,6 +7,7 @@ import {
 import { RootProvider } from 'fumadocs-ui/provider/tanstack';
 
 import { StaticSearchDialog } from '#/components/search';
+import { appName } from '#/lib/site';
 import appCss from '#/styles/app.css?url';
 
 export const Route = createRootRoute({
@@ -20,7 +21,7 @@ export const Route = createRootRoute({
         charSet: 'utf-8',
       },
       { content: 'width=device-width, initial-scale=1', name: 'viewport' },
-      { title: 'oakoss/ui' },
+      { title: appName },
     ],
   }),
 });

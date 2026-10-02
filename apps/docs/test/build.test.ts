@@ -2,28 +2,35 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
+import { INHERITED_PREFIX } from '../src/lib/props';
 import { staticPages } from '../src/lib/static-pages';
 
 const client = path.join(import.meta.dirname, '../dist/client');
 const content = path.join(import.meta.dirname, '../content/docs');
 
-// Each content page with its source file and the HTML and Markdown files it
-// should prerender to.
-function contentPages(
-  dir = content,
-  prefix = '',
-): [string, string, string, string][] {
+type ContentPage = {
+  html: string;
+  markdown: string;
+  slug: string;
+  source: string;
+};
+
+// Each content page with its source file and the files it prerenders to.
+function contentPages(dir = content, prefix = ''): ContentPage[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const slug = path.join(prefix, entry.name.replace(/\.mdx$/u, ''));
     if (entry.isDirectory()) {
       return contentPages(path.join(dir, entry.name), slug);
     }
     if (!entry.name.endsWith('.mdx')) return [];
-    const html =
-      slug === 'index' ? 'docs/index.html' : `docs/${slug}/index.html`;
     return [
-      [slug, path.join(dir, entry.name), html, `docs/${slug}.md`],
-    ] as const;
+      {
+        html: slug === 'index' ? 'docs/index.html' : `docs/${slug}/index.html`,
+        markdown: `docs/${slug}.md`,
+        slug,
+        source: path.join(dir, entry.name),
+      },
+    ];
   });
 }
 
@@ -63,7 +70,7 @@ const htmlFiles = readdirSync(client, { recursive: true })
   .filter((file) => file.endsWith('.html'));
 
 describe('prerendered docs', () => {
-  it.each(pages)('renders %s', (_slug, _source, html, markdown) => {
+  it.each(pages)('renders $slug', ({ html, markdown }) => {
     expect(existsSync(path.join(client, html))).toBe(true);
     expect(existsSync(path.join(client, markdown))).toBe(true);
   });
@@ -74,7 +81,7 @@ describe('prerendered docs', () => {
     expect(read(file)).not.toContain('<!--$!-->');
   });
 
-  it.each(pages)('links %s with absolute paths', (_slug, source) => {
+  it.each(pages)('links $slug with absolute paths', ({ source }) => {
     // Relative links render as links back to the current page.
     expect(relativeLinks(source)).toEqual([]);
   });
@@ -98,12 +105,13 @@ describe('prerendered site files', () => {
     expect(readdirSync(cache)).toHaveLength(pages.length);
   });
 
-  it.each(['api/search', 'llms-full.txt', ...pages.map((page) => page[3])])(
-    'keeps prop-table data out of %s',
-    (file) => {
-      expect(read(file)).not.toContain('~inherited:');
-    },
-  );
+  it.each([
+    'api/search',
+    'llms-full.txt',
+    ...pages.map((page) => page.markdown),
+  ])('keeps prop-table data out of %s', (file) => {
+    expect(read(file)).not.toContain(INHERITED_PREFIX);
+  });
 
   it.each([
     ['docs/components/button/index.html', 'intent'],
@@ -112,6 +120,6 @@ describe('prerendered site files', () => {
     const section = propsSection(file);
     expect(section).toContain(ownProp);
     expect(section).not.toContain('onBlur');
-    expect(section).not.toContain('~inherited:');
+    expect(section).not.toContain(INHERITED_PREFIX);
   });
 });

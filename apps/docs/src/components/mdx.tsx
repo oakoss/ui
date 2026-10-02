@@ -2,15 +2,12 @@ import type { MDXComponents } from 'mdx/types';
 
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 
-import { ButtonDemo } from '#/components/demos/button-demo';
-import { TextFieldDemo } from '#/components/demos/text-field-demo';
 import { OwnPropsTable } from '#/components/own-props-table';
 
+// Demos are imported by the MDX page that uses them, not registered here.
 export function getMDXComponents(components?: MDXComponents) {
   return {
     ...defaultMdxComponents,
-    ButtonDemo,
-    TextFieldDemo,
     TypeTable: OwnPropsTable,
     ...components,
   } satisfies MDXComponents;
