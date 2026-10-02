@@ -1,5 +1,5 @@
 import type { Color } from '#/color';
-import type { ColorRef } from '#/family';
+import type { ColorRef, Polarity } from '#/family';
 
 export const steps = [
   50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950,
@@ -14,8 +14,8 @@ export type AuthoredScale<
   Hue extends string = never,
   Neutral extends string = never,
 > = {
-  // The family's canonical step; the role-step rule tries it first for fills.
-  anchor?: Step;
+  // Where the role-step rule starts looking for each mode's fill.
+  readonly anchor: Readonly<Record<Polarity, Step>>;
   kind: 'authored';
   steps: Readonly<Partial<Record<ExtraStep, Color>>> &
     Readonly<Record<CoreStep, Color>>;
@@ -50,8 +50,11 @@ type ScaleBase<Hue extends string, Neutral extends string> = {
 };
 
 // `never` names fit any family's palette, since these scales reference nothing.
-export function authored(scaleSteps: AuthoredScale['steps']): AuthoredScale {
-  return { kind: 'authored', steps: scaleSteps };
+export function authored(
+  anchor: AuthoredScale['anchor'],
+  scaleSteps: AuthoredScale['steps'],
+): AuthoredScale {
+  return { anchor, kind: 'authored', steps: scaleSteps };
 }
 
 export function isStep(value: number): value is Step {

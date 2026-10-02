@@ -4,7 +4,13 @@ import { type Color, isUnitInterval, isValidColor } from '#/color';
 import { parseColorPath } from '#/color-path';
 import { resolveFlavor } from '#/resolve';
 import { allRoles, neutralRoles } from '#/roles';
-import { isStep, orderedSteps, type Scale, steps } from '#/scale';
+import {
+  type AuthoredScale,
+  isStep,
+  orderedSteps,
+  type Scale,
+  steps,
+} from '#/scale';
 
 type AnyScale = Scale<string, string>;
 
@@ -23,6 +29,22 @@ export function validateFamily(family: Family): string[] {
     ...intentErrors(family),
     ...chartErrors(family),
   ];
+}
+
+// Typed as optional because untyped data can leave the anchor out.
+function anchorErrors(
+  name: string,
+  anchor: Partial<AuthoredScale['anchor']> | undefined,
+  scaleSteps: AuthoredScale['steps'],
+): string[] {
+  return (['dark', 'light'] as const).flatMap((polarity) => {
+    const step = anchor?.[polarity];
+    if (step === undefined)
+      return [`scale "${name}" has no ${polarity} anchor`];
+    return Object.hasOwn(scaleSteps, step)
+      ? []
+      : [`scale "${name}" ${polarity} anchor is missing step ${step}`];
+  });
 }
 
 function chartErrors(family: Family): string[] {
@@ -252,8 +274,5 @@ function scaleErrors(name: string, scale: AnyScale): string[] {
   ) {
     errors.push(`scale "${name}" doesn't get darker at every step`);
   }
-  if (scale.anchor !== undefined && !Object.hasOwn(scale.steps, scale.anchor)) {
-    errors.push(`scale "${name}" anchors on missing step ${scale.anchor}`);
-  }
-  return errors;
+  return [...errors, ...anchorErrors(name, scale.anchor, scale.steps)];
 }
