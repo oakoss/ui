@@ -1,18 +1,10 @@
-import type { AuthoredScale } from '#/scale';
-
 import { oklch } from '#/color';
+import { tailwindGrays } from '#/families/tailwind-grays';
+import { authored } from '#/scale';
 
-// `never` names fit any family's palette, since these scales reference nothing.
-const authored = (scaleSteps: AuthoredScale['steps']): AuthoredScale => ({
-  kind: 'authored',
-  steps: scaleSteps,
-});
-
-/**
- * Tailwind CSS 4.3.3's neutral and accent scales (`theme.css`), copied
- * unchanged. Its other gray families arrive as families of their own.
- */
+// Tailwind CSS 4.3.3's scales (`theme.css`), copied unchanged.
 export const tailwindScales = {
+  ...tailwindGrays,
   amber: authored({
     100: oklch(96.2, 0.059, 95.617),
     200: oklch(92.4, 0.12, 95.746),
@@ -116,19 +108,6 @@ export const tailwindScales = {
     800: oklch(45.3, 0.124, 130.933),
     900: oklch(40.5, 0.101, 131.063),
     950: oklch(27.4, 0.072, 132.109),
-  }),
-  neutral: authored({
-    100: oklch(97, 0, null),
-    200: oklch(92.2, 0, null),
-    300: oklch(87, 0, null),
-    400: oklch(70.8, 0, null),
-    50: oklch(98.5, 0, null),
-    500: oklch(55.6, 0, null),
-    600: oklch(43.9, 0, null),
-    700: oklch(37.1, 0, null),
-    800: oklch(26.9, 0, null),
-    900: oklch(20.5, 0, null),
-    950: oklch(14.5, 0, null),
   }),
   orange: authored({
     100: oklch(95.4, 0.038, 75.164),

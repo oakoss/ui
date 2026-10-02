@@ -49,6 +49,11 @@ type ScaleBase<Hue extends string, Neutral extends string> = {
   foreground?: Color | ColorRef<Hue, Neutral>;
 };
 
+// `never` names fit any family's palette, since these scales reference nothing.
+export function authored(scaleSteps: AuthoredScale['steps']): AuthoredScale {
+  return { kind: 'authored', steps: scaleSteps };
+}
+
 export function isStep(value: number): value is Step {
   return (orderedSteps as readonly number[]).includes(value);
 }

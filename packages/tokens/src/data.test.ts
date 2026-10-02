@@ -30,6 +30,15 @@ const themeCss = readFileSync(
   'utf8',
 );
 
+function grayPattern(family: Family): unknown {
+  return JSON.parse(
+    JSON.stringify(family.flavors).replaceAll(
+      `color.${family.id}.`,
+      'color.GRAY.',
+    ),
+  );
+}
+
 function tailwindStep(hue: string, step: number) {
   const pattern = new RegExp(
     String.raw`--color-${hue}-${step}: oklch\(([\d.]+)% ([\d.]+) ([\d.]+|none)\)`,
@@ -74,6 +83,22 @@ describe('default data', () => {
     for (const axis of Object.values(axes)) {
       expect(axis.contexts).toContain(axis.default);
     }
+  });
+});
+
+describe('base colors', () => {
+  it('maps every base color to the same steps of its own gray', () => {
+    expect(grayPattern(families.zinc)).toMatchSnapshot();
+    for (const family of Object.values(families)) {
+      expect(grayPattern(family)).toEqual(grayPattern(families.zinc));
+    }
+  });
+
+  it('offers shadcn base colors with zinc as the default family', () => {
+    expect(axes.family).toEqual({
+      contexts: ['mauve', 'mist', 'neutral', 'olive', 'stone', 'taupe', 'zinc'],
+      default: 'zinc',
+    });
   });
 });
 

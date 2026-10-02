@@ -3,7 +3,7 @@ import type { ColorRef, Family, Flavor } from '#/family';
 import type { NeutralRole } from '#/roles';
 import type { Scale } from '#/scale';
 
-import { neutral } from '#/families/neutral';
+import { neutral } from '#/families/base-colors';
 
 export const base: Family = neutral;
 export const light: Flavor<string, string> = neutral.flavors.light;

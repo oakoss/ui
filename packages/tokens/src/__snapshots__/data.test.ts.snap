@@ -1,5 +1,139 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`base colors > maps every base color to the same steps of its own gray 1`] = `
+{
+  "dark": {
+    "name": "Dark",
+    "polarity": "dark",
+    "roles": {
+      "accent": {
+        "ref": "color.GRAY.800",
+      },
+      "accent-foreground": {
+        "ref": "color.GRAY.50",
+      },
+      "background": {
+        "ref": "color.GRAY.950",
+      },
+      "border": {
+        "alpha": 0.1,
+        "ref": "color.white",
+      },
+      "card": {
+        "ref": "color.GRAY.900",
+      },
+      "card-foreground": {
+        "ref": "color.GRAY.50",
+      },
+      "foreground": {
+        "ref": "color.GRAY.50",
+      },
+      "input": {
+        "alpha": 0.15,
+        "ref": "color.white",
+      },
+      "muted": {
+        "ref": "color.GRAY.800",
+      },
+      "muted-foreground": {
+        "ref": "color.GRAY.400",
+      },
+      "popover": {
+        "ref": "color.GRAY.900",
+      },
+      "popover-foreground": {
+        "ref": "color.GRAY.50",
+      },
+      "secondary": {
+        "ref": "color.GRAY.800",
+      },
+      "secondary-foreground": {
+        "ref": "color.GRAY.50",
+      },
+      "sidebar": {
+        "ref": "color.GRAY.900",
+      },
+      "sidebar-accent": {
+        "ref": "color.GRAY.800",
+      },
+      "sidebar-accent-foreground": {
+        "ref": "color.GRAY.50",
+      },
+      "sidebar-border": {
+        "alpha": 0.1,
+        "ref": "color.white",
+      },
+      "sidebar-foreground": {
+        "ref": "color.GRAY.50",
+      },
+    },
+  },
+  "light": {
+    "name": "Light",
+    "polarity": "light",
+    "roles": {
+      "accent": {
+        "ref": "color.GRAY.100",
+      },
+      "accent-foreground": {
+        "ref": "color.GRAY.900",
+      },
+      "background": {
+        "ref": "color.white",
+      },
+      "border": {
+        "ref": "color.GRAY.200",
+      },
+      "card": {
+        "ref": "color.white",
+      },
+      "card-foreground": {
+        "ref": "color.GRAY.950",
+      },
+      "foreground": {
+        "ref": "color.GRAY.950",
+      },
+      "input": {
+        "ref": "color.GRAY.200",
+      },
+      "muted": {
+        "ref": "color.GRAY.100",
+      },
+      "muted-foreground": {
+        "ref": "color.GRAY.500",
+      },
+      "popover": {
+        "ref": "color.white",
+      },
+      "popover-foreground": {
+        "ref": "color.GRAY.950",
+      },
+      "secondary": {
+        "ref": "color.GRAY.100",
+      },
+      "secondary-foreground": {
+        "ref": "color.GRAY.900",
+      },
+      "sidebar": {
+        "ref": "color.GRAY.50",
+      },
+      "sidebar-accent": {
+        "ref": "color.GRAY.100",
+      },
+      "sidebar-accent-foreground": {
+        "ref": "color.GRAY.900",
+      },
+      "sidebar-border": {
+        "ref": "color.GRAY.200",
+      },
+      "sidebar-foreground": {
+        "ref": "color.GRAY.950",
+      },
+    },
+  },
+}
+`;
+
 exports[`roles > pins the contrast pairs and minimums 1`] = `
 {
   "contrastMinimum": {

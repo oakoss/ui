@@ -1,4 +1,12 @@
-import { neutral } from '#/families/neutral';
+import {
+  mauve,
+  mist,
+  neutral,
+  olive,
+  stone,
+  taupe,
+  zinc,
+} from '#/families/base-colors';
 import { vega } from '#/styles/vega';
 import { defaultTypography } from '#/typographies/default';
 
@@ -46,7 +54,15 @@ export { validateFamily } from '#/validate';
 export { validateStyle, validateTypography } from '#/validate-axes';
 export { zIndex } from '#/z-index';
 
-export const families = { neutral } as const;
+export const families = {
+  mauve,
+  mist,
+  neutral,
+  olive,
+  stone,
+  taupe,
+  zinc,
+} as const;
 export const styles = { vega } as const;
 export const typographies = { default: defaultTypography } as const;
 
@@ -55,7 +71,7 @@ export const typographies = { default: defaultTypography } as const;
  * each intent's hue are chosen within a family (see `Family`).
  */
 export const axes = {
-  family: { contexts: Object.keys(families), default: 'neutral' },
+  family: { contexts: Object.keys(families), default: 'zinc' },
   style: { contexts: Object.keys(styles), default: 'vega' },
   typography: { contexts: Object.keys(typographies), default: 'default' },
 } as const;
