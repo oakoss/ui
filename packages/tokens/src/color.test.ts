@@ -15,7 +15,7 @@ describe('isValidColor', () => {
     ['alpha 1', oklch(50, 0, null, 1), true],
     ['alpha over 1', oklch(50, 0, null, 1.01), false],
     ['negative alpha', oklch(50, 0, null, -0.01), false],
-    ['alpha NaN', oklch(50, 0, null, Number('NaN')), false],
+    ['alpha NaN', oklch(50, 0, null, NaN), false],
   ])('%s → %s', (_, color, valid) => {
     expect(isValidColor(color)).toBe(valid);
   });

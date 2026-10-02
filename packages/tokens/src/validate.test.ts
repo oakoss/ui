@@ -46,15 +46,12 @@ describe('validateFamily: role references', () => {
     ]);
   });
 
-  it.each([1.5, -0.1, Number('NaN')])(
-    'reports alpha %s outside 0–1',
-    (alpha) => {
-      const family = withLightRole('border', { alpha, ref: 'color.white' });
-      expect(validateFamily(family)).toEqual([
-        `flavor "light" role "border": alpha ${alpha} is outside 0–1`,
-      ]);
-    },
-  );
+  it.each([1.5, -0.1, NaN])('reports alpha %s outside 0–1', (alpha) => {
+    const family = withLightRole('border', { alpha, ref: 'color.white' });
+    expect(validateFamily(family)).toEqual([
+      `flavor "light" role "border": alpha ${alpha} is outside 0–1`,
+    ]);
+  });
 });
 
 describe('validateFamily: names', () => {
@@ -175,7 +172,7 @@ describe('validateStyle and validateTypography', () => {
     ).toEqual([`style token "panel" has no value`]);
   });
 
-  it.each([2, Number('NaN')])('reports style color alpha %s', (alpha) => {
+  it.each([2, NaN])('reports style color alpha %s', (alpha) => {
     const field = {
       dark: { alpha, role: 'input' as const },
       light: 'transparent' as const,
