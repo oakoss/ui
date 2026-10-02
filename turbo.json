@@ -3,6 +3,7 @@
   "agentGuidance": false,
   "globalDependencies": [".gitignore", "registry.json"],
   "tasks": {
+    "build": { "dependsOn": ["^typecheck"], "outputs": ["dist/**"] },
     "build-storybook": {
       "dependsOn": ["^typecheck"],
       "outputs": ["storybook-static/**"]

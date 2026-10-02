@@ -23,3 +23,5 @@ allowBuilds:
   esbuild: true
   lefthook: true
   unrs-resolver: false
+  # Wrangler's local runtime; deploys don't need it.
+  workerd: false

@@ -1,0 +1,17 @@
+{
+  "extends": [
+    "@oakoss/tsconfig/base.json",
+    "@oakoss/tsconfig/dom.json",
+    "@oakoss/tsconfig/react.json"
+  ],
+  "compilerOptions": { "types": ["node", "vite/client"] },
+  "include": [
+    "src",
+    "test",
+    "source.config.ts",
+    "vite.config.ts",
+    "vitest.config.ts",
+    "eslint.config.js",
+    "oxlint.config.ts"
+  ]
+}

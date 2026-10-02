@@ -64,6 +64,7 @@ jobs:
             exit 1
           fi
 
+      - run: pnpm build
       - run: pnpm test
 
   ci-summary:

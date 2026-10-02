@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "oakoss-ui-docs",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist/client",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page",
+  },
+  "routes": [{ "pattern": "ui.oakoss.dev", "custom_domain": true }],
+  // A custom-domain route turns workers.dev off by default; enable preview URLs
+  // explicitly so PR preview aliases get one.
+  "preview_urls": true,
+}
