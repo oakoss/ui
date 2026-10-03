@@ -10,6 +10,7 @@ import { readFileSync } from 'node:fs';
 import { transformIcons } from 'shadcn/utils';
 import {
   type ImportSpecifier,
+  Node,
   Project,
   type SourceFile,
   SyntaxKind,
@@ -81,10 +82,16 @@ function boundName(named: ImportSpecifier): string {
 function declaredNames(sourceFile: SourceFile): string[] {
   return [
     ...sourceFile.getDescendantsOfKind(SyntaxKind.VariableDeclaration),
+    ...sourceFile.getDescendantsOfKind(SyntaxKind.BindingElement),
+    ...sourceFile.getDescendantsOfKind(SyntaxKind.Parameter),
     ...sourceFile.getDescendantsOfKind(SyntaxKind.FunctionDeclaration),
     ...sourceFile.getDescendantsOfKind(SyntaxKind.FunctionExpression),
     ...sourceFile.getDescendantsOfKind(SyntaxKind.ClassDeclaration),
-  ].flatMap((node) => node.getName() ?? []);
+    ...sourceFile.getDescendantsOfKind(SyntaxKind.ClassExpression),
+  ].flatMap((node) => {
+    const name = node.getNameNode();
+    return Node.isIdentifier(name) ? [name.getText()] : [];
+  });
 }
 
 async function installed(library: string): Promise<SourceFile> {
@@ -111,6 +118,37 @@ function valueImports(sourceFile: SourceFile): ImportSpecifier[] {
     .flatMap((declaration) => declaration.getNamedImports())
     .filter((named) => !named.isTypeOnly());
 }
+
+test('declaredNames collects every kind of local binding', () => {
+  const sourceFile = new Project({
+    useInMemoryFileSystem: true,
+  }).createSourceFile(
+    'fixture.ts',
+    [
+      'const Variable = 1;',
+      'const { key: Destructured } = { key: 1 };',
+      'const [Element] = [1];',
+      'function Declared(Param: number) {}',
+      'const Held = function Expressed() {};',
+      'class Klass {}',
+      'const Kept = class Classed {};',
+    ].join('\n'),
+  );
+  expect(new Set(declaredNames(sourceFile))).toEqual(
+    new Set([
+      'Classed',
+      'Declared',
+      'Destructured',
+      'Element',
+      'Expressed',
+      'Held',
+      'Kept',
+      'Klass',
+      'Param',
+      'Variable',
+    ]),
+  );
+});
 
 // Run shadcn's own install-time transform, as `shadcn add` would.
 describe.each(Object.keys(packages))(
