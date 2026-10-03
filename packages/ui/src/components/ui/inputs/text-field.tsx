@@ -17,7 +17,7 @@ import { inputFocusRing } from '#/lib/recipes';
 const textFieldStyles = tv({
   slots: {
     description: 'text-xs text-muted-foreground',
-    error: 'text-xs text-destructive',
+    error: 'text-xs text-destructive-text',
     input: [
       inputFocusRing,
       'flex h-9 w-full rounded-md border border-border bg-background px-3 py-1 text-sm transition-colors placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 data-[invalid]:border-destructive',

@@ -24,7 +24,9 @@ function ThemedStory({
 }
 
 const withTheme: Decorator = (Story, context) => {
-  const selected: string | undefined = context.globals.theme;
+  // The test projects set VITE_STORY_THEME; a story's own theme global wins.
+  const selected: string | undefined =
+    context.globals.theme ?? import.meta.env.VITE_STORY_THEME;
   // Docs defaults to dark, the canvas to light; the toolbar overrides both.
   const isDark =
     selected === 'dark' ||
@@ -53,7 +55,7 @@ const preview: Preview = {
     },
   },
   parameters: {
-    a11y: { test: 'todo' },
+    a11y: { test: 'error' },
     controls: {
       matchers: { color: /(?:background|color)$/iu, date: /Date$/iu },
     },

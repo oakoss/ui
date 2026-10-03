@@ -56,10 +56,10 @@ export const Dark: Story = {
 // A consumer's string className overrides the base via cn — the reason cx
 // exists rather than string concatenation.
 export const ClassNameOverride: Story = {
-  args: { className: 'bg-emerald-500' },
+  args: { className: 'bg-emerald-700 text-white' },
   play: async ({ canvas }) => {
     const button = canvas.getByRole('button', { name: /button/iu });
-    await expect(button.classList.contains('bg-emerald-500')).toBe(true);
+    await expect(button.classList.contains('bg-emerald-700')).toBe(true);
     await expect(button.classList.contains('bg-primary')).toBe(false);
   },
 };
@@ -67,10 +67,10 @@ export const ClassNameOverride: Story = {
 // A render-function className (React Aria's state-driven form) resolves through
 // cx's composeRenderProps path.
 export const RenderPropClassName: Story = {
-  args: { className: () => 'bg-fuchsia-500' },
+  args: { className: () => 'bg-fuchsia-700 text-white' },
   play: async ({ canvas }) => {
     const button = canvas.getByRole('button', { name: /button/iu });
-    await expect(button.classList.contains('bg-fuchsia-500')).toBe(true);
+    await expect(button.classList.contains('bg-fuchsia-700')).toBe(true);
     await expect(button.classList.contains('bg-primary')).toBe(false);
   },
 };
