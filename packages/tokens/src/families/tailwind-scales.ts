@@ -1,11 +1,15 @@
 import { oklch } from '#/color';
 import { tailwindGrays } from '#/families/tailwind-grays';
-import { authored } from '#/scale';
+import { authored, type AuthoredScale } from '#/scale';
+
+// shadcn's accent themes fill at 700 in light mode and 800 in dark.
+const accent = (steps: AuthoredScale['steps']) =>
+  authored({ dark: 800, light: 700 }, steps);
 
 // Tailwind CSS 4.3.3's scales (`theme.css`), copied unchanged.
 export const tailwindScales = {
   ...tailwindGrays,
-  amber: authored({
+  amber: accent({
     100: oklch(96.2, 0.059, 95.617),
     200: oklch(92.4, 0.12, 95.746),
     300: oklch(87.9, 0.169, 91.605),
@@ -18,7 +22,7 @@ export const tailwindScales = {
     900: oklch(41.4, 0.112, 45.904),
     950: oklch(27.9, 0.077, 45.635),
   }),
-  blue: authored({
+  blue: accent({
     100: oklch(93.2, 0.032, 255.585),
     200: oklch(88.2, 0.059, 254.128),
     300: oklch(80.9, 0.105, 251.813),
@@ -31,7 +35,7 @@ export const tailwindScales = {
     900: oklch(37.9, 0.146, 265.522),
     950: oklch(28.2, 0.091, 267.935),
   }),
-  cyan: authored({
+  cyan: accent({
     100: oklch(95.6, 0.045, 203.388),
     200: oklch(91.7, 0.08, 205.041),
     300: oklch(86.5, 0.127, 207.078),
@@ -44,7 +48,7 @@ export const tailwindScales = {
     900: oklch(39.8, 0.07, 227.392),
     950: oklch(30.2, 0.056, 229.695),
   }),
-  emerald: authored({
+  emerald: accent({
     100: oklch(95, 0.052, 163.051),
     200: oklch(90.5, 0.093, 164.15),
     300: oklch(84.5, 0.143, 164.978),
@@ -57,7 +61,7 @@ export const tailwindScales = {
     900: oklch(37.8, 0.077, 168.94),
     950: oklch(26.2, 0.051, 172.552),
   }),
-  fuchsia: authored({
+  fuchsia: accent({
     100: oklch(95.2, 0.037, 318.852),
     200: oklch(90.3, 0.076, 319.62),
     300: oklch(83.3, 0.145, 321.434),
@@ -70,7 +74,7 @@ export const tailwindScales = {
     900: oklch(40.1, 0.17, 325.612),
     950: oklch(29.3, 0.136, 325.661),
   }),
-  green: authored({
+  green: accent({
     100: oklch(96.2, 0.044, 156.743),
     200: oklch(92.5, 0.084, 155.995),
     300: oklch(87.1, 0.15, 154.449),
@@ -83,7 +87,7 @@ export const tailwindScales = {
     900: oklch(39.3, 0.095, 152.535),
     950: oklch(26.6, 0.065, 152.934),
   }),
-  indigo: authored({
+  indigo: accent({
     100: oklch(93, 0.034, 272.788),
     200: oklch(87, 0.065, 274.039),
     300: oklch(78.5, 0.115, 274.713),
@@ -96,7 +100,7 @@ export const tailwindScales = {
     900: oklch(35.9, 0.144, 278.697),
     950: oklch(25.7, 0.09, 281.288),
   }),
-  lime: authored({
+  lime: accent({
     100: oklch(96.7, 0.067, 122.328),
     200: oklch(93.8, 0.127, 124.321),
     300: oklch(89.7, 0.196, 126.665),
@@ -109,7 +113,7 @@ export const tailwindScales = {
     900: oklch(40.5, 0.101, 131.063),
     950: oklch(27.4, 0.072, 132.109),
   }),
-  orange: authored({
+  orange: accent({
     100: oklch(95.4, 0.038, 75.164),
     200: oklch(90.1, 0.076, 70.697),
     300: oklch(83.7, 0.128, 66.29),
@@ -122,7 +126,7 @@ export const tailwindScales = {
     900: oklch(40.8, 0.123, 38.172),
     950: oklch(26.6, 0.079, 36.259),
   }),
-  pink: authored({
+  pink: accent({
     100: oklch(94.8, 0.028, 342.258),
     200: oklch(89.9, 0.061, 343.231),
     300: oklch(82.3, 0.12, 346.018),
@@ -135,7 +139,7 @@ export const tailwindScales = {
     900: oklch(40.8, 0.153, 2.432),
     950: oklch(28.4, 0.109, 3.907),
   }),
-  purple: authored({
+  purple: accent({
     100: oklch(94.6, 0.033, 307.174),
     200: oklch(90.2, 0.063, 306.703),
     300: oklch(82.7, 0.119, 306.383),
@@ -148,7 +152,7 @@ export const tailwindScales = {
     900: oklch(38.1, 0.176, 304.987),
     950: oklch(29.1, 0.149, 302.717),
   }),
-  red: authored({
+  red: accent({
     100: oklch(93.6, 0.032, 17.717),
     200: oklch(88.5, 0.062, 18.334),
     300: oklch(80.8, 0.114, 19.571),
@@ -161,7 +165,7 @@ export const tailwindScales = {
     900: oklch(39.6, 0.141, 25.723),
     950: oklch(25.8, 0.092, 26.042),
   }),
-  rose: authored({
+  rose: accent({
     100: oklch(94.1, 0.03, 12.58),
     200: oklch(89.2, 0.058, 10.001),
     300: oklch(81, 0.117, 11.638),
@@ -174,7 +178,7 @@ export const tailwindScales = {
     900: oklch(41, 0.159, 10.272),
     950: oklch(27.1, 0.105, 12.094),
   }),
-  sky: authored({
+  sky: accent({
     100: oklch(95.1, 0.026, 236.824),
     200: oklch(90.1, 0.058, 230.902),
     300: oklch(82.8, 0.111, 230.318),
@@ -187,7 +191,7 @@ export const tailwindScales = {
     900: oklch(39.1, 0.09, 240.876),
     950: oklch(29.3, 0.066, 243.157),
   }),
-  teal: authored({
+  teal: accent({
     100: oklch(95.3, 0.051, 180.801),
     200: oklch(91, 0.096, 180.426),
     300: oklch(85.5, 0.138, 181.071),
@@ -200,7 +204,7 @@ export const tailwindScales = {
     900: oklch(38.6, 0.063, 188.416),
     950: oklch(27.7, 0.046, 192.524),
   }),
-  violet: authored({
+  violet: accent({
     100: oklch(94.3, 0.029, 294.588),
     200: oklch(89.4, 0.057, 293.283),
     300: oklch(81.1, 0.111, 293.571),
@@ -213,7 +217,7 @@ export const tailwindScales = {
     900: oklch(38, 0.189, 293.745),
     950: oklch(28.3, 0.141, 291.089),
   }),
-  yellow: authored({
+  yellow: accent({
     100: oklch(97.3, 0.071, 103.193),
     200: oklch(94.5, 0.129, 101.54),
     300: oklch(90.5, 0.182, 98.111),

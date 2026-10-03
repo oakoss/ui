@@ -16,6 +16,8 @@ describe('isValidColor', () => {
     ['alpha over 1', oklch(50, 0, null, 1.01), false],
     ['negative alpha', oklch(50, 0, null, -0.01), false],
     ['alpha NaN', oklch(50, 0, null, NaN), false],
+    ['infinite chroma', oklch(50, Infinity, 30), false],
+    ['chroma above 1', oklch(50, Number.MAX_VALUE, 30), false],
   ])('%s → %s', (_, color, valid) => {
     expect(isValidColor(color)).toBe(valid);
   });

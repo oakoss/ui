@@ -9,7 +9,8 @@
   },
   "exports": {
     "./components/*": "./src/components/*.tsx",
-    "./styles.css": "./src/styles/globals.css"
+    "./styles.css": "./src/styles/globals.css",
+    "./themes.css": "./src/styles/themes.css"
   },
   "scripts": {
     "test": "vitest run",

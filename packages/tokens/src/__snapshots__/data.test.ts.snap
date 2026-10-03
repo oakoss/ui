@@ -100,7 +100,7 @@ exports[`base colors > maps every base color to the same steps of its own gray 1
         "ref": "color.GRAY.100",
       },
       "muted-foreground": {
-        "ref": "color.GRAY.500",
+        "ref": "color.GRAY.600",
       },
       "popover": {
         "ref": "color.white",

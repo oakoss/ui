@@ -12,7 +12,9 @@ export function resolveFlavor(
   family: Family,
   flavorId: string,
 ): ResolvedFlavor | string {
-  const requested = family.flavors[flavorId];
+  const requested = Object.hasOwn(family.flavors, flavorId)
+    ? family.flavors[flavorId]
+    : undefined;
   if (requested === undefined) return `flavor "${flavorId}" doesn't exist`;
   const chain: Flavor<string, string>[] = [];
   const seen = new Set<string>();
@@ -22,7 +24,12 @@ export function resolveFlavor(
       return `flavor "${flavorId}" extends itself through "${id}"`;
     }
     seen.add(id);
-    const flavor: Flavor<string, string> | undefined = family.flavors[id];
+    const flavor: Flavor<string, string> | undefined = Object.hasOwn(
+      family.flavors,
+      id,
+    )
+      ? family.flavors[id]
+      : undefined;
     if (flavor === undefined) {
       return `flavor "${flavorId}" extends unknown flavor "${id}"`;
     }

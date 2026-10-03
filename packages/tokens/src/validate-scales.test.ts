@@ -133,8 +133,29 @@ describe('validateFamily: ramp charts', () => {
   });
 
   it('reports a base palette error once', () => {
-    expect(validateFamily(withScale('red', { ...red, anchor: 25 }))).toEqual([
-      `scale "red" anchors on missing step 25`,
+    const anchor = { dark: 800, light: 25 } as const;
+    expect(validateFamily(withScale('red', { ...red, anchor }))).toEqual([
+      `scale "red" light anchor is missing step 25`,
+    ]);
+  });
+});
+
+describe('validateFamily: anchors', () => {
+  it('checks each mode anchor', () => {
+    const anchor = { dark: 1000, light: 25 } as const;
+    expect(validateFamily(withScale('red', { ...red, anchor }))).toEqual([
+      `scale "red" dark anchor is missing step 1000`,
+      `scale "red" light anchor is missing step 25`,
+    ]);
+  });
+
+  it('reports a missing anchor from untyped data', () => {
+    const { anchor: _missing, ...rest } = red;
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the type requires an anchor; the runtime check covers untyped data
+    const scale = rest as AuthoredScale;
+    expect(validateFamily(withScale('red', scale))).toEqual([
+      `scale "red" has no dark anchor`,
+      `scale "red" has no light anchor`,
     ]);
   });
 });
@@ -157,7 +178,8 @@ describe('validateFamily: authored scales', () => {
       1000: oklch(18, 0.06, 26),
       25: oklch(99, 0.005, 17),
     };
-    const family = withScale('red', { ...red, anchor: 1000, steps });
+    const anchor = { dark: 25, light: 1000 } as const;
+    const family = withScale('red', { ...red, anchor, steps });
     expect(validateFamily(family)).toEqual([]);
   });
 
