@@ -82,6 +82,9 @@ jobs:
   commitlint:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
       - if: github.event_name == 'pull_request'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -99,11 +102,14 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           BASE: ${{ github.event.pull_request.base.sha }}
+          GH_TOKEN: ${{ github.token }}
           HEAD: ${{ github.event.pull_request.head.sha }}
-          TITLE: ${{ github.event.pull_request.title }}
+          PR: ${{ github.event.pull_request.number }}
         run: |
           pnpm exec commitlint --from "$BASE" --to "$HEAD" --verbose
-          printf '%s\n' "$TITLE" | pnpm exec commitlint --verbose
+          # Read the current title: a re-run reuses the event that started it.
+          title="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR" --jq .title)"
+          printf '%s\n' "$title" | pnpm exec commitlint --verbose
 
   ci-summary:
     name: CI Summary
