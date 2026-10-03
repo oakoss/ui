@@ -32,6 +32,31 @@ const withIcons: Decorator = (Story) => (
   </IconResolverContext>
 );
 
+function PalettedStory({
+  canvasElement,
+  children,
+  family,
+  primary,
+}: {
+  canvasElement: HTMLElement;
+  children: ReactNode;
+  family: string | undefined;
+  primary: string | undefined;
+}): ReactNode {
+  useEffect(() => {
+    const root = canvasElement.ownerDocument.documentElement;
+    for (const [name, value] of [
+      ['data-family', family],
+      ['data-primary', primary],
+    ] as const) {
+      root.removeAttribute(name);
+      if (value !== undefined) root.setAttribute(name, value);
+    }
+  }, [canvasElement, family, primary]);
+
+  return children;
+}
+
 function ThemedStory({
   canvasElement,
   children,
@@ -50,6 +75,17 @@ function ThemedStory({
 
   return children;
 }
+
+// Unset means the default theme from theme.css; themes.css holds the rest.
+const withPalette: Decorator = (Story, context) => (
+  <PalettedStory
+    canvasElement={context.canvasElement}
+    family={context.globals.family}
+    primary={context.globals.primary}
+  >
+    <Story />
+  </PalettedStory>
+);
 
 const withTheme: Decorator = (Story, context) => {
   // The test projects set VITE_STORY_THEME; a story's own theme global wins.
@@ -115,8 +151,27 @@ const withLocale: Decorator = (Story, context) => {
 };
 
 const preview: Preview = {
-  decorators: [withTheme, withLocale, withIcons],
+  decorators: [withTheme, withPalette, withLocale, withIcons],
   globalTypes: {
+    family: {
+      description: 'Gray family',
+      toolbar: {
+        dynamicTitle: true,
+        icon: 'paintbrush',
+        items: [
+          { title: 'Default family', value: undefined },
+          ...[
+            'mauve',
+            'mist',
+            'neutral',
+            'olive',
+            'stone',
+            'taupe',
+            'zinc',
+          ].map((value) => ({ title: value, value })),
+        ],
+      },
+    },
     locale: {
       description: 'Locale and text direction',
       toolbar: {
@@ -125,6 +180,35 @@ const preview: Preview = {
         items: [
           { title: 'English (LTR)', value: 'en-US' },
           { title: 'Arabic (RTL)', value: 'ar-EG' },
+        ],
+      },
+    },
+    primary: {
+      description: 'Primary color',
+      toolbar: {
+        dynamicTitle: true,
+        icon: 'circle',
+        items: [
+          { title: 'Default primary', value: undefined },
+          ...[
+            'amber',
+            'blue',
+            'cyan',
+            'emerald',
+            'fuchsia',
+            'green',
+            'indigo',
+            'lime',
+            'orange',
+            'pink',
+            'purple',
+            'red',
+            'rose',
+            'sky',
+            'teal',
+            'violet',
+            'yellow',
+          ].map((value) => ({ title: value, value })),
         ],
       },
     },

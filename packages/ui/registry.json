@@ -6,6 +6,8 @@
       "type": "registry:theme",
       "title": "Theme",
       "description": "Design tokens (color system) shared by all oakoss/ui components.",
+      "devDependencies": ["tailwindcss-react-aria-components"],
+      "css": { "@plugin tailwindcss-react-aria-components": {} },
       "cssVars": {
         "dark": {
           "field": "oklch(1 0 0 / 4.5%)",
@@ -295,6 +297,16 @@
           "path": "src/components/ui/inputs/button.tsx",
           "type": "registry:ui",
           "target": "@ui/inputs/button.tsx"
+        },
+        {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
         },
         {
           "path": "src/lib/recipes.ts",

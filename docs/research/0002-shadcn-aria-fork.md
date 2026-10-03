@@ -43,7 +43,7 @@ Every claim below comes from shadcn's source at commit `d75a96a` (2026-10-01) or
 Its interactive components wrap React Aria's own building blocks: Select, ComboBox, Dialog and Modal, Checkbox, Tooltip, Calendar and Tabs.
 
 - **Button.**
-  - It uses `variant` with 6 options (ours uses `intent` with 5), has 8 sizes and adds a `LinkButton`.
+  - It uses one `variant` prop with 6 options, has 8 sizes and adds a `LinkButton`. Ours splits look from color; see [Button](#button).
   - It sets `data-slot`, `data-variant` and `data-size` attributes.
   - It drops React Aria's function-style `className` (`Omit<…, "className">`), which our `cx` keeps.
 - **Fields.** shadcn wires `Field`, `FieldLabel`, `Input` and `FieldDescription` together manually with `htmlFor`/`id`.
@@ -141,6 +141,18 @@ Settled in `ui-lwb.2` (2026-10-03):
 - **A wrapper per icon, not inline placeholders.** Upstream writes `<IconPlaceholder>` inside each component, so installs render the library icon directly. Ours adds one pass-through function per icon in exchange for a single tested source of names across every component.
 - **`IconProps` omits `children` and narrows `strokeWidth` to a number**, because Remix Icon rejects children and HugeIcons wants a numeric stroke width. A typecheck-enforced assignment covers every library.
 - **VS Code autocomplete** excludes the icon libraries and `icons.tsx` (`.vscode/settings.json`), so typing `Calendar` offers the component.
+
+### Button
+
+Settled in `ui-lwb.4` (2026-10-03), after comparing 15 libraries' button APIs from their source. Every React Aria-based one (HeroUI, Intent UI, Untitled UI, Jolly UI, shadcn's base) uses one flat `variant` prop; Radix Themes, Chakra, Park UI, Mantine, MUI, Ant Design and Catalyst split look from color.
+
+- **Two props:** `variant` sets the look (`solid`, `soft`, `outline`, `ghost`, `link`) and `intent` the color (`primary`, `neutral`, `destructive`, `success`, `warning`, `info`), so each look reaches all five intent role sets. No aliases for shadcn's names: several would mean something else here (`secondary`).
+- **CSS variables:** each intent sets `--btn-*` colors and each look reads them, so the styles grow as looks plus intents, not looks × intents. oxlint allows Button to set those variables to named theme colors and neutral's hover mix only; a test pins how `@shadcn/lint`'s allow patterns match.
+- **Hover and press as a state layer.** Soft, outline and ghost tint their surface with their own text color, 8% on hover and 12% on press (Material's pattern), drawn as a gradient so it sits over the fill; solid fills swap to `<intent>-hover` on hover and press, plus a press scale; links underline. A whole-surface tint is a stronger cue than a 1px border change, and deriving it from the text color keeps it visible where `primary-subtle` equals the page in the gray families. Accent text sat at the 4.5:1 line, so the generator keeps it AA under the press layer (note 0004); a foreground layer on solid fills failed on keyboard and touch presses (3.83:1), hence the hover fill. `neutral` has no role set and uses the gray roles with opacity. The tokens package tests every hover and press across every theme.
+- **One component plus `buttonStyles()`.** Icon sizes (`icon-sm`, `icon`, `icon-lg`) require `aria-label` or `aria-labelledby` in the props type. A link styled as a button is React Aria's `Link` with `buttonStyles({ className })`, which also serves TanStack Router's `createLink`; `render` can't change a button's element type. Other components export a `<name>Styles` helper only when something needs it.
+- **Pending:** React Aria's `isPending`, with the label faded (not hidden) so the width and accessible name stay, and a `ProgressBar` named by `pendingLabel`.
+- **`hover:` and `pressed:` come from `tailwindcss-react-aria-components`,** which matches React Aria's `data-hovered` and `data-pressed` (absent while pending or disabled) and falls back to `:hover` on plain elements, so `buttonStyles` on an `<a>` still hovers.
+- **Checks:** Storybook renders every look × intent in light, dark, RTL and two other palettes for axe, hovers and presses each one, and a forced-colors project checks every look keeps a border in Windows High Contrast.
 
 ## Changes to 0001
 

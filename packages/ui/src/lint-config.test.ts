@@ -64,11 +64,15 @@ function parseJson(text: string | undefined): unknown {
 }
 
 // @shadcn/lint doesn't document how allow patterns match, so pin it.
-test('button may set its variables to named theme colors only', () => {
+test('button may set its variables to named theme colors and its neutral hover', () => {
   expect(
     arbitraryValues('src/components/ui/inputs/button.tsx', [
       '[--btn-bg:var(--color-primary)]',
       '[--btn-fg:var(--color-primary-foreground)]',
+      'gap-[inherit]',
+      'gap-[13px]',
+      '[--btn-hover:color-mix(in_oklab,var(--color-foreground)_90%,transparent)]',
+      '[--btn-hover:color-mix(in_oklab,var(--color-foreground)_50%,transparent)]',
       '[--btn-bg:var(--color-primary,#ff0000)]',
       '[--btn-bg:#ff0000]',
       '[--btn-bg:var(--color-nope)]',
@@ -77,6 +81,8 @@ test('button may set its variables to named theme colors only', () => {
       'p-[13px]',
     ]),
   ).toEqual([
+    'gap-[13px]',
+    '[--btn-hover:color-mix(in_oklab,var(--color-foreground)_50%,transparent)]',
     '[--btn-bg:var(--color-primary,#ff0000)]',
     '[--btn-bg:#ff0000]',
     '[--btn-bg:var(--color-nope)]',

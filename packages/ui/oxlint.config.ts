@@ -24,7 +24,8 @@ const buttonColors = [
 
 // Button sets its --btn-* variables to named theme colors. Each color is
 // listed because the plugin's `*` also matches `,#f00`, so a `var(--color-*)`
-// entry would let a hardcoded fallback through.
+// entry would let a hardcoded fallback through. The label's gap-[inherit]
+// lets size and className gaps reach the icon spacing.
 const componentVariables = defineConfig({
   overrides: [
     {
@@ -33,9 +34,12 @@ const componentVariables = defineConfig({
         'shadcn/no-arbitrary-values': [
           'error',
           {
-            allow: buttonColors.map(
-              (color) => `[--btn-*:var(--color-${color})]`,
-            ),
+            allow: [
+              ...buttonColors.map((color) => `[--btn-*:var(--color-${color})]`),
+              'gap-[inherit]',
+              // Neutral has no hover role: its fill fades instead.
+              '[--btn-hover:color-mix(in_oklab,var(--color-foreground)_90%,transparent)]',
+            ],
           },
         ],
       },

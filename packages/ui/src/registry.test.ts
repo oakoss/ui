@@ -48,6 +48,28 @@ const shipped = ui.items.flatMap(({ dependencies, files, name }) => {
   return [{ name, unlistedFiles, unlistedPackages }];
 });
 
+// Components use the plugin's pressed:/pending: variants, which Tailwind
+// drops without it; shadcn merges the theme's css and devDependencies into
+// every install that depends on it.
+test('the theme installs the React Aria Tailwind plugin', () => {
+  const theme = ui.items.find(({ name }) => name === 'theme');
+  expect(theme).toMatchObject({
+    css: { '@plugin tailwindcss-react-aria-components': {} },
+    devDependencies: ['tailwindcss-react-aria-components'],
+  });
+});
+
+function isThemeless(item: (typeof ui.items)[number]): boolean {
+  return (
+    item.type === 'registry:ui' &&
+    !(item.registryDependencies ?? []).includes('oakoss/ui/theme')
+  );
+}
+
+test('every component depends on the theme', () => {
+  expect(ui.items.filter(isThemeless).map(({ name }) => name)).toEqual([]);
+});
+
 describe.each(shipped)('$name', ({ unlistedFiles, unlistedPackages }) => {
   test('lists every local file it imports', () => {
     expect(unlistedFiles).toEqual([]);
