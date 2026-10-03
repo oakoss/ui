@@ -3,6 +3,7 @@ import '../src/styles.css';
 import type { Decorator, Preview } from '@storybook/react-vite';
 
 import { type ReactNode, useEffect } from 'react';
+import { I18nProvider, isRTL } from 'react-aria-components';
 
 function ThemedStory({
   canvasElement,
@@ -39,9 +40,67 @@ const withTheme: Decorator = (Story, context) => {
   );
 };
 
+// The root, so portaled overlays follow; but docs share one document across
+// stories, where the last story's locale would win the whole page.
+function LocalizedStory({
+  canvasElement,
+  children,
+  inDocs,
+  locale,
+}: {
+  canvasElement: HTMLElement;
+  children: ReactNode;
+  inDocs: boolean;
+  locale: string;
+}): ReactNode {
+  const dir = isRTL(locale) ? 'rtl' : 'ltr';
+  useEffect(() => {
+    // Docs reset the root too: the preview keeps one document across views.
+    const root = canvasElement.ownerDocument.documentElement;
+    root.setAttribute('lang', inDocs ? 'en-US' : locale);
+    root.setAttribute('dir', inDocs ? 'ltr' : dir);
+  }, [canvasElement, dir, inDocs, locale]);
+
+  return (
+    <I18nProvider locale={locale}>
+      {inDocs ? (
+        <div dir={dir} lang={locale}>
+          {children}
+        </div>
+      ) : (
+        children
+      )}
+    </I18nProvider>
+  );
+}
+
+const withLocale: Decorator = (Story, context) => {
+  const locale: string = context.globals.locale ?? 'en-US';
+  return (
+    <LocalizedStory
+      canvasElement={context.canvasElement}
+      inDocs={context.viewMode === 'docs'}
+      locale={locale}
+    >
+      <Story />
+    </LocalizedStory>
+  );
+};
+
 const preview: Preview = {
-  decorators: [withTheme],
+  decorators: [withTheme, withLocale],
   globalTypes: {
+    locale: {
+      description: 'Locale and text direction',
+      toolbar: {
+        dynamicTitle: true,
+        icon: 'globe',
+        items: [
+          { title: 'English (LTR)', value: 'en-US' },
+          { title: 'Arabic (RTL)', value: 'ar-EG' },
+        ],
+      },
+    },
     theme: {
       description: 'Theme',
       toolbar: {

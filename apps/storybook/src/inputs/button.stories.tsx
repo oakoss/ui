@@ -126,3 +126,12 @@ export const WithoutTargetSize: Story = {
     );
   },
 };
+
+export const RightToLeft: Story = {
+  args: { children: 'زر' },
+  globals: { locale: 'ar-EG' },
+  play: async ({ canvas }) => {
+    const button = canvas.getByRole('button', { name: 'زر' });
+    await expect(getComputedStyle(button).direction).toBe('rtl');
+  },
+};

@@ -116,3 +116,16 @@ export const FocusRing: Story = {
     await expect(style.outlineWidth).toBe('3px');
   },
 };
+
+export const RightToLeft: Story = {
+  args: {
+    description: 'سنرسل لك رسالة تأكيد',
+    label: 'البريد الإلكتروني',
+    placeholder: 'you@example.com',
+  },
+  globals: { locale: 'ar-EG' },
+  play: async ({ canvas }) => {
+    const input = canvas.getByRole('textbox', { name: 'البريد الإلكتروني' });
+    await expect(getComputedStyle(input).direction).toBe('rtl');
+  },
+};
