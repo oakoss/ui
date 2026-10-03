@@ -27,7 +27,7 @@ import { defineStyle } from '#/style';
 
 const themeCss = readFileSync(
   createRequire(import.meta.url).resolve('tailwindcss/theme.css'),
-  'utf8',
+  'utf-8',
 );
 
 function grayPattern(family: Family): unknown {

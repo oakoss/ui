@@ -81,7 +81,7 @@ describe.each(entries)('$key', ({ element, Icon, missing }) => {
   });
 });
 
-const source = readFileSync(new URL('icons.tsx', import.meta.url), 'utf8');
+const source = readFileSync(new URL('icons.tsx', import.meta.url), 'utf-8');
 
 // A local named like an imported icon renders itself instead of the icon.
 function declaredNames(sourceFile: SourceFile): string[] {

@@ -195,7 +195,8 @@ export default defineConfig({
     'unicorn/require-module-attributes': 'error',
     'unicorn/switch-case-braces': 'error',
     'unicorn/switch-case-break-position': 'error',
-    'unicorn/text-encoding-identifier-case': 'error',
+    // `<meta charset>` only allows `utf-8`, so that's the one spelling.
+    'unicorn/text-encoding-identifier-case': ['error', { withDash: true }],
     'unicorn/throw-new-error': 'error',
   },
 });

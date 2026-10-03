@@ -29,7 +29,7 @@ writeFileSync(
 );
 
 const registryUrl = new URL('registry.json', ui);
-const registry: unknown = JSON.parse(readFileSync(registryUrl, 'utf8'));
+const registry: unknown = JSON.parse(readFileSync(registryUrl, 'utf-8'));
 const items: unknown =
   typeof registry === 'object' && registry !== null && 'items' in registry
     ? registry.items

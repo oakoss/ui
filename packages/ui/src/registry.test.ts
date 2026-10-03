@@ -21,7 +21,7 @@ test('registryDependencies point at items in this repo', () => {
 
 // TypeScript's scanner also finds side-effect, type-only and multi-line imports.
 function importsOf(path: string): string[] {
-  const source = readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
+  const source = readFileSync(new URL(`../${path}`, import.meta.url), 'utf-8');
   return ts
     .preProcessFile(source, true, true)
     .importedFiles.map(({ fileName }) => fileName);

@@ -41,13 +41,13 @@ function propsSection(file: string) {
 }
 
 function read(file: string) {
-  return readFileSync(path.join(client, file), 'utf8');
+  return readFileSync(path.join(client, file), 'utf-8');
 }
 
 // Markdown link targets in a source file that are not absolute, an anchor, or
 // an external URL.
 function relativeLinks(source: string) {
-  return readFileSync(source, 'utf8')
+  return readFileSync(source, 'utf-8')
     .matchAll(/\]\(([^)\s]+)/gu)
     .map((match) => match[1] ?? '')
     .filter((target) => !/^(?:\/|#|https?:)/u.test(target))
