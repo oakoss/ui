@@ -414,6 +414,9 @@ importers:
       '@oakoss/oxlint-config':
         specifier: workspace:*
         version: link:../../tooling/oxlint-config
+      '@oakoss/tokens':
+        specifier: workspace:*
+        version: link:../../packages/tokens
       '@oakoss/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig

@@ -48,6 +48,15 @@ export function bundleCss(families: readonly Family[], style: Style): string {
   return blocks.join('\n\n');
 }
 
+/**
+ * Every hue some family offers as primary: the `data-primary` values.
+ */
+export function primaryHues(families: readonly Family[]): string[] {
+  return [
+    ...new Set(families.flatMap((family) => family.intents.primary.choices)),
+  ];
+}
+
 // Axis independence (note 0004): a primary hue must resolve to the same
 // values in every family that offers it, or one block can't serve them all.
 function primaryDeclarations(
@@ -78,12 +87,6 @@ function primaryDeclarations(
     }
   }
   return first;
-}
-
-function primaryHues(families: readonly Family[]): string[] {
-  return [
-    ...new Set(families.flatMap((family) => family.intents.primary.choices)),
-  ];
 }
 
 // `.dark` may sit on the element or on an ancestor such as `<html>`.

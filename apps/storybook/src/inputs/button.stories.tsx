@@ -41,8 +41,32 @@ export const WithIcons: Story = {
     const button = canvas.getByRole('button', { name: 'Add item' });
     // The start icon tightens the start padding.
     await expect(getComputedStyle(button).paddingInlineStart).toBe('8px');
+    await expectLabelGap(button, '8px');
   },
 };
+
+// Sizes set their own gap, which the label must follow.
+export const WithIconsSmall: Story = {
+  ...WithIcons,
+  args: { ...WithIcons.args, size: 'sm' },
+  play: async ({ canvas }) => {
+    await expectLabelGap(
+      canvas.getByRole('button', { name: 'Add item' }),
+      '6px',
+    );
+  },
+};
+
+// Children sit in a label span, which must lay them out with the button's gap.
+async function expectLabelGap(button: HTMLElement, gap: string) {
+  const label = button.querySelector('[data-icon]')?.parentElement ?? null;
+  await expect(label).toBeInstanceOf(HTMLElement);
+  await expect(label).not.toBe(button);
+  const style = getComputedStyle(label ?? button);
+  // A flex item's display is blockified: inline-flex computes as flex.
+  await expect(style.display).toBe('flex');
+  await expect(style.columnGap).toBe(gap);
+}
 
 // The start icon's padding is logical, so in RTL it tightens the right side.
 export const WithIconsRightToLeft: Story = {

@@ -19,6 +19,7 @@
     "@chromatic-com/storybook": "^5.3.1",
     "@oakoss/eslint-config": "workspace:*",
     "@oakoss/oxlint-config": "workspace:*",
+    "@oakoss/tokens": "workspace:*",
     "@oakoss/tsconfig": "workspace:*",
     "@storybook/addon-a11y": "^10.6.1",
     "@storybook/addon-docs": "^10.6.1",

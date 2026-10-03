@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { bundleCss } from '#/bundle';
+import { bundleCss, primaryHues } from '#/bundle';
 import { oklch } from '#/color';
 import {
   formatColor,
@@ -87,6 +87,21 @@ describe('bundleCss', () => {
     expect(css.lastIndexOf('[data-family=')).toBeLessThan(
       css.indexOf('[data-primary='),
     );
+  });
+
+  it('scopes exactly the primary hues, once each, every family offering them', () => {
+    const hues = primaryHues(Object.values(families));
+    const scoped = css
+      .matchAll(/^\[data-primary="(\w+)"\] \{$/gmu)
+      .map(([, hue]) => hue)
+      .toArray();
+    expect(scoped).toEqual(hues);
+    expect(new Set(hues).size).toBe(hues.length);
+    for (const family of Object.values(families)) {
+      expect(hues).toEqual(
+        expect.arrayContaining([...family.intents.primary.choices]),
+      );
+    }
   });
 });
 

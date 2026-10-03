@@ -10,6 +10,7 @@ import {
 import { vega } from '#/styles/vega';
 import { defaultTypography } from '#/typographies/default';
 
+export { primaryHues } from '#/bundle';
 export type { Color } from '#/color';
 export type {
   ColorPath,

@@ -2,6 +2,7 @@ import '../src/styles.css';
 
 import type { Decorator, Preview } from '@storybook/react-vite';
 
+import { families, primaryHues } from '@oakoss/tokens';
 import {
   type IconProps,
   type IconResolver,
@@ -160,15 +161,7 @@ const preview: Preview = {
         icon: 'paintbrush',
         items: [
           { title: 'Default family', value: undefined },
-          ...[
-            'mauve',
-            'mist',
-            'neutral',
-            'olive',
-            'stone',
-            'taupe',
-            'zinc',
-          ].map((value) => ({ title: value, value })),
+          ...Object.keys(families).map((value) => ({ title: value, value })),
         ],
       },
     },
@@ -190,25 +183,9 @@ const preview: Preview = {
         icon: 'circle',
         items: [
           { title: 'Default primary', value: undefined },
-          ...[
-            'amber',
-            'blue',
-            'cyan',
-            'emerald',
-            'fuchsia',
-            'green',
-            'indigo',
-            'lime',
-            'orange',
-            'pink',
-            'purple',
-            'red',
-            'rose',
-            'sky',
-            'teal',
-            'violet',
-            'yellow',
-          ].map((value) => ({ title: value, value })),
+          ...primaryHues(Object.values(families))
+            .toSorted((a, b) => a.localeCompare(b))
+            .map((value) => ({ title: value, value })),
         ],
       },
     },
