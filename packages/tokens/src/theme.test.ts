@@ -30,7 +30,7 @@ describe('resolveTheme', () => {
       primary: zinc.steps[900],
       'primary-500': zinc.steps[500],
       'primary-foreground': zinc.steps[50],
-      ring: zinc.steps[900],
+      ring: zinc.steps[600],
       'sidebar-primary': zinc.steps[900],
     });
   });
@@ -43,7 +43,7 @@ describe('resolveTheme', () => {
       primary: blue.steps[600],
       'primary-hover': blue.steps[700],
       'primary-text': blue.steps[400],
-      ring: blue.steps[600],
+      ring: blue.steps[400],
       'sidebar-primary-foreground': blue.steps[50],
     });
   });

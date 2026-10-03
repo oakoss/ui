@@ -106,3 +106,13 @@ export const RenderPropClassName: Story = {
     await expect(root).not.toHaveClass('gap-1.5');
   },
 };
+
+export const FocusRing: Story = {
+  play: async ({ canvas }) => {
+    const input = canvas.getByRole('textbox', { name: 'Email' });
+    await userEvent.click(input);
+    const style = getComputedStyle(input);
+    await expect(style.outlineStyle).toBe('solid');
+    await expect(style.outlineWidth).toBe('3px');
+  },
+};

@@ -5,10 +5,14 @@ import {
 import { tv, type VariantProps } from 'tailwind-variants/lite';
 
 import { cx } from '#/lib/cx';
+import { focusRing, targetSize } from '#/lib/recipes';
 
 const buttonStyles = tv({
-  base: 'inline-flex cursor-pointer items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
-  defaultVariants: { intent: 'primary', size: 'md' },
+  base: [
+    focusRing,
+    'inline-flex cursor-pointer items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors disabled:pointer-events-none disabled:opacity-50',
+  ],
+  defaultVariants: { intent: 'primary', size: 'md', targetSize: true },
   variants: {
     intent: {
       destructive:
@@ -25,16 +29,25 @@ const buttonStyles = tv({
       md: 'h-9 px-4',
       sm: 'h-8 px-3 text-xs',
     },
+    // Turn off where buttons sit closer than the hit area reaches (button
+    // groups, toolbars), or neighbors take each other's clicks.
+    targetSize: { false: '', true: targetSize },
   },
 });
 
 export type ButtonProps = AriaButtonProps & VariantProps<typeof buttonStyles>;
 
-export function Button({ className, intent, size, ...props }: ButtonProps) {
+export function Button({
+  className,
+  intent,
+  size,
+  targetSize,
+  ...props
+}: ButtonProps) {
   return (
     <AriaButton
       {...props}
-      className={cx(buttonStyles({ intent, size }), className)}
+      className={cx(buttonStyles({ intent, size, targetSize }), className)}
     />
   );
 }
