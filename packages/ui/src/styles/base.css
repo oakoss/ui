@@ -1,0 +1,17 @@
+/* No forced-colors token remap: system colors pass through unadjusted, so a
+   global remap repaints every control. A part that opts out with
+   forced-color-adjust: none uses system color keywords itself. */
+@layer base {
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-delay: 0s !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-delay: 0s !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
