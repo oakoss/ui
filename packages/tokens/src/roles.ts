@@ -59,11 +59,13 @@ export const derivedRoleNames = [
 export type DerivedRole = (typeof derivedRoleNames)[number];
 
 // shadcn roles that follow another role rather than mapping to a primitive.
+// Rings follow primary-text: the primary fill only has to pass 3:1 against
+// the page, and fails it on dark cards and popovers.
 export const derivedRoles = {
-  ring: 'primary',
+  ring: 'primary-text',
   'sidebar-primary': 'primary',
   'sidebar-primary-foreground': 'primary-foreground',
-  'sidebar-ring': 'primary',
+  'sidebar-ring': 'primary-text',
 } as const satisfies Record<DerivedRole, IntentRole>;
 
 export const chartRoles = [
@@ -158,8 +160,20 @@ const intentPairs: readonly ContrastPair[] = intents.flatMap((intent) => [
   },
 ]);
 
+const ringPairs: readonly ContrastPair[] = [
+  ...(['background', 'card', 'popover'] as const).map(
+    (background): ContrastPair => ({
+      background,
+      foreground: 'ring',
+      kind: 'non-text',
+    }),
+  ),
+  { background: 'sidebar', foreground: 'sidebar-ring', kind: 'non-text' },
+];
+
 export const contrastPairs: readonly ContrastPair[] = [
   ...neutralTextPairs,
   ...intentPairs,
+  ...ringPairs,
   { background: 'background', foreground: 'border', kind: 'decorative' },
 ];

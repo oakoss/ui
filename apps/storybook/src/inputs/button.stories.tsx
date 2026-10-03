@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Button } from '@oakoss/ui/components/ui/inputs/button';
-import { expect } from 'storybook/test';
+import { expect, userEvent } from 'storybook/test';
 
 const meta = {
   args: { children: 'Button' },
@@ -53,13 +53,13 @@ export const Dark: Story = {
   },
 };
 
-// A consumer's string className overrides the base via tailwind-merge — the
-// reason cx exists rather than string concatenation.
+// A consumer's string className overrides the base via cn — the reason cx
+// exists rather than string concatenation.
 export const ClassNameOverride: Story = {
-  args: { className: 'bg-emerald-500' },
+  args: { className: 'bg-emerald-700 text-white' },
   play: async ({ canvas }) => {
     const button = canvas.getByRole('button', { name: /button/iu });
-    await expect(button.classList.contains('bg-emerald-500')).toBe(true);
+    await expect(button.classList.contains('bg-emerald-700')).toBe(true);
     await expect(button.classList.contains('bg-primary')).toBe(false);
   },
 };
@@ -67,12 +67,71 @@ export const ClassNameOverride: Story = {
 // A render-function className (React Aria's state-driven form) resolves through
 // cx's composeRenderProps path.
 export const RenderPropClassName: Story = {
-  args: { className: () => 'bg-fuchsia-500' },
+  args: { className: () => 'bg-fuchsia-700 text-white' },
   play: async ({ canvas }) => {
     const button = canvas.getByRole('button', { name: /button/iu });
-    await expect(button.classList.contains('bg-fuchsia-500')).toBe(true);
+    await expect(button.classList.contains('bg-fuchsia-700')).toBe(true);
     await expect(button.classList.contains('bg-primary')).toBe(false);
   },
 };
 
 export const Disabled: Story = { args: { isDisabled: true } };
+
+function ringColor(): string {
+  const probe = document.createElement('div');
+  probe.style.color = 'var(--ring)';
+  document.body.append(probe);
+  const { color } = getComputedStyle(probe);
+  probe.remove();
+  return color;
+}
+
+export const FocusRing: Story = {
+  play: async ({ canvas }) => {
+    const button = canvas.getByRole('button', { name: /button/iu });
+    await userEvent.tab();
+    await expect(button).toHaveFocus();
+    const style = getComputedStyle(button);
+    await expect(style.outlineStyle).toBe('solid');
+    await expect(style.outlineWidth).toBe('3px');
+    // transition-colors fades outline-color in from currentColor.
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 300);
+    });
+    await expect(style.outlineColor).toBe(ringColor());
+    await expect(style.boxShadow).toBe('none');
+  },
+};
+
+// One glyph keeps the button narrower and shorter than 44px on its own.
+export const TargetSize: Story = {
+  args: { 'aria-label': 'Add', children: '+', size: 'sm' },
+  play: async ({ canvas }) => {
+    const button = canvas.getByRole('button', { name: 'Add' });
+    await expect(button.getBoundingClientRect().width).toBeLessThan(44);
+    const after = getComputedStyle(button, '::after');
+    await expect(after.position).toBe('absolute');
+    // The button is smaller than 44px both ways, so the minimum sets both.
+    await expect(after.height).toBe('44px');
+    await expect(after.width).toBe('44px');
+  },
+};
+
+export const WithoutTargetSize: Story = {
+  args: { 'aria-label': 'Add', children: '+', size: 'sm', targetSize: false },
+  play: async ({ canvas }) => {
+    const button = canvas.getByRole('button', { name: 'Add' });
+    await expect(getComputedStyle(button, '::after').position).not.toBe(
+      'absolute',
+    );
+  },
+};
+
+export const RightToLeft: Story = {
+  args: { children: 'زر' },
+  globals: { locale: 'ar-EG' },
+  play: async ({ canvas }) => {
+    const button = canvas.getByRole('button', { name: 'زر' });
+    await expect(getComputedStyle(button).direction).toBe('rtl');
+  },
+};

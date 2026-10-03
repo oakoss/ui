@@ -17,6 +17,15 @@ const head = [
   { languageOptions: { ecmaVersion: 'latest', globals: globals.browser } },
 ];
 
+// A package that sets its own no-restricted-syntax replaces these options, so
+// it spreads them back in.
+export const restrictedSyntax = [
+  {
+    message: 'Use static import instead of dynamic import().',
+    selector: 'ImportExpression',
+  },
+] as const;
+
 const tail = [
   // oxlint runs the unicorn rules it enables; the finisher disables those here.
   eslintPluginUnicorn.configs.recommended,
@@ -37,15 +46,7 @@ const tail = [
     files: ['**/src/**/*.{ts,tsx}'],
     // Test files use dynamic imports intentionally (vi.mock factories).
     ignores: ['**/*.{test,spec}.{ts,tsx}', '**/*.integration.{ts,tsx}'],
-    rules: {
-      'no-restricted-syntax': [
-        'error',
-        {
-          message: 'Use static import instead of dynamic import().',
-          selector: 'ImportExpression',
-        },
-      ],
-    },
+    rules: { 'no-restricted-syntax': ['error', ...restrictedSyntax] },
   },
 ];
 

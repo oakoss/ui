@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 
 import { bundleCss } from '#/bundle';
+import { cnConfigModule, cnTheme } from '#/cn-config';
 import { themeCss } from '#/css';
 import { axes, families, styles, typographies } from '#/index';
 import { registryCssVars } from '#/registry';
@@ -17,6 +18,14 @@ writeFileSync(
 writeFileSync(
   new URL('src/styles/themes.css', ui),
   `${bundleCss(Object.values(families), style)}\n`,
+);
+const cnThemeNames = cnTheme(
+  Object.values(styles),
+  Object.values(typographies),
+);
+writeFileSync(
+  new URL('src/lib/cn-config.ts', ui),
+  cnConfigModule(cnThemeNames),
 );
 
 const registryUrl = new URL('registry.json', ui);

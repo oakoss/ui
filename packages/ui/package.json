@@ -17,8 +17,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "cn": "catalog:",
     "react-aria-components": "catalog:",
-    "tailwind-merge": "catalog:",
     "tailwind-variants": "catalog:"
   },
   "devDependencies": {

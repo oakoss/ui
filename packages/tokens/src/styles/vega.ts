@@ -66,13 +66,8 @@ export const vega = defineStyle({
       namespace: null,
       value: '0.625rem',
     },
-    'ring-opacity': {
-      description: 'Opacity of the focus ring color (`ring-ring/50`).',
-      namespace: null,
-      value: '0.5',
-    },
     'ring-width': {
-      description: 'Focus ring width (`ring-3`).',
+      description: 'Width of the focus outline (shadcn `ring-3`).',
       namespace: null,
       value: '3px',
     },

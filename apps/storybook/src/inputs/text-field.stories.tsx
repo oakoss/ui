@@ -84,7 +84,7 @@ export const InvalidWithFunctionMessage: Story = {
 };
 
 // A consumer's string className merges onto the TextField root (not the input)
-// via cx — tailwind-merge lets gap-8 win over the base gap-1.5.
+// via cx — cn lets gap-8 win over the base gap-1.5.
 export const ClassNameOverride: Story = {
   args: { className: 'gap-8' },
   play: async ({ canvas }) => {
@@ -104,5 +104,28 @@ export const RenderPropClassName: Story = {
     if (root === null) throw new Error('TextField root not found');
     await expect(root).toHaveClass('gap-8');
     await expect(root).not.toHaveClass('gap-1.5');
+  },
+};
+
+export const FocusRing: Story = {
+  play: async ({ canvas }) => {
+    const input = canvas.getByRole('textbox', { name: 'Email' });
+    await userEvent.click(input);
+    const style = getComputedStyle(input);
+    await expect(style.outlineStyle).toBe('solid');
+    await expect(style.outlineWidth).toBe('3px');
+  },
+};
+
+export const RightToLeft: Story = {
+  args: {
+    description: 'سنرسل لك رسالة تأكيد',
+    label: 'البريد الإلكتروني',
+    placeholder: 'you@example.com',
+  },
+  globals: { locale: 'ar-EG' },
+  play: async ({ canvas }) => {
+    const input = canvas.getByRole('textbox', { name: 'البريد الإلكتروني' });
+    await expect(getComputedStyle(input).direction).toBe('rtl');
   },
 };

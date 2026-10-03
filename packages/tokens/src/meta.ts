@@ -16,7 +16,8 @@ export type TokenMeta = {
 export const derivedRoleMeta = {
   ring: {
     description: 'Focus ring.',
-    usage: 'Follows the primary fill, which passes 3:1 against the page.',
+    usage:
+      'Follows primary-text, which passes 3:1 on the page, cards and popovers.',
   },
   'sidebar-primary': { description: 'Primary fill inside the sidebar.' },
   'sidebar-primary-foreground': { description: 'Text on `sidebar-primary`.' },

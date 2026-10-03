@@ -76,6 +76,13 @@ describe('bundleCss', () => {
     );
   });
 
+  it('sets color-scheme on each family block', () => {
+    expect(css).toContain('[data-family="stone"] {\n  color-scheme: light;');
+    expect(css).toContain(
+      '[data-family="stone"].dark {\n  color-scheme: dark;',
+    );
+  });
+
   it('puts primary blocks after family blocks so they win a tie', () => {
     expect(css.lastIndexOf('[data-family=')).toBeLessThan(
       css.indexOf('[data-primary='),

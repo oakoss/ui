@@ -26,6 +26,7 @@ export function bundleCss(families: readonly Family[], style: Style): string {
       const tokens = resolved(family, polarity);
       blocks.push(
         rule(selector('data-family', family.id, polarity), [
+          ['color-scheme', polarity],
           ['--field', fieldColor(style, polarity, tokens)],
           ...tokenDeclarations(tokens),
         ]),

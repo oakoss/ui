@@ -339,6 +339,26 @@ exports[`roles > pins the contrast pairs and minimums 1`] = `
     },
     {
       "background": "background",
+      "foreground": "ring",
+      "kind": "non-text",
+    },
+    {
+      "background": "card",
+      "foreground": "ring",
+      "kind": "non-text",
+    },
+    {
+      "background": "popover",
+      "foreground": "ring",
+      "kind": "non-text",
+    },
+    {
+      "background": "sidebar",
+      "foreground": "sidebar-ring",
+      "kind": "non-text",
+    },
+    {
+      "background": "background",
       "foreground": "border",
       "kind": "decorative",
     },
