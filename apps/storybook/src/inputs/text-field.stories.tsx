@@ -84,7 +84,7 @@ export const InvalidWithFunctionMessage: Story = {
 };
 
 // A consumer's string className merges onto the TextField root (not the input)
-// via cx — tailwind-merge lets gap-8 win over the base gap-1.5.
+// via cx — cn lets gap-8 win over the base gap-1.5.
 export const ClassNameOverride: Story = {
   args: { className: 'gap-8' },
   play: async ({ canvas }) => {

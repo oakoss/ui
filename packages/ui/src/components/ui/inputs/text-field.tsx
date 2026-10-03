@@ -9,11 +9,11 @@ import {
   type TextFieldProps as AriaTextFieldProps,
   type ValidationResult,
 } from 'react-aria-components';
-import { tv } from 'tailwind-variants';
+import { tv } from 'tailwind-variants/lite';
 
-import { cx } from '#/lib/cx';
+import { cn, cx } from '#/lib/cx';
 
-export const textFieldStyles = tv({
+const textFieldStyles = tv({
   slots: {
     description: 'text-xs text-muted-foreground',
     error: 'text-xs text-destructive',
@@ -45,15 +45,17 @@ export function TextField({
   return (
     <AriaTextField {...props} className={cx(styles.root(), className)}>
       {hasLabel ? (
-        <AriaLabel className={styles.label()}>{label}</AriaLabel>
+        <AriaLabel className={cn(styles.label())}>{label}</AriaLabel>
       ) : null}
-      <AriaInput className={styles.input()} placeholder={placeholder} />
+      <AriaInput className={cn(styles.input())} placeholder={placeholder} />
       {hasDescription ? (
-        <AriaText className={styles.description()} slot="description">
+        <AriaText className={cn(styles.description())} slot="description">
           {description}
         </AriaText>
       ) : null}
-      <AriaFieldError className={styles.error()}>{errorMessage}</AriaFieldError>
+      <AriaFieldError className={cn(styles.error())}>
+        {errorMessage}
+      </AriaFieldError>
     </AriaTextField>
   );
 }

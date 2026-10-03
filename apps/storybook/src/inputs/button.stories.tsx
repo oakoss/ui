@@ -53,8 +53,8 @@ export const Dark: Story = {
   },
 };
 
-// A consumer's string className overrides the base via tailwind-merge — the
-// reason cx exists rather than string concatenation.
+// A consumer's string className overrides the base via cn — the reason cx
+// exists rather than string concatenation.
 export const ClassNameOverride: Story = {
   args: { className: 'bg-emerald-500' },
   play: async ({ canvas }) => {

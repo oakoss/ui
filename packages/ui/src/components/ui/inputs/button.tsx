@@ -2,11 +2,11 @@ import {
   Button as AriaButton,
   type ButtonProps as AriaButtonProps,
 } from 'react-aria-components';
-import { tv, type VariantProps } from 'tailwind-variants';
+import { tv, type VariantProps } from 'tailwind-variants/lite';
 
 import { cx } from '#/lib/cx';
 
-export const buttonStyles = tv({
+const buttonStyles = tv({
   base: 'inline-flex cursor-pointer items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
   defaultVariants: { intent: 'primary', size: 'md' },
   variants: {

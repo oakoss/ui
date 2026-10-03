@@ -290,11 +290,7 @@
       "title": "Button",
       "description": "Accessible button built on React Aria Components.",
       "registryDependencies": ["oakoss/ui/theme"],
-      "dependencies": [
-        "react-aria-components",
-        "tailwind-variants",
-        "tailwind-merge"
-      ],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
       "files": [
         {
           "path": "src/components/ui/inputs/button.tsx",
@@ -305,6 +301,11 @@
           "path": "src/lib/cx.ts",
           "type": "registry:lib",
           "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
         }
       ]
     },
@@ -314,11 +315,7 @@
       "title": "Text Field",
       "description": "Labeled text input with description and validation, built on React Aria Components.",
       "registryDependencies": ["oakoss/ui/theme"],
-      "dependencies": [
-        "react-aria-components",
-        "tailwind-variants",
-        "tailwind-merge"
-      ],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
       "files": [
         {
           "path": "src/components/ui/inputs/text-field.tsx",
@@ -329,6 +326,11 @@
           "path": "src/lib/cx.ts",
           "type": "registry:lib",
           "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
         }
       ]
     }

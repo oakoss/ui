@@ -17,6 +17,17 @@ describe('cx', () => {
     );
   });
 
+  test.each([
+    ['h-control', 'h-9', 'h-9'],
+    ['px-control-x', 'px-4', 'px-4'],
+    ['font-heading', 'font-mono', 'font-mono'],
+    ['rounded-control', 'rounded-none', 'rounded-none'],
+    ['text-ui', 'text-sm', 'text-sm'],
+    ['text-ui', 'text-foreground', 'text-ui text-foreground'],
+  ])('merges token class %s with %s', (base, className, expected) => {
+    expect(cx(base, className)({})).toBe(expected);
+  });
+
   test('resolves a render-prop className against the render values', () => {
     const className = cx<{ tone: string }>('bg-primary px-2', (v) => v.tone);
 

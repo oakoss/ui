@@ -1,16 +1,17 @@
+import { type ClassNameValue } from 'cn';
+import { createCn } from 'cn/config';
 import { composeRenderProps } from 'react-aria-components';
-import { type ClassNameValue, twMerge } from 'tailwind-merge';
+
+import { cnTheme } from '#/lib/cn-config';
 
 type Render<T> = ((values: T) => string) | string | undefined;
 
-/**
- * Merge Tailwind classes and compose with React Aria's render-prop `className`.
- * `base` is the component's own classes (a string or array); `className` is the
- * consumer's override — a string, a render function, or undefined.
- */
+// tailwind-variants/lite doesn't merge, so every tv result goes through cn or cx.
+export const cn = createCn({ extend: { theme: cnTheme } });
+
 export function cx<T = unknown>(
   base: ClassNameValue,
   className?: Render<T>,
 ): (values: T) => string {
-  return composeRenderProps(className, (resolved) => twMerge(base, resolved));
+  return composeRenderProps(className, (resolved) => cn(base, resolved));
 }
