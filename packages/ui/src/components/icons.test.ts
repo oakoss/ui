@@ -8,8 +8,13 @@ import * as tabler from '@tabler/icons-react';
 import * as lucide from 'lucide-react';
 import { readFileSync } from 'node:fs';
 import { transformIcons } from 'shadcn/utils';
-import { Project, type SourceFile, SyntaxKind } from 'ts-morph';
-import { describe, expect, test } from 'vitest';
+import {
+  type ImportSpecifier,
+  Project,
+  type SourceFile,
+  SyntaxKind,
+} from 'ts-morph';
+import { beforeAll, describe, expect, test } from 'vitest';
 
 import {
   type IconLibrary,
@@ -25,22 +30,6 @@ const packages: Record<IconLibrary, object> = {
   remixicon,
   tabler,
 };
-const libraries = [
-  'hugeicons',
-  'lucide',
-  'phosphor',
-  'remixicon',
-  'tabler',
-] as const satisfies readonly IconLibrary[];
-
-function importedNames(source: string): Set<string> {
-  return new Set(
-    source
-      .matchAll(/import\s*\{(?<names>[^}]*)\}/gu)
-      .flatMap(({ groups }) => (groups?.names ?? '').split(','))
-      .map((name) => name.trim()),
-  );
-}
 
 const entries = Object.entries(icons).map(([key, Icon]) => {
   const element = Icon({});
@@ -83,6 +72,11 @@ describe.each(entries)('$key', ({ element, Icon, missing }) => {
 
 const source = readFileSync(new URL('icons.tsx', import.meta.url), 'utf-8');
 
+// The local name an import binds: its alias when renamed.
+function boundName(named: ImportSpecifier): string {
+  return (named.getAliasNode() ?? named.getNameNode()).getText();
+}
+
 // A local named like an imported icon renders itself instead of the icon.
 function declaredNames(sourceFile: SourceFile): string[] {
   return [
@@ -93,7 +87,7 @@ function declaredNames(sourceFile: SourceFile): string[] {
   ].flatMap((node) => node.getName() ?? []);
 }
 
-async function installed(library: IconLibrary): Promise<SourceFile> {
+async function installed(library: string): Promise<SourceFile> {
   const project = new Project({ useInMemoryFileSystem: true });
   const sourceFile = project.createSourceFile('icons.tsx', source);
   // transformIcons reads only config.iconLibrary.
@@ -110,25 +104,42 @@ async function installed(library: IconLibrary): Promise<SourceFile> {
   return sourceFile;
 }
 
-// Run shadcn's own install-time transform, as `shadcn add` would.
-describe.each(libraries)('installed with iconLibrary %s', (library) => {
-  test('replaces every IconPlaceholder and imports each icon', async () => {
-    const sourceFile = await installed(library);
-    const output = sourceFile.getFullText();
-    expect(output).not.toMatch(/<IconPlaceholder\b/u);
-    const imported = importedNames(output);
-    const wanted = entries.map(({ names }) => String(names[library]));
-    expect(wanted.filter((name) => !imported.has(name))).toEqual([]);
-  });
+function valueImports(sourceFile: SourceFile): ImportSpecifier[] {
+  return sourceFile
+    .getImportDeclarations()
+    .filter((declaration) => !declaration.isTypeOnly())
+    .flatMap((declaration) => declaration.getNamedImports())
+    .filter((named) => !named.isTypeOnly());
+}
 
-  test('declares nothing named like an imported icon', async () => {
-    const sourceFile = await installed(library);
-    const imported = importedNames(sourceFile.getFullText());
-    expect(
-      declaredNames(sourceFile).filter((name) => imported.has(name)),
-    ).toEqual([]);
-  });
-});
+// Run shadcn's own install-time transform, as `shadcn add` would.
+describe.each(Object.keys(packages))(
+  'installed with iconLibrary %s',
+  (library) => {
+    let sourceFile: SourceFile;
+    beforeAll(async () => {
+      sourceFile = await installed(library);
+    });
+
+    test('replaces every IconPlaceholder and imports each icon', () => {
+      expect(sourceFile.getFullText()).not.toMatch(/<IconPlaceholder\b/u);
+      const imported = new Set(
+        valueImports(sourceFile).map((named) => named.getName()),
+      );
+      const wanted = entries.map(({ names }) => String(names[library]));
+      expect(wanted.filter((name) => !imported.has(name))).toEqual([]);
+    });
+
+    test('declares nothing named like an imported icon', () => {
+      const bound = new Set(
+        valueImports(sourceFile).map((named) => boundName(named)),
+      );
+      expect(
+        declaredNames(sourceFile).filter((name) => bound.has(name)),
+      ).toEqual([]);
+    });
+  },
+);
 
 // Checked by typecheck: each assignment fails if an installed icon would
 // reject the props the map spreads onto it.
