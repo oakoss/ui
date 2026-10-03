@@ -17,16 +17,16 @@ Every claim below comes from shadcn's source at commit `d75a96a` (2026-10-01) or
 
 ## Decisions
 
-| Decision        | Choice                                                                                                        |
-| --------------- | ------------------------------------------------------------------------------------------------------------- |
-| Components      | Fork shadcn's React Aria base (`apps/v4/registry/bases/aria/ui`) and convert it to `tv`                       |
-| Variant library | Keep tailwind-variants (slots, `extend`), using its `lite` build                                              |
-| Class merging   | The `cn` package, through `cx`, replacing `tailwind-merge`; configured with our custom token names            |
-| Styles          | Built from tokens. No `cva`, no `cn-*` hook CSS, no registry build step; shadcn's styles are reference values |
-| Themes          | Family × flavor × accent, with a primitive palette tier from the start                                        |
-| Typography      | Font roles and a type scale as tokens; presets ship as `registry:font` items                                  |
-| Icons           | One `icons.tsx` map with PascalCase keys, written as `IconPlaceholder` elements                               |
-| Defaults        | An `oakoss/ui/base` (`registry:base`) item that sets `iconLibrary` and the default theme                      |
+| Decision        | Choice                                                                                                                                         |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Components      | Fork shadcn's React Aria base (`apps/v4/registry/bases/aria/ui`) and convert it to `tv`                                                        |
+| Variant library | Keep tailwind-variants (slots, `extend`), using its `lite` build                                                                               |
+| Class merging   | The `cn` package, through `cx`, replacing `tailwind-merge`; configured with our custom token names                                             |
+| Styles          | Built from tokens. No `cva`, no `cn-*` hook CSS, no registry build step; shadcn's styles are reference values                                  |
+| Themes          | Family × flavor × accent, with a primitive palette tier from the start                                                                         |
+| Typography      | Font roles and a type scale as tokens; presets ship as `registry:font` items                                                                   |
+| Icons           | One `icons.tsx` module, a PascalCase named export per icon written as an `IconPlaceholder` element; components import it as `import * as Icon` |
+| Defaults        | An `oakoss/ui/base` (`registry:base`) item that sets `iconLibrary` and the default theme                                                       |
 
 ## Findings
 
@@ -133,6 +133,15 @@ Our approach:
 - Storybook and the docs need a runtime `IconPlaceholder`.
 - A test checks that every `icons.tsx` entry sets all five library props and that each name exists in its package.
 
+Settled in `ui-lwb.2` (2026-10-03):
+
+- **Named exports, not an object.** Bundlers tree-shake per export but keep an object literal whole. Bundling an app that uses one icon, after the Lucide transform, esbuild kept every icon from the map and only that icon from named exports (6,584 B against 4,432 B); rolldown did the same (9,050 B against 5,402 B).
+- **`import * as Icon` in components.** Icon names overlap component names (`Calendar`, `Menu`), and a namespace keeps them apart. A static namespace import tree-shakes like a named one: in a separate six-icon test, both forms bundled to the same size (esbuild 4,314 B, rolldown 5,404 B), against 5,423 B and 7,278 B when every icon was used. A lint rule rejects named imports from `icons.tsx`, and another keeps icon libraries out of component code.
+- **Plain names, no `Icon` suffix or prefix.** After install, `icons.tsx` imports each library's icon by name: Lucide and Phosphor use `CheckIcon`, Tabler uses `IconCheck`. An export with either form would share that name and render itself. A test runs shadcn's `transformIcons` for all five libraries and fails on any such collision. Phosphor's plain names (`Check`) are deprecated in 2.1.10, so its `…Icon` names are used.
+- **A wrapper per icon, not inline placeholders.** Upstream writes `<IconPlaceholder>` inside each component, so installs render the library icon directly. Ours adds one pass-through function per icon in exchange for a single tested source of names across every component.
+- **`IconProps` omits `children` and narrows `strokeWidth` to a number**, because Remix Icon rejects children and HugeIcons wants a numeric stroke width. A typecheck-enforced assignment covers every library.
+- **VS Code autocomplete** excludes the icon libraries and `icons.tsx` (`.vscode/settings.json`), so typing `Calendar` offers the component.
+
 ## Changes to 0001
 
 - **Primitive token tier:** needed from the start, no longer deferred until a second theme.
@@ -140,7 +149,7 @@ Our approach:
 - **`tv({ slots })` for multi-part components:** kept, applied to the forked components.
 - **Token schema:** shadcn's 32 names become a subset of ours, replacing the planned ~19, plus the style tokens above.
 - **Type scale:** font roles and a type scale become tokens, no longer deferred.
-- **Icons:** components use the `icons.tsx` map, replacing icons as injected `ReactNode`. Icons a consumer passes in stay `ReactNode`.
+- **Icons:** components use `icons.tsx` through `import * as Icon`, replacing icons as injected `ReactNode`. Icons a consumer passes in stay `ReactNode`.
 - **Build order:** see below.
 
 ## Build order

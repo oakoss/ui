@@ -2,8 +2,35 @@ import '../src/styles.css';
 
 import type { Decorator, Preview } from '@storybook/react-vite';
 
-import { type ReactNode, useEffect } from 'react';
+import {
+  type IconProps,
+  type IconResolver,
+  IconResolverContext,
+} from '@oakoss/ui/components/icon-placeholder';
+import * as lucide from 'lucide-react';
+import { type ComponentType, type ReactNode, useEffect } from 'react';
 import { I18nProvider, isRTL } from 'react-aria-components';
+
+// Installs swap icons at `shadcn add` time; Storybook resolves them live.
+const lucideIcons = new Map<string, unknown>(Object.entries(lucide));
+
+function isIcon(value: unknown): value is ComponentType<IconProps> {
+  return (
+    typeof value === 'function' ||
+    (typeof value === 'object' && value !== null && '$$typeof' in value)
+  );
+}
+
+const resolveLucide: IconResolver = ({ lucide: name }, props) => {
+  const Icon = lucideIcons.get(name);
+  return isIcon(Icon) ? <Icon aria-hidden {...props} /> : undefined;
+};
+
+const withIcons: Decorator = (Story) => (
+  <IconResolverContext value={resolveLucide}>
+    <Story />
+  </IconResolverContext>
+);
 
 function ThemedStory({
   canvasElement,
@@ -88,7 +115,7 @@ const withLocale: Decorator = (Story, context) => {
 };
 
 const preview: Preview = {
-  decorators: [withTheme, withLocale],
+  decorators: [withTheme, withLocale, withIcons],
   globalTypes: {
     locale: {
       description: 'Locale and text direction',
