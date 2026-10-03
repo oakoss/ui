@@ -7,11 +7,15 @@
     "./base": "./src/base.ts",
     "./compose": "./src/compose.ts",
     "./react": "./src/react.ts",
+    "./tailwind": "./src/tailwind.ts",
     "./vitest": "./src/vitest.ts"
   },
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@shadcn/lint": "catalog:"
   },
   "devDependencies": {
     "@oakoss/tsconfig": "workspace:*",
