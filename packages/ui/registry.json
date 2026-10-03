@@ -10,7 +10,7 @@
       "css": { "@plugin tailwindcss-react-aria-components": {} },
       "cssVars": {
         "dark": {
-          "field": "oklch(1 0 0 / 4.5%)",
+          "field": "oklch(0.985 0 0 / 4.5%)",
           "background": "oklch(0.141 0.005 285.823)",
           "foreground": "oklch(0.985 0 0)",
           "card": "oklch(0.21 0.006 285.885)",
@@ -24,7 +24,7 @@
           "accent": "oklch(0.274 0.006 286.033)",
           "accent-foreground": "oklch(0.985 0 0)",
           "border": "oklch(1 0 0 / 10%)",
-          "input": "oklch(1 0 0 / 15%)",
+          "input": "oklch(0.552 0.016 285.938)",
           "sidebar": "oklch(0.21 0.006 285.885)",
           "sidebar-foreground": "oklch(0.985 0 0)",
           "sidebar-accent": "oklch(0.274 0.006 286.033)",
@@ -141,7 +141,7 @@
           "accent": "oklch(0.967 0.001 286.375)",
           "accent-foreground": "oklch(0.21 0.006 285.885)",
           "border": "oklch(0.92 0.004 286.32)",
-          "input": "oklch(0.92 0.004 286.32)",
+          "input": "oklch(0.552 0.016 285.938)",
           "sidebar": "oklch(0.985 0 0)",
           "sidebar-foreground": "oklch(0.141 0.005 285.823)",
           "sidebar-accent": "oklch(0.967 0.001 286.375)",

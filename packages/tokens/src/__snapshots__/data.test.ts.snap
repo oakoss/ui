@@ -29,8 +29,7 @@ exports[`base colors > maps every base color to the same steps of its own gray 1
         "ref": "color.GRAY.50",
       },
       "input": {
-        "alpha": 0.15,
-        "ref": "color.white",
+        "ref": "color.GRAY.500",
       },
       "muted": {
         "ref": "color.GRAY.800",
@@ -94,7 +93,7 @@ exports[`base colors > maps every base color to the same steps of its own gray 1
         "ref": "color.GRAY.950",
       },
       "input": {
-        "ref": "color.GRAY.200",
+        "ref": "color.GRAY.500",
       },
       "muted": {
         "ref": "color.GRAY.100",
@@ -355,6 +354,36 @@ exports[`roles > pins the contrast pairs, minimums and state layers 1`] = `
     {
       "background": "sidebar",
       "foreground": "sidebar-ring",
+      "kind": "non-text",
+    },
+    {
+      "background": "background",
+      "foreground": "input",
+      "kind": "non-text",
+    },
+    {
+      "background": "background",
+      "foreground": "destructive-text",
+      "kind": "non-text",
+    },
+    {
+      "background": "card",
+      "foreground": "input",
+      "kind": "non-text",
+    },
+    {
+      "background": "card",
+      "foreground": "destructive-text",
+      "kind": "non-text",
+    },
+    {
+      "background": "popover",
+      "foreground": "input",
+      "kind": "non-text",
+    },
+    {
+      "background": "popover",
+      "foreground": "destructive-text",
       "kind": "non-text",
     },
     {

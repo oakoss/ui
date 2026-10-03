@@ -49,7 +49,7 @@ describe('themeCss', () => {
     expect(css).toContain('--primary: oklch(0.21 0.006 285.885);');
     expect(css).toContain('--color-primary: var(--primary);');
     expect(css).toContain('--radius-md: calc(var(--radius) * 0.8);');
-    expect(css).toContain('--field: oklch(1 0 0 / 4.5%);');
+    expect(css).toContain('--field: oklch(0.985 0 0 / 4.5%);');
     expect(css).toContain('--z-modal: 1300;');
   });
 

@@ -36,7 +36,7 @@ const whiteAlpha = (alpha: number) => ({ alpha, ref: 'color.white' }) as const;
 /**
  * A shadcn base color on Tailwind's palette. shadcn maps every base color's
  * neutral roles to the same steps of its gray (`themes.ts` at d75a96a); light
- * `muted-foreground` is the one change. Intent roles come from the intent
+ * `muted-foreground` and `input` are the changes. Intent roles come from the intent
  * scales, and the derived roles follow primary rather than shadcn's grays.
  */
 function baseColor(gray: Gray, name: string) {
@@ -77,7 +77,7 @@ function darkRoles<G extends Gray>(gray: G): GrayRoles<G> {
     card: step(900),
     'card-foreground': step(50),
     foreground: step(50),
-    input: whiteAlpha(0.15),
+    input: step(500),
     muted: step(800),
     'muted-foreground': step(400),
     popover: step(900),
@@ -107,7 +107,8 @@ function lightRoles<G extends Gray>(gray: G): GrayRoles<G> {
     card: white,
     'card-foreground': step(950),
     foreground: step(950),
-    input: step(200),
+    // The lowest step at 3:1 on the page in every gray: 400 reaches 2.3–2.6.
+    input: step(500),
     muted: step(100),
     // shadcn's 500 falls under 4.5:1 on `muted` (100) in six of the grays.
     'muted-foreground': step(600),

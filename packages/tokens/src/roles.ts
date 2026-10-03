@@ -175,10 +175,20 @@ const ringPairs: readonly ContrastPair[] = [
   { background: 'sidebar', foreground: 'sidebar-ring', kind: 'non-text' },
 ];
 
+// A control's border identifies it (WCAG 1.4.11). Invalid borders use
+// `destructive-text`: the `destructive` fill drops under 3:1 on dark cards.
+const controlPairs: readonly ContrastPair[] = (
+  ['background', 'card', 'popover'] as const
+).flatMap((background): ContrastPair[] => [
+  { background, foreground: 'input', kind: 'non-text' },
+  { background, foreground: 'destructive-text', kind: 'non-text' },
+]);
+
 export const contrastPairs: readonly ContrastPair[] = [
   ...neutralTextPairs,
   ...intentPairs,
   ...ringPairs,
+  ...controlPairs,
   { background: 'background', foreground: 'border', kind: 'decorative' },
 ];
 

@@ -6,7 +6,8 @@ import { defineStyle } from '#/style';
  */
 export const vega = defineStyle({
   colors: {
-    field: { dark: { alpha: 0.3, role: 'input' }, light: 'transparent' },
+    // shadcn's `input/30` over its 15% white input; our input is an opaque gray.
+    field: { dark: { alpha: 0.045, role: 'foreground' }, light: 'transparent' },
   },
   id: 'vega',
   name: 'Vega',
