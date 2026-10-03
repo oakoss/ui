@@ -43,6 +43,7 @@
     "@oakoss/tsconfig": "workspace:*",
     "@tanstack/intent": "^0.5.0",
     "@types/node": "catalog:",
+    "conventional-changelog-conventionalcommits": "^10.4.0",
     "czg": "^1.14.0",
     "eslint": "catalog:",
     "lefthook": "^2.1.15",
