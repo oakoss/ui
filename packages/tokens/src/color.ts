@@ -14,7 +14,9 @@ export function isValidColor(color: Color): boolean {
   const [lightness, chroma, hue] = color.components;
   const isAlphaOk = color.alpha === undefined || isUnitInterval(color.alpha);
   const isHueOk = hue === null || (hue >= 0 && hue < 360);
-  return isUnitInterval(lightness) && chroma >= 0 && isHueOk && isAlphaOk;
+  // Tailwind 4.3.3's highest is 0.295; far larger values overflow conversion.
+  const isChromaOk = chroma >= 0 && chroma <= 1;
+  return isUnitInterval(lightness) && isChromaOk && isHueOk && isAlphaOk;
 }
 
 // Lightness is a percentage here, as Tailwind's `theme.css` writes it.

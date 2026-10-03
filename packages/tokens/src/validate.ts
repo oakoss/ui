@@ -3,14 +3,15 @@ import type { ColorRef, Family, Palette } from '#/family';
 import { type Color, isUnitInterval, isValidColor } from '#/color';
 import { parseColorPath } from '#/color-path';
 import { resolveFlavor } from '#/resolve';
-import { allRoles, neutralRoles } from '#/roles';
 import {
-  type AuthoredScale,
-  isStep,
-  orderedSteps,
-  type Scale,
-  steps,
-} from '#/scale';
+  allRoles,
+  chartRoles,
+  type Intent,
+  intents,
+  neutralRoles,
+} from '#/roles';
+import { hasStep, isStep, type Scale } from '#/scale';
+import { scaleErrors } from '#/validate-scale';
 
 type AnyScale = Scale<string, string>;
 
@@ -31,28 +32,18 @@ export function validateFamily(family: Family): string[] {
   ];
 }
 
-// Typed as optional because untyped data can leave the anchor out.
-function anchorErrors(
-  name: string,
-  anchor: Partial<AuthoredScale['anchor']> | undefined,
-  scaleSteps: AuthoredScale['steps'],
-): string[] {
-  return (['dark', 'light'] as const).flatMap((polarity) => {
-    const step = anchor?.[polarity];
-    if (step === undefined)
-      return [`scale "${name}" has no ${polarity} anchor`];
-    return Object.hasOwn(scaleSteps, step)
-      ? []
-      : [`scale "${name}" ${polarity} anchor is missing step ${step}`];
-  });
-}
-
 function chartErrors(family: Family): string[] {
   const { charts } = family;
+  // The tuple type fixes the count; untyped data doesn't.
+  const count: number =
+    charts.kind === 'ramp' ? charts.steps.length : charts.hues.length;
+  if (count !== chartRoles.length) {
+    return [`charts need ${chartRoles.length} entries, not ${count}`];
+  }
   if (charts.kind === 'ramp' && charts.source.intent !== undefined) {
-    return Object.hasOwn(family.intents, charts.source.intent)
-      ? []
-      : [`chart intent "${charts.source.intent}" doesn't exist`];
+    return declaredIntent(family, charts.source.intent) === undefined
+      ? [`chart intent "${charts.source.intent}" doesn't exist`]
+      : [];
   }
   const hues =
     charts.kind === 'categorical'
@@ -61,8 +52,19 @@ function chartErrors(family: Family): string[] {
         ? []
         : [charts.source.hue];
   return hues
-    .filter((hue) => !Object.hasOwn(family.palette.scales, hue))
+    .filter((hue) => !hasScale(family.palette, hue))
     .map((hue) => `chart hue "${hue}" has no scale`);
+}
+
+// Untyped data can leave an intent out, set it to `undefined` or name an
+// inherited key.
+function declaredIntent(
+  family: Family,
+  intent: string,
+): Family['intents'][Intent] | undefined {
+  const declared: Partial<Record<string, Family['intents'][Intent]>> =
+    family.intents;
+  return Object.hasOwn(declared, intent) ? declared[intent] : undefined;
 }
 
 function defaultsErrors(family: Family): string[] {
@@ -126,18 +128,28 @@ function foregroundErrorOf(
   return isValidColor(foreground) ? undefined : 'invalid color';
 }
 
+// Untyped data can set a scale to `undefined`.
+function hasScale(palette: Palette<string, string>, name: string): boolean {
+  const scales: Partial<Record<string, AnyScale>> = palette.scales;
+  return Object.hasOwn(scales, name) && scales[name] !== undefined;
+}
+
 function intentErrors(family: Family): string[] {
   const errors: string[] = [];
-  for (const [intent, { choices, default: fallback }] of Object.entries(
-    family.intents,
-  )) {
+  for (const intent of intents) {
+    const choice = declaredIntent(family, intent);
+    if (choice === undefined) {
+      errors.push(`intent "${intent}" is missing`);
+      continue;
+    }
+    const { choices, default: fallback } = choice;
     if (!choices.includes(fallback)) {
       errors.push(
         `intent "${intent}" default "${fallback}" isn't one of its choices`,
       );
     }
     for (const hue of choices) {
-      if (!Object.hasOwn(family.palette.scales, hue)) {
+      if (!hasScale(family.palette, hue)) {
         errors.push(`intent "${intent}" choice "${hue}" has no scale`);
       }
     }
@@ -182,18 +194,17 @@ function rampErrors(
   const { charts } = family;
   if (charts.kind !== 'ramp') return [];
   const { source } = charts;
-  let hues: readonly string[] = [];
-  if (source.intent === undefined) hues = [source.hue];
-  else if (Object.hasOwn(family.intents, source.intent)) {
-    hues = family.intents[source.intent].choices;
-  }
+  const hues =
+    source.intent === undefined
+      ? [source.hue]
+      : (declaredIntent(family, source.intent)?.choices ?? []);
   return hues.flatMap((hue) => {
     const scale = Object.hasOwn(palette.scales, hue)
       ? palette.scales[hue]
       : undefined;
     if (scale?.kind !== 'authored') return [];
     return charts.steps
-      .filter((step) => !Object.hasOwn(scale.steps, step))
+      .filter((step) => !hasStep(scale.steps, step))
       .map((step): ScaleError => [
         hue,
         `chart step ${step} is missing from scale "${hue}"`,
@@ -208,7 +219,10 @@ function referenceErrors(
   palette: Palette<string, string>,
 ): ScaleError[] {
   const errors: ScaleError[] = [];
-  for (const [name, scale] of Object.entries(palette.scales)) {
+  // Untyped data can set a scale to `undefined`.
+  const scales: Partial<Record<string, AnyScale>> = palette.scales;
+  for (const [name, scale] of Object.entries(scales)) {
+    if (scale === undefined) continue;
     const error = foregroundErrorOf(scale, palette);
     if (error !== undefined) {
       errors.push([name, `scale "${name}" foreground: ${error}`]);
@@ -228,7 +242,8 @@ function refError(
   if (parsed === undefined) return `"${ref.ref}" is not a color path`;
   const { name, step } = parsed;
   if (step === undefined) {
-    return Object.hasOwn(palette.neutrals, name)
+    const neutrals: Partial<Record<string, Color>> = palette.neutrals;
+    return Object.hasOwn(neutrals, name) && neutrals[name] !== undefined
       ? undefined
       : `unknown neutral "${name}"`;
   }
@@ -237,42 +252,8 @@ function refError(
   if (scale === undefined) return `unknown scale "${name}"`;
   const value = Number(step);
   if (String(value) !== step || !isStep(value)) return `unknown step "${step}"`;
-  if (scale.kind === 'authored' && !Object.hasOwn(scale.steps, value)) {
+  if (scale.kind === 'authored' && !hasStep(scale.steps, value)) {
     return `scale "${name}" has no step ${step}`;
   }
   return undefined;
-}
-
-function scaleErrors(name: string, scale: AnyScale): string[] {
-  const errors: string[] = [];
-  if (scale.kind === 'seeded') {
-    const overrides = Object.values(scale.overrides ?? {});
-    if ([scale.seed, ...overrides].some((color) => !isValidColor(color))) {
-      errors.push(`scale "${name}" has an invalid color`);
-    }
-    return errors;
-  }
-  const missing = steps.filter((step) => !Object.hasOwn(scale.steps, step));
-  if (missing.length > 0) {
-    return [
-      ...errors,
-      `scale "${name}" is missing steps ${missing.join(', ')}`,
-    ];
-  }
-  const present: Color[] = orderedSteps.flatMap((step) => {
-    const color: Color | undefined = scale.steps[step];
-    return color === undefined ? [] : [color];
-  });
-  if (present.some((color) => !isValidColor(color))) {
-    errors.push(`scale "${name}" has an invalid color`);
-  }
-  const lightness = present.map((color) => color.components[0]);
-  if (
-    lightness.some(
-      (value, index) => index > 0 && value >= (lightness[index - 1] ?? 1),
-    )
-  ) {
-    errors.push(`scale "${name}" doesn't get darker at every step`);
-  }
-  return [...errors, ...anchorErrors(name, scale.anchor, scale.steps)];
 }

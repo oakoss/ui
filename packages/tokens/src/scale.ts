@@ -57,6 +57,19 @@ export function authored(
   return { anchor, kind: 'authored', steps: scaleSteps };
 }
 
+// Untyped data can inherit a key, use a string key or set a step to `undefined`.
+export function hasStep(
+  scaleSteps: AuthoredScale['steps'],
+  step: unknown,
+): step is Step {
+  return (
+    typeof step === 'number' &&
+    isStep(step) &&
+    Object.hasOwn(scaleSteps, step) &&
+    scaleSteps[step] !== undefined
+  );
+}
+
 export function isStep(value: number): value is Step {
   return (orderedSteps as readonly number[]).includes(value);
 }

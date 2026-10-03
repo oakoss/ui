@@ -3,9 +3,11 @@ import type { Polarity } from '#/family';
 
 import { contrastRatio, isOpaque } from '#/contrast';
 import { contrastMinimum, type IntentRoleKind } from '#/roles';
-import { type AuthoredScale, orderedSteps, type Step } from '#/scale';
+import { type AuthoredScale, hasStep, orderedSteps, type Step } from '#/scale';
 
 export type IntentSteps = Readonly<Record<IntentRoleKind, Step>>;
+
+type AnyScale = AuthoredScale<string, string>;
 
 type Foreground = { end: 50 | 950; ratio: number };
 
@@ -22,13 +24,11 @@ const textStart = { dark: 400, light: 600 } as const;
  * Text on the fill is whichever end of the scale contrasts more.
  */
 export function pickIntentSteps(
-  scale: AuthoredScale,
+  scale: AnyScale,
   polarity: Polarity,
   page: Color,
 ): IntentSteps | string {
-  const present = orderedSteps.filter((step) =>
-    Object.hasOwn(scale.steps, step),
-  );
+  const present = orderedSteps.filter((step) => hasStep(scale.steps, step));
   const problem = inputProblem(scale, present, polarity, page);
   if (problem !== undefined) return problem;
   const fill = pickFill(scale, present, polarity, page);
@@ -49,7 +49,7 @@ export function pickIntentSteps(
   };
 }
 
-function foregroundOf(scale: AuthoredScale, fill: Step): Foreground {
+function foregroundOf(scale: AnyScale, fill: Step): Foreground {
   const light = contrastRatio(stepColor(scale, fill), stepColor(scale, 50));
   const dark = contrastRatio(stepColor(scale, fill), stepColor(scale, 950));
   return light >= dark ? { end: 50, ratio: light } : { end: 950, ratio: dark };
@@ -58,7 +58,7 @@ function foregroundOf(scale: AuthoredScale, fill: Step): Foreground {
 // Contrast is undefined for translucent colors, and a missing start step
 // would make the searches start from index -1.
 function inputProblem(
-  scale: AuthoredScale,
+  scale: AnyScale,
   present: readonly Step[],
   polarity: Polarity,
   page: Color,
@@ -79,7 +79,7 @@ function inputProblem(
 }
 
 function pickFill(
-  scale: AuthoredScale,
+  scale: AnyScale,
   present: readonly Step[],
   polarity: Polarity,
   page: Color,
@@ -106,7 +106,7 @@ function pickFill(
 // held to 3:1 against the page: in dark mode that neighbor is usually the step
 // the fill rule rejected, and the other one fails the text.
 function pickHover(
-  scale: AuthoredScale,
+  scale: AnyScale,
   present: readonly Step[],
   fill: Step,
   foreground: 50 | 950,
@@ -122,7 +122,7 @@ function pickHover(
 }
 
 function pickText(
-  scale: AuthoredScale,
+  scale: AnyScale,
   present: readonly Step[],
   polarity: Polarity,
   page: Color,
@@ -140,7 +140,7 @@ function pickText(
   );
 }
 
-function stepColor(scale: AuthoredScale, step: Step): Color {
+function stepColor(scale: AnyScale, step: Step): Color {
   const color = scale.steps[step];
   if (color === undefined) throw new Error(`scale has no step ${step}`);
   return color;
