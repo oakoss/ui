@@ -1,6 +1,26 @@
+import { tv } from 'tailwind-variants/lite';
 import { describe, expect, test } from 'vitest';
 
-import { cx } from '#/lib/cx';
+import { cn, cx } from '#/lib/cx';
+
+// Checked by typecheck: each @ts-expect-error fails the build if its line
+// starts compiling.
+test('cn rejects an uncalled tv slot', () => {
+  const styles = tv({ slots: { label: 'font-medium' } })();
+  // @ts-expect-error uncalled slot
+  const uncalled = cn(styles.label);
+  // @ts-expect-error uncalled slot
+  const uncalledBase = cx(styles.label);
+  // @ts-expect-error uncalled slot
+  const nested = cn(['px-2', styles.label]);
+  expect([cn(styles.label()), uncalled, uncalledBase, nested]).toHaveLength(4);
+});
+
+test('cn accepts clsx object syntax', () => {
+  expect(
+    cn('px-2', { 'font-bold': true, italic: false }, [{ 'p-4': true }]),
+  ).toBe('font-bold p-4');
+});
 
 describe('cx', () => {
   test('returns the base classes when no className is given', () => {
