@@ -1,8 +1,18 @@
-import { type Oklch, toGamut, wcagContrast } from 'culori';
+import { differenceCiede2000, type Oklch, toGamut, wcagContrast } from 'culori';
 
 import type { Color } from '#/color';
 
 const toSrgb = toGamut('rgb', 'oklch');
+const ciede2000 = differenceCiede2000();
+
+// CIEDE2000, measured as displayed (sRGB); 1 is about the smallest
+// difference people notice.
+export function colorDifference(a: Color, b: Color): number {
+  if (!isOpaque(a) || !isOpaque(b)) {
+    throw new Error('color difference needs opaque colors');
+  }
+  return ciede2000(toSrgb(toCulori(a)), toSrgb(toCulori(b)));
+}
 
 // WCAG 2.x is defined in sRGB, so both colors are gamut-mapped first.
 export function contrastRatio(a: Color, b: Color): number {

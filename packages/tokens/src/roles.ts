@@ -177,3 +177,17 @@ export const contrastPairs: readonly ContrastPair[] = [
   ...ringPairs,
   { background: 'background', foreground: 'border', kind: 'decorative' },
 ];
+
+// Colors a component swaps on hover, which only help if people see the change:
+// a solid fill darkens, and soft and ghost buttons gain their intent's border.
+export const distinctMinimum = 2;
+
+export type DistinctPair = readonly [from: Role, to: Role];
+
+export const distinctPairs: readonly DistinctPair[] = intents.flatMap(
+  (intent): DistinctPair[] => [
+    [intent, intentRole(intent, 'hover')],
+    [intentRole(intent, 'subtle'), intentRole(intent, 'border')],
+    ['background', intentRole(intent, 'border')],
+  ],
+);

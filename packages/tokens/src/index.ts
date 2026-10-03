@@ -30,6 +30,7 @@ export { type ResolvedFlavor, resolveFlavor } from '#/resolve';
 export type {
   ContrastKind,
   ContrastPair,
+  DistinctPair,
   Intent,
   IntentRole,
   IntentRoleKind,
@@ -41,6 +42,8 @@ export {
   contrastMinimum,
   contrastPairs,
   derivedRoles,
+  distinctMinimum,
+  distinctPairs,
   intentRoleKinds,
   intents,
   neutralRoles,
