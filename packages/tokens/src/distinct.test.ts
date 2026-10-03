@@ -1,11 +1,18 @@
-import { type Oklch, oklch, rgb } from 'culori';
 import { describe, expect, it } from 'vitest';
 
 import type { Color } from '#/color';
 
-import { colorDifference } from '#/contrast';
+import { colorDifference, contrastRatio, overlay } from '#/contrast';
 import { families } from '#/index';
-import { distinctMinimum, distinctPairs, type Role } from '#/roles';
+import {
+  contrastMinimum,
+  distinctMinimum,
+  distinctPairs,
+  type LayeredSurface,
+  layeredSurfaces,
+  type Role,
+  stateLayer,
+} from '#/roles';
 import { resolveTheme, type Theme } from '#/theme';
 
 const themes = Object.values(families).flatMap((family) =>
@@ -16,55 +23,55 @@ const themes = Object.values(families).flatMap((family) =>
   ),
 );
 
-function check(label: string, a: Color, b: Color): string[] {
+// Neutral has no role set: it tints the page and `secondary` with the
+// foreground, and its solid fill hovers to the foreground at 90%.
+const neutralSurfaces: readonly LayeredSurface[] = [
+  ['background', 'foreground'],
+  ['secondary', 'foreground'],
+];
+
+function distinct(label: string, a: Color, b: Color): string[] {
   const difference = colorDifference(a, b);
   return difference >= distinctMinimum
     ? []
     : [`${label}: ${difference.toFixed(2)} < ${distinctMinimum}`];
 }
 
-// Neutral has no role set; its hovers are opacity over existing roles.
-function neutralFailures(theme: Theme): string[] {
-  const background = token(theme, 'background');
-  const border = token(theme, 'border');
-  const foreground = token(theme, 'foreground');
-  const secondary = token(theme, 'secondary');
-  return [
-    // Dark themes make the border translucent.
-    ...check(
-      'background vs a border border',
-      background,
-      over(border, border.alpha ?? 1, background),
-    ),
-    ...check(
-      'foreground vs foreground/90',
-      foreground,
-      over(foreground, 0.9, background),
-    ),
-    ...check(
-      'secondary vs a foreground/20 border',
-      secondary,
-      over(foreground, 0.2, secondary),
-    ),
-  ];
+function layerFailures(theme: Theme): string[] {
+  return [...layeredSurfaces, ...neutralSurfaces].flatMap(
+    ([surfaceRole, textRole]) => {
+      const surface = token(theme, surfaceRole);
+      const text = token(theme, textRole);
+      const pressed = overlay(text, stateLayer.press, surface);
+      const ratio = contrastRatio(text, pressed);
+      return [
+        ...distinct(
+          `${textRole} hover layer on ${surfaceRole}`,
+          surface,
+          overlay(text, stateLayer.hover, surface),
+        ),
+        ...(ratio >= contrastMinimum.text
+          ? []
+          : [
+              `${textRole} on pressed ${surfaceRole}: ${ratio.toFixed(2)} < ${contrastMinimum.text}`,
+            ]),
+      ];
+    },
+  );
 }
 
-// `top` at `alpha` over `bottom`, as `bg-foreground/90` renders.
-function over(top: Color, alpha: number, bottom: Color): Color {
-  const a = rgb(toCulori(top));
-  const b = rgb(toCulori(bottom));
-  const mixed = oklch({
-    b: a.b * alpha + b.b * (1 - alpha),
-    g: a.g * alpha + b.g * (1 - alpha),
-    mode: 'rgb',
-    r: a.r * alpha + b.r * (1 - alpha),
-  });
-  return { components: [mixed.l, mixed.c, mixed.h ?? null], space: 'oklch' };
+function neutralFillFailures(theme: Theme): string[] {
+  const foreground = token(theme, 'foreground');
+  return distinct(
+    'foreground vs foreground/90',
+    foreground,
+    overlay(foreground, 0.9, token(theme, 'background')),
+  );
 }
 
 function pairFailures(theme: Theme): string[] {
   return distinctPairs.flatMap(([from, to]) =>
-    check(`${from} vs ${to}`, token(theme, from), token(theme, to)),
+    distinct(`${from} vs ${to}`, token(theme, from), token(theme, to)),
   );
 }
 
@@ -76,26 +83,19 @@ function resolved(familyId: string, flavor: string, primary: string): Theme {
   return theme;
 }
 
-function toCulori(color: Color): Oklch {
-  const [l, c, h] = color.components;
-  return h === null ? { c, l, mode: 'oklch' } : { c, h, l, mode: 'oklch' };
-}
-
 function token(theme: Theme, role: Role): Color {
   const color = theme.tokens[role];
   if (color === undefined) throw new Error(`missing ${role}`);
   return color;
 }
 
-describe('hover changes stay visible', () => {
+describe('hover and press stay visible and readable', () => {
   it.each(themes)('%s %s with a %s primary', (familyId, flavor, primary) => {
-    expect(pairFailures(resolved(familyId, flavor, primary))).toEqual([]);
+    const theme = resolved(familyId, flavor, primary);
+    expect([
+      ...pairFailures(theme),
+      ...layerFailures(theme),
+      ...neutralFillFailures(theme),
+    ]).toEqual([]);
   });
-
-  it.each(themes)(
-    'neutral on %s %s with a %s primary',
-    (familyId, flavor, primary) => {
-      expect(neutralFailures(resolved(familyId, flavor, primary))).toEqual([]);
-    },
-  );
 });

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { contrastRatio, isOpaque } from '#/contrast';
+import { oklch } from '#/color';
+import { colorDifference, contrastRatio, isOpaque, overlay } from '#/contrast';
 import { families } from '#/index';
 import { contrastMinimum, contrastPairs } from '#/roles';
 import { resolveTheme } from '#/theme';
@@ -36,6 +37,28 @@ function failures(familyId: string, flavor: string, primary: string): string[] {
       : [`${foreground} on ${background}: ${ratio.toFixed(2)} < ${minimum}`];
   });
 }
+
+describe('overlay', () => {
+  const white = oklch(100, 0, null);
+  const red = oklch(60, 0.2, 25);
+
+  it('returns the bottom at 0 and the top at 1', () => {
+    expect(colorDifference(overlay(red, 0, white), white)).toBeLessThan(0.01);
+    expect(colorDifference(overlay(red, 1, white), red)).toBeLessThan(0.01);
+  });
+
+  // An OKLCH blend would give 0.5; browsers blend in sRGB.
+  it('blends in sRGB', () => {
+    const [lightness] = overlay(oklch(0, 0, null), 0.5, white).components;
+    expect(lightness).toBeCloseTo(0.598, 3);
+  });
+
+  it('refuses translucent colors', () => {
+    expect(() => overlay(oklch(0, 0, null, 0.5), 0.1, white)).toThrow(
+      'overlay needs opaque colors',
+    );
+  });
+});
 
 describe('WCAG 2.2 AA contrast', () => {
   it.each(themes)('%s %s with a %s primary', (familyId, flavor, primary) => {

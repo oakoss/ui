@@ -112,6 +112,10 @@ export const contrastMinimum = {
   text: 4.5,
 } as const satisfies Record<ContrastKind, number>;
 
+// Hover and press tint a control with its own text color at these opacities.
+// The generator keeps intent text AA under the press layer.
+export const stateLayer = { hover: 0.08, press: 0.12 } as const;
+
 const neutralTextRoles: readonly (readonly [
   foreground: NeutralRole,
   background: NeutralRole,
@@ -178,16 +182,23 @@ export const contrastPairs: readonly ContrastPair[] = [
   { background: 'background', foreground: 'border', kind: 'decorative' },
 ];
 
-// Colors a component swaps on hover, which only help if people see the change:
-// a solid fill darkens, and soft and ghost buttons gain their intent's border.
+// Hover and press only help if people see the change.
 export const distinctMinimum = 2;
 
 export type DistinctPair = readonly [from: Role, to: Role];
 
-export const distinctPairs: readonly DistinctPair[] = intents.flatMap(
-  (intent): DistinctPair[] => [
-    [intent, intentRole(intent, 'hover')],
-    [intentRole(intent, 'subtle'), intentRole(intent, 'border')],
-    ['background', intentRole(intent, 'border')],
+// A solid fill swaps to its hover color.
+export const distinctPairs: readonly DistinctPair[] = intents.map(
+  (intent): DistinctPair => [intent, intentRole(intent, 'hover')],
+);
+
+// Each surface a state layer tints, with the text color that tints it: soft
+// controls sit on `subtle`, outline and ghost on the page.
+export type LayeredSurface = readonly [surface: Role, text: Role];
+
+export const layeredSurfaces: readonly LayeredSurface[] = intents.flatMap(
+  (intent): LayeredSurface[] => [
+    ['background', intentRole(intent, 'text')],
+    [intentRole(intent, 'subtle'), intentRole(intent, 'text')],
   ],
 );

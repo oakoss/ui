@@ -1,8 +1,8 @@
 import type { Color } from '#/color';
 import type { Polarity } from '#/family';
 
-import { contrastRatio, isOpaque } from '#/contrast';
-import { contrastMinimum, type IntentRoleKind } from '#/roles';
+import { contrastRatio, isOpaque, overlay } from '#/contrast';
+import { contrastMinimum, type IntentRoleKind, stateLayer } from '#/roles';
 import { type AuthoredScale, hasStep, orderedSteps, type Step } from '#/scale';
 
 export type IntentSteps = Readonly<Record<IntentRoleKind, Step>>;
@@ -133,11 +133,17 @@ function pickText(
       ? present.slice(start)
       : present.slice(0, start + 1).toReversed();
   const subtle = stepColor(scale, subtleStep[polarity]);
-  return candidates.find(
-    (step) =>
-      contrastRatio(stepColor(scale, step), page) >= contrastMinimum.text &&
-      contrastRatio(stepColor(scale, step), subtle) >= contrastMinimum.text,
-  );
+  // Pressing tints the surface toward the text, so the text has to stay AA on
+  // the pressed surface too.
+  return candidates.find((step) => {
+    const text = stepColor(scale, step);
+    return [page, subtle].every(
+      (surface) =>
+        contrastRatio(text, surface) >= contrastMinimum.text &&
+        contrastRatio(text, overlay(text, stateLayer.press, surface)) >=
+          contrastMinimum.text,
+    );
+  });
 }
 
 function stepColor(scale: AnyScale, step: Step): Color {

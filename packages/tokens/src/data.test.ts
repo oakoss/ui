@@ -12,10 +12,14 @@ import {
   contrastPairs,
   derivedRoleMeta,
   derivedRoles,
+  distinctMinimum,
+  distinctPairs,
   families,
   intentRoleMeta,
   intents,
+  layeredSurfaces,
   neutralRoleMeta,
+  stateLayer,
   styles,
   typographies,
   validateFamily,
@@ -126,8 +130,17 @@ describe('roles', () => {
     }
   });
 
-  it('pins the contrast pairs and minimums', () => {
-    expect({ contrastMinimum, contrastPairs }).toMatchSnapshot();
+  // The generator and distinct.test.ts read the same values, so a change to
+  // one wouldn't fail the other.
+  it('pins the contrast pairs, minimums and state layers', () => {
+    expect({
+      contrastMinimum,
+      contrastPairs,
+      distinctMinimum,
+      distinctPairs,
+      layeredSurfaces,
+      stateLayer,
+    }).toMatchSnapshot();
   });
 
   it('describes every role', () => {

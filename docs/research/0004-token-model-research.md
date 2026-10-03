@@ -222,7 +222,7 @@ Agreed on 2026-10-02 while building the generator. Contrast figures are WCAG 2.x
 - **Text on the fill.** Whichever end of the scale (50 or 950) contrasts more. This is why Zinc's dark primary text is zinc-950 where shadcn has zinc-900.
 - **Hover.** The neighbor away from the text color, which keeps 4.5:1 with it; at the end of a scale, or when that neighbor fails, the other neighbor. It is not held to 3:1 against the page: for accents in dark mode, the neighbor away from the text is the step the fill rule rejected, and the other neighbor fails the text.
 - **Subtle and border.** 50/950 and 200/800. Border pairs are decorative.
-- **Accent text.** Starts at 600 (light) or 400 (dark) and moves away from the page until it passes 4.5:1 on the page and on subtle.
+- **Accent text.** Starts at 600 (light) or 400 (dark) and moves away from the page until it passes 4.5:1 on the page and on subtle, including when pressed: controls tint their surface with their own text color (8% on hover, 12% on press, `stateLayer`), which pulls the surface toward the text. Without that, `success-text` measured 4.02:1 on pressed `success-subtle`. The rule moves 44 of 180 text and ring colors one step (light accents darker, two dark accents lighter); `destructive` and `info` don't move. (Added in `ui-lwb.4`, 2026-10-03.)
 
 **Neutral roles.** Light `muted-foreground` is step 600, not shadcn's 500: on `muted` (step 100) shadcn's value measures 3.86–4.41:1 in six of the seven grays. It is the one change from shadcn's neutral mapping.
 

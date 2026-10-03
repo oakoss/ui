@@ -59,9 +59,10 @@ describe('pickIntentSteps', () => {
   it.each([
     ['zinc', 'light', white, [900, 50, 950, 50, 200, 600]],
     ['zinc', 'dark', darkPage, [200, 950, 100, 950, 800, 400]],
-    ['blue', 'light', white, [700, 50, 800, 50, 200, 600]],
+    // blue-600 passes on the page but not once pressing tints it.
+    ['blue', 'light', white, [700, 50, 800, 50, 200, 700]],
     ['blue', 'dark', darkPage, [600, 50, 700, 950, 800, 400]],
-    ['amber', 'light', white, [700, 50, 800, 50, 200, 700]],
+    ['amber', 'light', white, [700, 50, 800, 50, 200, 800]],
     ['amber', 'dark', darkPage, [700, 50, 800, 950, 800, 400]],
     // red-600 passes on the page but not on the subtle 50 step.
     ['red', 'light', white, [700, 50, 800, 50, 200, 700]],

@@ -34,6 +34,7 @@ export type {
   Intent,
   IntentRole,
   IntentRoleKind,
+  LayeredSurface,
   NeutralRole,
   Role,
 } from '#/roles';
@@ -46,7 +47,9 @@ export {
   distinctPairs,
   intentRoleKinds,
   intents,
+  layeredSurfaces,
   neutralRoles,
+  stateLayer,
 } from '#/roles';
 
 export type { Scale, Step } from '#/scale';

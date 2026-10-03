@@ -1,4 +1,11 @@
-import { differenceCiede2000, type Oklch, toGamut, wcagContrast } from 'culori';
+import {
+  differenceCiede2000,
+  type Oklch,
+  oklch,
+  rgb,
+  toGamut,
+  wcagContrast,
+} from 'culori';
 
 import type { Color } from '#/color';
 
@@ -26,6 +33,23 @@ export function contrastRatio(a: Color, b: Color): number {
 
 export function isOpaque(color: Color): boolean {
   return color.alpha === undefined || color.alpha === 1;
+}
+
+// `top` at `alpha` over `bottom`, blended in sRGB as browsers paint a
+// translucent background (`bg-x/8`).
+export function overlay(top: Color, alpha: number, bottom: Color): Color {
+  if (!isOpaque(top) || !isOpaque(bottom)) {
+    throw new Error('overlay needs opaque colors');
+  }
+  const a = rgb(toSrgb(toCulori(top)));
+  const b = rgb(toSrgb(toCulori(bottom)));
+  const mixed = oklch({
+    b: a.b * alpha + b.b * (1 - alpha),
+    g: a.g * alpha + b.g * (1 - alpha),
+    mode: 'rgb',
+    r: a.r * alpha + b.r * (1 - alpha),
+  });
+  return { components: [mixed.l, mixed.c, mixed.h ?? null], space: 'oklch' };
 }
 
 function toCulori(color: Color): Oklch {
