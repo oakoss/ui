@@ -34,6 +34,16 @@ jobs:
       - run: pnpm format:check
       - run: pnpm exec shadcn registry validate
 
+      - name: Check generated theme files are up to date
+        run: |
+          pnpm --filter @oakoss/tokens generate
+          if [ -n "$(git status --porcelain -- packages/ui)" ]; then
+            echo "Generated theme files are stale; run: pnpm --filter @oakoss/tokens generate"
+            git status --short -- packages/ui
+            git diff -- packages/ui
+            exit 1
+          fi
+
       - name: Check every package has a test script and lint configs
         run: |
           set -euo pipefail

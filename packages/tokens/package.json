@@ -10,6 +10,7 @@
     ".": "./src/index.ts"
   },
   "scripts": {
+    "generate": "node src/generate.ts && cd ../ui && oxfmt src/styles/theme.css src/styles/themes.css registry.json",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
