@@ -1,0 +1,51 @@
+---
+title: Installation
+description: Set up a project for oakoss/ui components.
+---
+
+oakoss/ui installs with the [shadcn CLI](https://ui.shadcn.com/docs/cli) from
+this GitHub repository, into a React project with Tailwind CSS v4.
+
+## Set up the project
+
+Run this once. The `base` item sets Lucide as the icon library and installs the
+theme, `color-scheme` and the reduced-motion styles.
+
+<Tabs defaultValue="New project">
+  <TabsList>
+    <TabsTrigger value="New project">New project</TabsTrigger>
+    <TabsTrigger value="Existing project">Existing project</TabsTrigger>
+  </TabsList>
+  <TabsContent value="New project">
+
+```npm
+npx shadcn@latest init oakoss/ui/base
+```
+
+This creates `components.json`.
+
+  </TabsContent>
+  <TabsContent value="Existing project">
+
+```npm
+npx shadcn@latest apply oakoss/ui/base
+```
+
+This keeps your aliases and style and sets `iconLibrary`. It also sets
+`baseColor` to `neutral`.
+
+  </TabsContent>
+</Tabs>
+
+`shadcn add oakoss/ui/base` installs the styles but doesn't set the icon
+library, so icons render as empty squares. If that happens, run the
+existing-project command and add the component again.
+
+## Add components
+
+```npm
+npx shadcn@latest add oakoss/ui/button
+```
+
+Each page lists its own command. The files land in your project, so you can
+edit them freely.

@@ -1,17 +1,24 @@
 ---
 title: Button
 description: A pressable button built on React Aria.
+item: button
+reactAria: https://react-aria.adobe.com/Button
 ---
 
+import { ButtonCustomColors } from '#/components/demos/button-custom-colors';
 import { ButtonDemo } from '#/components/demos/button-demo';
+import { ButtonIconOnly } from '#/components/demos/button-icon-only';
+import { ButtonLinks } from '#/components/demos/button-links';
+import { ButtonPending } from '#/components/demos/button-pending';
+import { ButtonVariants } from '#/components/demos/button-variants';
 
-<ButtonDemo />
+<ComponentPreview name="button-demo">
+  <ButtonDemo />
+</ComponentPreview>
 
 ## Installation
 
-```bash
-pnpm dlx shadcn@latest add oakoss/ui/button
-```
+<ComponentInstall item="button" />
 
 ## Usage
 
@@ -23,64 +30,85 @@ import { Button } from '#/components/ui/inputs/button';
 </Button>;
 ```
 
+## Examples
+
+### Variants and intents
+
 `variant` sets the look (`solid`, `soft`, `outline`, `ghost`, `link`) and
 `intent` sets the color (`primary`, `neutral`, `destructive`, `success`,
-`warning`, `info`).
+`warning`, `info`). Every look works with every intent.
+
+<ComponentPreview name="button-variants">
+  <ButtonVariants />
+</ComponentPreview>
 
 ### Custom colors
 
-Each intent sets `--btn-*` variables that every look reads, so recolor a
-button by setting them rather than overriding `bg-*`, which hover and press
-would replace:
+`className` can set the `--btn-*` variables that every look reads. Set them
+rather than overriding `bg-*`, which hover and press would replace. See
+[CSS variables](#css-variables) for each one.
 
-```tsx
-<Button className="[--btn-bg:var(--color-emerald-700)] [--btn-hover:var(--color-emerald-800)] [--btn-fg:white]">
-  Publish
-</Button>
-```
-
-The variables are `--btn-bg` and `--btn-hover` (solid fill), `--btn-fg`
-(text on the fill), `--btn-subtle` (soft fill), `--btn-border` (outline) and
-`--btn-text` (text, and the hover tint, for the other looks).
+<ComponentPreview name="button-custom-colors">
+  <ButtonCustomColors />
+</ComponentPreview>
 
 ### Icon-only
 
-Icon sizes (`icon-sm`, `icon`, `icon-lg`) require an `aria-label` or
+`size="icon"` (or `icon-sm`, `icon-lg`) requires an `aria-label` or
 `aria-labelledby`, since there's no text to name the button.
 
-```tsx
-import * as Icon from '#/components/icons';
-
-<Button aria-label="Close" size="icon" variant="ghost">
-  <Icon.X />
-</Button>;
-```
+<ComponentPreview name="button-icon-only">
+  <ButtonIconOnly />
+</ComponentPreview>
 
 ### Pending
 
 `isPending` keeps the button's width and focus, blocks presses, and shows a
-spinner that screen readers announce with the label. Set `pendingLabel` to
-translate it (see [Localization](/docs/guides/localization)).
+spinner. Set `pendingLabel` to translate the spinner's name (see
+[Localization](/docs/guides/localization)).
+
+<ComponentPreview name="button-pending">
+  <ButtonPending />
+</ComponentPreview>
 
 ### Links
 
-A link that looks like a button is still a link. Style one with
-`buttonStyles`, for example a TanStack Router link wrapped with `createLink`:
+`buttonStyles` styles a link as a button; it stays a link. Here it styles a
+TanStack Router link wrapped with `createLink`.
 
-```tsx
-import { createLink } from '@tanstack/react-router';
-import { Link as AriaLink } from 'react-aria-components';
+<ComponentPreview name="button-links">
+  <ButtonLinks />
+</ComponentPreview>
 
-import { buttonStyles } from '#/components/ui/inputs/button';
+## Accessibility
 
-const Link = createLink(AriaLink);
+React Aria renders a native `<button>` and handles:
 
-<Link className={buttonStyles({ variant: 'outline' })} to="/docs">
-  Docs
-</Link>;
-```
+- **Press:** one event for mouse, touch, pen and keyboard, so `onPress` fires
+  once however the button is used.
+- **Focus:** the focus outline shows for keyboard focus only
+  (`data-focus-visible`).
+- **Pending:** the button stays focusable but ignores presses, and screen
+  readers announce the change while it has focus.
 
-## Props
+This component adds a 44×44 pointer target around every size, and keeps a
+visible border in Windows High Contrast. Icon-only sizes require a name in the
+type.
+
+| Key     | Action             |
+| ------- | ------------------ |
+| `Space` | Presses the button |
+| `Enter` | Presses the button |
+
+Follows the [WAI-ARIA button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/button/).
+
+## API
+
+### Button
+
+Extends React Aria's [`Button`](https://react-aria.adobe.com/Button#api).
+
+#### Props
 
 <auto-type-table
   path="../../../../../packages/ui/src/components/ui/inputs/button.tsx"
@@ -88,3 +116,29 @@ const Link = createLink(AriaLink);
 />
 
 Also accepts all [React Aria `Button` props](https://react-aria.adobe.com/Button#api).
+
+#### Data attributes
+
+| Attribute            | Present when          |
+| -------------------- | --------------------- |
+| `data-slot`          | Always `button`       |
+| `data-variant`       | Always; the look      |
+| `data-intent`        | Always; the color     |
+| `data-size`          | Always; the size      |
+| `data-hovered`       | A pointer hovers it   |
+| `data-pressed`       | It's being pressed    |
+| `data-focused`       | It has focus          |
+| `data-focus-visible` | It has keyboard focus |
+| `data-disabled`      | `isDisabled` is set   |
+| `data-pending`       | `isPending` is set    |
+
+#### CSS variables
+
+| Variable       | Sets                                                |
+| -------------- | --------------------------------------------------- |
+| `--btn-bg`     | The solid fill                                      |
+| `--btn-hover`  | The solid fill on hover and press                   |
+| `--btn-fg`     | Text on the solid fill                              |
+| `--btn-subtle` | The soft fill                                       |
+| `--btn-border` | The outline border                                  |
+| `--btn-text`   | Text, and the hover and press tint, for other looks |

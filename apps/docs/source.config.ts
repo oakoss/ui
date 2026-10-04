@@ -7,6 +7,7 @@ import {
 } from 'fumadocs-typescript';
 
 import { INHERITED_PREFIX, isInheritedDeclaration } from './src/lib/props';
+import { remarkComponentDocs } from './src/lib/remark-component-docs';
 
 const typeTable: RemarkAutoTypeTableOptions = {
   generator: createGenerator({
@@ -28,5 +29,8 @@ const typeTable: RemarkAutoTypeTableOptions = {
 };
 
 export default defineConfig({
-  mdxOptions: { remarkPlugins: [[remarkAutoTypeTable, typeTable]] },
+  mdxOptions: {
+    remarkNpmOptions: { persist: { id: 'package-manager' } },
+    remarkPlugins: [[remarkAutoTypeTable, typeTable], remarkComponentDocs],
+  },
 });

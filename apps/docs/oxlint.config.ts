@@ -7,7 +7,10 @@ import { defineConfig } from 'oxlint';
 export default defineConfig(
   compose(base, react, vitest, {
     ignorePatterns: ['src/routeTree.gen.ts'],
-    // `_splat` is TanStack Router's catch-all param name.
-    rules: { 'no-underscore-dangle': ['error', { allow: ['_splat'] }] },
+    // `_splat` is TanStack Router's catch-all param name; `_compiler` is
+    // fumadocs-mdx's handle on the file a remark plugin compiles.
+    rules: {
+      'no-underscore-dangle': ['error', { allow: ['_compiler', '_splat'] }],
+    },
   }),
 );

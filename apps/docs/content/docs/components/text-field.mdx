@@ -1,17 +1,22 @@
 ---
 title: Text Field
 description: A text input with a label, description and validation message.
+item: text-field
+reactAria: https://react-aria.adobe.com/TextField
 ---
 
+import { TextFieldCustomLayout } from '#/components/demos/text-field-custom-layout';
 import { TextFieldDemo } from '#/components/demos/text-field-demo';
+import { TextFieldSizes } from '#/components/demos/text-field-sizes';
+import { TextFieldValidation } from '#/components/demos/text-field-validation';
 
-<TextFieldDemo />
+<ComponentPreview name="text-field-demo">
+  <TextFieldDemo />
+</ComponentPreview>
 
 ## Installation
 
-```bash
-pnpm dlx shadcn@latest add oakoss/ui/text-field
-```
+<ComponentInstall item="text-field" />
 
 This also installs [Field](/docs/components/field), whose parts TextField
 renders.
@@ -28,25 +33,30 @@ import { TextField } from '#/components/ui/inputs/text-field';
 />;
 ```
 
+## Examples
+
+### Sizes
+
 `size` (`sm`, `md`, `lg`) matches Button's heights, so an input and a button of
 the same size line up.
 
+<ComponentPreview name="text-field-sizes">
+  <TextFieldSizes />
+</ComponentPreview>
+
 ### Validation
 
-Set `isInvalid` and pass the message as `errorMessage`, or pass `errors` from a
-form library: strings, or objects with a `message`, as TanStack Form and React
-Hook Form produce. Several errors render one per line. Derive `isInvalid` from
-the same state, so the field clears when the errors do:
+`errors` takes a form library's errors: strings, or objects with a `message`,
+as TanStack Form and React Hook Form produce. Several errors render one per
+line. Derive `isInvalid` from the same state, so the field clears when the
+errors do. Type a `.com` address to clear them:
 
-```tsx
-<TextField
-  errors={field.state.meta.errors}
-  isInvalid={!field.state.meta.isValid}
-  label="Email"
-/>
-```
+<ComponentPreview name="text-field-validation">
+  <TextFieldValidation />
+</ComponentPreview>
 
-The error shows only while the field is invalid, so `errors` without
+With TanStack Form, that's
+`errors={field.state.meta.errors} isInvalid={!field.state.meta.isValid}`. The error shows only while the field is invalid, so `errors` without
 `isInvalid` renders nothing, and `errorMessage` wins over `errors`. Without
 either, React Aria's own validation (`isRequired`, `validate`, `type="email"`)
 supplies the message. For a whole form, see
@@ -54,28 +64,44 @@ supplies the message. For a whole form, see
 
 ### Custom layout
 
-Children replace the default layout. Compose the
+`children` replace the default layout. Compose the
 [Field](/docs/components/field) parts, which wire up the label, description and
 error the same way:
 
-```tsx
-import { FieldError, FieldLabel, Input } from '#/components/ui/inputs/field';
-
-<TextField isRequired type="password">
-  <div className="flex items-center justify-between">
-    <FieldLabel>Password</FieldLabel>
-    <Link href="/reset">Forgot?</Link>
-  </div>
-  <Input />
-  <FieldError />
-</TextField>;
-```
+<ComponentPreview name="text-field-custom-layout">
+  <TextFieldCustomLayout />
+</ComponentPreview>
 
 Children and the layout props (`label`, `description`, `errorMessage`,
 `errors`, `placeholder`, `size`) can't be mixed; set those on the parts
 instead.
 
-## Props
+## Accessibility
+
+React Aria renders a native `<input>` and links it to its parts:
+
+- **Name and description:** the label names the input, and the description and
+  error describe it (`aria-labelledby`, `aria-describedby`), with no ids to
+  wire.
+- **Validation:** an invalid field sets `aria-invalid`, and `isRequired` sets
+  the native `required` attribute (`aria-required` with
+  `validationBehavior="aria"`). The required asterisk is hidden from screen
+  readers, which already announce the field as required.
+
+The border reaches 3:1 against the page at rest and when invalid, and the focus
+outline shows for any focus, mouse included.
+
+The input keeps the browser's own keyboard behavior; React Aria adds no keys.
+
+## API
+
+### TextField
+
+Extends React Aria's [`TextField`](https://react-aria.adobe.com/TextField#api).
+With `children`, it renders only them; the parts are on the
+[Field](/docs/components/field#api) page.
+
+#### Props
 
 <auto-type-table
   path="../../../../../packages/ui/src/components/ui/inputs/text-field.tsx"
@@ -83,3 +109,13 @@ instead.
 />
 
 Also accepts all [React Aria `TextField` props](https://react-aria.adobe.com/TextField#api).
+
+#### Data attributes
+
+| Attribute       | Present when         |
+| --------------- | -------------------- |
+| `data-slot`     | Always `text-field`  |
+| `data-disabled` | `isDisabled` is set  |
+| `data-invalid`  | The field is invalid |
+| `data-readonly` | `isReadOnly` is set  |
+| `data-required` | `isRequired` is set  |

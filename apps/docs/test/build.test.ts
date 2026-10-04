@@ -87,6 +87,42 @@ describe('prerendered docs', () => {
   });
 });
 
+const componentPages = pages.filter(({ slug }) =>
+  slug.startsWith('components/'),
+);
+
+describe('component pages', () => {
+  it.each(componentPages)('follows the template on $slug', ({ source }) => {
+    const mdx = readFileSync(source, 'utf-8');
+    const sections = mdx.matchAll(/^## (.+)$/gmu).map(([, title]) => title);
+    expect(sections.toArray()).toEqual([
+      'Installation',
+      'Usage',
+      'Examples',
+      'Accessibility',
+      'API',
+    ]);
+    expect(mdx.indexOf('<ComponentPreview')).toBeLessThan(
+      mdx.indexOf('## Installation'),
+    );
+  });
+
+  it.each(componentPages)(
+    'links manual-install files instead of inlining them on $slug',
+    ({ markdown }) => {
+      // cx.ts, which every component installs; e2e checks the page shows it.
+      expect(read(markdown)).toContain('/blob/main/packages/ui/src/lib/cx.ts');
+      expect(read(markdown)).not.toContain('createCn');
+    },
+  );
+
+  it.each(componentPages)('shows the demo source on $slug', ({ markdown }) => {
+    // The Code tab's source reaches the Markdown output, imports rewritten.
+    expect(read(markdown)).toContain("from '#/components/ui/inputs/");
+    expect(read(markdown)).not.toContain('@oakoss/ui');
+  });
+});
+
 describe('prerendered site files', () => {
   it('prerenders every unlinked route', () => {
     expect(staticPages.map((page) => page.file)).toEqual(unlinkedFiles);
