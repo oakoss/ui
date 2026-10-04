@@ -18,11 +18,11 @@ const borderStep = { dark: 800, light: 200 } as const;
 const textStart = { dark: 400, light: 600 } as const;
 
 /**
- * Picks each intent role's step for one scale on one page (note 0004). The
- * fill is the nearest step to the anchor whose text passes 4.5:1 and which
- * passes 3:1 against the page; ties go to the side with more page contrast.
- * Text on the fill is whichever end of the scale contrasts more.
- */
+Picks each intent role's step for one scale on one page (note 0004). The
+fill is the nearest step to the anchor whose text passes 4.5:1 and which
+passes 3:1 against the page; ties go to the side with more page contrast.
+Text on the fill is whichever end of the scale contrasts more.
+*/
 export function pickIntentSteps(
   scale: AnyScale,
   polarity: Polarity,

@@ -23,14 +23,12 @@ function contentPages(dir = content, prefix = ''): ContentPage[] {
       return contentPages(path.join(dir, entry.name), slug);
     }
     if (!entry.name.endsWith('.mdx')) return [];
-    return [
-      {
-        html: slug === 'index' ? 'docs/index.html' : `docs/${slug}/index.html`,
-        markdown: `docs/${slug}.md`,
-        slug,
-        source: path.join(dir, entry.name),
-      },
-    ];
+    return {
+      html: slug === 'index' ? 'docs/index.html' : `docs/${slug}/index.html`,
+      markdown: `docs/${slug}.md`,
+      slug,
+      source: path.join(dir, entry.name),
+    };
   });
 }
 

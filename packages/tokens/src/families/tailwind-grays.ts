@@ -6,9 +6,9 @@ const gray = (steps: AuthoredScale['steps']) =>
   authored({ dark: 200, light: 900 }, steps);
 
 /**
- * Tailwind CSS 4.3.3's gray scales that shadcn offers as base colors
- * (`theme.css`), copied unchanged.
- */
+Tailwind CSS 4.3.3's gray scales that shadcn offers as base colors
+(`theme.css`), copied unchanged.
+*/
 export const tailwindGrays = {
   mauve: gray({
     100: oklch(96, 0.003, 325.6),

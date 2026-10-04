@@ -59,7 +59,7 @@ const shipped = ui.items.flatMap(({ dependencies, files, name }) => {
     .filter((specifier) => !specifier.startsWith('#/'))
     .map((specifier) => packageName(specifier))
     .filter((pkg) => !provided.has(pkg) && !listed.has(pkg));
-  return [{ name, unlistedFiles, unlistedPackages }];
+  return { name, unlistedFiles, unlistedPackages };
 });
 
 // Components use the plugin's pressed:/pending: variants, which Tailwind

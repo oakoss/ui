@@ -25,16 +25,16 @@ function failures(familyId: string, flavor: string, primary: string): string[] {
     const back = theme.tokens[background];
     const fore = theme.tokens[foreground];
     if (back === undefined || fore === undefined) {
-      return [`${foreground} on ${background}: missing token`];
+      return `${foreground} on ${background}: missing token`;
     }
     if (!isOpaque(back) || !isOpaque(fore)) {
-      return [`${foreground} on ${background}: translucent`];
+      return `${foreground} on ${background}: translucent`;
     }
     const ratio = contrastRatio(fore, back);
     const minimum = contrastMinimum[kind];
     return ratio >= minimum
       ? []
-      : [`${foreground} on ${background}: ${ratio.toFixed(2)} < ${minimum}`];
+      : `${foreground} on ${background}: ${ratio.toFixed(2)} < ${minimum}`;
   });
 }
 
@@ -85,12 +85,12 @@ function fieldFailures(
     return (['background', 'card', 'popover'] as const).flatMap((surface) => {
       const bottom = theme.tokens[surface];
       if (input === undefined || top === undefined || bottom === undefined) {
-        return [`${style.id} on ${surface}: missing token`];
+        return `${style.id} on ${surface}: missing token`;
       }
       const ratio = contrastRatio(input, overlay(top, fill.alpha, bottom));
       return ratio >= contrastMinimum['non-text']
         ? []
-        : [`${style.id} on ${surface}: ${ratio.toFixed(2)}`];
+        : `${style.id} on ${surface}: ${ratio.toFixed(2)}`;
     });
   });
 }

@@ -30,9 +30,9 @@ export type Scale<Hue extends string = never, Neutral extends string = never> =
   | SeededScale<Hue, Neutral>;
 
 /**
- * One published color the generator expands into a full scale. The seed sits
- * unchanged at the step nearest its lightness; `overrides` always win.
- */
+One published color the generator expands into a full scale. The seed sits
+unchanged at the step nearest its lightness; `overrides` always win.
+*/
 export type SeededScale<
   Hue extends string = never,
   Neutral extends string = never,

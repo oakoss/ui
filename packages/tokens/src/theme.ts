@@ -20,9 +20,9 @@ import { validateFamily } from '#/validate';
 export type Theme = { polarity: Polarity; tokens: ThemeTokens };
 
 /**
- * Every color token of one flavor, keyed by CSS variable name without `--`:
- * the roles, plus each intent's scale (`primary-50` … `primary-950`).
- */
+Every color token of one flavor, keyed by CSS variable name without `--`:
+the roles, plus each intent's scale (`primary-50` … `primary-950`).
+*/
 export type ThemeTokens = Readonly<Record<string, Color>>;
 
 type AnyPalette = Palette<string, string>;
@@ -30,10 +30,10 @@ type AnyPalette = Palette<string, string>;
 type AnyScale = AuthoredScale<string, string>;
 
 /**
- * Resolves a flavor, with `primary` overriding the family's default primary
- * hue. Returns the problems instead: `validateFamily`'s errors for the whole
- * family, or errors that name the flavor.
- */
+Resolves a flavor, with `primary` overriding the family's default primary
+hue. Returns the problems instead: `validateFamily`'s errors for the whole
+family, or errors that name the flavor.
+*/
 export function resolveTheme(
   family: Family,
   flavorId: string,

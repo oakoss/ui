@@ -20,11 +20,11 @@ export type ColorRef<Hue extends string, Neutral extends string> = {
 };
 
 /**
- * Write families with `defineFamily`: an annotation, `satisfies Family` or a
- * `Record<string, …>` annotation on `palette.scales` widens the names to
- * `string` and drops the reference checks. `NoInfer` makes `palette` the only
- * source of hue and neutral names.
- */
+Write families with `defineFamily`: an annotation, `satisfies Family` or a
+`Record<string, …>` annotation on `palette.scales` widens the names to
+`string` and drops the reference checks. `NoInfer` makes `palette` the only
+source of hue and neutral names.
+*/
 export type Family<
   Hue extends string = string,
   Neutral extends string = string,

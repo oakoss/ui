@@ -20,12 +20,12 @@
   "dependencies": {
     "@oakoss/ui": "workspace:*",
     "@tanstack/react-form": "^1.33.5",
-    "@tanstack/react-router": "^1.170.38",
-    "@tanstack/react-start": "^1.168.56",
+    "@tanstack/react-router": "^1.170.41",
+    "@tanstack/react-start": "^1.168.60",
     "@tanstack/start-static-server-functions": "^1.167.39",
-    "fumadocs-core": "^16.15.17",
-    "fumadocs-mdx": "^15.4.5",
-    "fumadocs-ui": "^16.15.17",
+    "fumadocs-core": "^16.16.0",
+    "fumadocs-mdx": "^15.4.6",
+    "fumadocs-ui": "^16.16.0",
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-aria-components": "catalog:",
@@ -49,8 +49,8 @@
     "oxlint": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
-    "vite": "^8.3.1",
+    "vite": "^8.3.2",
     "vitest": "catalog:",
-    "wrangler": "^4.145.0"
+    "wrangler": "^4.147.0"
   }
 }

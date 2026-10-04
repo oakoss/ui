@@ -12,10 +12,10 @@ export function cnConfigModule(theme: Record<string, string[]>): string {
 }
 
 /**
- * Names `cn` must learn for each theme scale it merges by. Without them it
- * keeps both `h-control h-9`, and reads `text-ui` as a color, so
- * `text-ui text-foreground` drops the size.
- */
+Names `cn` must learn for each theme scale it merges by. Without them it
+keeps both `h-control h-9`, and reads `text-ui` as a color, so
+`text-ui text-foreground` drops the size.
+*/
 export function cnTheme(
   styles: readonly Style[],
   typographies: readonly Typography[],

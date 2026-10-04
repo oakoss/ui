@@ -47,9 +47,9 @@ export function formatColor(color: Color): string {
 }
 
 /**
- * Tokens that follow the primary hue: its scale, its roles, the roles derived
- * from it and, for a primary ramp, the charts.
- */
+Tokens that follow the primary hue: its scale, its roles, the roles derived
+from it and, for a primary ramp, the charts.
+*/
 export function primaryTokenNames(family: Family): string[] {
   const { charts } = family;
   const hasPrimaryCharts =
@@ -107,12 +107,12 @@ export function styleDeclarations(style: Style): {
 }
 
 /**
- * Colors and the radius scale go through `@theme inline`, so utilities read
- * the scoped role variables and `--radius`. Style and type tokens use a plain
- * `@theme`: a scope can override a literal one, but one that refers to another
- * variable (`--radius-control: var(--radius-md)`) resolves at `:root`, so a
- * scope has to redeclare it.
- */
+Colors and the radius scale go through `@theme inline`, so utilities read
+the scoped role variables and `--radius`. Style and type tokens use a plain
+`@theme`: a scope can override a literal one, but one that refers to another
+variable (`--radius-control: var(--radius-md)`) resolves at `:root`, so a
+scope has to redeclare it.
+*/
 export function themeCss(
   family: Family,
   style: Style,

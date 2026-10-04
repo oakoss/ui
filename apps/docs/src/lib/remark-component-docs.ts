@@ -121,10 +121,10 @@ const aliasDirectories: Record<string, string> = {
 };
 
 /**
- * Expands `<ComponentPreview name>` and `<ComponentInstall item>` into
- * Markdown at build time, so the demo source and install steps also reach the
- * `.md` and llms.txt output, and the install steps' text reaches search.
- */
+Expands `<ComponentPreview name>` and `<ComponentInstall item>` into
+Markdown at build time, so the demo source and install steps also reach the
+`.md` and llms.txt output, and the install steps' text reaches search.
+*/
 export function remarkComponentDocs() {
   return (tree: Node, file: { data: object }) => {
     const compiler = '_compiler' in file.data ? file.data._compiler : undefined;
