@@ -9,6 +9,7 @@
   },
   "exports": {
     "./components/*": "./src/components/*.tsx",
+    "./registry.json": "./registry.json",
     "./styles.css": "./src/styles/globals.css",
     "./themes.css": "./src/styles/themes.css"
   },

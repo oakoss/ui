@@ -56,6 +56,47 @@ test('collapsing the sidebar keeps the full content width', async ({
     .toBe(900);
 });
 
+test('the package-manager choice carries to other pages', async ({ page }) => {
+  await page.goto('/docs/components/button');
+  const tab = page.getByRole('tab', { name: 'pnpm' }).first();
+  // A click before hydration does nothing, so retry until the choice is saved.
+  await expect(async () => {
+    await tab.click();
+    await expect(tab).toHaveAttribute('aria-selected', 'true', {
+      timeout: 1000,
+    });
+  }).toPass();
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem('package-manager')))
+    .toBe('pnpm');
+  // A new tab shares localStorage but not the sessionStorage Fumadocs also writes.
+  const next = await page.context().newPage();
+  await next.goto('/docs/components/text-field');
+  await expect(next.getByRole('tab', { name: 'pnpm' }).first()).toHaveAttribute(
+    'aria-selected',
+    'true',
+  );
+  await expect(next.getByText('pnpm dlx shadcn@latest add')).toBeVisible();
+});
+
+test('the Code tab shows the example source', async ({ page }) => {
+  await page.goto('/docs/components/button');
+  const example = page
+    .getByRole('tabpanel')
+    .filter({ hasText: 'Publish' })
+    .locator('..');
+  await example.getByRole('tab', { name: 'Code' }).click();
+  await expect(
+    example.getByText('[--btn-bg:var(--color-emerald-700)]'),
+  ).toBeVisible();
+});
+
+test('the Manual tab shows each file it installs', async ({ page }) => {
+  await page.goto('/docs/components/button');
+  await page.getByRole('tab', { name: 'Manual' }).click();
+  await expect(page.getByText('createCn').first()).toBeVisible();
+});
+
 test('search finds a component page', async ({ page }) => {
   await page.goto('/docs');
   await page

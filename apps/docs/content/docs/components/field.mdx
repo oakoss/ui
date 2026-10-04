@@ -1,13 +1,22 @@
 ---
 title: Field
 description: Label, description, error and input parts for any React Aria field.
+item: field
+reactAria: https://react-aria.adobe.com/forms
 ---
+
+import { FieldDemo } from '#/components/demos/field-demo';
+import { FieldErrors } from '#/components/demos/field-errors';
+import { FieldInputSizes } from '#/components/demos/field-input-sizes';
+import { FieldLayout } from '#/components/demos/field-layout';
+
+<ComponentPreview name="field-demo">
+  <FieldDemo />
+</ComponentPreview>
 
 ## Installation
 
-```bash
-pnpm dlx shadcn@latest add oakoss/ui/field
-```
+<ComponentInstall item="field" />
 
 ## Usage
 
@@ -32,37 +41,125 @@ import {
 </SearchField>;
 ```
 
-`Input` takes `size` (`sm`, `md`, `lg`), the control height, which matches
-Button's. It replaces HTML's `size` attribute (width in characters).
+## Examples
 
 ### Errors
 
-`FieldError` renders only while its field is invalid. Pass `errors` from a form
-library (strings, or objects with a `message`); duplicates, blank entries and
-anything else are dropped, and several errors render one per line. Children win
-over `errors` unless empty (`cond && 'Message'`). With neither, it shows React
-Aria's validation messages.
+`errors` on `FieldError` takes a form library's errors (strings, or objects
+with a `message`); duplicates, blank entries and anything else are dropped, and
+several errors render one per line. Children win over `errors` unless empty
+(`cond && 'Message'`). With neither, it shows React Aria's validation messages.
+It renders only while its field is invalid.
+
+<ComponentPreview name="field-errors">
+  <FieldErrors />
+</ComponentPreview>
+
+### Input sizes
+
+`size` on `Input` (`sm`, `md`, `lg`) sets the control height, which matches
+Button's. It replaces HTML's `size` attribute (width in characters).
+
+<ComponentPreview name="field-input-sizes">
+  <FieldInputSizes />
+</ComponentPreview>
 
 ### Layout
 
 `FieldSet` and `FieldLegend` group related fields under a caption that screen
-readers announce, and `FieldGroup` stacks fields with consistent spacing:
+readers announce, and `FieldGroup` stacks fields with consistent spacing.
 
-```tsx
-<FieldSet>
-  <FieldLegend>Shipping address</FieldLegend>
-  <FieldGroup>
-    <TextField label="Street" />
-    <TextField label="City" />
-  </FieldGroup>
-</FieldSet>
-```
+<ComponentPreview name="field-layout">
+  <FieldLayout />
+</ComponentPreview>
 
-## Props
+## Accessibility
+
+React Aria links the parts through context:
+
+- **Name and description:** `FieldLabel` names the input, and
+  `FieldDescription` and `FieldError` describe it, with no ids to wire.
+- **Errors:** `FieldError` renders only while the field is invalid, so screen
+  readers never read a stale message. Several errors are read in one pass,
+  with a space between them so their words don't run together.
+- **Groups:** `FieldSet` is a native `<fieldset>`, and `FieldLegend` its
+  `<legend>`, which screen readers announce on entering the group.
+
+`Input`'s border reaches 3:1 against the page at rest and when invalid.
+
+The input keeps the browser's own keyboard behavior; React Aria adds no keys.
+
+## API
+
+### FieldError
+
+Extends React Aria's [`FieldError`](https://react-aria.adobe.com/forms).
+
+#### Props
 
 <auto-type-table
   path="../../../../../packages/ui/src/components/ui/inputs/field.tsx"
   name="FieldErrorProps"
 />
 
-Also accepts all React Aria `FieldError` props; see [React Aria forms](https://react-aria.adobe.com/forms).
+Also accepts all React Aria `FieldError` props.
+
+#### Data attributes
+
+| Attribute   | Present when         |
+| ----------- | -------------------- |
+| `data-slot` | Always `field-error` |
+
+### Input
+
+Extends React Aria's [`Input`](https://react-aria.adobe.com/TextField#api).
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/field.tsx"
+  name="InputProps"
+/>
+
+Also accepts all React Aria `Input` props except HTML's `size`.
+
+#### Data attributes
+
+| Attribute            | Present when          |
+| -------------------- | --------------------- |
+| `data-slot`          | Always `input`        |
+| `data-size`          | Always; the height    |
+| `data-hovered`       | A pointer hovers it   |
+| `data-focused`       | It has focus          |
+| `data-focus-visible` | It has keyboard focus |
+| `data-disabled`      | Its field is disabled |
+| `data-invalid`       | Its field is invalid  |
+
+### FieldLegend
+
+A `<legend>`.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/field.tsx"
+  name="FieldLegendProps"
+/>
+
+#### Data attributes
+
+| Attribute      | Present when                          |
+| -------------- | ------------------------------------- |
+| `data-slot`    | Always `field-legend`                 |
+| `data-variant` | Always; `legend` or `label` text size |
+
+### Other parts
+
+These add no props of their own, and each sets a `data-slot`:
+
+| Part               | Extends                                       | `data-slot`         |
+| ------------------ | --------------------------------------------- | ------------------- |
+| `FieldLabel`       | React Aria's `Label`                          | `field-label`       |
+| `FieldDescription` | React Aria's `Text` with `slot="description"` | `field-description` |
+| `FieldSet`         | `<fieldset>`                                  | `field-set`         |
+| `FieldGroup`       | `<div>`                                       | `field-group`       |

@@ -142,6 +142,12 @@ Settled in `ui-lwb.2` (2026-10-03):
 - **`IconProps` omits `children` and narrows `strokeWidth` to a number**, because Remix Icon rejects children and HugeIcons wants a numeric stroke width. A typecheck-enforced assignment covers every library.
 - **VS Code autocomplete** excludes the icon libraries and `icons.tsx` (`.vscode/settings.json`), so typing `Calendar` offers the component.
 
+Settled in `ui-lwb.3` (2026-10-04), measured with shadcn 4.21.0 against local registry files and then the GitHub registry (`oakoss/ui/base#feat/foundations-finish`):
+
+- **`init` for new projects, `add` for existing ones.** Only `init` writes a base item's `config`: from GitHub, `init oakoss/ui/base` created `components.json` with `iconLibrary: lucide`, and `add button` then installed `icons.tsx` with Lucide imports and no `IconPlaceholder` left. Over an existing `components.json`, `init` asks to overwrite and replaces aliases and `style`. `apply` merged instead when given a URL, but rejects a GitHub registry address (`Invalid preset`; it takes only its own presets or a URL). In an existing project using Tabler with custom aliases, `add oakoss/ui/base` from GitHub installed the CSS and left `components.json` byte-identical, and `add button` installed Tabler icons under the project's aliases. Existing projects keep the icon library they already chose.
+- **`config` sets only `iconLibrary`,** so `init` installs nothing else into a project's config. **`extends: "none"`** stops `init` from also installing shadcn's own style and its packages.
+- **The base item carries the CSS the theme's `cssVars` can't:** `color-scheme` lands in the `:root` and `.dark` blocks, and the reduced-motion `@layer base` block arrives intact; re-adding changes nothing, and Tailwind 4.3.3 compiles the result. The theme comes in through `registryDependencies`.
+
 ### Button
 
 Settled in `ui-lwb.4` (2026-10-03), after comparing 15 libraries' button APIs from their source. Every React Aria-based one (HeroUI, Intent UI, Untitled UI, Jolly UI, shadcn's base) uses one flat `variant` prop; Radix Themes, Chakra, Park UI, Mantine, MUI, Ant Design and Catalyst split look from color.
@@ -192,7 +198,6 @@ Settled in `ui-lwb.4` (2026-10-03), after surveying 16 libraries' text fields fr
 
 ## Still unverified
 
-- An end-to-end `shadcn add` from our GitHub registry, with and without `iconLibrary` set.
 - Whether Fumadocs' dark-mode toggle switches our components' colors (both use a `.dark` class).
 - Whether React Aria popovers keep a per-preview theme when they render outside the preview wrapper.
 

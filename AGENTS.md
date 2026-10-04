@@ -17,9 +17,10 @@ Before editing files for a substantial task:
 
 Read every file whose trigger matches before acting:
 
-- Writing or changing a component in `packages/ui`: `docs/best-practices/components.md`. A new component also adds stories and a registry item, so read the other two as well.
+- Writing or changing a component in `packages/ui`: `docs/best-practices/components.md`. A new component also adds stories, a registry item and a docs page, so read the other three as well.
 - Writing stories or tests: `docs/best-practices/testing.md`
 - Adding or changing items in `packages/ui/registry.json`: `docs/best-practices/registry.md`
+- Writing or changing a component page in `apps/docs`: `docs/best-practices/docs-pages.md`
 
 When a review or discussion settles a new convention, add it to the matching file, with its reason, instead of a comment in the component.
 

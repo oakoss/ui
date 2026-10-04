@@ -4,7 +4,7 @@ import { useState } from 'react';
 export function ButtonDemo() {
   const [count, setCount] = useState(0);
   return (
-    <div className="not-prose flex flex-wrap items-center gap-3 rounded-lg border p-6">
+    <div className="not-prose flex flex-wrap items-center gap-3">
       <Button data-testid="demo-button" onPress={() => setCount((c) => c + 1)}>
         Pressed {count} times
       </Button>

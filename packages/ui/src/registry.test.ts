@@ -73,6 +73,71 @@ test('the theme installs the React Aria Tailwind plugin', () => {
   });
 });
 
+// Only init writes `config` (apply takes no GitHub registry address), and
+// without `extends: none` init also installs shadcn's own style.
+test('the base item sets the icon library and installs the theme', () => {
+  const base = ui.items.find(({ name }) => name === 'base');
+  expect(base).toMatchObject({
+    config: { iconLibrary: 'lucide' },
+    extends: 'none',
+    registryDependencies: ['oakoss/ui/theme'],
+    type: 'registry:base',
+  });
+});
+
+// The theme item's cssVars can't carry color-scheme, so the base item does.
+test('the base item sets the color-scheme theme.css sets', () => {
+  const theme = readFileSync(
+    new URL('styles/theme.css', import.meta.url),
+    'utf-8',
+  );
+  const scheme = (selector: string) =>
+    new RegExp(`^${selector} \\{\\s*color-scheme: (\\w+);`, 'mu').exec(
+      theme,
+    )?.[1];
+  expect(ui.items.find(({ name }) => name === 'base')).toMatchObject({
+    css: {
+      ':root': { 'color-scheme': scheme(':root') },
+      '.dark': { 'color-scheme': scheme(String.raw`\.dark`) },
+    },
+  });
+});
+
+function baseLayer(): unknown {
+  const base = ui.items.find(({ name }) => name === 'base');
+  const css = base && 'css' in base ? base.css : undefined;
+  return css && '@layer base' in css ? css['@layer base'] : undefined;
+}
+
+function minified(css: string): string {
+  return css
+    .replaceAll(/\/\*[\s\S]*?\*\//gu, '')
+    .replaceAll(/\s*([{}:;,])\s*/gu, '$1')
+    .replaceAll(/\s+/gu, ' ')
+    .trim();
+}
+
+// A registry `css` object as the stylesheet text shadcn writes for it.
+function stylesheet(rules: unknown): string {
+  if (typeof rules !== 'object' || rules === null) return '';
+  return Object.entries(rules)
+    .map(([key, value]) =>
+      typeof value === 'string'
+        ? `${key}:${value};`
+        : `${key}{${stylesheet(value)}}`,
+    )
+    .join('');
+}
+
+test('the base item ships base.css', () => {
+  const layer = baseLayer();
+  const source = readFileSync(
+    new URL('styles/base.css', import.meta.url),
+    'utf-8',
+  );
+  expect(minified(stylesheet({ '@layer base': layer }))).toBe(minified(source));
+});
+
 function isThemeless(item: (typeof ui.items)[number]): boolean {
   return (
     item.type === 'registry:ui' &&
