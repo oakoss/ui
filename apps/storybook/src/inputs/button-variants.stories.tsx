@@ -4,7 +4,7 @@ import {
   Button,
   type ButtonStyleProps,
 } from '@oakoss/ui/components/ui/inputs/button';
-import { expect, userEvent } from 'storybook/test';
+import { expect, userEvent, waitFor } from 'storybook/test';
 
 const variants = [
   'solid',
@@ -48,6 +48,16 @@ const meta = {
 export default meta;
 
 type Story = StoryObj<typeof meta>;
+
+// Wait for React Aria's state attribute before reading styles, so a missed or
+// lost hover or press fails here rather than as a wrong color.
+async function inState(element: HTMLElement, name: string, isSet: boolean) {
+  await waitFor(async () => {
+    await (isSet
+      ? expect(element).toHaveAttribute(name)
+      : expect(element).not.toHaveAttribute(name));
+  });
+}
 
 // A CSS color expression as the browser computes it.
 function resolved(value: string): string {
@@ -106,10 +116,13 @@ export const HoverAndPress: Story = {
     const unchanged: string[] = [];
     for (const button of canvas.getAllByRole('button')) {
       await userEvent.unhover(button);
+      await inState(button, 'data-hovered', false);
       const rest = settled(button);
       await userEvent.hover(button);
+      await inState(button, 'data-hovered', true);
       const hover = settled(button);
       await userEvent.pointer({ keys: '[MouseLeft>]', target: button });
+      await inState(button, 'data-pressed', true);
       const press = settled(button);
       await userEvent.pointer({ keys: '[/MouseLeft]', target: button });
       await userEvent.unhover(button);
