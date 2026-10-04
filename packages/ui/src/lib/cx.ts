@@ -4,8 +4,6 @@ import { composeRenderProps } from 'react-aria-components';
 
 import { cnTheme } from '#/lib/cn-config';
 
-// Narrower than cn's ClassValue, whose dictionary branch accepts an uncalled
-// tv slot (a function) and drops its classes.
 export type ClassInput =
   | ClassNameValue
   | readonly ClassInput[]
@@ -13,7 +11,6 @@ export type ClassInput =
 
 type Render<T> = ((values: T) => string) | string | undefined;
 
-// tailwind-variants/lite doesn't merge, so every tv result goes through cn or cx.
 export const cn: (...inputs: ClassInput[]) => string = createCn({
   extend: { theme: cnTheme },
 });

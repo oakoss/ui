@@ -1,12 +1,5 @@
 import { IconPlaceholder, type IconProps } from '#/components/icon-placeholder';
 
-// Each icon names its counterpart in all five libraries shadcn can install;
-// `shadcn add` rewrites the element for the project's `iconLibrary`. Export
-// names must differ from the library names written below, or the installed
-// file imports that name and the icon renders itself; icons.test.ts checks
-// every library. Components import this module as a namespace
-// (`import * as Icon`), so icon and component names never clash.
-
 export function Check(props: IconProps) {
   return (
     <IconPlaceholder

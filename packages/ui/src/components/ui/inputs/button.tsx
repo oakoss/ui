@@ -49,8 +49,6 @@ const styles = tv({
       md: 'h-control px-control-x has-data-[icon=inline-end]:pe-2 has-data-[icon=inline-start]:ps-2',
       sm: 'h-control-sm gap-1.5 px-control-x has-data-[icon=inline-end]:pe-1.5 has-data-[icon=inline-start]:ps-1.5',
     },
-    // Turn off where buttons sit closer than the hit area reaches (button
-    // groups, toolbars), or neighbors take each other's clicks.
     targetSize: { false: '', true: targetSize },
     variant: {
       ghost: [stateLayer, 'text-(--btn-text)'],
@@ -66,10 +64,7 @@ const styles = tv({
   },
 });
 
-export type ButtonProps = {
-  // Read after the label while pending, e.g. "Save Pending".
-  pendingLabel?: string;
-} & AriaButtonProps &
+export type ButtonProps = { pendingLabel?: string } & AriaButtonProps &
   Omit<ButtonStyleProps, 'size'> &
   SizeProps;
 
@@ -77,7 +72,6 @@ export type ButtonStyleProps = VariantProps<typeof styles>;
 
 type IconSize = 'icon-lg' | 'icon-sm' | 'icon';
 
-// Icon-only sizes have no text, so they need an accessible name.
 type SizeProps =
   | { 'aria-label': string; size?: ButtonStyleProps['size'] }
   | { 'aria-labelledby': string; size?: ButtonStyleProps['size'] }
@@ -108,7 +102,6 @@ export function Button({
     >
       {composeRenderProps(children, (resolved, { isPending }) => (
         <>
-          {/* Faded, not hidden: it keeps the width and stays in the name. */}
           <span
             className={cn(
               'inline-flex items-center justify-center gap-[inherit]',
@@ -133,8 +126,6 @@ export function Button({
   );
 }
 
-// Styles another element (a router link) as a button; `className` wins over
-// conflicting base classes.
 export function buttonStyles({
   className,
   ...props

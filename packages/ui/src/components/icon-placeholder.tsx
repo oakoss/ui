@@ -15,8 +15,6 @@ export type IconLibrary =
 
 export type IconNames = Readonly<Record<IconLibrary, string>>;
 
-// Spread onto whichever library's icon the install swaps in: Remix Icon
-// rejects children, and HugeIcons wants a numeric strokeWidth.
 export type IconProps = { strokeWidth?: number } & Omit<
   SVGProps<SVGSVGElement>,
   'children' | 'strokeWidth'
@@ -24,7 +22,6 @@ export type IconProps = { strokeWidth?: number } & Omit<
 
 export type IconResolver = (names: IconNames, props: IconProps) => ReactNode;
 
-// Lets Storybook and the docs render real icons; installs never reach it.
 export const IconResolverContext = createContext<IconResolver | undefined>(
   undefined,
 );
