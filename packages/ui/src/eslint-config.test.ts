@@ -1,6 +1,6 @@
 import { ESLint } from 'eslint';
 import path from 'node:path';
-import { expect, test } from 'vitest';
+import { beforeAll, expect, test } from 'vitest';
 
 const root = path.join(import.meta.dirname, '..');
 // The real config, minus type information: fixtures aren't in the tsconfig,
@@ -32,6 +32,12 @@ async function textHits(source: string, file: string): Promise<string[]> {
 const component = 'src/components/ui/inputs/fixture.tsx';
 const wrap = (jsx: string) =>
   `export function Fixture() {\n  return ${jsx};\n}\n`;
+
+// Loading the config and its plugins takes seconds on a cold CI runner; pay
+// for it once here rather than in whichever case runs first.
+beforeAll(async () => {
+  await eslint.lintText('', { filePath: path.join(root, component) });
+}, 60_000);
 
 test.each([
   ['JSX text', '<span>Loading</span>'],
