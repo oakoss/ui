@@ -128,35 +128,47 @@ export const Dark: Story = {
     const root = document.documentElement;
     const wasDark = root.classList.contains('dark');
 
+    // Finish the color transition each switch starts, or a read sees its start.
+    const background = () => {
+      for (const animation of button.getAnimations()) animation.finish();
+      return getComputedStyle(button).backgroundColor;
+    };
     root.classList.remove('dark');
-    const light = getComputedStyle(button).backgroundColor;
+    const light = background();
     root.classList.add('dark');
-    const dark = getComputedStyle(button).backgroundColor;
+    const dark = background();
     root.classList.toggle('dark', wasDark);
+    background();
 
     await expect(dark).not.toBe(light);
   },
 };
 
 // A consumer's string className overrides the base via cn — the reason cx
-// exists rather than string concatenation.
+// exists rather than string concatenation. A fill override must cover hover
+// too, or the hover fill shows under the override's text; the story ends
+// hovered so axe checks that state.
 export const ClassNameOverride: Story = {
-  args: { className: 'bg-emerald-700 text-white' },
+  args: { className: 'bg-emerald-700 text-white hover:bg-emerald-800' },
   play: async ({ canvas }) => {
     const button = canvas.getByRole('button', { name: /button/iu });
-    await expect(button).toHaveClass('bg-emerald-700');
+    await expect(button).toHaveClass('bg-emerald-700', 'hover:bg-emerald-800');
     await expect(button).not.toHaveClass('bg-(--btn-bg)');
+    await expect(button).not.toHaveClass('hover:bg-(--btn-hover)');
+    await userEvent.hover(button);
   },
 };
 
 // A render-function className (React Aria's state-driven form) resolves through
 // cx's composeRenderProps path.
 export const RenderPropClassName: Story = {
-  args: { className: () => 'bg-fuchsia-700 text-white' },
+  args: { className: () => 'bg-fuchsia-700 text-white hover:bg-fuchsia-800' },
   play: async ({ canvas }) => {
     const button = canvas.getByRole('button', { name: /button/iu });
-    await expect(button).toHaveClass('bg-fuchsia-700');
+    await expect(button).toHaveClass('bg-fuchsia-700', 'hover:bg-fuchsia-800');
     await expect(button).not.toHaveClass('bg-(--btn-bg)');
+    await expect(button).not.toHaveClass('hover:bg-(--btn-hover)');
+    await userEvent.hover(button);
   },
 };
 

@@ -105,6 +105,7 @@ export const HoverAndPress: Story = {
   play: async ({ canvas }) => {
     const unchanged: string[] = [];
     for (const button of canvas.getAllByRole('button')) {
+      await userEvent.unhover(button);
       const rest = settled(button);
       await userEvent.hover(button);
       const hover = settled(button);
@@ -130,11 +131,14 @@ export const HoverAndPress: Story = {
 };
 
 // Touch presses without hovering. One press per button: the runner's release
-// doesn't reach React Aria, so a second reading would see a stale press.
+// doesn't reach React Aria, so a second reading would see a stale press. Both
+// stories unhover first: the browser's real pointer can rest on the first
+// button, which then reads hovered at rest.
 export const TouchPress: Story = {
   play: async ({ canvas }) => {
     const unchanged: string[] = [];
     for (const button of canvas.getAllByRole('button')) {
+      await userEvent.unhover(button);
       const rest = settled(button);
       await userEvent.pointer({ keys: '[TouchA>]', target: button });
       const press = settled(button);
@@ -160,6 +164,7 @@ export const CustomColors: Story = {
       button.style.setProperty('--btn-bg', 'var(--color-success)');
       button.style.setProperty('--btn-hover', 'var(--color-success-hover)');
       button.style.setProperty('--btn-fg', 'var(--color-success-foreground)');
+      await userEvent.unhover(button);
       await userEvent.hover(button);
       const { background } = settled(button);
       await userEvent.unhover(button);
