@@ -13,6 +13,10 @@ Before editing files for a substantial task:
 
 <!-- intent-skills:end -->
 
+# Component conventions
+
+Read `docs/best-practices.md` before writing or changing a component. When a review or discussion settles a new convention, add it there, with its reason, instead of a comment in the component.
+
 # Comment policy
 
 Comments are useful when they add value. Keep them clean and minimal.

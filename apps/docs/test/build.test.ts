@@ -116,6 +116,7 @@ describe('prerendered site files', () => {
   it.each([
     ['docs/components/button/index.html', 'intent'],
     ['docs/components/text-field/index.html', 'errorMessage'],
+    ['docs/components/field/index.html', 'errors'],
   ])('lists only own props on %s', (file, ownProp) => {
     const section = propsSection(file);
     expect(section).toContain(ownProp);

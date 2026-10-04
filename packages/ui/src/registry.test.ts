@@ -27,6 +27,19 @@ function importsOf(path: string): string[] {
     .importedFiles.map(({ fileName }) => fileName);
 }
 
+// An item's own files plus every file its registry dependencies install.
+function installedPaths(name: string, seen = new Set<string>()): string[] {
+  if (seen.has(name)) return [];
+  seen.add(name);
+  const item = ui.items.find((candidate) => candidate.name === name);
+  return [
+    ...(item?.files ?? []).map((file) => file.path),
+    ...(item?.registryDependencies ?? []).flatMap((dep) =>
+      installedPaths(dep.replace('oakoss/ui/', ''), seen),
+    ),
+  ];
+}
+
 function packageName(specifier: string): string {
   const [first = '', second = ''] = specifier.split('/', 2);
   return first.startsWith('@') ? `${first}/${second}` : first;
@@ -35,12 +48,13 @@ function packageName(specifier: string): string {
 const shipped = ui.items.flatMap(({ dependencies, files, name }) => {
   if (files === undefined) return [];
   const paths = files.map((file) => file.path);
+  const installed = installedPaths(name);
   const imports = paths.flatMap((path) => importsOf(path));
   const listed = new Set(dependencies);
   const unlistedFiles = imports
     .filter((specifier) => specifier.startsWith('#/'))
     .map((specifier) => `src/${specifier.slice(2)}`)
-    .filter((path) => paths.every((file) => !file.startsWith(`${path}.`)));
+    .filter((path) => installed.every((file) => !file.startsWith(`${path}.`)));
   const unlistedPackages = imports
     .filter((specifier) => !specifier.startsWith('#/'))
     .map((specifier) => packageName(specifier))

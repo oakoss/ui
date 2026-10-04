@@ -1,6 +1,6 @@
 ---
 title: Text Field
-description: A labeled text input with a description and validation message.
+description: A text input with a label, description and validation message.
 ---
 
 import { TextFieldDemo } from '#/components/demos/text-field-demo';
@@ -13,13 +13,66 @@ import { TextFieldDemo } from '#/components/demos/text-field-demo';
 pnpm dlx shadcn@latest add oakoss/ui/text-field
 ```
 
+This also installs [Field](/docs/components/field), whose parts TextField
+renders.
+
 ## Usage
 
 ```tsx
 import { TextField } from '#/components/ui/inputs/text-field';
 
-<TextField label="Email" description="We never share your address." />;
+<TextField
+  description="We never share your address."
+  label="Email"
+  type="email"
+/>;
 ```
+
+`size` (`sm`, `md`, `lg`) matches Button's heights, so an input and a button of
+the same size line up.
+
+### Validation
+
+Set `isInvalid` and pass the message as `errorMessage`, or pass `errors` from a
+form library: strings, or objects with a `message`, as TanStack Form and React
+Hook Form produce. Several errors render one per line. Derive `isInvalid` from
+the same state, so the field clears when the errors do:
+
+```tsx
+<TextField
+  errors={field.state.meta.errors}
+  isInvalid={!field.state.meta.isValid}
+  label="Email"
+/>
+```
+
+The error shows only while the field is invalid, so `errors` without
+`isInvalid` renders nothing, and `errorMessage` wins over `errors`. Without
+either, React Aria's own validation (`isRequired`, `validate`, `type="email"`)
+supplies the message.
+
+### Custom layout
+
+Children replace the default layout. Compose the
+[Field](/docs/components/field) parts, which wire up the label, description and
+error the same way:
+
+```tsx
+import { FieldError, FieldLabel, Input } from '#/components/ui/inputs/field';
+
+<TextField isRequired type="password">
+  <div className="flex items-center justify-between">
+    <FieldLabel>Password</FieldLabel>
+    <Link href="/reset">Forgot?</Link>
+  </div>
+  <Input />
+  <FieldError />
+</TextField>;
+```
+
+Children and the layout props (`label`, `description`, `errorMessage`,
+`errors`, `placeholder`, `size`) can't be mixed; set those on the parts
+instead.
 
 ## Props
 

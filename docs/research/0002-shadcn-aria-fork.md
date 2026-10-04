@@ -154,6 +154,17 @@ Settled in `ui-lwb.4` (2026-10-03), after comparing 15 libraries' button APIs fr
 - **`hover:` and `pressed:` come from `tailwindcss-react-aria-components`,** which matches React Aria's `data-hovered` and `data-pressed` (absent while pending or disabled) and falls back to `:hover` on plain elements, so `buttonStyles` on an `<a>` still hovers.
 - **Checks:** Storybook renders every look × intent in light, dark, RTL and two other palettes for axe, hovers and presses each one, and a forced-colors project checks every look keeps a border in Windows High Contrast.
 
+### Fields
+
+Settled in `ui-lwb.4` (2026-10-03), after surveying 16 libraries' text fields from their docs and source. shadcn's React Aria `field.tsx` is plain DOM: `Field` is a `div`, `FieldDescription` a `<p>` and `FieldError` a `role="alert"` div, wired to the input by hand with `htmlFor`/`id` and `aria-invalid`, so the description never reaches `aria-describedby` and React Aria's validation is bypassed.
+
+- **A `field` item** keeps upstream's names and `data-slot`s (`FieldLabel`, `FieldDescription`, `FieldError`, `FieldSet`, `FieldLegend`, `FieldGroup`, `Input`) but backs the first three with React Aria's `Label`, `Text slot="description"` and `FieldError`. They find their field through context, so they wire up inside any React Aria field (`SearchField` is tested). `Field`, `FieldContent`, `FieldTitle` and `FieldSeparator` wait for the checkbox and radio ports that use them.
+- **`TextField` takes props or children.** `label`, `description`, `errorMessage`, `errors`, `placeholder` and `size` render the common layout; children replace it for custom layouts. The props type is a union, so mixing the two is a type error. This is the shape React Aria's starter, Jolly, Untitled and Spectrum call `TextField`, and the other fields will copy it.
+- **`errors`** accepts what form libraries produce (TanStack Form types it as whatever the validators return): strings and objects with a `message` render, deduplicated, one per line (`FieldError` renders a span, and `aria-describedby` reads the text flat). Children win over `errors` unless empty. `FieldError` keeps React Aria's rule of rendering only while the field is invalid.
+- **`Input` takes `size`** (`sm`, `md`, `lg`) on Button's control-height tokens, replacing HTML's character-width `size`. No variant or color props, and invalid is the only state, as in nearly every library surveyed.
+- **Borders** use `input` at rest and `destructive-text` when invalid, both 3:1 (note 0004, Control borders). The required asterisk is `aria-hidden`, since React Aria already exposes the field as required.
+- **Conventions** these decisions produced (state from render props, empty values mount nothing, message separators) live in [best practices](../best-practices.md).
+
 ## Changes to 0001
 
 - **Primitive token tier:** needed from the start, no longer deferred until a second theme.

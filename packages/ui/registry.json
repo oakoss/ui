@@ -326,22 +326,47 @@
       ]
     },
     {
-      "name": "text-field",
+      "name": "field",
       "type": "registry:ui",
-      "title": "Text Field",
-      "description": "Labeled text input with description and validation, built on React Aria Components.",
+      "title": "Field",
+      "description": "Label, description, error and input parts that wire into any React Aria field, plus fieldset and group layout.",
       "registryDependencies": ["oakoss/ui/theme"],
       "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
       "files": [
         {
-          "path": "src/components/ui/inputs/text-field.tsx",
+          "path": "src/components/ui/inputs/field.tsx",
           "type": "registry:ui",
-          "target": "@ui/inputs/text-field.tsx"
+          "target": "@ui/inputs/field.tsx"
         },
         {
           "path": "src/lib/recipes.ts",
           "type": "registry:lib",
           "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "text-field",
+      "type": "registry:ui",
+      "title": "Text Field",
+      "description": "Text input with a label, description and error, built on React Aria Components; pass children to compose the field parts.",
+      "registryDependencies": ["oakoss/ui/theme", "oakoss/ui/field"],
+      "dependencies": ["cn", "react-aria-components"],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/text-field.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/text-field.tsx"
         },
         {
           "path": "src/lib/cx.ts",
