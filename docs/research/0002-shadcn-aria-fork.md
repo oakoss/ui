@@ -142,6 +142,12 @@ Settled in `ui-lwb.2` (2026-10-03):
 - **`IconProps` omits `children` and narrows `strokeWidth` to a number**, because Remix Icon rejects children and HugeIcons wants a numeric stroke width. A typecheck-enforced assignment covers every library.
 - **VS Code autocomplete** excludes the icon libraries and `icons.tsx` (`.vscode/settings.json`), so typing `Calendar` offers the component.
 
+Settled in `ui-lwb.3` (2026-10-03), measured with shadcn 4.21.0 against local registry files:
+
+- **`init` or `apply`, never `add`.** `shadcn add oakoss/ui/base` writes the item's CSS but leaves `components.json` byte-identical, so `iconLibrary` stays unset. `shadcn init` writes it into a new `components.json`. Over an existing one, `init` asks to overwrite and then replaces aliases and `style`; `apply` merges, keeping aliases and `style` while setting `iconLibrary`. `apply` also reset `baseColor` to neutral, which the item can't prevent. After `init`, `add button` installed `icons.tsx` with Lucide imports and no `IconPlaceholder` left.
+- **`config` sets only `iconLibrary`,** since `apply` would overwrite any alias or `style` set there. **`extends: "none"`** stops `init` from also installing shadcn's own style and its packages.
+- **The base item carries the CSS the theme's `cssVars` can't:** `color-scheme` lands in the `:root` and `.dark` blocks, and the reduced-motion `@layer base` block arrives intact; re-adding changes nothing, and Tailwind 4.3.3 compiles the result. The theme comes in through `registryDependencies`.
+
 ### Button
 
 Settled in `ui-lwb.4` (2026-10-03), after comparing 15 libraries' button APIs from their source. Every React Aria-based one (HeroUI, Intent UI, Untitled UI, Jolly UI, shadcn's base) uses one flat `variant` prop; Radix Themes, Chakra, Park UI, Mantine, MUI, Ant Design and Catalyst split look from color.
@@ -192,7 +198,7 @@ Settled in `ui-lwb.4` (2026-10-03), after surveying 16 libraries' text fields fr
 
 ## Still unverified
 
-- An end-to-end `shadcn add` from our GitHub registry, with and without `iconLibrary` set.
+- An end-to-end install from our GitHub registry: `shadcn init` and `shadcn apply` with `oakoss/ui/base`, then `shadcn add`, with and without `iconLibrary` set. The base-item behavior above was measured with local registry files only.
 - Whether Fumadocs' dark-mode toggle switches our components' colors (both use a `.dark` class).
 - Whether React Aria popovers keep a per-preview theme when they render outside the preview wrapper.
 

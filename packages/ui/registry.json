@@ -2,6 +2,31 @@
   "$schema": "https://ui.shadcn.com/schema/registry.json",
   "items": [
     {
+      "name": "base",
+      "type": "registry:base",
+      "title": "Base",
+      "description": "Sets Lucide as the icon library and installs the default theme, color-scheme and reduced-motion base styles. Run shadcn init with it in a new project, or shadcn apply in an existing one.",
+      "extends": "none",
+      "config": { "iconLibrary": "lucide" },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "css": {
+        ":root": { "color-scheme": "light" },
+        ".dark": { "color-scheme": "dark" },
+        "@layer base": {
+          "@media (prefers-reduced-motion: reduce)": {
+            "*, ::before, ::after": {
+              "animation-delay": "0s !important",
+              "animation-duration": "0.01ms !important",
+              "animation-iteration-count": "1 !important",
+              "scroll-behavior": "auto !important",
+              "transition-delay": "0s !important",
+              "transition-duration": "0.01ms !important"
+            }
+          }
+        }
+      }
+    },
+    {
       "name": "theme",
       "type": "registry:theme",
       "title": "Theme",
