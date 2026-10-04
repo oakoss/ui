@@ -53,7 +53,8 @@ How to write components here. Each entry is a rule and its reason; the decision 
 
 ## Strings
 
-- **No hardcoded user-facing English.** Text React Aria doesn't translate is a prop with an English default (`pendingLabel = 'Pending'`), so no fallback message is invented inside a component.
+- **No hardcoded user-facing English.** Text React Aria doesn't translate is a prop with an English default (`pendingLabel = 'Pending'`), so no fallback message is invented inside a component. A lint rule flags JSX text and literal text in children and in text attributes (`aria-label`, `placeholder`, `title`, `alt` and the like) in component files, including one ternary or fallback deep (`label ?? 'Close'`) and literal spread props. It checks only literals in those positions, so strings built by concatenation, returned from a render prop, nested deeper, or passed through a variable or array need review.
+- **Every string a component renders can be overridden per use** through that prop, whether an app translates it or just prefers other wording. The default lives in the copied file, so changing it there changes it app-wide. A strings provider for app-wide translation can come later and slot in between: prop, then provider, then default. Strings React Aria renders itself follow its own translations; where a component wraps one that can't be overridden, its docs page says so.
 
 ## Tests
 
