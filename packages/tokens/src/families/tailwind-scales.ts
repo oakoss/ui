@@ -6,7 +6,7 @@ import { authored, type AuthoredScale } from '#/scale';
 const accent = (steps: AuthoredScale['steps']) =>
   authored({ dark: 800, light: 700 }, steps);
 
-// Tailwind CSS 4.3.3's scales (`theme.css`), copied unchanged.
+// Tailwind's color scales (`theme.css`), copied unchanged.
 export const tailwindScales = {
   ...tailwindGrays,
   amber: accent({

@@ -4,7 +4,7 @@ const sans =
   "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'";
 
 /**
-Tailwind CSS 4.3.3's font stacks and its type scale up to `4xl` (`theme.css`).
+Tailwind's font stacks and its type scale up to `4xl` (`theme.css`).
 */
 export const defaultTypography = defineTypography({
   fonts: {

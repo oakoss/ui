@@ -14,7 +14,7 @@ export function isValidColor(color: Color): boolean {
   const [lightness, chroma, hue] = color.components;
   const isAlphaOk = color.alpha === undefined || isUnitInterval(color.alpha);
   const isHueOk = hue === null || (hue >= 0 && hue < 360);
-  // Tailwind 4.3.3's highest is 0.295; far larger values overflow conversion.
+  // Palette chroma stays far below 1; far larger values overflow conversion.
   const isChromaOk = chroma >= 0 && chroma <= 1;
   return isUnitInterval(lightness) && isChromaOk && isHueOk && isAlphaOk;
 }
