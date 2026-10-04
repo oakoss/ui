@@ -15,7 +15,13 @@ Before editing files for a substantial task:
 
 # Component conventions
 
-Read `docs/best-practices.md` before writing or changing a component. When a review or discussion settles a new convention, add it there, with its reason, instead of a comment in the component.
+Read every file whose trigger matches before acting:
+
+- Writing or changing a component in `packages/ui`: `docs/best-practices/components.md`. A new component also adds stories and a registry item, so read the other two as well.
+- Writing stories or tests: `docs/best-practices/testing.md`
+- Adding or changing items in `packages/ui/registry.json`: `docs/best-practices/registry.md`
+
+When a review or discussion settles a new convention, add it to the matching file, with its reason, instead of a comment in the component.
 
 # Comment policy
 

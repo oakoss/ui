@@ -1,6 +1,6 @@
-# Best practices
+# Components
 
-How to write components here. Each entry is a rule and its reason; the decision records in `docs/research/` hold the history. Add an entry when a review or discussion settles a convention, and keep rationale here rather than in component comments, since components ship into users' projects.
+How to write a component in `packages/ui`. Each entry is a rule and its reason; the decision records in `docs/research/` hold the history. Keep rationale here rather than in component comments, since components ship into users' projects. Stories and type tests follow [testing](testing.md), and registry items follow [registry](registry.md).
 
 ## React Aria
 
@@ -37,11 +37,6 @@ How to write components here. Each entry is a rule and its reason; the decision 
 - **Hover and press on non-solid looks are a state layer.** The `stateLayer` recipe tints the surface with its own text color at the tokens' strengths (8% hover, 12% press), which the tokens keep text AA under. It's a gradient so it paints over the fill. Solid fills swap to their `-hover` color instead.
 - **Arbitrary-value exceptions name each value.** A per-file oxlint allow list may wildcard the variable name but lists each color (`[--btn-*:var(--color-primary)]`); a `*` in the value would also admit a hardcoded fallback like `var(--color-primary,#f00)`.
 
-## Registry
-
-- **Every `registry:ui` item depends on `oakoss/ui/theme`,** which installs the tokens and the React Aria Tailwind plugin the variants need.
-- **An item ships what it imports:** every local file in its `files` or through `registryDependencies`, and every package in `dependencies`. `registry.test.ts` checks both.
-
 ## Accessibility
 
 - **Borders that identify a control need 3:1.** Use `border-input` at rest and `destructive-text` when invalid; the `-border` intent roles are decorative.
@@ -49,17 +44,9 @@ How to write components here. Each entry is a rule and its reason; the decision 
 - **Visual-only marks are `aria-hidden`.** A required asterisk would otherwise be read on top of React Aria's own required state.
 - **Several messages in one described-by target need a separator in the text.** `aria-describedby` reads text flat, so layout alone doesn't separate them.
 - **Pointer targets reach 44×44** (WCAG 2.5.5, above AA's 24×24) with the `targetSize` recipe, which grows the hit area without changing the visible size. Turn it off only where controls sit closer than that (toolbars, button groups), or neighbors take each other's clicks.
-- **Controls stay visible in forced colors.** Every control keeps a border or outline in Windows High Contrast; stories tagged `forced-colors` run under that emulation.
+- **Controls stay visible in forced colors.** Every control keeps a border or outline in Windows High Contrast.
 
 ## Strings
 
 - **No hardcoded user-facing English.** Text React Aria doesn't translate is a prop with an English default (`pendingLabel = 'Pending'`), so no fallback message is invented inside a component. A lint rule flags JSX text and literal text in children and in text attributes (`aria-label`, `placeholder`, `title`, `alt` and the like) in component files, including one ternary or fallback deep (`label ?? 'Close'`) and literal spread props. It checks only literals in those positions, so strings built by concatenation, returned from a render prop, nested deeper, or passed through a variable or array need review.
 - **Every string a component renders can be overridden per use** through that prop, whether an app translates it or just prefers other wording. The default lives in the copied file, so changing it there changes it app-wide. A strings provider for app-wide translation can come later and slot in between: prop, then provider, then default. Strings React Aria renders itself follow its own translations; where a component wraps one that can't be overridden, its docs page says so.
-
-## Tests
-
-- **Stories are the component tests.** Assert behavior (accessible name and description, computed styles) rather than class names, and check a guard by breaking the code under it: a test that passes either way isn't guarding anything.
-- **Type rules get type tests.** `@ts-expect-error` cases in a `*.test.ts` fail the typecheck when a rule stops holding.
-- **Stories run axe in the light and dark projects** (stories tagged `forced-colors` run only in their own project), and RTL stories set `globals: { locale: 'ar-EG' }`.
-- **`CssCheck` stories assert values from utilities used only in `packages/ui`,** so they fail if Tailwind stops scanning the package. Keep those class names out of story files.
-- **One press per element.** Storybook's `userEvent` releases a held press without React Aria seeing it, so a second reading on the same element sees a stale `data-pressed`.

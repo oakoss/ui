@@ -163,7 +163,7 @@ Settled in `ui-lwb.4` (2026-10-03), after surveying 16 libraries' text fields fr
 - **`errors`** accepts what form libraries produce (TanStack Form types it as whatever the validators return): strings and objects with a `message` render, deduplicated, one per line (`FieldError` renders a span, and `aria-describedby` reads the text flat). Children win over `errors` unless empty. `FieldError` keeps React Aria's rule of rendering only while the field is invalid.
 - **`Input` takes `size`** (`sm`, `md`, `lg`) on Button's control-height tokens, replacing HTML's character-width `size`. No variant or color props, and invalid is the only state, as in nearly every library surveyed.
 - **Borders** use `input` at rest and `destructive-text` when invalid, both 3:1 (note 0004, Control borders). The required asterisk is `aria-hidden`, since React Aria already exposes the field as required.
-- **Conventions** these decisions produced (state from render props, empty values mount nothing, message separators) live in [best practices](../best-practices.md).
+- **Conventions** these decisions produced (state from render props, empty values mount nothing, message separators) live in [best practices](../best-practices/components.md).
 
 ## Changes to 0001
 
