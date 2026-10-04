@@ -112,6 +112,10 @@ export const contrastMinimum = {
   text: 4.5,
 } as const satisfies Record<ContrastKind, number>;
 
+// Hover and press tint a control with its own text color at these opacities.
+// The generator keeps intent text AA under the press layer.
+export const stateLayer = { hover: 0.08, press: 0.12 } as const;
+
 const neutralTextRoles: readonly (readonly [
   foreground: NeutralRole,
   background: NeutralRole,
@@ -171,9 +175,40 @@ const ringPairs: readonly ContrastPair[] = [
   { background: 'sidebar', foreground: 'sidebar-ring', kind: 'non-text' },
 ];
 
+// A control's border identifies it (WCAG 1.4.11). Invalid borders use
+// `destructive-text`: the `destructive` fill drops under 3:1 on dark cards.
+const controlPairs: readonly ContrastPair[] = (
+  ['background', 'card', 'popover'] as const
+).flatMap((background): ContrastPair[] => [
+  { background, foreground: 'input', kind: 'non-text' },
+  { background, foreground: 'destructive-text', kind: 'non-text' },
+]);
+
 export const contrastPairs: readonly ContrastPair[] = [
   ...neutralTextPairs,
   ...intentPairs,
   ...ringPairs,
+  ...controlPairs,
   { background: 'background', foreground: 'border', kind: 'decorative' },
 ];
+
+// Hover and press only help if people see the change.
+export const distinctMinimum = 2;
+
+export type DistinctPair = readonly [from: Role, to: Role];
+
+// A solid fill swaps to its hover color.
+export const distinctPairs: readonly DistinctPair[] = intents.map(
+  (intent): DistinctPair => [intent, intentRole(intent, 'hover')],
+);
+
+// Each surface a state layer tints, with the text color that tints it: soft
+// controls sit on `subtle`, outline and ghost on the page.
+export type LayeredSurface = readonly [surface: Role, text: Role];
+
+export const layeredSurfaces: readonly LayeredSurface[] = intents.flatMap(
+  (intent): LayeredSurface[] => [
+    ['background', intentRole(intent, 'text')],
+    [intentRole(intent, 'subtle'), intentRole(intent, 'text')],
+  ],
+);

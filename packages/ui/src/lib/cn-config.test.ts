@@ -5,7 +5,7 @@ import { cnTheme } from '#/lib/cn-config';
 
 const css = readFileSync(
   new URL('../styles/theme.css', import.meta.url),
-  'utf8',
+  'utf-8',
 );
 const plainTheme = /^@theme \{\n(?<body>[\s\S]*?)^\}/mu.exec(css)?.groups?.body;
 // `--text-ui--line-height` modifies `text-ui`; it isn't a utility of its own.

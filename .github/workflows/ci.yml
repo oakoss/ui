@@ -76,12 +76,47 @@ jobs:
 
       - run: pnpm test
 
+  # A squash merge's message is built from the PR's commits and, when there
+  # are several, its title; the commit-msg hook never sees it. Steps skip on
+  # push so the job still reports success to the gate.
+  commitlint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - if: github.event_name == 'pull_request'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - if: github.event_name == 'pull_request'
+        uses: pnpm/setup@fbda4c85fc2e1e08721cd8763afea8f48d60f024 # v3.0.0
+        with:
+          cache: true
+          require-lockfile: true
+
+      - name: Lint the PR's commits and title
+        if: github.event_name == 'pull_request'
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          GH_TOKEN: ${{ github.token }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          pnpm exec commitlint --from "$BASE" --to "$HEAD" --verbose
+          # Read the current title: a re-run reuses the event that started it.
+          title="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR" --jq .title)"
+          printf '%s\n' "$title" | pnpm exec commitlint --verbose
+
   ci-summary:
     name: CI Summary
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: always()
-    needs: [check]
+    needs: [check, commitlint]
     steps:
       # Gates every job in `needs`; a job left out of `needs` is not gated.
       - name: Gate on all required jobs

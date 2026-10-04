@@ -2,8 +2,61 @@ import '../src/styles.css';
 
 import type { Decorator, Preview } from '@storybook/react-vite';
 
-import { type ReactNode, useEffect } from 'react';
+import { families, primaryHues } from '@oakoss/tokens';
+import {
+  type IconProps,
+  type IconResolver,
+  IconResolverContext,
+} from '@oakoss/ui/components/icon-placeholder';
+import * as lucide from 'lucide-react';
+import { type ComponentType, type ReactNode, useEffect } from 'react';
 import { I18nProvider, isRTL } from 'react-aria-components';
+
+// Installs swap icons at `shadcn add` time; Storybook resolves them live.
+const lucideIcons = new Map<string, unknown>(Object.entries(lucide));
+
+function isIcon(value: unknown): value is ComponentType<IconProps> {
+  return (
+    typeof value === 'function' ||
+    (typeof value === 'object' && value !== null && '$$typeof' in value)
+  );
+}
+
+const resolveLucide: IconResolver = ({ lucide: name }, props) => {
+  const Icon = lucideIcons.get(name);
+  return isIcon(Icon) ? <Icon aria-hidden {...props} /> : undefined;
+};
+
+const withIcons: Decorator = (Story) => (
+  <IconResolverContext value={resolveLucide}>
+    <Story />
+  </IconResolverContext>
+);
+
+function PalettedStory({
+  canvasElement,
+  children,
+  family,
+  primary,
+}: {
+  canvasElement: HTMLElement;
+  children: ReactNode;
+  family: string | undefined;
+  primary: string | undefined;
+}): ReactNode {
+  useEffect(() => {
+    const root = canvasElement.ownerDocument.documentElement;
+    for (const [name, value] of [
+      ['data-family', family],
+      ['data-primary', primary],
+    ] as const) {
+      root.removeAttribute(name);
+      if (value !== undefined) root.setAttribute(name, value);
+    }
+  }, [canvasElement, family, primary]);
+
+  return children;
+}
 
 function ThemedStory({
   canvasElement,
@@ -23,6 +76,17 @@ function ThemedStory({
 
   return children;
 }
+
+// Unset means the default theme from theme.css; themes.css holds the rest.
+const withPalette: Decorator = (Story, context) => (
+  <PalettedStory
+    canvasElement={context.canvasElement}
+    family={context.globals.family}
+    primary={context.globals.primary}
+  >
+    <Story />
+  </PalettedStory>
+);
 
 const withTheme: Decorator = (Story, context) => {
   // The test projects set VITE_STORY_THEME; a story's own theme global wins.
@@ -88,8 +152,19 @@ const withLocale: Decorator = (Story, context) => {
 };
 
 const preview: Preview = {
-  decorators: [withTheme, withLocale],
+  decorators: [withTheme, withPalette, withLocale, withIcons],
   globalTypes: {
+    family: {
+      description: 'Gray family',
+      toolbar: {
+        dynamicTitle: true,
+        icon: 'paintbrush',
+        items: [
+          { title: 'Default family', value: undefined },
+          ...Object.keys(families).map((value) => ({ title: value, value })),
+        ],
+      },
+    },
     locale: {
       description: 'Locale and text direction',
       toolbar: {
@@ -98,6 +173,19 @@ const preview: Preview = {
         items: [
           { title: 'English (LTR)', value: 'en-US' },
           { title: 'Arabic (RTL)', value: 'ar-EG' },
+        ],
+      },
+    },
+    primary: {
+      description: 'Primary color',
+      toolbar: {
+        dynamicTitle: true,
+        icon: 'circle',
+        items: [
+          { title: 'Default primary', value: undefined },
+          ...primaryHues(Object.values(families))
+            .toSorted((a, b) => a.localeCompare(b))
+            .map((value) => ({ title: value, value })),
         ],
       },
     },

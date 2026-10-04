@@ -10,6 +10,7 @@ import {
 import { vega } from '#/styles/vega';
 import { defaultTypography } from '#/typographies/default';
 
+export { primaryHues } from '#/bundle';
 export type { Color } from '#/color';
 export type {
   ColorPath,
@@ -30,9 +31,11 @@ export { type ResolvedFlavor, resolveFlavor } from '#/resolve';
 export type {
   ContrastKind,
   ContrastPair,
+  DistinctPair,
   Intent,
   IntentRole,
   IntentRoleKind,
+  LayeredSurface,
   NeutralRole,
   Role,
 } from '#/roles';
@@ -41,9 +44,13 @@ export {
   contrastMinimum,
   contrastPairs,
   derivedRoles,
+  distinctMinimum,
+  distinctPairs,
   intentRoleKinds,
   intents,
+  layeredSurfaces,
   neutralRoles,
+  stateLayer,
 } from '#/roles';
 
 export type { Scale, Step } from '#/scale';

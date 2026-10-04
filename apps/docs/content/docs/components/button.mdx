@@ -18,7 +18,66 @@ pnpm dlx shadcn@latest add oakoss/ui/button
 ```tsx
 import { Button } from '#/components/ui/inputs/button';
 
-<Button intent="outline">Click me</Button>;
+<Button intent="success" variant="soft">
+  Save
+</Button>;
+```
+
+`variant` sets the look (`solid`, `soft`, `outline`, `ghost`, `link`) and
+`intent` sets the color (`primary`, `neutral`, `destructive`, `success`,
+`warning`, `info`).
+
+### Custom colors
+
+Each intent sets `--btn-*` variables that every look reads, so recolor a
+button by setting them rather than overriding `bg-*`, which hover and press
+would replace:
+
+```tsx
+<Button className="[--btn-bg:var(--color-emerald-700)] [--btn-hover:var(--color-emerald-800)] [--btn-fg:white]">
+  Publish
+</Button>
+```
+
+The variables are `--btn-bg` and `--btn-hover` (solid fill), `--btn-fg`
+(text on the fill), `--btn-subtle` (soft fill), `--btn-border` (outline) and
+`--btn-text` (text, and the hover tint, for the other looks).
+
+### Icon-only
+
+Icon sizes (`icon-sm`, `icon`, `icon-lg`) require an `aria-label` or
+`aria-labelledby`, since there's no text to name the button.
+
+```tsx
+import * as Icon from '#/components/icons';
+
+<Button aria-label="Close" size="icon" variant="ghost">
+  <Icon.X />
+</Button>;
+```
+
+### Pending
+
+`isPending` keeps the button's width and focus, blocks presses, and shows a
+spinner that screen readers announce with the label. Set `pendingLabel` to
+translate it (see [Localization](/docs/guides/localization)).
+
+### Links
+
+A link that looks like a button is still a link. Style one with
+`buttonStyles`, for example a TanStack Router link wrapped with `createLink`:
+
+```tsx
+import { createLink } from '@tanstack/react-router';
+import { Link as AriaLink } from 'react-aria-components';
+
+import { buttonStyles } from '#/components/ui/inputs/button';
+
+const Link = createLink(AriaLink);
+
+<Link className={buttonStyles({ variant: 'outline' })} to="/docs">
+  Docs
+</Link>;
 ```
 
 ## Props

@@ -21,10 +21,23 @@ test('registryDependencies point at items in this repo', () => {
 
 // TypeScript's scanner also finds side-effect, type-only and multi-line imports.
 function importsOf(path: string): string[] {
-  const source = readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
+  const source = readFileSync(new URL(`../${path}`, import.meta.url), 'utf-8');
   return ts
     .preProcessFile(source, true, true)
     .importedFiles.map(({ fileName }) => fileName);
+}
+
+// An item's own files plus every file its registry dependencies install.
+function installedPaths(name: string, seen = new Set<string>()): string[] {
+  if (seen.has(name)) return [];
+  seen.add(name);
+  const item = ui.items.find((candidate) => candidate.name === name);
+  return [
+    ...(item?.files ?? []).map((file) => file.path),
+    ...(item?.registryDependencies ?? []).flatMap((dep) =>
+      installedPaths(dep.replace('oakoss/ui/', ''), seen),
+    ),
+  ];
 }
 
 function packageName(specifier: string): string {
@@ -35,17 +48,40 @@ function packageName(specifier: string): string {
 const shipped = ui.items.flatMap(({ dependencies, files, name }) => {
   if (files === undefined) return [];
   const paths = files.map((file) => file.path);
+  const installed = installedPaths(name);
   const imports = paths.flatMap((path) => importsOf(path));
   const listed = new Set(dependencies);
   const unlistedFiles = imports
     .filter((specifier) => specifier.startsWith('#/'))
     .map((specifier) => `src/${specifier.slice(2)}`)
-    .filter((path) => paths.every((file) => !file.startsWith(`${path}.`)));
+    .filter((path) => installed.every((file) => !file.startsWith(`${path}.`)));
   const unlistedPackages = imports
     .filter((specifier) => !specifier.startsWith('#/'))
     .map((specifier) => packageName(specifier))
     .filter((pkg) => !provided.has(pkg) && !listed.has(pkg));
   return [{ name, unlistedFiles, unlistedPackages }];
+});
+
+// Components use the plugin's pressed:/pending: variants, which Tailwind
+// drops without it; shadcn merges the theme's css and devDependencies into
+// every install that depends on it.
+test('the theme installs the React Aria Tailwind plugin', () => {
+  const theme = ui.items.find(({ name }) => name === 'theme');
+  expect(theme).toMatchObject({
+    css: { '@plugin tailwindcss-react-aria-components': {} },
+    devDependencies: ['tailwindcss-react-aria-components'],
+  });
+});
+
+function isThemeless(item: (typeof ui.items)[number]): boolean {
+  return (
+    item.type === 'registry:ui' &&
+    !(item.registryDependencies ?? []).includes('oakoss/ui/theme')
+  );
+}
+
+test('every component depends on the theme', () => {
+  expect(ui.items.filter(isThemeless).map(({ name }) => name)).toEqual([]);
 });
 
 describe.each(shipped)('$name', ({ unlistedFiles, unlistedPackages }) => {

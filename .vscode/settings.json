@@ -24,7 +24,15 @@
   "files.readonlyInclude": { "pnpm-lock.yaml": true },
   "files.watcherExclude": { "pnpm-lock.yaml": true },
   "js/ts.preferences.autoImportFileExcludePatterns": [],
-  "js/ts.preferences.autoImportSpecifierExcludeRegexes": ["^(node:)?os$"],
+  "js/ts.preferences.autoImportSpecifierExcludeRegexes": [
+    "^(node:)?os$",
+    "^lucide-react$",
+    "^@tabler/icons-react$",
+    "^@phosphor-icons/react$",
+    "^@remixicon/react$",
+    "^@hugeicons/",
+    "components/icons$"
+  ],
   "js/ts.preferences.importModuleSpecifier": "non-relative",
   "js/ts.tsdk.path": "node_modules/typescript/lib",
   "js/ts.tsdk.promptToUseWorkspaceVersion": true,

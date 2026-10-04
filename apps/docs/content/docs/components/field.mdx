@@ -1,0 +1,68 @@
+---
+title: Field
+description: Label, description, error and input parts for any React Aria field.
+---
+
+## Installation
+
+```bash
+pnpm dlx shadcn@latest add oakoss/ui/field
+```
+
+## Usage
+
+`FieldLabel`, `FieldDescription` and `FieldError` find their field through
+React Aria's context. Inside any React Aria field (`TextField`, `SearchField`,
+`NumberField`, `Select`, `ComboBox`, `DatePicker` and others) they link to the
+input for screen readers with no ids to wire.
+
+```tsx
+import { SearchField } from 'react-aria-components';
+
+import {
+  FieldDescription,
+  FieldLabel,
+  Input,
+} from '#/components/ui/inputs/field';
+
+<SearchField>
+  <FieldLabel>Search docs</FieldLabel>
+  <Input />
+  <FieldDescription>Press / to focus.</FieldDescription>
+</SearchField>;
+```
+
+`Input` takes `size` (`sm`, `md`, `lg`), the control height, which matches
+Button's. It replaces HTML's `size` attribute (width in characters).
+
+### Errors
+
+`FieldError` renders only while its field is invalid. Pass `errors` from a form
+library (strings, or objects with a `message`); duplicates, blank entries and
+anything else are dropped, and several errors render one per line. Children win
+over `errors` unless empty (`cond && 'Message'`). With neither, it shows React
+Aria's validation messages.
+
+### Layout
+
+`FieldSet` and `FieldLegend` group related fields under a caption that screen
+readers announce, and `FieldGroup` stacks fields with consistent spacing:
+
+```tsx
+<FieldSet>
+  <FieldLegend>Shipping address</FieldLegend>
+  <FieldGroup>
+    <TextField label="Street" />
+    <TextField label="City" />
+  </FieldGroup>
+</FieldSet>
+```
+
+## Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/field.tsx"
+  name="FieldErrorProps"
+/>
+
+Also accepts all React Aria `FieldError` props; see [React Aria forms](https://react-aria.adobe.com/forms).

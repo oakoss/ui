@@ -20,11 +20,7 @@ export const Route = createRootRoute({
       { href: '/apple-touch-icon.png', rel: 'apple-touch-icon' },
     ],
     meta: [
-      {
-        // HTML requires the `utf-8` label.
-        // oxlint-disable-next-line unicorn/text-encoding-identifier-case
-        charSet: 'utf-8',
-      },
+      { charSet: 'utf-8' },
       { content: 'width=device-width, initial-scale=1', name: 'viewport' },
       { title: appName },
     ],

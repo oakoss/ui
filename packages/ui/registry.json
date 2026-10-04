@@ -6,9 +6,11 @@
       "type": "registry:theme",
       "title": "Theme",
       "description": "Design tokens (color system) shared by all oakoss/ui components.",
+      "devDependencies": ["tailwindcss-react-aria-components"],
+      "css": { "@plugin tailwindcss-react-aria-components": {} },
       "cssVars": {
         "dark": {
-          "field": "oklch(1 0 0 / 4.5%)",
+          "field": "oklch(0.985 0 0 / 4.5%)",
           "background": "oklch(0.141 0.005 285.823)",
           "foreground": "oklch(0.985 0 0)",
           "card": "oklch(0.21 0.006 285.885)",
@@ -22,7 +24,7 @@
           "accent": "oklch(0.274 0.006 286.033)",
           "accent-foreground": "oklch(0.985 0 0)",
           "border": "oklch(1 0 0 / 10%)",
-          "input": "oklch(1 0 0 / 15%)",
+          "input": "oklch(0.552 0.016 285.938)",
           "sidebar": "oklch(0.21 0.006 285.885)",
           "sidebar-foreground": "oklch(0.985 0 0)",
           "sidebar-accent": "oklch(0.274 0.006 286.033)",
@@ -139,7 +141,7 @@
           "accent": "oklch(0.967 0.001 286.375)",
           "accent-foreground": "oklch(0.21 0.006 285.885)",
           "border": "oklch(0.92 0.004 286.32)",
-          "input": "oklch(0.92 0.004 286.32)",
+          "input": "oklch(0.552 0.016 285.938)",
           "sidebar": "oklch(0.985 0 0)",
           "sidebar-foreground": "oklch(0.141 0.005 285.823)",
           "sidebar-accent": "oklch(0.967 0.001 286.375)",
@@ -194,7 +196,7 @@
           "success-hover": "oklch(0.448 0.119 151.328)",
           "success-subtle": "oklch(0.982 0.018 155.826)",
           "success-border": "oklch(0.925 0.084 155.995)",
-          "success-text": "oklch(0.527 0.154 150.069)",
+          "success-text": "oklch(0.448 0.119 151.328)",
           "success-foreground": "oklch(0.982 0.018 155.826)",
           "warning-50": "oklch(0.987 0.022 95.277)",
           "warning-100": "oklch(0.962 0.059 95.617)",
@@ -211,7 +213,7 @@
           "warning-hover": "oklch(0.473 0.137 46.201)",
           "warning-subtle": "oklch(0.987 0.022 95.277)",
           "warning-border": "oklch(0.924 0.12 95.746)",
-          "warning-text": "oklch(0.555 0.163 48.998)",
+          "warning-text": "oklch(0.473 0.137 46.201)",
           "warning-foreground": "oklch(0.987 0.022 95.277)",
           "info-50": "oklch(0.977 0.013 236.62)",
           "info-100": "oklch(0.951 0.026 236.824)",
@@ -297,6 +299,46 @@
           "target": "@ui/inputs/button.tsx"
         },
         {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "field",
+      "type": "registry:ui",
+      "title": "Field",
+      "description": "Label, description, error and input parts that wire into any React Aria field, plus fieldset and group layout.",
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/field.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/field.tsx"
+        },
+        {
           "path": "src/lib/recipes.ts",
           "type": "registry:lib",
           "target": "@lib/recipes.ts"
@@ -317,19 +359,14 @@
       "name": "text-field",
       "type": "registry:ui",
       "title": "Text Field",
-      "description": "Labeled text input with description and validation, built on React Aria Components.",
-      "registryDependencies": ["oakoss/ui/theme"],
-      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "description": "Text input with a label, description and error, built on React Aria Components; pass children to compose the field parts.",
+      "registryDependencies": ["oakoss/ui/theme", "oakoss/ui/field"],
+      "dependencies": ["cn", "react-aria-components"],
       "files": [
         {
           "path": "src/components/ui/inputs/text-field.tsx",
           "type": "registry:ui",
           "target": "@ui/inputs/text-field.tsx"
-        },
-        {
-          "path": "src/lib/recipes.ts",
-          "type": "registry:lib",
-          "target": "@lib/recipes.ts"
         },
         {
           "path": "src/lib/cx.ts",

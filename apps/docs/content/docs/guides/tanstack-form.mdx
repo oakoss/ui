@@ -1,0 +1,228 @@
+---
+title: TanStack Form
+description: Build forms with TanStack Form and React Aria fields.
+---
+
+import { TanStackFormDemo } from '#/components/demos/tanstack-form-demo';
+
+<TanStackFormDemo />
+
+## Approach
+
+[TanStack Form](https://tanstack.com/form) owns the form state and validation;
+the fields render it. Each field gets its value and change handler, which make
+it controlled, plus its blur handler, errors and `isInvalid`; React Aria wires
+up the label, description and error itself.
+
+## Installation
+
+```bash
+pnpm add @tanstack/react-form zod
+pnpm dlx shadcn@latest add oakoss/ui/text-field oakoss/ui/button
+```
+
+Any [Standard Schema](https://standardschema.dev) library works in place of
+Zod.
+
+## A single field
+
+```tsx
+<form.Field name="email">
+  {(field) => (
+    <TextField
+      errors={field.state.meta.errors}
+      isInvalid={!field.state.meta.isValid}
+      label="Email"
+      name={field.name}
+      onBlur={field.handleBlur}
+      onChange={field.handleChange}
+      value={field.state.value}
+    />
+  )}
+</form.Field>
+```
+
+- `onChange` receives the value, not an event, so `field.handleChange` passes
+  straight through.
+- `isInvalid` comes from the same state as `errors`, so the field clears when
+  the errors do. The error shows only while the field is invalid.
+- `errors` takes the validator output as is: strings from function validators,
+  or issues with a `message` from a schema.
+
+## Setting up the form
+
+Define the field components once with `createFormHook`, then every field is one
+line, and field names are type-checked against the form's values. A registered
+component can't check its value type (`useFieldContext<string>()` is a cast), so
+use `field.TextField` only for string fields:
+
+```tsx title="form.tsx"
+import { createFormHook, createFormHookContexts } from '@tanstack/react-form';
+
+import { Button } from '#/components/ui/inputs/button';
+import {
+  TextField,
+  type TextFieldProps,
+} from '#/components/ui/inputs/text-field';
+
+const { fieldContext, formContext, useFieldContext, useFormContext } =
+  createFormHookContexts();
+
+function FormTextField({
+  description,
+  label,
+  type,
+}: {
+  description?: string;
+  label: string;
+  type?: TextFieldProps['type'];
+}) {
+  const field = useFieldContext<string>();
+  return (
+    <TextField
+      description={description}
+      errors={field.state.meta.errors}
+      isInvalid={!field.state.meta.isValid}
+      label={label}
+      name={field.name}
+      onBlur={field.handleBlur}
+      onChange={field.handleChange}
+      type={type}
+      value={field.state.value}
+    />
+  );
+}
+
+function SubmitButton({ label }: { label: string }) {
+  const form = useFormContext();
+  return (
+    <form.Subscribe selector={(state) => state.isSubmitting}>
+      {(isSubmitting) => (
+        <Button isPending={isSubmitting} type="submit">
+          {label}
+        </Button>
+      )}
+    </form.Subscribe>
+  );
+}
+
+export const { useAppForm } = createFormHook({
+  fieldComponents: { TextField: FormTextField },
+  fieldContext,
+  formComponents: { SubmitButton },
+  formContext,
+});
+```
+
+## Building a form
+
+```tsx title="sign-up-form.tsx"
+import { revalidateLogic } from '@tanstack/react-form';
+import { Form } from 'react-aria-components';
+import * as z from 'zod';
+
+import { useAppForm } from './form';
+
+const schema = z.object({
+  email: z.email('Enter a valid email.'),
+  name: z.string().min(2, 'Enter at least 2 characters.'),
+});
+
+export function SignUpForm() {
+  const form = useAppForm({
+    defaultValues: { email: '', name: '' },
+    onSubmit: ({ value }) => {
+      // Send value to your server.
+    },
+    validationLogic: revalidateLogic(),
+    validators: { onDynamic: schema },
+  });
+
+  return (
+    <Form
+      onSubmit={(event) => {
+        event.preventDefault();
+        void form.handleSubmit();
+      }}
+      validationBehavior="aria"
+    >
+      <form.AppField name="name">
+        {(field) => <field.TextField label="Name" />}
+      </form.AppField>
+      <form.AppField name="email">
+        {(field) => <field.TextField label="Email" type="email" />}
+      </form.AppField>
+      <form.AppForm>
+        <form.SubmitButton label="Sign up" />
+      </form.AppForm>
+    </Form>
+  );
+}
+```
+
+- **`validationBehavior="aria"`** on React Aria's `Form` lets TanStack Form own
+  validation: fields report errors through ARIA instead of the browser's own
+  constraint checks, so `type="email"` or `isRequired` doesn't block the
+  submit with a browser bubble.
+- **`revalidateLogic()`** validates on submit first, then on every change, so
+  errors appear after the first attempt and clear as the user fixes them.
+
+## Validation timing
+
+`revalidateLogic` takes the mode before and after the first submit:
+
+| Option                | Values                     | Default  |
+| --------------------- | -------------------------- | -------- |
+| `mode`                | `change`, `blur`, `submit` | `submit` |
+| `modeAfterSubmission` | `change`, `blur`, `submit` | `change` |
+
+Without it, put a validator on `onChange`, `onBlur` or `onSubmit` in
+`validators` to run on that event; submitting runs all three.
+
+## Server errors
+
+Checks only your server can make, such as whether an email is already
+registered, go in an async validator on that field. Its message shows like any
+other error:
+
+```tsx
+<form.AppField
+  name="email"
+  validators={{
+    onDynamicAsync: async ({ value }) =>
+      (await isRegistered(value))
+        ? 'This email is already registered.'
+        : undefined,
+    onDynamicAsyncDebounceMs: 300,
+  }}
+>
+  {(field) => <field.TextField label="Email" type="email" />}
+</form.AppField>
+```
+
+With `revalidateLogic`, it runs at submit, then, debounced, on each later change
+the schema accepts. Try `taken@example.com` in the demo above. Keep it on the
+field rather than the form: a form-level async validator shares its result with
+the schema, so its passing result would clear the schema's errors on other
+fields.
+
+## Validating on the server
+
+To validate on the server as well, so the form works before JavaScript loads
+and a modified client can't skip the checks, TanStack Form's
+[server-side guide](https://tanstack.com/form/latest/docs/framework/react/guides/ssr)
+covers TanStack Start (`@tanstack/react-form-start`), Next.js and Remix.
+
+## Resetting
+
+Call `form.reset()` to restore the default values, for example from a cancel
+button with `onPress={() => form.reset()}`.
+
+## Going further
+
+Everything beyond this is TanStack Form itself, and the fields work the same
+way: see its guides on
+[array fields](https://tanstack.com/form/latest/docs/framework/react/guides/arrays),
+[linked fields](https://tanstack.com/form/latest/docs/framework/react/guides/linked-fields)
+and
+[form composition](https://tanstack.com/form/latest/docs/framework/react/guides/form-composition).

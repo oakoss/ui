@@ -29,8 +29,7 @@ exports[`base colors > maps every base color to the same steps of its own gray 1
         "ref": "color.GRAY.50",
       },
       "input": {
-        "alpha": 0.15,
-        "ref": "color.white",
+        "ref": "color.GRAY.500",
       },
       "muted": {
         "ref": "color.GRAY.800",
@@ -94,7 +93,7 @@ exports[`base colors > maps every base color to the same steps of its own gray 1
         "ref": "color.GRAY.950",
       },
       "input": {
-        "ref": "color.GRAY.200",
+        "ref": "color.GRAY.500",
       },
       "muted": {
         "ref": "color.GRAY.100",
@@ -134,7 +133,7 @@ exports[`base colors > maps every base color to the same steps of its own gray 1
 }
 `;
 
-exports[`roles > pins the contrast pairs and minimums 1`] = `
+exports[`roles > pins the contrast pairs, minimums and state layers 1`] = `
 {
   "contrastMinimum": {
     "decorative": 0,
@@ -359,9 +358,108 @@ exports[`roles > pins the contrast pairs and minimums 1`] = `
     },
     {
       "background": "background",
+      "foreground": "input",
+      "kind": "non-text",
+    },
+    {
+      "background": "background",
+      "foreground": "destructive-text",
+      "kind": "non-text",
+    },
+    {
+      "background": "card",
+      "foreground": "input",
+      "kind": "non-text",
+    },
+    {
+      "background": "card",
+      "foreground": "destructive-text",
+      "kind": "non-text",
+    },
+    {
+      "background": "popover",
+      "foreground": "input",
+      "kind": "non-text",
+    },
+    {
+      "background": "popover",
+      "foreground": "destructive-text",
+      "kind": "non-text",
+    },
+    {
+      "background": "background",
       "foreground": "border",
       "kind": "decorative",
     },
   ],
+  "distinctMinimum": 2,
+  "distinctPairs": [
+    [
+      "primary",
+      "primary-hover",
+    ],
+    [
+      "destructive",
+      "destructive-hover",
+    ],
+    [
+      "success",
+      "success-hover",
+    ],
+    [
+      "warning",
+      "warning-hover",
+    ],
+    [
+      "info",
+      "info-hover",
+    ],
+  ],
+  "layeredSurfaces": [
+    [
+      "background",
+      "primary-text",
+    ],
+    [
+      "primary-subtle",
+      "primary-text",
+    ],
+    [
+      "background",
+      "destructive-text",
+    ],
+    [
+      "destructive-subtle",
+      "destructive-text",
+    ],
+    [
+      "background",
+      "success-text",
+    ],
+    [
+      "success-subtle",
+      "success-text",
+    ],
+    [
+      "background",
+      "warning-text",
+    ],
+    [
+      "warning-subtle",
+      "warning-text",
+    ],
+    [
+      "background",
+      "info-text",
+    ],
+    [
+      "info-subtle",
+      "info-text",
+    ],
+  ],
+  "stateLayer": {
+    "hover": 0.08,
+    "press": 0.12,
+  },
 }
 `;
