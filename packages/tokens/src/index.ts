@@ -74,9 +74,9 @@ export const styles = { vega } as const;
 export const typographies = { default: defaultTypography } as const;
 
 /**
- * Theme axes as DTCG Resolver modifiers: each is chosen on its own. Flavor and
- * each intent's hue are chosen within a family (see `Family`).
- */
+Theme axes as DTCG Resolver modifiers: each is chosen on its own. Flavor and
+each intent's hue are chosen within a family (see `Family`).
+*/
 export const axes = {
   family: { contexts: Object.keys(families), default: 'zinc' },
   style: { contexts: Object.keys(styles), default: 'vega' },

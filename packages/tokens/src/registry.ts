@@ -20,12 +20,12 @@ export type CssVars = {
 };
 
 /**
- * The default theme as a shadcn `registry:theme` item's `cssVars`. shadcn
- * writes `light` to `:root` and `dark` to `.dark`, bridging only literal
- * colors to `--color-*`, so values are resolved rather than `var()` aliases.
- * It would also bridge other `light` values to themselves, so only `radius`,
- * which it expands into the radius scale, joins the colors there.
- */
+The default theme as a shadcn `registry:theme` item's `cssVars`. shadcn
+writes `light` to `:root` and `dark` to `.dark`, bridging only literal
+colors to `--color-*`, so values are resolved rather than `var()` aliases.
+It would also bridge other `light` values to themselves, so only `radius`,
+which it expands into the radius scale, joins the colors there.
+*/
 export function registryCssVars(
   family: Family,
   style: Style,

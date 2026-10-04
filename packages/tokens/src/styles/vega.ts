@@ -1,9 +1,9 @@
 import { defineStyle } from '#/style';
 
 /**
- * shadcn's Vega style as tokens: `style-vega.css` at d75a96a, plus the base
- * `radius` from `themes.ts`.
- */
+shadcn's Vega style as tokens: `style-vega.css` at d75a96a, plus the base
+`radius` from `themes.ts`.
+*/
 export const vega = defineStyle({
   colors: {
     // shadcn's `input/30` over its 15% white input; our input is an opaque gray.

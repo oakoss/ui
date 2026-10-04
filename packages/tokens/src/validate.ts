@@ -164,9 +164,9 @@ function nameErrors(family: Family): string[] {
     ...Object.keys(family.palette.neutrals),
   ];
   return names.flatMap((name) => {
-    if (name.includes('.')) return [`name "${name}" contains a "."`];
+    if (name.includes('.')) return `name "${name}" contains a "."`;
     return reservedNames.has(name)
-      ? [`name "${name}" is reserved for a role or intent`]
+      ? `name "${name}" is reserved for a role or intent`
       : [];
   });
 }

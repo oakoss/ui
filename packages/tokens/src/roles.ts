@@ -94,10 +94,10 @@ export const allRoles: readonly Role[] = [
 ];
 
 /**
- * - `text`: 4.5:1 (WCAG 2.2 SC 1.4.3)
- * - `non-text`: 3:1 for boundaries, fills and focus rings (SC 1.4.11)
- * - `decorative`: no requirement
- */
+- `text`: 4.5:1 (WCAG 2.2 SC 1.4.3)
+- `non-text`: 3:1 for boundaries, fills and focus rings (SC 1.4.11)
+- `decorative`: no requirement
+*/
 export type ContrastKind = 'decorative' | 'non-text' | 'text';
 
 export type ContrastPair = {

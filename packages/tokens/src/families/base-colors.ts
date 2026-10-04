@@ -31,14 +31,14 @@ const accentHues = [
   'rose',
 ] as const;
 
-const whiteAlpha = (alpha: number) => ({ alpha, ref: 'color.white' }) as const;
+const darkBorder = { alpha: 0.1, ref: 'color.white' } as const;
 
 /**
- * A shadcn base color on Tailwind's palette. shadcn maps every base color's
- * neutral roles to the same steps of its gray (`themes.ts` at d75a96a); light
- * `muted-foreground` and `input` are the changes. Intent roles come from the intent
- * scales, and the derived roles follow primary rather than shadcn's grays.
- */
+A shadcn base color on Tailwind's palette. shadcn maps every base color's
+neutral roles to the same steps of its gray (`themes.ts` at d75a96a); light
+`muted-foreground` and `input` are the changes. Intent roles come from the intent
+scales, and the derived roles follow primary rather than shadcn's grays.
+*/
 function baseColor(gray: Gray, name: string) {
   return defineFamily({
     charts: {
@@ -73,7 +73,7 @@ function darkRoles<G extends Gray>(gray: G): GrayRoles<G> {
     accent: step(800),
     'accent-foreground': step(50),
     background: step(950),
-    border: whiteAlpha(0.1),
+    border: darkBorder,
     card: step(900),
     'card-foreground': step(50),
     foreground: step(50),
@@ -87,7 +87,7 @@ function darkRoles<G extends Gray>(gray: G): GrayRoles<G> {
     sidebar: step(900),
     'sidebar-accent': step(800),
     'sidebar-accent-foreground': step(50),
-    'sidebar-border': whiteAlpha(0.1),
+    'sidebar-border': darkBorder,
     'sidebar-foreground': step(50),
   };
 }

@@ -114,7 +114,7 @@ function errorList(errors: readonly unknown[] | undefined): ReactNode {
     ...new Set(
       errors.flat().flatMap((error) => {
         const message = messageOf(error)?.trim();
-        return message === undefined || message === '' ? [] : [message];
+        return message === undefined || message === '' ? [] : message;
       }),
     ),
   ];

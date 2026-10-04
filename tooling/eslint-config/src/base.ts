@@ -29,6 +29,15 @@ export const restrictedSyntax = [
 const tail = [
   // oxlint runs the unicorn rules it enables; the finisher disables those here.
   eslintPluginUnicorn.configs.recommended,
+  {
+    // Tools require a config module's top-level `export default defineConfig(…)`.
+    files: [
+      '**/*.config.{js,ts}',
+      '**/.commitlintrc.js',
+      'tooling/oxlint-config/src/**',
+    ],
+    rules: { 'unicorn/no-top-level-side-effects': 'off' },
+  },
 
   // Sorting. oxfmt owns import-statement order, so the finisher disables
   // sort-imports.

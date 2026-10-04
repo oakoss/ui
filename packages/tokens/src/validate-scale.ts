@@ -52,10 +52,9 @@ function anchorErrors(
 ): string[] {
   return (['dark', 'light'] as const).flatMap((polarity) => {
     const step = anchor?.[polarity];
-    if (step === undefined)
-      return [`scale "${name}" has no ${polarity} anchor`];
+    if (step === undefined) return `scale "${name}" has no ${polarity} anchor`;
     return hasStep(scaleSteps, step)
       ? []
-      : [`scale "${name}" ${polarity} anchor is missing step ${step}`];
+      : `scale "${name}" ${polarity} anchor is missing step ${step}`;
   });
 }

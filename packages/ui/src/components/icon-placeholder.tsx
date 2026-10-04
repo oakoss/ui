@@ -29,9 +29,9 @@ export const IconResolverContext = createContext<IconResolver | undefined>(
 const warning = { hasShown: false };
 
 /**
- * `shadcn add` replaces each `<IconPlaceholder>` with the icon for the
- * project's `iconLibrary`, so this only renders when that didn't happen.
- */
+`shadcn add` replaces each `<IconPlaceholder>` with the icon for the
+project's `iconLibrary`, so this only renders when that didn't happen.
+*/
 export function IconPlaceholder({
   hugeicons,
   lucide,

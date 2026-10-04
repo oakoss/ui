@@ -37,7 +37,7 @@ const entries = Object.entries(icons).map(([key, Icon]) => {
     const name = names[library];
     return typeof name === 'string' && Object.hasOwn(exports, name)
       ? []
-      : [library];
+      : library;
   });
   return { element, Icon, key, missing, names };
 });
@@ -97,7 +97,7 @@ const { Project } = tsMorph;
 function declaredNames(text: string): string[] {
   return descendants(parse(text)).flatMap((node) =>
     isNamedDeclaration(node) && node.name && ts.isIdentifier(node.name)
-      ? [node.name.text]
+      ? node.name.text
       : [],
   );
 }
