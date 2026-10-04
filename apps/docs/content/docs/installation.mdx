@@ -8,8 +8,8 @@ this GitHub repository, into a React project with Tailwind CSS v4.
 
 ## Set up the project
 
-Run this once. The `base` item sets Lucide as the icon library and installs the
-theme, `color-scheme` and the reduced-motion styles.
+Run this once. The `base` item installs the theme, `color-scheme` and the
+reduced-motion styles, and in a new project sets Lucide as the icon library.
 
 <Tabs defaultValue="New project">
   <TabsList>
@@ -28,18 +28,18 @@ This creates `components.json`.
   <TabsContent value="Existing project">
 
 ```npm
-npx shadcn@latest apply oakoss/ui/base
+npx shadcn@latest add oakoss/ui/base
 ```
 
-This keeps your aliases and style and sets `iconLibrary`. It also sets
-`baseColor` to `neutral`.
+This leaves `components.json` as it is, so components use the icon library it
+already names: Lucide, Tabler, HugeIcons, Phosphor or Remix Icon.
 
   </TabsContent>
 </Tabs>
 
-`shadcn add oakoss/ui/base` installs the styles but doesn't set the icon
-library, so icons render as empty squares. If that happens, run the
-existing-project command and add the component again.
+Icons that render as empty squares mean `components.json` names no icon
+library. Set `"iconLibrary": "lucide"` (or another of the five) and add the
+component again.
 
 ## Add components
 

@@ -73,8 +73,8 @@ test('the theme installs the React Aria Tailwind plugin', () => {
   });
 });
 
-// Only init and apply write `config`, and without `extends: none` init also
-// installs shadcn's own style.
+// Only init writes `config` (apply takes no GitHub registry address), and
+// without `extends: none` init also installs shadcn's own style.
 test('the base item sets the icon library and installs the theme', () => {
   const base = ui.items.find(({ name }) => name === 'base');
   expect(base).toMatchObject({

@@ -52,7 +52,7 @@ export function IconPlaceholder({
     warning.hasShown = true;
     // oxlint-disable-next-line no-console -- tells the consumer how to fix their setup
     console.warn(
-      'IconPlaceholder rendered without an icon library. Set "iconLibrary" in components.json (or run shadcn apply oakoss/ui/base), then re-add the component so shadcn swaps in your icons.',
+      'IconPlaceholder rendered without an icon library. Set "iconLibrary" in components.json, then re-add the component so shadcn swaps in your icons.',
     );
   }, [isResolved]);
 

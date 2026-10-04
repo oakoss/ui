@@ -5,7 +5,7 @@
       "name": "base",
       "type": "registry:base",
       "title": "Base",
-      "description": "Sets Lucide as the icon library and installs the default theme, color-scheme and reduced-motion base styles. Run shadcn init with it in a new project, or shadcn apply in an existing one.",
+      "description": "Sets Lucide as the icon library and installs the default theme, color-scheme and reduced-motion base styles. Run shadcn init with it in a new project; in an existing one, shadcn add installs the styles and keeps your icon library.",
       "extends": "none",
       "config": { "iconLibrary": "lucide" },
       "registryDependencies": ["oakoss/ui/theme"],
