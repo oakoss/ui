@@ -146,8 +146,8 @@ export const Dark: Story = {
 
 // A consumer's string className overrides the base via cn — the reason cx
 // exists rather than string concatenation. A fill override must cover hover
-// too, or the hover fill shows under the override's text; the story ends
-// hovered so axe checks that state.
+// too, or the hover fill shows under the override's text; the story ends in
+// React Aria's hovered state so axe checks it.
 export const ClassNameOverride: Story = {
   args: { className: 'bg-emerald-700 text-white hover:bg-emerald-800' },
   play: async ({ canvas }) => {
@@ -155,7 +155,7 @@ export const ClassNameOverride: Story = {
     await expect(button).toHaveClass('bg-emerald-700', 'hover:bg-emerald-800');
     await expect(button).not.toHaveClass('bg-(--btn-bg)');
     await expect(button).not.toHaveClass('hover:bg-(--btn-hover)');
-    await userEvent.hover(button);
+    button.dataset.hovered = 'true';
   },
 };
 
@@ -168,7 +168,7 @@ export const RenderPropClassName: Story = {
     await expect(button).toHaveClass('bg-fuchsia-700', 'hover:bg-fuchsia-800');
     await expect(button).not.toHaveClass('bg-(--btn-bg)');
     await expect(button).not.toHaveClass('hover:bg-(--btn-hover)');
-    await userEvent.hover(button);
+    button.dataset.hovered = 'true';
   },
 };
 

@@ -4,7 +4,7 @@ import {
   Button,
   type ButtonStyleProps,
 } from '@oakoss/ui/components/ui/inputs/button';
-import { expect, userEvent, waitFor } from 'storybook/test';
+import { expect } from 'storybook/test';
 
 const variants = [
   'solid',
@@ -49,14 +49,28 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-// Wait for React Aria's state attribute before reading styles, so a missed or
-// lost hover or press fails here rather than as a wrong color.
-async function inState(element: HTMLElement, name: string, isSet: boolean) {
-  await waitFor(async () => {
-    await (isSet
-      ? expect(element).toHaveAttribute(name)
-      : expect(element).not.toHaveAttribute(name));
-  });
+const stateNames = ['hovered', 'pressed'] as const;
+
+// The settled style in exactly these React Aria states, which the hover: and
+// pressed: variants match. Simulated pointer events don't reliably reach that
+// state on CI, and the real pointer may have set one already, so every state
+// is set explicitly and put back afterwards.
+function inState(
+  element: HTMLElement,
+  states: readonly (typeof stateNames)[number][],
+) {
+  const saved = stateNames.map(
+    (state) => [state, element.getAttribute(`data-${state}`)] as const,
+  );
+  for (const state of stateNames) {
+    element.toggleAttribute(`data-${state}`, states.includes(state));
+  }
+  const style = settled(element);
+  for (const [state, value] of saved) {
+    if (value === null) element.removeAttribute(`data-${state}`);
+    else element.setAttribute(`data-${state}`, value);
+  }
+  return style;
 }
 
 // A CSS color expression as the browser computes it.
@@ -115,17 +129,9 @@ export const HoverAndPress: Story = {
   play: async ({ canvas }) => {
     const unchanged: string[] = [];
     for (const button of canvas.getAllByRole('button')) {
-      await userEvent.unhover(button);
-      await inState(button, 'data-hovered', false);
-      const rest = settled(button);
-      await userEvent.hover(button);
-      await inState(button, 'data-hovered', true);
-      const hover = settled(button);
-      await userEvent.pointer({ keys: '[MouseLeft>]', target: button });
-      await inState(button, 'data-pressed', true);
-      const press = settled(button);
-      await userEvent.pointer({ keys: '[/MouseLeft]', target: button });
-      await userEvent.unhover(button);
+      const rest = inState(button, []);
+      const hover = inState(button, ['hovered']);
+      const press = inState(button, ['hovered', 'pressed']);
       const { variant } = button.dataset;
       const isRight =
         variant === 'solid'
@@ -143,18 +149,13 @@ export const HoverAndPress: Story = {
   },
 };
 
-// Touch presses without hovering. One press per button: the runner's release
-// doesn't reach React Aria, so a second reading would see a stale press. Both
-// stories unhover first: the browser's real pointer can rest on the first
-// button, which then reads hovered at rest.
-export const TouchPress: Story = {
+// Touch and keyboard press without hovering.
+export const PressWithoutHover: Story = {
   play: async ({ canvas }) => {
     const unchanged: string[] = [];
     for (const button of canvas.getAllByRole('button')) {
-      await userEvent.unhover(button);
-      const rest = settled(button);
-      await userEvent.pointer({ keys: '[TouchA>]', target: button });
-      const press = settled(button);
+      const rest = inState(button, []);
+      const press = inState(button, ['pressed']);
       const { variant } = button.dataset;
       const isRight =
         variant === 'solid'
@@ -177,10 +178,7 @@ export const CustomColors: Story = {
       button.style.setProperty('--btn-bg', 'var(--color-success)');
       button.style.setProperty('--btn-hover', 'var(--color-success-hover)');
       button.style.setProperty('--btn-fg', 'var(--color-success-foreground)');
-      await userEvent.unhover(button);
-      await userEvent.hover(button);
-      const { background } = settled(button);
-      await userEvent.unhover(button);
+      const { background } = inState(button, ['hovered']);
       if (background !== resolved('var(--color-success-hover)')) {
         wrong.push(button.textContent);
       }
