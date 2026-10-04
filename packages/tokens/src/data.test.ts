@@ -117,6 +117,34 @@ describe('Tailwind scales', () => {
   );
 });
 
+// A theme.css declaration's value, whitespace collapsed.
+function tailwindValue(name: string): string {
+  const match = new RegExp(String.raw`--${name}:\s*([^;]+);`, 'u').exec(
+    themeCss,
+  );
+  if (match === null) throw new Error(`theme.css has no --${name}`);
+  return (match[1] ?? '').replaceAll(/\s+/gu, ' ').trim();
+}
+
+describe('default typography', () => {
+  const { fonts, scale } = typographies.default;
+
+  it('uses tailwindcss theme.css font stacks', () => {
+    expect(fonts.sans).toBe(tailwindValue('font-sans'));
+    expect(fonts.mono).toBe(tailwindValue('font-mono'));
+  });
+
+  it.each(Object.entries(scale))(
+    'text-%s matches tailwindcss theme.css',
+    (size, entry) => {
+      expect(entry).toEqual({
+        lineHeight: tailwindValue(`text-${size}--line-height`),
+        size: tailwindValue(`text-${size}`),
+      });
+    },
+  );
+});
+
 describe('roles', () => {
   it('names every role once', () => {
     expect(new Set(allRoles).size).toBe(allRoles.length);

@@ -44,6 +44,7 @@ Avoid:
 - Cross-references that belong in the PR description ("added for X", "used by Y")
 - Multi-line comments on trivial code
 - AI-flavored phrasings ("Here we...", "Let's...", "This...")
+- Dependency versions ("Tailwind CSS 4.3.3's scales"); name the package, and let a test against the installed version catch drift. A version stays where it scopes a measured quirk ("on bd 1.3.1"), and in dated `docs/research/` records.
 
 When in doubt: keep the comment, but make it tighter.
 

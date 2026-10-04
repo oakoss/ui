@@ -176,7 +176,7 @@ export default defineConfig({
     'unicorn/prefer-module': 'error',
     'unicorn/prefer-negative-index': 'error',
     'unicorn/prefer-node-protocol': 'error',
-    // unicorn 76's defaults; ESLint's prefer-global-number-constants wants the globals.
+    // eslint-plugin-unicorn's defaults; its prefer-global-number-constants wants the globals.
     'unicorn/prefer-number-properties': [
       'error',
       { checkInfinity: false, checkNaN: false },
