@@ -58,13 +58,25 @@ test('collapsing the sidebar keeps the full content width', async ({
 
 test('the package-manager choice carries to other pages', async ({ page }) => {
   await page.goto('/docs/components/button');
-  await page.getByRole('tab', { name: 'pnpm' }).first().click();
-  await page.goto('/docs/components/text-field');
-  await expect(page.getByRole('tab', { name: 'pnpm' }).first()).toHaveAttribute(
+  const tab = page.getByRole('tab', { name: 'pnpm' }).first();
+  // A click before hydration does nothing, so retry until the choice is saved.
+  await expect(async () => {
+    await tab.click();
+    await expect(tab).toHaveAttribute('aria-selected', 'true', {
+      timeout: 1000,
+    });
+  }).toPass();
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem('package-manager')))
+    .toBe('pnpm');
+  // A new tab shares localStorage but not the sessionStorage Fumadocs also writes.
+  const next = await page.context().newPage();
+  await next.goto('/docs/components/text-field');
+  await expect(next.getByRole('tab', { name: 'pnpm' }).first()).toHaveAttribute(
     'aria-selected',
     'true',
   );
-  await expect(page.getByText('pnpm dlx shadcn@latest add')).toBeVisible();
+  await expect(next.getByText('pnpm dlx shadcn@latest add')).toBeVisible();
 });
 
 test('the Code tab shows the example source', async ({ page }) => {
