@@ -42,7 +42,6 @@
     "shadcn": "catalog:",
     "tailwindcss": "catalog:",
     "tailwindcss-react-aria-components": "catalog:",
-    "ts-morph": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },
