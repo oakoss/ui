@@ -1,9 +1,38 @@
 import { expect, test } from '@playwright/test';
 
+test('the localization demo flips direction and translates strings', async ({
+  page,
+}) => {
+  await page.goto('/docs/guides/localization');
+  const demo = page.getByTestId('localized');
+  await expect(demo).toHaveAttribute('dir', 'ltr');
+  await expect(
+    demo.getByRole('button', { name: 'Clear search' }),
+  ).toBeAttached();
+
+  await page.getByRole('button', { name: 'العربية' }).click();
+  await expect(demo).toHaveAttribute('dir', 'rtl');
+  await expect(demo).toHaveAttribute('lang', 'ar-EG');
+  // The app's own string, passed as a prop.
+  const email = demo.getByRole('textbox', { name: 'البريد الإلكتروني' });
+  await expect(email).toBeVisible();
+  // React Aria's built-in string, translated with no work from the app.
+  await expect(demo.getByRole('button', { name: 'مسح البحث' })).toBeAttached();
+  // Logical padding: the search input's end padding (room for the clear
+  // button) moves to the left in RTL.
+  const padding = await demo
+    .getByRole('searchbox', { name: 'بحث' })
+    .evaluate((input) => {
+      const style = getComputedStyle(input);
+      return { left: style.paddingLeft, right: style.paddingRight };
+    });
+  expect(padding).toEqual({ left: '36px', right: '10px' });
+});
+
 test('the TanStack Form demo validates, shows server errors and submits', async ({
   page,
 }) => {
-  await page.goto('/docs/forms/tanstack-form');
+  await page.goto('/docs/guides/tanstack-form');
   const name = page.getByRole('textbox', { name: 'Name' });
   const email = page.getByRole('textbox', { name: 'Email' });
   const submit = page.getByRole('button', { name: 'Sign up' });

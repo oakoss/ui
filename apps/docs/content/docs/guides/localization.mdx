@@ -1,0 +1,100 @@
+---
+title: Localization
+description: Set the locale, render right-to-left, translate strings and keep bundles small.
+---
+
+import { LocalizationDemo } from '#/components/demos/localization-demo';
+
+<LocalizationDemo />
+
+## Setting the locale
+
+Your app owns the locale; the components never set one. Wrap the app in React
+Aria's `I18nProvider`, and every component formats dates and numbers, picks a
+text direction and translates React Aria's built-in strings for that locale:
+
+```tsx
+import { I18nProvider, isRTL } from 'react-aria-components';
+
+// From your router, the user's settings or the request.
+const locale = 'ar-EG';
+
+<html dir={isRTL(locale) ? 'rtl' : 'ltr'} lang={locale}>
+  <body>
+    <I18nProvider locale={locale}>
+      <App />
+    </I18nProvider>
+  </body>
+</html>;
+```
+
+Set `lang` and `dir` on `<html>` from the same value, so the page and anything
+rendered outside your components follow it. Inside the provider, `useLocale()`
+returns the locale and its direction; above it, React Aria falls back to the
+browser's language (`en-US` while rendering on the server).
+
+## Right-to-left
+
+The components use logical utilities (`ps-*` and `pe-*`, `ms-*` and `me-*`,
+`start-*` and `end-*`) instead of left and right, so padding, icons and
+alignment flip with `dir="rtl"`. Switch the demo to Arabic to see it.
+
+## Strings
+
+React Aria translates its own strings, such as a search field's clear button,
+in over 30 languages. Text the components add themselves is a prop with an
+English default, so pass your translation, or wording you prefer, wherever you
+use the component:
+
+```tsx
+<Button isPending pendingLabel={t('saving')}>
+  {t('save')}
+</Button>
+```
+
+Any i18n library works, since the components only take strings. To change a
+default everywhere, edit it in the copied component file.
+
+## Server rendering
+
+When the server renders the page, the browser needs React Aria's strings for
+the locale before your JavaScript loads. Render `LocalizedStringProvider` in the
+document so they arrive with the HTML:
+
+```tsx
+import { I18nProvider, isRTL } from 'react-aria-components';
+import { LocalizedStringProvider } from 'react-aria-components/i18n';
+
+<html dir={isRTL(locale) ? 'rtl' : 'ltr'} lang={locale}>
+  <head>
+    <LocalizedStringProvider locale={locale} />
+  </head>
+  <body>
+    <I18nProvider locale={locale}>
+      <App />
+    </I18nProvider>
+  </body>
+</html>;
+```
+
+`getLocalizationScript(locale)` returns the same script as a string, for setups
+that inject HTML themselves.
+
+## Smaller bundles
+
+React Aria bundles strings for every language it supports. If your app ships
+fewer, `@react-aria/optimize-locales-plugin` drops the rest at build time:
+
+```ts title="vite.config.ts"
+import optimizeLocales from '@react-aria/optimize-locales-plugin';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  plugins: [optimizeLocales.vite({ locales: ['en', 'ar'] })],
+});
+```
+
+List languages, not regions. A locale with a region keeps only that exact
+region, and React Aria usually ships one region per language (Arabic is
+`ar-AE`), so `'ar-EG'` would drop Arabic entirely. It works with Vite, webpack,
+Rollup and esbuild.
