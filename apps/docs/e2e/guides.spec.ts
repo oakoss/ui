@@ -1,9 +1,11 @@
 import { expect, test } from '@playwright/test';
 
+import { gotoHydrated } from './hydrated';
+
 test('the localization demo flips direction and translates strings', async ({
   page,
 }) => {
-  await page.goto('/docs/guides/localization');
+  await gotoHydrated(page, '/docs/guides/localization');
   const demo = page.getByTestId('localized');
   await expect(demo).toHaveAttribute('dir', 'ltr');
   await expect(
@@ -32,7 +34,7 @@ test('the localization demo flips direction and translates strings', async ({
 test('the TanStack Form demo validates, shows server errors and submits', async ({
   page,
 }) => {
-  await page.goto('/docs/guides/tanstack-form');
+  await gotoHydrated(page, '/docs/guides/tanstack-form');
   const name = page.getByRole('textbox', { name: 'Name' });
   const email = page.getByRole('textbox', { name: 'Email' });
   const submit = page.getByRole('button', { name: 'Sign up' });

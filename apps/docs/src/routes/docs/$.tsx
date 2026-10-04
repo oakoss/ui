@@ -13,7 +13,7 @@ import {
   ViewOptionsPopover,
 } from 'fumadocs-ui/layouts/docs/page';
 import { BookOpen, Code } from 'lucide-react';
-import { Suspense, use } from 'react';
+import { Suspense, use, useEffect } from 'react';
 
 import { baseOptions } from '#/components/layout';
 import { useMDXComponents } from '#/components/mdx';
@@ -64,6 +64,11 @@ function Content({
   reactAria: string | undefined;
   sourceUrl: string | undefined;
 }) {
+  // End-to-end tests wait for this: clicks and typing before hydration are lost.
+  useEffect(() => {
+    document.documentElement.dataset.hydrated = '';
+  }, []);
+
   const page = docs.getPage(path);
   if (!page) throw new Error(`unknown page: ${path}`);
 

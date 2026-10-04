@@ -1,7 +1,9 @@
 import { expect, test } from '@playwright/test';
 
+import { gotoHydrated } from './hydrated';
+
 test('a component demo responds after hydration', async ({ page }) => {
-  await page.goto('/docs/components/button');
+  await gotoHydrated(page, '/docs/components/button');
   const demo = page.getByTestId('demo-button');
   await expect(demo).toHaveText('Pressed 0 times');
   await demo.click();
@@ -10,7 +12,7 @@ test('a component demo responds after hydration', async ({ page }) => {
 });
 
 test('sidebar links navigate without a full page load', async ({ page }) => {
-  await page.goto('/docs/components/button');
+  await gotoHydrated(page, '/docs/components/button');
   // Survives client-side navigation and is lost on a full reload.
   await page.evaluate(() => {
     document.documentElement.dataset.e2eMarker = 'kept';
@@ -38,7 +40,7 @@ test('collapsing the sidebar keeps the full content width', async ({
   page,
 }) => {
   await page.setViewportSize({ height: 800, width: 1024 });
-  await page.goto('/docs/components/button');
+  await gotoHydrated(page, '/docs/components/button');
   await page
     .locator('#nd-sidebar')
     .getByRole('button', { name: 'Collapse Sidebar' })
@@ -57,21 +59,14 @@ test('collapsing the sidebar keeps the full content width', async ({
 });
 
 test('the package-manager choice carries to other pages', async ({ page }) => {
-  await page.goto('/docs/components/button');
-  const tab = page.getByRole('tab', { name: 'pnpm' }).first();
-  // A click before hydration does nothing, so retry until the choice is saved.
-  await expect(async () => {
-    await tab.click();
-    await expect(tab).toHaveAttribute('aria-selected', 'true', {
-      timeout: 1000,
-    });
-  }).toPass();
+  await gotoHydrated(page, '/docs/components/button');
+  await page.getByRole('tab', { name: 'pnpm' }).first().click();
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem('package-manager')))
     .toBe('pnpm');
   // A new tab shares localStorage but not the sessionStorage Fumadocs also writes.
   const next = await page.context().newPage();
-  await next.goto('/docs/components/text-field');
+  await gotoHydrated(next, '/docs/components/text-field');
   await expect(next.getByRole('tab', { name: 'pnpm' }).first()).toHaveAttribute(
     'aria-selected',
     'true',
@@ -80,7 +75,7 @@ test('the package-manager choice carries to other pages', async ({ page }) => {
 });
 
 test('the Code tab shows the example source', async ({ page }) => {
-  await page.goto('/docs/components/button');
+  await gotoHydrated(page, '/docs/components/button');
   const example = page
     .getByRole('tabpanel')
     .filter({ hasText: 'Publish' })
@@ -92,13 +87,13 @@ test('the Code tab shows the example source', async ({ page }) => {
 });
 
 test('the Manual tab shows each file it installs', async ({ page }) => {
-  await page.goto('/docs/components/button');
+  await gotoHydrated(page, '/docs/components/button');
   await page.getByRole('tab', { name: 'Manual' }).click();
   await expect(page.getByText('createCn').first()).toBeVisible();
 });
 
 test('search finds a component page', async ({ page }) => {
-  await page.goto('/docs');
+  await gotoHydrated(page, '/docs');
   await page
     .getByRole('button', { name: /search/iu })
     .first()
