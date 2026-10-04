@@ -7,14 +7,9 @@ import * as remixicon from '@remixicon/react';
 import * as tabler from '@tabler/icons-react';
 import * as lucide from 'lucide-react';
 import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { transformIcons } from 'shadcn/utils';
-import {
-  type ImportSpecifier,
-  Node,
-  Project,
-  type SourceFile,
-  SyntaxKind,
-} from 'ts-morph';
+import ts from 'typescript';
 import { beforeAll, describe, expect, test } from 'vitest';
 
 import {
@@ -73,28 +68,49 @@ describe.each(entries)('$key', ({ element, Icon, missing }) => {
 
 const source = readFileSync(new URL('icons.tsx', import.meta.url), 'utf-8');
 
-// The local name an import binds: its alias when renamed.
-function boundName(named: ImportSpecifier): string {
-  return (named.getAliasNode() ?? named.getNameNode()).getText();
+type SourceFile = Parameters<typeof transformIcons>[0]['sourceFile'];
+
+type TsMorph = {
+  Project: new (options: { useInMemoryFileSystem: boolean }) => {
+    createSourceFile: (name: string, text: string) => SourceFile;
+  };
+};
+
+function isTsMorph(value: unknown): value is TsMorph {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'Project' in value &&
+    typeof value.Project === 'function'
+  );
 }
+
+// shadcn's transform only matches nodes from its own ts-morph version; a file
+// from another version passes through untransformed.
+const tsMorph: unknown = createRequire(import.meta.resolve('shadcn/utils'))(
+  'ts-morph',
+);
+if (!isTsMorph(tsMorph)) throw new Error("shadcn's ts-morph has no Project");
+const { Project } = tsMorph;
 
 // A local named like an imported icon renders itself instead of the icon.
-function declaredNames(sourceFile: SourceFile): string[] {
-  return [
-    ...sourceFile.getDescendantsOfKind(SyntaxKind.VariableDeclaration),
-    ...sourceFile.getDescendantsOfKind(SyntaxKind.BindingElement),
-    ...sourceFile.getDescendantsOfKind(SyntaxKind.Parameter),
-    ...sourceFile.getDescendantsOfKind(SyntaxKind.FunctionDeclaration),
-    ...sourceFile.getDescendantsOfKind(SyntaxKind.FunctionExpression),
-    ...sourceFile.getDescendantsOfKind(SyntaxKind.ClassDeclaration),
-    ...sourceFile.getDescendantsOfKind(SyntaxKind.ClassExpression),
-  ].flatMap((node) => {
-    const name = node.getNameNode();
-    return Node.isIdentifier(name) ? [name.getText()] : [];
-  });
+function declaredNames(text: string): string[] {
+  return descendants(parse(text)).flatMap((node) =>
+    isNamedDeclaration(node) && node.name && ts.isIdentifier(node.name)
+      ? [node.name.text]
+      : [],
+  );
 }
 
-async function installed(library: string): Promise<SourceFile> {
+function descendants(node: ts.Node): ts.Node[] {
+  const children: ts.Node[] = [];
+  ts.forEachChild(node, (child) => {
+    children.push(child, ...descendants(child));
+  });
+  return children;
+}
+
+async function installed(library: string): Promise<string> {
   const project = new Project({ useInMemoryFileSystem: true });
   const sourceFile = project.createSourceFile('icons.tsx', source);
   // transformIcons reads only config.iconLibrary.
@@ -108,33 +124,68 @@ async function installed(library: string): Promise<SourceFile> {
     raw: source,
     sourceFile,
   });
-  return sourceFile;
+  return sourceFile.getFullText();
 }
 
-function valueImports(sourceFile: SourceFile): ImportSpecifier[] {
-  return sourceFile
-    .getImportDeclarations()
-    .filter((declaration) => !declaration.isTypeOnly())
-    .flatMap((declaration) => declaration.getNamedImports())
-    .filter((named) => !named.isTypeOnly());
+function isNamedDeclaration(
+  node: ts.Node,
+): node is { name?: ts.Node } & ts.Node {
+  return (
+    ts.isVariableDeclaration(node) ||
+    ts.isBindingElement(node) ||
+    ts.isParameter(node) ||
+    ts.isFunctionDeclaration(node) ||
+    ts.isFunctionExpression(node) ||
+    ts.isClassDeclaration(node) ||
+    ts.isClassExpression(node)
+  );
 }
+
+function parse(text: string): ts.SourceFile {
+  return ts.createSourceFile('icons.tsx', text, ts.ScriptTarget.Latest, true);
+}
+
+// Value imports as [imported name, local name], the alias when renamed.
+function valueImports(text: string): [string, string][] {
+  return parse(text).statements.flatMap((statement) => {
+    const clause = ts.isImportDeclaration(statement)
+      ? statement.importClause
+      : undefined;
+    const bindings = clause?.namedBindings;
+    const isTypeOnly = clause?.phaseModifier === ts.SyntaxKind.TypeKeyword;
+    if (!clause || isTypeOnly || !bindings) return [];
+    if (!ts.isNamedImports(bindings)) return [];
+    return bindings.elements
+      .filter((element) => !element.isTypeOnly)
+      .map((element): [string, string] => [
+        (element.propertyName ?? element.name).text,
+        element.name.text,
+      ]);
+  });
+}
+
+test('valueImports skips type-only imports and binds aliases', () => {
+  const fixture = [
+    "import { A, B as C, type D } from 'x';",
+    "import type { E } from 'y';",
+  ].join('\n');
+  expect(valueImports(fixture)).toEqual([
+    ['A', 'A'],
+    ['B', 'C'],
+  ]);
+});
 
 test('declaredNames collects every kind of local binding', () => {
-  const sourceFile = new Project({
-    useInMemoryFileSystem: true,
-  }).createSourceFile(
-    'fixture.ts',
-    [
-      'const Variable = 1;',
-      'const { key: Destructured } = { key: 1 };',
-      'const [Element] = [1];',
-      'function Declared(Param: number) {}',
-      'const Held = function Expressed() {};',
-      'class Klass {}',
-      'const Kept = class Classed {};',
-    ].join('\n'),
-  );
-  expect(new Set(declaredNames(sourceFile))).toEqual(
+  const fixture = [
+    'const Variable = 1;',
+    'const { key: Destructured } = { key: 1 };',
+    'const [Element] = [1];',
+    'function Declared(Param: number) {}',
+    'const Held = function Expressed() {};',
+    'class Klass {}',
+    'const Kept = class Classed {};',
+  ].join('\n');
+  expect(new Set(declaredNames(fixture))).toEqual(
     new Set([
       'Classed',
       'Declared',
@@ -154,27 +205,21 @@ test('declaredNames collects every kind of local binding', () => {
 describe.each(Object.keys(packages))(
   'installed with iconLibrary %s',
   (library) => {
-    let sourceFile: SourceFile;
+    let text = '';
     beforeAll(async () => {
-      sourceFile = await installed(library);
+      text = await installed(library);
     });
 
     test('replaces every IconPlaceholder and imports each icon', () => {
-      expect(sourceFile.getFullText()).not.toMatch(/<IconPlaceholder\b/u);
-      const imported = new Set(
-        valueImports(sourceFile).map((named) => named.getName()),
-      );
+      expect(text).not.toMatch(/<IconPlaceholder\b/u);
+      const imported = new Set(valueImports(text).map(([name]) => name));
       const wanted = entries.map(({ names }) => String(names[library]));
       expect(wanted.filter((name) => !imported.has(name))).toEqual([]);
     });
 
     test('declares nothing named like an imported icon', () => {
-      const bound = new Set(
-        valueImports(sourceFile).map((named) => boundName(named)),
-      );
-      expect(
-        declaredNames(sourceFile).filter((name) => bound.has(name)),
-      ).toEqual([]);
+      const bound = new Set(valueImports(text).map(([, local]) => local));
+      expect(declaredNames(text).filter((name) => bound.has(name))).toEqual([]);
     });
   },
 );
