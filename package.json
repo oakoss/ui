@@ -16,7 +16,6 @@
   "scripts": {
     "build": "turbo run build",
     "build-storybook": "turbo run build-storybook",
-    "changeset": "changeset",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "lint": "pnpm run lint:oxlint && pnpm run lint:eslint && pnpm run lint:md",
@@ -27,18 +26,16 @@
     "lint:md:fix": "markdownlint-cli2 --fix '**/*.md'",
     "lint:oxlint": "oxlint",
     "lint:oxlint:fix": "oxlint --fix",
-    "release:tag": "changeset git-tag",
-    "release:version": "changeset version",
     "setup": "bd bootstrap --yes",
     "storybook": "pnpm --filter @oakoss/storybook storybook",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck && tsc --noEmit"
   },
   "devDependencies": {
-    "@changesets/cli": "^3.0.3",
     "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.3",
     "@oakoss/eslint-config": "workspace:*",
+    "@oakoss/oakum": "0.5.0",
     "@oakoss/oxlint-config": "workspace:*",
     "@oakoss/tsconfig": "workspace:*",
     "@tanstack/intent": "^0.5.3",

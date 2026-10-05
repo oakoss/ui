@@ -1,0 +1,9 @@
+#:schema ./_schema.json
+tool-version = "0.5.0"
+change-files = true
+conventional-commits = true
+versioning = "zero-major"
+private-packages = { version = true, tag = true }
+# The registry is the one release; consumers pin its tag as `#v0.1.0`.
+include = ["@oakoss/ui"]
+tag-format = "v{{ version }}"
