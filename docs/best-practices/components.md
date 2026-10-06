@@ -35,6 +35,7 @@ How to write a component in `packages/ui`. Each entry is a rule and its reason; 
 
 ## Styling
 
+- **In a `tv` with `slots`, every variant value names its slot** (`true: { content: 'h-full' }`). A plain string goes to the `base` slot, which `tv` adds even when `slots` doesn't list it, so no element renders the classes; that briefly left side sheets without their width.
 - **Every `tv` result goes through `cn` or `cx`.** `tailwind-variants/lite` doesn't merge. `cn` takes `ClassInput` rather than the `cn` package's `ClassValue`, whose dictionary branch accepts an uncalled slot (`cn(styles.label)`, a function) and drops its classes.
 - **`data-slot` on every part, with upstream shadcn names** (`field-label`, `field-description`, `field-error`, `input`), so consumers can target parts.
 - **Tokens, not raw values.** Control heights use `h-control-sm`/`h-control`/`h-control-lg`, padding `px-control-x`, radius `rounded-control`. oxlint's `no-arbitrary-values` allows exceptions per file only.
