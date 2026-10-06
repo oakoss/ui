@@ -9,6 +9,7 @@ import {
 } from 'react-aria-components';
 
 import { cn, cx } from '#/lib/cx';
+import { useOverlayOpen } from '#/lib/use-overlay-open';
 
 export type TooltipProps = { children: ReactNode; className?: string } & Omit<
   AriaTooltipProps,
@@ -54,11 +55,26 @@ export function Tooltip({
 // open its tooltip, short enough to read as a response.
 export function TooltipTrigger({
   closeDelay = 500,
+  defaultOpen,
   delay = 500,
+  isDisabled,
+  isOpen,
+  onOpenChange,
   ...props
 }: ComponentProps<typeof AriaTooltipTrigger>) {
+  const open = useOverlayOpen({
+    defaultOpen,
+    isDisabled,
+    isOpen,
+    onOpenChange,
+  });
   return (
-    <AriaTooltipTrigger closeDelay={closeDelay} delay={delay} {...props} />
+    <AriaTooltipTrigger
+      closeDelay={closeDelay}
+      delay={delay}
+      {...props}
+      {...open}
+    />
   );
 }
 

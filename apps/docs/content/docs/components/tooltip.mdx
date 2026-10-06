@@ -101,4 +101,6 @@ defaults to 10.
 Renders React Aria's
 [`TooltipTrigger`](https://react-aria.adobe.com/Tooltip#api) with `delay`
 and `closeDelay` of 500ms. Its first child is the trigger: a React Aria
-control, or any element wrapped in `Focusable`.
+control, or any element wrapped in `Focusable`. Disabling the trigger closes an
+open tooltip and calls `onOpenChange(false)`, where React Aria alone would
+leave it open.

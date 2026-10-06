@@ -6,8 +6,9 @@ import {
   Tooltip,
   TooltipTrigger,
 } from '@oakoss/ui/components/ui/overlays/tooltip';
+import { useEffect, useState } from 'react';
 import { Focusable } from 'react-aria-components';
-import { expect, screen, userEvent, waitFor } from 'storybook/test';
+import { expect, fn, screen, userEvent, waitFor } from 'storybook/test';
 
 import {
   settledTooltip,
@@ -149,6 +150,53 @@ export const InsideDialog: Story = {
         <Tooltip>Merge the layers</Tooltip>
       </TooltipTrigger>
     </Dialog>
+  ),
+};
+
+function DisablesLater() {
+  const [isDisabled, setIsDisabled] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsDisabled(true);
+    }, 1000);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, []);
+  return (
+    <TooltipTrigger isDisabled={isDisabled}>
+      <Button variant="outline">Save</Button>
+      <Tooltip>Save your changes</Tooltip>
+    </TooltipTrigger>
+  );
+}
+
+// Disabling the trigger closes an open tooltip while focus stays on it.
+export const DisableWhileOpen: Story = {
+  play: async () => {
+    await userEvent.tab();
+    await expect(screen.getByRole('tooltip')).toBeInTheDocument();
+    await wait(1500);
+    await expect(screen.getByRole('button', { name: 'Save' })).toHaveFocus();
+    await expect(screen.queryByRole('tooltip')).toBeNull();
+  },
+  render: () => <DisablesLater />,
+};
+
+// A controlled tooltip shows from isOpen and reports Escape.
+export const Controlled: Story = {
+  args: { onOpenChange: fn<(isOpen: boolean) => void>() },
+  play: async ({ args }) => {
+    await expect(await screen.findByRole('tooltip')).toBeInTheDocument();
+    screen.getByRole('button', { name: 'Save' }).focus();
+    await userEvent.keyboard('{Escape}');
+    await expect(args.onOpenChange).toHaveBeenCalledWith(false);
+  },
+  render: (args) => (
+    <TooltipTrigger isOpen onOpenChange={args.onOpenChange}>
+      <Button variant="outline">Save</Button>
+      <Tooltip>Save your changes</Tooltip>
+    </TooltipTrigger>
   ),
 };
 
