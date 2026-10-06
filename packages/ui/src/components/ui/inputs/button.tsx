@@ -90,6 +90,7 @@ export function Button({
 }: ButtonProps) {
   return (
     <AriaButton
+      data-slot="button"
       {...props}
       className={cx(
         styles({ fullWidth, intent, size, targetSize, variant }),
@@ -97,7 +98,6 @@ export function Button({
       )}
       data-intent={intent ?? defaults.intent}
       data-size={size ?? defaults.size}
-      data-slot="button"
       data-variant={variant ?? defaults.variant}
     >
       {composeRenderProps(children, (resolved, { isPending }) => (
