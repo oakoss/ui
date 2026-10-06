@@ -14,7 +14,7 @@ import {
 import { expect, screen, userEvent, waitFor } from 'storybook/test';
 
 import { AlertDemo, type AlertDemoProps, openAlert } from './alert-dialog-demo';
-import { closed, dialogParts, visible } from './dialog-demo';
+import { closed, dialogParts, stayedOpen } from './dialog-demo';
 
 const meta = {
   render: (args) => <AlertDemo {...args} />,
@@ -96,7 +96,7 @@ export const Dismissal: Story = {
   play: async () => {
     const { overlay } = dialogParts(await openAlert());
     await userEvent.click(overlay, { skipHover: true });
-    await visible(screen.getByRole('alertdialog'));
+    await stayedOpen(overlay);
     await userEvent.keyboard('{Escape}');
     await closed('alertdialog');
   },

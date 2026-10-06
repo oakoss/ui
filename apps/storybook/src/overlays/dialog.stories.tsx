@@ -17,6 +17,7 @@ import {
   type DemoProps,
   dialogParts,
   openDialog,
+  stayedOpen,
   visible,
 } from './dialog-demo';
 
@@ -100,7 +101,7 @@ export const NotDismissable: Story = {
   play: async () => {
     const { overlay } = dialogParts(await openDialog());
     await userEvent.click(overlay, { skipHover: true });
-    await visible(screen.getByRole('dialog'));
+    await stayedOpen(overlay);
     await userEvent.keyboard('{Escape}');
     await closed();
   },

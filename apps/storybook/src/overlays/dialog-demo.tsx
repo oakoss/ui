@@ -73,6 +73,15 @@ export async function openDialog() {
   return screen.findByRole('dialog', { name: 'Edit profile' });
 }
 
+// A closing overlay stays visible and findable by role until its exit ends.
+export async function stayedOpen(overlay: HTMLElement) {
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, 400);
+  });
+  await expect(overlay).toBeInTheDocument();
+  await expect(overlay).not.toHaveAttribute('data-exiting');
+}
+
 // Visibility settles once the enter transition finishes.
 export async function visible(element: HTMLElement) {
   await waitFor(async () => {

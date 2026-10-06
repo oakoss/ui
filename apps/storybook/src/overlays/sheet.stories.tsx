@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { expect, screen, userEvent } from 'storybook/test';
 
-import { closed } from './dialog-demo';
+import { closed, stayedOpen } from './dialog-demo';
 import {
   expectEdge,
   settledPanel,
@@ -80,14 +80,9 @@ export const OutsideClickDismisses: Story = {
 export const NotDismissable: Story = {
   args: { isDismissable: false },
   play: async () => {
-    const { dialog, overlay, panel } = await settledPanel();
+    const { overlay } = await settledPanel();
     await userEvent.click(overlay, { skipHover: true });
-    // Longer than the slide-out, which keeps a closing panel visible.
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 400);
-    });
-    await expect(panel).not.toHaveAttribute('data-exiting');
-    await expect(dialog).toBeInTheDocument();
+    await stayedOpen(overlay);
   },
 };
 
