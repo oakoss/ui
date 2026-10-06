@@ -2,6 +2,10 @@
 
 How to write a component in `packages/ui`. Each entry is a rule and its reason; the decision records in `docs/research/` hold the history. Keep rationale here rather than in component comments, since components ship into users' projects. Stories and type tests follow [testing](testing.md), and registry items follow [registry](registry.md).
 
+## Porting
+
+- **Survey before porting.** Before writing a component, compare how 3–5 React Aria libraries (React Aria's starter kit, Intent UI, Jolly UI, HeroUI, Untitled UI) and the WAI-ARIA pattern handle it, and pick the features worth adding beyond upstream. Upstream is a starting point, not the spec: Dialog's port found an unnamed dialog, an unlinked description and unscrollable tall content.
+
 ## React Aria
 
 - **Read state from render props, not props.** Visuals that follow field or control state (a required asterisk, disabled or invalid styling) use React Aria's render-props values, which include values merged from context and slots. Props flow through `...props` untouched, so nothing needs forwarding.
@@ -35,6 +39,7 @@ How to write a component in `packages/ui`. Each entry is a rule and its reason; 
 - **`data-slot` on every part, with upstream shadcn names** (`field-label`, `field-description`, `field-error`, `input`), so consumers can target parts.
 - **Tokens, not raw values.** Control heights use `h-control-sm`/`h-control`/`h-control-lg`, padding `px-control-x`, radius `rounded-control`. oxlint's `no-arbitrary-values` allows exceptions per file only.
 - **Per-component color variables.** A component recolors through its own prefix (`--btn-*`), not a shared one, so each can be tuned alone. Each intent sets them in `tv` classes, not generated `@utility` classes: re-adding an item reverts a consumer's edits inside its CSS, `cn` keeps two intent utilities and lets alphabetical CSS order pick the winner, and a missing stylesheet leaves the component uncolored with no error.
+- **Enter and exit are transitions on React Aria's `entering:` and `exiting:` states,** not `tw-animate-css` keyframes. React Aria waits for an element's CSS transitions before unmounting it, so no animation package ships, and the reduced-motion layer shortens them.
 - **Logical utilities only** (`ps`/`pe`, `ms`/`me`, `start`/`end`, `text-start`); the lint rule bans physical ones in component files.
 - **Hover and press on non-solid looks are a state layer.** The `stateLayer` recipe tints the surface with its own text color at the tokens' strengths (8% hover, 12% press), which the tokens keep text AA under. It's a gradient so it paints over the fill. Solid fills swap to their `-hover` color instead.
 - **Arbitrary-value exceptions name each value.** A per-file oxlint allow list may wildcard the variable name but lists each color (`[--btn-*:var(--color-primary)]`); a `*` in the value would also admit a hardcoded fallback like `var(--color-primary,#f00)`.
@@ -46,7 +51,7 @@ How to write a component in `packages/ui`. Each entry is a rule and its reason; 
 - **Visual-only marks are `aria-hidden`.** A required asterisk would otherwise be read on top of React Aria's own required state.
 - **Several messages in one described-by target need a separator in the text.** `aria-describedby` reads text flat, so layout alone doesn't separate them.
 - **Pointer targets reach 44×44** (WCAG 2.5.5, above AA's 24×24) with the `targetSize` recipe, which grows the hit area without changing the visible size. Turn it off only where controls sit closer than that (toolbars, button groups), or neighbors take each other's clicks.
-- **Controls stay visible in forced colors.** Every control keeps a border or outline in Windows High Contrast.
+- **Controls and panels stay visible in forced colors.** Every control keeps a border or outline in Windows High Contrast, and a panel drawn with a ring or shadow (a dialog, a popover) adds a transparent border, which forced colors repaints.
 
 ## Strings
 

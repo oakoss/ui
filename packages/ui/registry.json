@@ -315,6 +315,9 @@
       "type": "registry:ui",
       "title": "Button",
       "description": "Accessible button built on React Aria Components.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/button.tsx"
+      },
       "registryDependencies": ["oakoss/ui/theme"],
       "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
       "files": [
@@ -355,6 +358,9 @@
       "type": "registry:ui",
       "title": "Field",
       "description": "Label, description, error and input parts that wire into any React Aria field, plus fieldset and group layout.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/field.tsx"
+      },
       "registryDependencies": ["oakoss/ui/theme"],
       "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
       "files": [
@@ -392,6 +398,34 @@
           "path": "src/components/ui/inputs/text-field.tsx",
           "type": "registry:ui",
           "target": "@ui/inputs/text-field.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "dialog",
+      "type": "registry:ui",
+      "title": "Dialog",
+      "description": "Modal dialog built on React Aria Components, with a title, description and close button wired to the dialog.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/dialog.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme", "oakoss/ui/button"],
+      "dependencies": ["cn", "react-aria-components"],
+      "files": [
+        {
+          "path": "src/components/ui/overlays/dialog.tsx",
+          "type": "registry:ui",
+          "target": "@ui/overlays/dialog.tsx"
         },
         {
           "path": "src/lib/cx.ts",

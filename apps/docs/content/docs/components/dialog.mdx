@@ -1,0 +1,159 @@
+---
+title: Dialog
+description: A modal window over the page, with a title, description and close button.
+item: dialog
+reactAria: https://react-aria.adobe.com/Modal
+---
+
+import { DialogControlled } from '#/components/demos/dialog-controlled';
+import { DialogDemo } from '#/components/demos/dialog-demo';
+import { DialogRequiredChoice } from '#/components/demos/dialog-required-choice';
+
+<ComponentPreview name="dialog-demo">
+  <DialogDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="dialog" />
+
+This also installs [Button](/docs/components/button), which the close buttons
+use.
+
+## Usage
+
+```tsx
+import {
+  Dialog,
+  DialogClose,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '#/components/ui/overlays/dialog';
+
+<DialogTrigger>
+  <Button>Open</Button>
+  <Dialog>
+    <DialogHeader>
+      <DialogTitle>Title</DialogTitle>
+      <DialogDescription>Description</DialogDescription>
+    </DialogHeader>
+    <DialogFooter>
+      <DialogClose>Cancel</DialogClose>
+    </DialogFooter>
+  </Dialog>
+</DialogTrigger>;
+```
+
+## Examples
+
+### Controlled
+
+`isOpen` and `onOpenChange` open the dialog from state instead of a trigger.
+`showCloseButton` on `DialogFooter` adds a Close button to the footer:
+
+<ComponentPreview name="dialog-controlled">
+  <DialogControlled />
+</ComponentPreview>
+
+### Required choice
+
+`isDismissable={false}` keeps a click outside from closing the dialog, and
+`showCloseButton={false}` drops the close button, so the footer's buttons are
+the only way out. Escape still closes it unless `isKeyboardDismissDisabled` is
+set:
+
+<ComponentPreview name="dialog-required-choice">
+  <DialogRequiredChoice />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria renders the dialog in a portal and handles:
+
+- **Name:** `DialogTitle` names the dialog (`aria-labelledby`). A dialog
+  without one needs an `aria-label`.
+- **Description:** with `role="alertdialog"`, `DialogDescription` describes the
+  dialog (`aria-describedby`). A plain dialog leaves it out, so screen readers
+  don't read a long dialog in full when it opens.
+- **Focus:** focus moves into the dialog on open, stays inside it, and returns
+  to the trigger on close. The page behind it is hidden from screen readers.
+
+`DialogClose` and the close button close the dialog through React Aria's
+`close` slot. The close button's name comes from `closeLabel`, and the dialog
+keeps a visible edge in Windows High Contrast.
+
+| Key           | Action                                                          |
+| ------------- | --------------------------------------------------------------- |
+| `Escape`      | Closes the dialog, unless `isKeyboardDismissDisabled` is set    |
+| `Tab`         | Moves to the next focusable element, wrapping inside the dialog |
+| `Shift + Tab` | Moves to the previous one, wrapping inside the dialog           |
+
+Follows the [WAI-ARIA dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/).
+
+## API
+
+### DialogTrigger
+
+React Aria's [`DialogTrigger`](https://react-aria.adobe.com/Modal#api): opens
+the `Dialog` from its first child, a pressable element. It renders no element
+of its own.
+
+### Dialog
+
+Renders React Aria's [`ModalOverlay`](https://react-aria.adobe.com/Modal#api),
+`Modal` and `Dialog`. `className` applies to the panel.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/overlays/dialog.tsx"
+  name="DialogProps"
+/>
+
+Also accepts all [React Aria `ModalOverlay` props](https://react-aria.adobe.com/Modal#api).
+
+#### Data attributes
+
+| Attribute       | Present when                                                        |
+| --------------- | ------------------------------------------------------------------- |
+| `data-slot`     | Always: `dialog-overlay`, `dialog-content` (the panel) and `dialog` |
+| `data-entering` | The overlay and panel are animating in                              |
+| `data-exiting`  | The overlay and panel are animating out                             |
+
+### DialogHeader, DialogTitle, DialogDescription
+
+`DialogHeader` is a `div` that stacks the title and description.
+`DialogTitle` is React Aria's [`Heading`](https://react-aria.adobe.com/Modal#api)
+in the `title` slot, and `DialogDescription` is its `Text` in the
+`description` slot. Their `data-slot`s are `dialog-header`, `dialog-title` and
+`dialog-description`.
+
+### DialogFooter
+
+A `div` for the dialog's actions, stacked on small screens and in a row from
+`sm` up.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/overlays/dialog.tsx"
+  name="DialogFooterProps"
+/>
+
+Also accepts all `div` props. `data-slot` is `dialog-footer`.
+
+### DialogClose
+
+A [Button](/docs/components/button#api) in React Aria's `close` slot, so
+pressing it closes the dialog. It defaults to `variant="outline"` and
+`intent="neutral"`, and accepts all Button props. `data-slot` is
+`dialog-close`.
+
+### DialogOverlay
+
+The `ModalOverlay` that `Dialog` renders, for building a custom modal. Accepts
+all [React Aria `ModalOverlay` props](https://react-aria.adobe.com/Modal#api).
+`data-slot` is `dialog-overlay`.
