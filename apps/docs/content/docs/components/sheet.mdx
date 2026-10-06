@@ -1,0 +1,110 @@
+---
+title: Sheet
+description: A panel that slides in from an edge of the screen.
+item: sheet
+reactAria: https://react-aria.adobe.com/Modal
+---
+
+import { SheetDemo } from '#/components/demos/sheet-demo';
+import { SheetSides } from '#/components/demos/sheet-sides';
+import { SheetSizes } from '#/components/demos/sheet-sizes';
+
+<ComponentPreview name="sheet-demo">
+  <SheetDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="sheet" />
+
+This also installs [Dialog](/docs/components/dialog), whose parts Sheet
+reuses, and [Button](/docs/components/button).
+
+## Usage
+
+```tsx
+import {
+  Sheet,
+  SheetBody,
+  SheetClose,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '#/components/ui/overlays/sheet';
+
+<SheetTrigger>
+  <Button>Open</Button>
+  <Sheet>
+    <SheetHeader>
+      <SheetTitle>Title</SheetTitle>
+    </SheetHeader>
+    <SheetBody>Content</SheetBody>
+    <SheetFooter>
+      <SheetClose>Done</SheetClose>
+    </SheetFooter>
+  </Sheet>
+</SheetTrigger>;
+```
+
+## Examples
+
+### Sides
+
+`side` picks the edge: `start` and `end` (the default) follow the page's `dir`,
+and a `bottom` sheet pads for a phone's home indicator.
+
+<ComponentPreview name="sheet-sides">
+  <SheetSides />
+</ComponentPreview>
+
+### Sizes
+
+`size` (`sm`, `md` by default, `lg`) sets a side sheet's width; `top` and
+`bottom` sheets span the screen.
+
+<ComponentPreview name="sheet-sizes">
+  <SheetSizes />
+</ComponentPreview>
+
+## Accessibility
+
+Sheet is a [Dialog](/docs/components/dialog#accessibility) placed against an
+edge, with the same naming, focus containment and keys: Escape closes it
+unless `isKeyboardDismissDisabled` is set, and Tab and Shift + Tab wrap inside
+it. Like Dialog, a click outside closes it
+unless `isDismissable` is `false`, and the close button's name comes from
+`closeLabel`. The inner edge keeps a border in Windows High Contrast.
+
+Follows the [WAI-ARIA dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/).
+
+## API
+
+### Sheet
+
+Renders React Aria's [`ModalOverlay`](https://react-aria.adobe.com/Modal#api),
+`Modal` and `Dialog` against an edge. `className` applies to the panel.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/overlays/sheet.tsx"
+  name="SheetProps"
+/>
+
+Also accepts all [React Aria `ModalOverlay` props](https://react-aria.adobe.com/Modal#api).
+
+#### Data attributes
+
+| Attribute       | Present when                                                   |
+| --------------- | -------------------------------------------------------------- |
+| `data-slot`     | Always: `dialog-overlay`, `sheet-content` (the panel), `sheet` |
+| `data-side`     | Always, on the overlay and panel; the side                     |
+| `data-size`     | Always, on the panel; the size                                 |
+| `data-entering` | The overlay and panel are sliding in                           |
+| `data-exiting`  | The overlay and panel are sliding out                          |
+
+### SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetBody, SheetClose, SheetTrigger
+
+Dialog's parts with `sheet-*` `data-slot`s (`SheetBody` keeps `dialog-body`).
+The footer sits at the bottom of the panel.

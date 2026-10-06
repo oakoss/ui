@@ -44,6 +44,20 @@ const componentVariables = defineConfig({
         ],
       },
     },
+    {
+      files: ['src/components/ui/overlays/sheet.tsx'],
+      rules: {
+        'shadcn/no-arbitrary-values': [
+          'error',
+          // A bottom sheet clears the home indicator on notched phones.
+          {
+            allow: [
+              'pb-[max(var(--spacing-panel),env(safe-area-inset-bottom))]',
+            ],
+          },
+        ],
+      },
+    },
   ],
 });
 
