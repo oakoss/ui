@@ -1,0 +1,162 @@
+---
+title: Alert Dialog
+description: A dialog that interrupts with a decision, focused on the safe choice.
+item: alert-dialog
+reactAria: https://react-aria.adobe.com/Modal
+---
+
+import { AlertDialogAsync } from '#/components/demos/alert-dialog-async';
+import { AlertDialogDemo } from '#/components/demos/alert-dialog-demo';
+import { AlertDialogSmall } from '#/components/demos/alert-dialog-small';
+
+<ComponentPreview name="alert-dialog-demo">
+  <AlertDialogDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="alert-dialog" />
+
+This also installs [Dialog](/docs/components/dialog), which AlertDialog builds
+on, and [Button](/docs/components/button).
+
+## Usage
+
+```tsx
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '#/components/ui/overlays/alert-dialog';
+
+<AlertDialogTrigger>
+  <Button>Delete</Button>
+  <AlertDialog>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Delete this project?</AlertDialogTitle>
+      <AlertDialogDescription>This can't be undone.</AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Cancel</AlertDialogCancel>
+      <AlertDialogAction onAction={deleteProject}>Delete</AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialog>
+</AlertDialogTrigger>;
+```
+
+## Examples
+
+### Async actions
+
+When `onAction` returns a promise, the action shows its pending state, Cancel,
+Escape and a click outside stop working, and the dialog closes once the promise
+resolves. If `onAction` throws or its promise rejects, the dialog stays open
+and `onError` receives the error, so the app can show it in the dialog; without
+`onError`, the error goes to `reportError`:
+
+<ComponentPreview name="alert-dialog-async">
+  <AlertDialogAsync />
+</ComponentPreview>
+
+### Small
+
+`size="sm"` narrows the dialog and puts the two buttons side by side.
+`AlertDialogMedia` holds an icon above the title:
+
+<ComponentPreview name="alert-dialog-small">
+  <AlertDialogSmall />
+</ComponentPreview>
+
+## Accessibility
+
+AlertDialog is a [Dialog](/docs/components/dialog#accessibility) with
+`role="alertdialog"`, and differs from it in these ways:
+
+- **Description:** `AlertDialogDescription` describes the dialog
+  (`aria-describedby`), so screen readers read it with the title on open.
+- **Focus:** focus starts on `AlertDialogCancel`, the least destructive
+  choice, as the WAI-ARIA alertdialog pattern recommends. Pass
+  `autoFocus={false}` to leave it on the dialog.
+- **Dismissal:** a click outside doesn't close it, since the user has to
+  choose; Escape does, unless an action is pending. There's no close button.
+- **Pending:** while `onAction`'s promise is pending, screen readers announce
+  the action's pending state.
+
+| Key           | Action                                                          |
+| ------------- | --------------------------------------------------------------- |
+| `Escape`      | Closes the dialog, unless an action is pending                  |
+| `Tab`         | Moves to the next focusable element, wrapping inside the dialog |
+| `Shift + Tab` | Moves to the previous one, wrapping inside the dialog           |
+
+Follows the [WAI-ARIA alertdialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/alertdialog/).
+
+## API
+
+### AlertDialog
+
+A [Dialog](/docs/components/dialog#api) with `role="alertdialog"`, no close
+button, and `isDismissable` off by default. Its overlay and panel keep
+Dialog's `data-slot`s.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/overlays/alert-dialog.tsx"
+  name="AlertDialogProps"
+/>
+
+Also accepts Dialog's other props.
+
+### AlertDialogAction
+
+A [Button](/docs/components/button#api), `variant="solid"` and
+`intent="primary"` by default, that runs `onAction` and then closes the
+dialog.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/overlays/alert-dialog.tsx"
+  name="AlertDialogActionProps"
+/>
+
+#### Data attributes
+
+| Attribute      | Present when                        |
+| -------------- | ----------------------------------- |
+| `data-slot`    | Always `alert-dialog-action`        |
+| `data-intent`  | Always; the color                   |
+| `data-variant` | Always; the look                    |
+| `data-pending` | `onAction`'s promise hasn't settled |
+
+Also accepts Button's other props, except `isPending` and `onPress`, which
+the action manages.
+
+### AlertDialogCancel
+
+A `DialogClose` that takes focus when the dialog opens and is disabled while
+an action is pending. Accepts all Button props. `data-slot` is
+`alert-dialog-cancel`.
+
+### AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter
+
+Dialog's parts, with `alert-dialog-*` `data-slot`s. With `size="sm"`, the
+footer lays its buttons out in two columns.
+
+### AlertDialogBody
+
+Dialog's `DialogBody`, for a long message; its `data-slot` stays
+`dialog-body`.
+
+### AlertDialogMedia
+
+A `div` for an icon above the title. `data-slot` is `alert-dialog-media`.
+
+### AlertDialogTrigger
+
+Dialog's `DialogTrigger`.

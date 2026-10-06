@@ -202,7 +202,12 @@ const preview: Preview = {
     },
   },
   parameters: {
-    a11y: { test: 'error' },
+    a11y: {
+      // React Aria's live announcer keeps a node labelled by a pending button's
+      // id for up to 7s after the button unmounts; it isn't markup we render.
+      context: { exclude: ['[data-live-announcer]'] },
+      test: 'error',
+    },
     controls: {
       matchers: { color: /(?:background|color)$/iu, date: /Date$/iu },
     },

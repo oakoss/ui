@@ -17,9 +17,9 @@ export type DemoProps = { defaultOpen?: boolean } & Omit<
   'children'
 >;
 
-export async function closed() {
+export async function closed(role: 'alertdialog' | 'dialog' = 'dialog') {
   await waitFor(async () => {
-    await expect(screen.queryByRole('dialog')).toBeNull();
+    await expect(screen.queryByRole(role)).toBeNull();
   });
 }
 
