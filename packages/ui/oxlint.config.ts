@@ -59,7 +59,10 @@ const componentVariables = defineConfig({
       },
     },
     {
-      files: ['src/components/ui/overlays/popover.tsx'],
+      files: [
+        'src/components/ui/overlays/popover.tsx',
+        'src/components/ui/overlays/tooltip.tsx',
+      ],
       rules: {
         'shadcn/no-arbitrary-values': [
           'error',

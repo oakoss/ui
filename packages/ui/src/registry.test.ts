@@ -27,6 +27,7 @@ const forked = [
   'field',
   'popover',
   'sheet',
+  'tooltip',
 ];
 const upstreams = new Map(
   ui.items.map((item) => [item.name, item.meta?.upstream]),
