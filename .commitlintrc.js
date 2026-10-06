@@ -15,6 +15,8 @@ const scopes = [
   'deps',
   'tooling',
   'ci',
+  // oakum's version PR: `chore(release): version packages`.
+  'release',
 ];
 
 export default defineConfig({

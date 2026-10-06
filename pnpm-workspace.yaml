@@ -31,8 +31,14 @@ catalog:
   vitest: ^5.0.3
 
 allowBuilds:
+  # Its postinstall downloads the release binary.
+  '@oakoss/oakum': true
   esbuild: true
   lefthook: true
   unrs-resolver: false
   # Wrangler's local runtime; deploys don't need it.
   workerd: false
+
+# Our own packages; the release-age window guards against third-party compromises.
+minimumReleaseAgeExclude:
+  - '@oakoss/*'

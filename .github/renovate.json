@@ -21,6 +21,17 @@
     },
     { "automerge": false, "matchUpdateTypes": ["major"] },
     {
+      "description": "Our own packages; the release-age wait guards against third-party compromises.",
+      "matchPackageNames": ["@oakoss/**"],
+      "minimumReleaseAge": null
+    },
+    {
+      "automerge": false,
+      "description": "oakum's tool-version must match its pin, so each bump needs `pnpm exec oakum upgrade` on its branch.",
+      "groupName": "oakum",
+      "matchPackageNames": ["@oakoss/oakum"]
+    },
+    {
       "allowedVersions": "<7",
       "description": "TypeScript 7 crashes the ESLint config load until typescript-eslint supports it (typescript-eslint#10940).",
       "matchPackageNames": ["typescript"]

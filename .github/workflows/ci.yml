@@ -111,12 +111,70 @@ jobs:
           title="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR" --jq .title)"
           printf '%s\n' "$title" | pnpm exec commitlint --verbose
 
+  # A changed @oakoss/ui needs a bump file. The version PR is the bump itself,
+  # so its check skips unless a person triggered the run; steps skip on push so
+  # the gate still sees success.
+  oakum:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - if: github.event_name == 'pull_request'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - if: github.event_name == 'pull_request'
+        uses: pnpm/setup@fbda4c85fc2e1e08721cd8763afea8f48d60f024 # v3.0.0
+        with:
+          cache: true
+          require-lockfile: true
+
+      - name: Check release intent
+        if: >-
+          github.event_name == 'pull_request'
+          && (github.head_ref != 'oakum/version-packages'
+          || github.event.pull_request.head.repo.full_name != github.repository
+          || github.event.pull_request.user.type != 'Bot'
+          || github.event.sender.type != 'Bot')
+        run: pnpm exec oakum check --strict
+
+      # Fork PRs get no secrets, so they skip the mint; a failed mint must not
+      # fail the gate. Either way pr-status falls back to github.token.
+      - name: Mint the oakoss App token
+        id: app-token
+        if: >-
+          github.event_name == 'pull_request'
+          && github.event.pull_request.head.repo.full_name == github.repository
+          && (success() || failure())
+        continue-on-error: true
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ secrets.BOT_CLIENT_ID }}
+          private-key: ${{ secrets.BOT_PRIVATE_KEY }}
+          permission-pull-requests: write
+
+      - name: Post the release plan
+        id: pr-status
+        if: github.event_name == 'pull_request' && (success() || failure())
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token || github.token }}
+        run: pnpm exec oakum ci pr-status
+
+      # A step that failed must not read as one that reported.
+      - if: (success() || failure()) && steps.pr-status.outcome == 'failure'
+        run: echo "::warning title=oakum ci pr-status::the step failed, so the release plan may not have reached the PR or the job summary; the check above still decides"
+
   ci-summary:
     name: CI Summary
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: always()
-    needs: [check, commitlint]
+    needs: [check, commitlint, oakum]
     steps:
       # Gates every job in `needs`; a job left out of `needs` is not gated.
       - name: Gate on all required jobs

@@ -63,6 +63,14 @@ If you can describe the fix in one sentence, just do the fix.
 
 When deferring, briefly state which criterion above applies.
 
+# Releasing
+
+`@oakoss/ui` is the one release: [oakum](https://github.com/oakoss/oakum) versions it and tags `v<version>`, the ref consumers pin. Config lives in `.changeset/_config.toml`.
+
+- **A PR that changes `packages/ui` adds a bump file:** `pnpm exec oakum add --packages '@oakoss/ui:<patch|minor|major>' --message "…"`, or `--packages '@oakoss/ui:none'` when nothing ships (tests, internal refactors). CI's `oakum` job fails without one. `pnpm exec oakum generate` drafts one from the branch's commits; trim the `chore` and `test` entries it counts as patches, and any line for `oakoss-ui`, which `check --strict` rejects.
+- **Releases are CI's job.** Merging to `main` opens or updates the version PR (`oakum/version-packages`); merging that tags the version and creates the GitHub release. Don't run `oakum version` or `oakum release` locally, and don't push to, update, or close and reopen the version PR: CI checks any run a person triggers there and fails it until the next merge to `main` rewrites the branch.
+- **Upgrading oakum:** bump the exact `@oakoss/oakum` pin in `package.json` and run `pnpm exec oakum upgrade` in the same PR, since `tool-version` must match.
+
 # Task tracking
 
 Use `bd` (beads). Run `bd prime` for the command reference and session protocol.

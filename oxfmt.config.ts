@@ -12,6 +12,8 @@ export default defineConfig({
     '**/routeTree.gen.ts',
     // Generated and rewritten by beads.
     '.beads/',
+    // Generated and rewritten by `oakum upgrade`.
+    '.changeset/_schema.json',
   ],
   objectWrap: 'collapse',
   printWidth: 80,
