@@ -23,16 +23,16 @@ export async function closed() {
   });
 }
 
-// Where the close button sits: which half of the dialog, and how far above its
-// top edge (-top-2).
+// Whether the close button sits 1rem in from the panel's top and right/left
+// edges. The 1px border and sub-pixel layout put each gap at 16–17px.
 export function closePosition(dialog: HTMLElement) {
   const close = screen.getByRole('button', { name: 'Close' });
   const closeBox = close.getBoundingClientRect();
-  const dialogBox = dialog.getBoundingClientRect();
+  const panel = dialogParts(dialog).content.getBoundingClientRect();
   return {
-    side:
-      closeBox.left < dialogBox.left + dialogBox.width / 2 ? 'left' : 'right',
-    topOffset: Math.round(closeBox.top - dialogBox.top),
+    left: isInset(closeBox.left - panel.left),
+    right: isInset(panel.right - closeBox.right),
+    top: isInset(closeBox.top - panel.top),
   };
 }
 
@@ -78,4 +78,8 @@ export async function visible(element: HTMLElement) {
   await waitFor(async () => {
     await expect(element).toBeVisible();
   });
+}
+
+function isInset(gap: number) {
+  return gap >= 15.5 && gap <= 17.5;
 }

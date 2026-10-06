@@ -42,8 +42,7 @@ export const Open: Story = {
     await expect(getComputedStyle(content).opacity).toBe('1');
     await expect(getComputedStyle(overlay).zIndex).toBe('1300');
     const close = closePosition(dialog);
-    await expect(close.side).toBe('right');
-    await expect(close.topOffset).toBe(-8);
+    await expect(close).toMatchObject({ left: false, right: true, top: true });
   },
 };
 
@@ -51,8 +50,7 @@ export const RightToLeft: Story = {
   globals: { locale: 'ar-EG' },
   play: async () => {
     const close = closePosition(await screen.findByRole('dialog'));
-    await expect(close.side).toBe('left');
-    await expect(close.topOffset).toBe(-8);
+    await expect(close).toMatchObject({ left: true, right: false, top: true });
   },
 };
 

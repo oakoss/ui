@@ -8,6 +8,8 @@ reactAria: https://react-aria.adobe.com/Modal
 import { DialogControlled } from '#/components/demos/dialog-controlled';
 import { DialogDemo } from '#/components/demos/dialog-demo';
 import { DialogRequiredChoice } from '#/components/demos/dialog-required-choice';
+import { DialogScrolling } from '#/components/demos/dialog-scrolling';
+import { DialogSizes } from '#/components/demos/dialog-sizes';
 
 <ComponentPreview name="dialog-demo">
   <DialogDemo />
@@ -49,6 +51,27 @@ import {
 
 ## Examples
 
+### Sizes
+
+`size` (`sm`, `md`, `lg`) caps the width from the `sm` breakpoint up, and on
+narrower screens the dialog sits on the bottom edge and slides up. `full`
+fills the screen at every width:
+
+<ComponentPreview name="dialog-sizes">
+  <DialogSizes />
+</ComponentPreview>
+
+### Scrolling content
+
+`DialogBody` scrolls between the header and footer, so the title and actions
+stay in view. When the visible viewport is too short to leave it room (below
+31.25rem, including while a phone's on-screen keyboard is open), the whole
+dialog scrolls instead:
+
+<ComponentPreview name="dialog-scrolling">
+  <DialogScrolling />
+</ComponentPreview>
+
 ### Controlled
 
 `isOpen` and `onOpenChange` open the dialog from state instead of a trigger.
@@ -83,7 +106,9 @@ React Aria renders the dialog in a portal and handles:
 
 `DialogClose` and the close button close the dialog through React Aria's
 `close` slot. The close button's name comes from `closeLabel`, and the dialog
-keeps a visible edge in Windows High Contrast.
+keeps a visible edge in Windows High Contrast. `DialogBody` is focusable, so
+keyboard users can scroll it, and the dialog's height follows React Aria's
+visible-viewport height, which leaves out a phone's on-screen keyboard.
 
 | Key           | Action                                                          |
 | ------------- | --------------------------------------------------------------- |
@@ -120,6 +145,7 @@ Also accepts all [React Aria `ModalOverlay` props](https://react-aria.adobe.com/
 | Attribute       | Present when                                                        |
 | --------------- | ------------------------------------------------------------------- |
 | `data-slot`     | Always: `dialog-overlay`, `dialog-content` (the panel) and `dialog` |
+| `data-size`     | Always, on the overlay and panel; the size                          |
 | `data-entering` | The overlay and panel are animating in                              |
 | `data-exiting`  | The overlay and panel are animating out                             |
 
@@ -130,6 +156,15 @@ Also accepts all [React Aria `ModalOverlay` props](https://react-aria.adobe.com/
 in the `title` slot, and `DialogDescription` is its `Text` in the
 `description` slot. Their `data-slot`s are `dialog-header`, `dialog-title` and
 `dialog-description`.
+
+### DialogBody
+
+A `div` that scrolls between the header and footer, and is focusable so the
+keyboard can scroll it. Accepts all `div` props. `data-slot` is `dialog-body`.
+
+A `<form>` wrapped around the body and footer needs `className="contents"`,
+so the body still scrolls between them; a plain form box stops the body
+shrinking and the whole dialog scrolls instead.
 
 ### DialogFooter
 

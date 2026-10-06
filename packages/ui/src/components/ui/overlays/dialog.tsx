@@ -13,10 +13,12 @@ import {
   Text as AriaText,
   type TextProps as AriaTextProps,
 } from 'react-aria-components';
+import { tv, type VariantProps } from 'tailwind-variants/lite';
 
 import * as Icon from '#/components/icons';
 import { Button, type ButtonProps } from '#/components/ui/inputs/button';
 import { cn, cx } from '#/lib/cx';
+import { focusRing } from '#/lib/recipes';
 
 export type DialogCloseProps = DistributiveOmit<ButtonProps, 'slot'>;
 
@@ -30,6 +32,7 @@ export type DialogProps = {
   className?: string;
   closeLabel?: string;
   showCloseButton?: boolean;
+  size?: DialogSize;
 } & DialogNameProps &
   Omit<AriaModalOverlayProps, 'children' | 'className' | keyof DialogNameProps>;
 
@@ -42,6 +45,39 @@ type DistributiveOmit<T, K extends PropertyKey> = T extends unknown
   ? Omit<T, K>
   : never;
 
+// Below `sm` the panel sits on the bottom edge and slides up; from `sm` it's
+// centered and scales in. `full` fills the screen at every width.
+const styles = tv({
+  compoundVariants: [
+    {
+      class: {
+        content:
+          'rounded-t-panel sm:rounded-panel entering:translate-y-full sm:entering:translate-y-0 sm:entering:scale-95 exiting:translate-y-full sm:exiting:translate-y-0 sm:exiting:scale-95',
+        overlay: 'items-end p-0 pt-4 sm:items-center sm:p-4',
+      },
+      size: ['lg', 'md', 'sm'],
+    },
+  ],
+  defaultVariants: { size: 'md' },
+  slots: {
+    content: [
+      'relative flex max-h-full w-full flex-col overflow-y-auto border border-transparent bg-popover p-panel text-sm text-popover-foreground shadow-lg ring-1 ring-foreground/10 outline-hidden transition duration-100',
+      'entering:opacity-0 exiting:opacity-0',
+    ],
+    overlay: '',
+  },
+  variants: {
+    size: {
+      full: { content: 'h-full rounded-none', overlay: 'items-stretch p-0' },
+      lg: { content: 'sm:max-w-2xl' },
+      md: { content: 'sm:max-w-md' },
+      sm: { content: 'sm:max-w-sm' },
+    },
+  },
+});
+
+export type DialogSize = NonNullable<VariantProps<typeof styles>['size']>;
+
 export function Dialog({
   'aria-describedby': ariaDescribedby,
   'aria-label': ariaLabel,
@@ -52,22 +88,27 @@ export function Dialog({
   isDismissable = true,
   role,
   showCloseButton = true,
+  size = 'md',
   ...props
 }: DialogProps) {
+  const { content, overlay } = styles({ size });
   return (
-    <DialogOverlay isDismissable={isDismissable} {...props}>
+    <DialogOverlay
+      className={cn(overlay())}
+      data-size={size}
+      isDismissable={isDismissable}
+      {...props}
+    >
       <AriaModal
-        className={cx(
-          'max-h-full w-full overflow-y-auto rounded-panel border border-transparent bg-popover p-panel text-sm text-popover-foreground shadow-lg ring-1 ring-foreground/10 outline-hidden transition duration-100 sm:max-w-md entering:scale-95 entering:opacity-0 exiting:scale-95 exiting:opacity-0',
-          className,
-        )}
+        className={cx(content(), className)}
+        data-size={size}
         data-slot="dialog-content"
       >
         <AriaDialog
           aria-describedby={ariaDescribedby}
           aria-label={ariaLabel}
           aria-labelledby={ariaLabelledby}
-          className="relative grid gap-6 outline-hidden"
+          className="flex flex-1 flex-col gap-6 outline-hidden has-data-[slot=dialog-body]:min-h-0 [@container(max-height:31.25rem)]:has-data-[slot=dialog-body]:min-h-auto"
           data-slot="dialog"
           role={role}
         >
@@ -75,7 +116,7 @@ export function Dialog({
           {showCloseButton ? (
             <DialogClose
               aria-label={closeLabel}
-              className="absolute -end-2 -top-2"
+              className="absolute end-4 top-4"
               size="icon-sm"
               variant="ghost"
             >
@@ -85,6 +126,22 @@ export function Dialog({
         </AriaDialog>
       </AriaModal>
     </DialogOverlay>
+  );
+}
+
+export function DialogBody({ className, ...props }: ComponentProps<'div'>) {
+  return (
+    <div
+      className={cn(
+        focusRing,
+        '-mx-panel -my-2 min-h-0 flex-1 overflow-y-auto px-panel py-2 focus-visible:-outline-offset-3 [@container(max-height:31.25rem)]:flex-none [@container(max-height:31.25rem)]:overflow-visible',
+        className,
+      )}
+      data-slot="dialog-body"
+      // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scrolling region needs keyboard access (axe scrollable-region-focusable)
+      tabIndex={0}
+      {...props}
+    />
   );
 }
 
@@ -158,7 +215,7 @@ export function DialogOverlay({ className, ...props }: AriaModalOverlayProps) {
   return (
     <AriaModalOverlay
       className={cx(
-        'fixed inset-0 isolate z-(--z-modal) flex items-center justify-center bg-black/10 p-4 transition-opacity duration-100 supports-backdrop-filter:backdrop-blur-xs entering:opacity-0 exiting:opacity-0',
+        '@container-size fixed inset-x-0 top-0 isolate z-(--z-modal) flex h-(--visual-viewport-height) items-center justify-center bg-black/10 p-4 transition-opacity duration-100 supports-backdrop-filter:backdrop-blur-xs entering:opacity-0 exiting:opacity-0',
         className,
       )}
       data-slot="dialog-overlay"

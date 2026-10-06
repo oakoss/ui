@@ -420,7 +420,7 @@
         "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/dialog.tsx"
       },
       "registryDependencies": ["oakoss/ui/theme", "oakoss/ui/button"],
-      "dependencies": ["cn", "react-aria-components"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
       "files": [
         {
           "path": "src/components/ui/overlays/dialog.tsx",
