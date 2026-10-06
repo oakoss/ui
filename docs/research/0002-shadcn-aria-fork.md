@@ -194,7 +194,7 @@ Settled in `ui-lwb.4` (2026-10-03), after surveying 16 libraries' text fields fr
    - the `oakoss/ui/base` item;
    - `cx` on `cn`, with a lint rule or test that every `tv` result passes through it;
    - Button and TextField re-ported as the reference conversions.
-4. **Component migration** in batches by category, starting with overlays (Dialog first). Each component records the shadcn commit it was forked from, so upstream fixes can be found by diffing.
+4. **Component migration** in batches by category, starting with overlays (Dialog first). Each component records the shadcn commit it was forked from, so upstream fixes can be found by diffing. The batches, their order, and the components left out (`direction`, and `drawer`, whose Base UI base gives way to Sheet's `side="bottom"`) are recorded in `ui-o2f.1`; React Aria components shadcn has no item for (date fields, `NumberField`, `SearchField`, `CheckboxGroup`, `TagGroup`, `Meter`) follow the shadcn ports, and the rest come on demand.
 
 ## Still unverified
 
