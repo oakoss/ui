@@ -4,12 +4,12 @@
   color-scheme: light;
   --radius: 0.625rem;
   --ring-width: 3px;
-  --z-dropdown: 1000;
   --z-modal: 1300;
   --z-overlay: 1200;
   --z-popover: 1400;
   --z-sticky: 1100;
-  --z-toast: 1500;
+  --z-toast: 1350;
+  --z-tooltip: 1600;
   --field: oklch(0 0 0 / 0%);
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
