@@ -58,6 +58,26 @@ const componentVariables = defineConfig({
         ],
       },
     },
+    {
+      files: ['src/components/ui/overlays/popover.tsx'],
+      rules: {
+        'shadcn/no-arbitrary-values': [
+          'error',
+          // Forced colors repaint borders but not SVG fills, so the arrow
+          // takes the system colors itself.
+          {
+            allow: [
+              'forced-colors:fill-[Canvas]',
+              'forced-colors:stroke-[CanvasText]',
+            ],
+          },
+        ],
+        // The rule can't read composeRenderProps, which clears React Aria's
+        // inline z-index while keeping its style type, and no option exempts
+        // an unreadable style object.
+        'shadcn/no-inline-styles': 'off',
+      },
+    },
   ],
 });
 

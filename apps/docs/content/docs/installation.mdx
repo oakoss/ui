@@ -41,6 +41,10 @@ Icons that render as empty squares mean `components.json` names no icon
 library. Set `"iconLibrary": "lucide"` (or another of the five) and add the
 component again.
 
+Give your app's root element `isolation: isolate` (the `isolate` class). Dialogs
+and popovers render at the end of `<body>` on the `--z-*` scale, and the root's
+own stacking context keeps z-indexes inside the app from competing with them.
+
 ## Add components
 
 ```npm
