@@ -1,0 +1,107 @@
+---
+title: Hover Card
+description: A preview of a link's content, shown on hover, keyboard focus or long press.
+item: hover-card
+reactAria: https://react-aria.adobe.com/PreviewTrigger
+---
+
+import { HoverCardArrow } from '#/components/demos/hover-card-arrow';
+import { HoverCardDemo } from '#/components/demos/hover-card-demo';
+
+<ComponentPreview name="hover-card-demo">
+  <HoverCardDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="hover-card" />
+
+Hover Card needs react-aria-components 1.20 or later, which added
+`PreviewTrigger`. It also installs [Popover](/docs/components/popover), whose
+styles and arrow it shares.
+
+## Usage
+
+```tsx
+import {
+  HoverCard,
+  HoverCardTrigger,
+} from '#/components/ui/overlays/hover-card';
+import { Link } from 'react-aria-components';
+
+<HoverCardTrigger>
+  <Link href="/ada">@ada</Link>
+  <HoverCard aria-label="Ada Lovelace">Wrote the first program.</HoverCard>
+</HoverCardTrigger>;
+```
+
+## Examples
+
+### Arrow
+
+`showArrow` adds an arrow that points at the trigger.
+
+<ComponentPreview name="hover-card-arrow">
+  <HoverCardArrow />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria's `PreviewTrigger` opens the card 600ms after the pointer or
+keyboard focus reaches the trigger and closes it 200ms after both leave, with
+room to move the pointer from the trigger to the card. On touch, a long press
+opens it, and React Aria adds a translated "Long press to open preview" hint
+to the trigger. The card is a dialog, so `aria-label` or `aria-labelledby` is
+required.
+
+While the card is open, the trigger is described by the card's whole content,
+so keep it short. Tab moves from the trigger into the card, Shift + Tab out of
+the card moves to the element before the trigger, and Escape closes it and
+returns focus to the trigger. The card may hold links and buttons, unlike a
+[Tooltip](/docs/components/tooltip), but the page must not depend on it: use
+it for a preview of where a link goes. Inside an open Dialog or Popover it
+stays out of the content React Aria hides behind them, so it stays reachable.
+
+## API
+
+### HoverCard
+
+Renders React Aria's [`Popover`](https://react-aria.adobe.com/Popover#api)
+with Popover's styles, 16rem wide. `className` applies to the card, and a
+`z-*` class overrides its `z-(--z-popover)`.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/overlays/hover-card.tsx"
+  name="HoverCardProps"
+/>
+
+Also accepts [React Aria `Popover` props](https://react-aria.adobe.com/Popover#api)
+except `isNonModal`, `trigger` and `slot`, which `PreviewTrigger` sets, and
+the open state props, which go on `HoverCardTrigger`; `children` and
+`className` take plain values. `placement` defaults to `bottom`, and `offset`
+to 8, or 12 with an arrow.
+
+#### Data attributes
+
+| Attribute        | Present when                                                     |
+| ---------------- | ---------------------------------------------------------------- |
+| `data-slot`      | Always: `hover-card-content`; `popover-arrow` with `showArrow`   |
+| `data-placement` | Always; the side it opened on (`top`, `bottom`, `left`, `right`) |
+| `data-entering`  | The card is fading in                                            |
+| `data-exiting`   | The card is fading out                                           |
+
+### HoverCardTrigger
+
+Renders React Aria's
+[`PreviewTrigger`](https://react-aria.adobe.com/PreviewTrigger). Its first
+child is the trigger, usually a React Aria `Link`. Open state lives here, not
+on `HoverCard`, so the trigger and card stay in step.
+
+Accepts all [React Aria `PreviewTrigger` props](https://react-aria.adobe.com/PreviewTrigger):
+`delay` (600ms) and `closeDelay` (200ms), `isOpen`, `defaultOpen` and
+`onOpenChange`, and `isDisabled`. A disabled trigger keeps the card closed on
+hover, keyboard focus and long press, and disabling an open card closes it and
+calls `onOpenChange(false)`; React Aria's own `isDisabled` stops only hover and
+long press, and leaves an open card open.

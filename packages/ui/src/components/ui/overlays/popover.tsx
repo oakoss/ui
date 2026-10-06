@@ -16,7 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '#/components/ui/overlays/dialog';
-import { cn, cx } from '#/lib/cx';
+import { cn } from '#/lib/cx';
 
 export type PopoverProps = {
   children: ReactNode;
@@ -54,7 +54,7 @@ export function Popover({
 }: PopoverProps) {
   return (
     <AriaPopover
-      className={cx(panel, className)}
+      className={cn(popoverStyles(), className)}
       data-slot="popover-content"
       offset={offset ?? (showArrow ? 12 : 8)}
       placement={placement}
@@ -76,6 +76,21 @@ export function Popover({
         {children}
       </AriaDialog>
     </AriaPopover>
+  );
+}
+
+// Points down; rotated toward the trigger for the other placements.
+export function PopoverArrow() {
+  return (
+    <AriaOverlayArrow className="group" data-slot="popover-arrow">
+      <svg
+        aria-hidden="true"
+        className="block size-3 fill-popover stroke-foreground/10 group-placement-left:-rotate-90 group-placement-right:rotate-90 group-placement-bottom:rotate-180 forced-colors:fill-[Canvas] forced-colors:stroke-[CanvasText]"
+        viewBox="0 0 12 12"
+      >
+        <path d="M0 0 L6 6 L12 0" />
+      </svg>
+    </AriaOverlayArrow>
   );
 }
 
@@ -110,6 +125,11 @@ export function PopoverHeader({
   );
 }
 
+// The panel's look and motion; `className` wins over conflicting classes.
+export function popoverStyles({ className }: { className?: string } = {}) {
+  return cn(panel, className);
+}
+
 export function PopoverTitle({
   className,
   ...props
@@ -125,19 +145,4 @@ export function PopoverTitle({
 
 export function PopoverTrigger(props: ComponentProps<typeof DialogTrigger>) {
   return <DialogTrigger {...props} />;
-}
-
-// Points down; rotated toward the trigger for the other placements.
-function PopoverArrow() {
-  return (
-    <AriaOverlayArrow className="group" data-slot="popover-arrow">
-      <svg
-        aria-hidden="true"
-        className="block size-3 fill-popover stroke-foreground/10 group-placement-left:-rotate-90 group-placement-right:rotate-90 group-placement-bottom:rotate-180 forced-colors:fill-[Canvas] forced-colors:stroke-[CanvasText]"
-        viewBox="0 0 12 12"
-      >
-        <path d="M0 0 L6 6 L12 0" />
-      </svg>
-    </AriaOverlayArrow>
-  );
 }

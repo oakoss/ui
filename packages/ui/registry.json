@@ -472,6 +472,39 @@
       ]
     },
     {
+      "name": "hover-card",
+      "type": "registry:ui",
+      "title": "Hover Card",
+      "description": "Non-modal preview of a link's content on hover, keyboard focus or long press, built on React Aria's PreviewTrigger.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/hover-card.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme", "oakoss/ui/popover"],
+      "dependencies": ["cn", "react-aria-components"],
+      "files": [
+        {
+          "path": "src/components/ui/overlays/hover-card.tsx",
+          "type": "registry:ui",
+          "target": "@ui/overlays/hover-card.tsx"
+        },
+        {
+          "path": "src/lib/use-overlay-open.ts",
+          "type": "registry:lib",
+          "target": "@lib/use-overlay-open.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
       "name": "popover",
       "type": "registry:ui",
       "title": "Popover",
@@ -550,6 +583,11 @@
           "path": "src/components/ui/overlays/tooltip.tsx",
           "type": "registry:ui",
           "target": "@ui/overlays/tooltip.tsx"
+        },
+        {
+          "path": "src/lib/use-overlay-open.ts",
+          "type": "registry:lib",
+          "target": "@lib/use-overlay-open.ts"
         },
         {
           "path": "src/lib/cx.ts",

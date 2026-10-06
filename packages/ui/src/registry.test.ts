@@ -25,6 +25,7 @@ const forked = [
   'button',
   'dialog',
   'field',
+  'hover-card',
   'popover',
   'sheet',
   'tooltip',

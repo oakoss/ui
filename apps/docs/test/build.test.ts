@@ -116,7 +116,7 @@ describe('component pages', () => {
 
   it.each(componentPages)('shows the demo source on $slug', ({ markdown }) => {
     // The Code tab's source reaches the Markdown output, imports rewritten.
-    expect(read(markdown)).toContain("from '#/components/ui/inputs/");
+    expect(read(markdown)).toContain("from '#/components/ui/");
     expect(read(markdown)).not.toContain('@oakoss/ui');
   });
 });

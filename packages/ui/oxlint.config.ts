@@ -60,6 +60,7 @@ const componentVariables = defineConfig({
     },
     {
       files: [
+        'src/components/ui/overlays/hover-card.tsx',
         'src/components/ui/overlays/popover.tsx',
         'src/components/ui/overlays/tooltip.tsx',
       ],
