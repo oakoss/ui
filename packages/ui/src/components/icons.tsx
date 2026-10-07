@@ -91,6 +91,32 @@ export function Ellipsis(props: IconProps) {
   );
 }
 
+export function Help(props: IconProps) {
+  return (
+    <IconPlaceholder
+      hugeicons="HelpCircleIcon"
+      lucide="CircleQuestionMarkIcon"
+      phosphor="QuestionIcon"
+      remixicon="RiQuestionLine"
+      tabler="IconHelpCircle"
+      {...props}
+    />
+  );
+}
+
+export function Info(props: IconProps) {
+  return (
+    <IconPlaceholder
+      hugeicons="InformationCircleIcon"
+      lucide="InfoIcon"
+      phosphor="InfoIcon"
+      remixicon="RiInformationLine"
+      tabler="IconInfoCircle"
+      {...props}
+    />
+  );
+}
+
 export function Loader(props: IconProps) {
   return (
     <IconPlaceholder
