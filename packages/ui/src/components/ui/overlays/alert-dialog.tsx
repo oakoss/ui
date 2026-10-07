@@ -20,6 +20,7 @@ import {
   type DialogProps,
   DialogTitle,
   DialogTrigger,
+  type DistributiveOmit,
 } from '#/components/ui/overlays/dialog';
 import { cn } from '#/lib/cx';
 
@@ -40,10 +41,6 @@ export type AlertDialogProps = { size?: 'md' | 'sm' } & Omit<
   DialogProps,
   'role' | 'showCloseButton' | 'size'
 >;
-
-type DistributiveOmit<T, K extends PropertyKey> = T extends unknown
-  ? Omit<T, K>
-  : never;
 
 type Pending = {
   isPending: boolean;

@@ -1,18 +1,16 @@
 import type { ComponentProps, ReactNode } from 'react';
 
 import {
-  Dialog as AriaDialog,
   type DialogProps as AriaDialogProps,
-  Modal as AriaModal,
   type ModalOverlayProps as AriaModalOverlayProps,
 } from 'react-aria-components';
 import { tv, type VariantProps } from 'tailwind-variants/lite';
 
-import * as Icon from '#/components/icons';
 import {
   DialogBody,
   DialogClose,
   type DialogCloseProps,
+  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -108,23 +106,19 @@ export function Sheet({
       isDismissable={isDismissable}
       {...props}
     >
-      <AriaModal
+      <DialogContent
+        aria-describedby={ariaDescribedby}
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledby}
         className={cx(content(), className)}
+        closeLabel={closeLabel}
         data-side={side}
         data-size={size}
-        data-slot="sheet-content"
+        data-slot="sheet"
+        showCloseButton={showCloseButton}
       >
-        <AriaDialog
-          aria-describedby={ariaDescribedby}
-          aria-label={ariaLabel}
-          aria-labelledby={ariaLabelledby}
-          className="flex flex-1 flex-col gap-6 outline-hidden has-data-[slot=dialog-body]:min-h-0 [@container(max-height:31.25rem)]:has-data-[slot=dialog-body]:min-h-auto"
-          data-slot="sheet"
-        >
-          {children}
-          {showCloseButton ? <CloseButton label={closeLabel} /> : null}
-        </AriaDialog>
-      </AriaModal>
+        {children}
+      </DialogContent>
     </DialogOverlay>
   );
 }
@@ -166,18 +160,4 @@ export function SheetTitle(props: ComponentProps<typeof DialogTitle>) {
 
 export function SheetTrigger(props: ComponentProps<typeof DialogTrigger>) {
   return <DialogTrigger {...props} />;
-}
-
-function CloseButton({ label }: { label: string }) {
-  return (
-    <DialogClose
-      aria-label={label}
-      className="absolute end-4 top-4"
-      data-slot="sheet-close"
-      size="icon-sm"
-      variant="ghost"
-    >
-      <Icon.X />
-    </DialogClose>
-  );
 }

@@ -22,6 +22,29 @@ import { focusRing } from '#/lib/recipes';
 
 export type DialogCloseProps = DistributiveOmit<ButtonProps, 'slot'>;
 
+export type DialogContentProps = {
+  children: ReactNode;
+  closeLabel?: string;
+  // Names the dialog's part, and prefixes the panel's and the close button's.
+  'data-slot'?: string;
+  showCloseButton?: boolean;
+} & DialogNameProps &
+  // Inside an overlay, Modal ignores its open state and dismissal props.
+  Omit<
+    ComponentProps<typeof AriaModal>,
+    | 'children'
+    | 'defaultOpen'
+    | 'isDismissable'
+    | 'isEntering'
+    | 'isExiting'
+    | 'isKeyboardDismissDisabled'
+    | 'isOpen'
+    | 'onOpenChange'
+    | 'shouldCloseOnInteractOutside'
+    | 'UNSTABLE_portalContainer'
+    | keyof DialogNameProps
+  >;
+
 export type DialogFooterProps = {
   closeLabel?: string;
   showCloseButton?: boolean;
@@ -36,14 +59,14 @@ export type DialogProps = {
 } & DialogNameProps &
   Omit<AriaModalOverlayProps, 'children' | 'className' | keyof DialogNameProps>;
 
+export type DistributiveOmit<T, K extends PropertyKey> = T extends unknown
+  ? Omit<T, K>
+  : never;
+
 type DialogNameProps = Pick<
   AriaDialogProps,
   'aria-describedby' | 'aria-label' | 'aria-labelledby' | 'role'
 >;
-
-type DistributiveOmit<T, K extends PropertyKey> = T extends unknown
-  ? Omit<T, K>
-  : never;
 
 // Below `sm` the panel sits on the bottom edge and slides up; from `sm` it's
 // centered and scales in. `full` fills the screen at every width.
@@ -99,32 +122,18 @@ export function Dialog({
       isDismissable={isDismissable}
       {...props}
     >
-      <AriaModal
+      <DialogContent
+        aria-describedby={ariaDescribedby}
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledby}
         className={cx(content(), className)}
+        closeLabel={closeLabel}
         data-size={size}
-        data-slot="dialog-content"
+        role={role}
+        showCloseButton={showCloseButton}
       >
-        <AriaDialog
-          aria-describedby={ariaDescribedby}
-          aria-label={ariaLabel}
-          aria-labelledby={ariaLabelledby}
-          className="flex flex-1 flex-col gap-6 outline-hidden has-data-[slot=dialog-body]:min-h-0 [@container(max-height:31.25rem)]:has-data-[slot=dialog-body]:min-h-auto"
-          data-slot="dialog"
-          role={role}
-        >
-          {children}
-          {showCloseButton ? (
-            <DialogClose
-              aria-label={closeLabel}
-              className="absolute end-4 top-4"
-              size="icon-sm"
-              variant="ghost"
-            >
-              <Icon.X />
-            </DialogClose>
-          ) : null}
-        </AriaDialog>
-      </AriaModal>
+        {children}
+      </DialogContent>
     </DialogOverlay>
   );
 }
@@ -158,6 +167,46 @@ export function DialogClose({
       {...props}
       slot="close"
     />
+  );
+}
+
+// The panel and dialog inside an overlay, for a modal with its own layout, as
+// Sheet does. A tall DialogBody scrolls unless the viewport is short.
+export function DialogContent({
+  'aria-describedby': ariaDescribedby,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledby,
+  children,
+  closeLabel = 'Close',
+  'data-slot': slot = 'dialog',
+  role,
+  showCloseButton = true,
+  ...props
+}: DialogContentProps) {
+  return (
+    <AriaModal data-slot={`${slot}-content`} {...props}>
+      <AriaDialog
+        aria-describedby={ariaDescribedby}
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledby}
+        className="flex flex-1 flex-col gap-6 outline-hidden has-data-[slot=dialog-body]:min-h-0 [@container(max-height:31.25rem)]:has-data-[slot=dialog-body]:min-h-auto"
+        data-slot={slot}
+        role={role}
+      >
+        {children}
+        {showCloseButton ? (
+          <DialogClose
+            aria-label={closeLabel}
+            className="absolute end-4 top-4"
+            data-slot={`${slot}-close`}
+            size="icon-sm"
+            variant="ghost"
+          >
+            <Icon.X />
+          </DialogClose>
+        ) : null}
+      </AriaDialog>
+    </AriaModal>
   );
 }
 

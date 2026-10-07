@@ -187,6 +187,34 @@ pressing it closes the dialog. It defaults to `variant="outline"` and
 `intent="neutral"`, and accepts all Button props. `data-slot` is
 `dialog-close`.
 
+### DialogContent
+
+The panel `Dialog` renders inside `DialogOverlay`, for building a custom modal,
+as [Sheet](/docs/components/sheet) does: React Aria's
+[`Modal`](https://react-aria.adobe.com/Modal#api) with a `Dialog` and the close
+button inside, and a `DialogBody` that scrolls between header and footer.
+`className` applies to the panel.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/overlays/dialog.tsx"
+  name="DialogContentProps"
+/>
+
+Also accepts [React Aria `Modal` props](https://react-aria.adobe.com/Modal#api)
+except the ones React Aria reads from the overlay: the open state props,
+`isEntering`, `isExiting`, the dismissal props and `UNSTABLE_portalContainer`,
+which go on `DialogOverlay`.
+
+#### Data attributes
+
+| Attribute       | Present when                                                                                                                    |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `data-slot`     | Always: the `data-slot` prop (`dialog` by default) on the dialog, with `-content` on the panel and `-close` on the close button |
+| `data-entering` | The panel is animating in                                                                                                       |
+| `data-exiting`  | The panel is animating out                                                                                                      |
+
 ### DialogOverlay
 
 The `ModalOverlay` that `Dialog` renders, for building a custom modal. Accepts
