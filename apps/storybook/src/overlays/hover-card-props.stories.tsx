@@ -7,7 +7,14 @@ import {
   type HoverCardDemoProps,
   settledCard,
 } from './hover-card-demo';
-import { wait } from './tooltip-demo';
+import {
+  exitStarted,
+  expectAfter,
+  hoverFresh,
+  leave,
+  slowTimeout,
+  wait,
+} from './overlay-test';
 
 const meta = {
   render: (args) => <HoverCardDemo {...args} />,
@@ -18,32 +25,40 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-async function pointerOn() {
-  await wait(600);
-  await userEvent.click(document.body);
-  await userEvent.hover(screen.getByRole('link', { name: '@ada' }));
+function link() {
+  return screen.getByRole('link', { name: '@ada' });
 }
 
-// A consumer's delays reach PreviewTrigger.
-export const NoOpenDelay: Story = {
-  args: { trigger: { delay: 0 } },
+function pointerOn() {
+  return hoverFresh(link());
+}
+
+// A consumer's delays reach PreviewTrigger. Each is longer than the default,
+// so a dropped prop or a leftover warm-up acts too soon and fails.
+export const LongOpenDelay: Story = {
+  args: { trigger: { delay: 1500 } },
   play: async () => {
-    await pointerOn();
-    await wait(100);
-    await expect(screen.queryByRole('dialog')).not.toBeNull();
+    const hovered = await pointerOn();
+    await expect(screen.queryByRole('dialog')).toBeNull();
+    await expectAfter(hovered, 1500, () =>
+      screen.findByRole('dialog', undefined, { timeout: slowTimeout }),
+    );
+    await leave(link(), 'dialog');
   },
 };
 
 export const LongCloseDelay: Story = {
-  args: { trigger: { closeDelay: 1500, delay: 0 } },
+  args: { trigger: { closeDelay: 1500 } },
   play: async () => {
     await pointerOn();
-    await screen.findByRole('dialog');
-    await userEvent.unhover(screen.getByRole('link', { name: '@ada' }));
-    await wait(700);
-    await expect(screen.getByRole('dialog')).not.toHaveAttribute(
-      'data-exiting',
-    );
+    const card = await screen.findByRole('dialog', undefined, {
+      timeout: slowTimeout,
+    });
+    const left = performance.now();
+    await userEvent.unhover(link());
+    await expect(card).not.toHaveAttribute('data-exiting');
+    await expectAfter(left, 1500, () => exitStarted(card));
+    await leave(link(), 'dialog');
   },
 };
 
@@ -64,6 +79,9 @@ export const Disabled: Story = {
     await wait(1000);
     await expect(screen.queryByRole('dialog')).toBeNull();
     await expect(args.trigger?.onOpenChange).not.toHaveBeenCalled();
+    // Focus warmed React Aria up; blurring requests the close that cools it.
+    await userEvent.tab();
+    await leave(link(), 'dialog');
   },
 };
 

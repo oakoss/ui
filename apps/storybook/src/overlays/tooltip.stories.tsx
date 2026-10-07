@@ -11,10 +11,16 @@ import { Focusable } from 'react-aria-components';
 import { expect, fn, screen, userEvent, waitFor } from 'storybook/test';
 
 import {
+  exitStarted,
+  expectAfter,
+  hoverFresh,
+  leave,
+  slowTimeout,
+} from './overlay-test';
+import {
   settledTooltip,
   TooltipDemo,
   type TooltipDemoProps,
-  wait,
 } from './tooltip-demo';
 
 const meta = {
@@ -49,25 +55,16 @@ export const FocusOpensAtOnce: Story = {
 export const HoverDelays: Story = {
   play: async () => {
     const trigger = screen.getByRole('button', { name: 'Save' });
-    // A tooltip closed in the last half second leaves React Aria warmed up,
-    // opening the next at once. It opens on hover only after pointer input.
-    await wait(600);
-    await userEvent.click(document.body);
-    await userEvent.hover(trigger);
-    await wait(300);
+    const hovered = await hoverFresh(trigger);
     await expect(screen.queryByRole('tooltip')).toBeNull();
-    await screen.findByRole('tooltip', undefined, { timeout: 600 });
+    const tooltip = await expectAfter(hovered, 500, () =>
+      screen.findByRole('tooltip', undefined, { timeout: slowTimeout }),
+    );
+    const left = performance.now();
     await userEvent.unhover(trigger);
-    await wait(300);
-    await expect(screen.getByRole('tooltip')).not.toHaveAttribute(
-      'data-exiting',
-    );
-    await waitFor(
-      async () => {
-        await expect(screen.queryByRole('tooltip')).toBeNull();
-      },
-      { timeout: 600 },
-    );
+    await expect(tooltip).not.toHaveAttribute('data-exiting');
+    await expectAfter(left, 500, () => exitStarted(tooltip));
+    await leave(trigger, 'tooltip');
   },
 };
 
@@ -105,17 +102,20 @@ export const StyleFunction: Story = {
   },
 };
 
-// A consumer's delay and offset reach React Aria.
-export const NoDelay: Story = {
+// A consumer's delay and offset reach React Aria. The delay is longer than the
+// default, so a dropped prop or a leftover warm-up opens too soon and fails.
+export const ConsumerDelay: Story = {
   play: async () => {
-    await wait(600);
-    await userEvent.click(document.body);
-    await userEvent.hover(screen.getByRole('button', { name: 'Save' }));
-    await wait(100);
-    await expect(screen.queryByRole('tooltip')).not.toBeNull();
+    const trigger = screen.getByRole('button', { name: 'Save' });
+    const hovered = await hoverFresh(trigger);
+    await expect(screen.queryByRole('tooltip')).toBeNull();
+    await expectAfter(hovered, 1500, () =>
+      screen.findByRole('tooltip', undefined, { timeout: slowTimeout }),
+    );
+    await leave(trigger, 'tooltip');
   },
   render: () => (
-    <TooltipTrigger delay={0}>
+    <TooltipTrigger delay={1500}>
       <Button variant="outline">Save</Button>
       <Tooltip>Save your changes</Tooltip>
     </TooltipTrigger>
