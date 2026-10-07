@@ -39,7 +39,7 @@ export type AlertDialogActionProps = {
 
 export type AlertDialogProps = { size?: 'md' | 'sm' } & Omit<
   DialogProps,
-  'role' | 'showCloseButton' | 'size'
+  'data-slot' | 'role' | 'showCloseButton' | 'size'
 >;
 
 type Pending = {
@@ -63,6 +63,7 @@ export function AlertDialog({
         isKeyboardDismissDisabled={isKeyboardDismissDisabled || isPending}
         size={size}
         {...props}
+        data-slot="alert-dialog"
         role="alertdialog"
         showCloseButton={false}
       />

@@ -105,6 +105,7 @@ export function Sheet({
       data-side={side}
       isDismissable={isDismissable}
       {...props}
+      data-slot="sheet-overlay"
     >
       <DialogContent
         aria-describedby={ariaDescribedby}

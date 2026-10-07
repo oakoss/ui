@@ -142,12 +142,12 @@ Also accepts all [React Aria `ModalOverlay` props](https://react-aria.adobe.com/
 
 #### Data attributes
 
-| Attribute       | Present when                                                        |
-| --------------- | ------------------------------------------------------------------- |
-| `data-slot`     | Always: `dialog-overlay`, `dialog-content` (the panel) and `dialog` |
-| `data-size`     | Always, on the overlay and panel; the size                          |
-| `data-entering` | The overlay and panel are animating in                              |
-| `data-exiting`  | The overlay and panel are animating out                             |
+| Attribute       | Present when                                                                                                      |
+| --------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `data-slot`     | Always: `dialog-overlay`, `dialog-content` (the panel) and `dialog`; a `data-slot` prop replaces `dialog` in each |
+| `data-size`     | Always, on the overlay and panel; the size                                                                        |
+| `data-entering` | The overlay and panel are animating in                                                                            |
+| `data-exiting`  | The overlay and panel are animating out                                                                           |
 
 ### DialogHeader, DialogTitle, DialogDescription
 
@@ -219,4 +219,5 @@ which go on `DialogOverlay`.
 
 The `ModalOverlay` that `Dialog` renders, for building a custom modal. Accepts
 all [React Aria `ModalOverlay` props](https://react-aria.adobe.com/Modal#api).
-`data-slot` is `dialog-overlay`.
+`data-slot` is `dialog-overlay`, or the `data-slot` passed in, as Sheet passes
+`sheet-overlay`.

@@ -55,10 +55,11 @@ export const Default: Story = {
     ]) {
       await expect(slotOf(dialog, slot)).toBeInTheDocument();
     }
-    await expect(dialogParts(dialog).content).toHaveAttribute(
-      'data-size',
-      'md',
-    );
+    // Upstream's part names, not Dialog's.
+    const { content, overlay } = dialogParts(dialog, 'alert-dialog');
+    await expect(dialog).toHaveAttribute('data-slot', 'alert-dialog');
+    await expect(overlay).toBeInTheDocument();
+    await expect(content).toHaveAttribute('data-size', 'md');
     await expect(
       getComputedStyle(slotOf(dialog, 'alert-dialog-footer')).display,
     ).not.toBe('grid');
@@ -94,7 +95,7 @@ export const WithoutCancelFocus: Story = {
 // A click outside doesn't dismiss it; Escape does.
 export const Dismissal: Story = {
   play: async () => {
-    const { overlay } = dialogParts(await openAlert());
+    const { overlay } = dialogParts(await openAlert(), 'alert-dialog');
     await userEvent.click(overlay, { skipHover: true });
     await stayedOpen(overlay);
     await userEvent.keyboard('{Escape}');

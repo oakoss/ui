@@ -31,7 +31,9 @@ async function pressDelete() {
 // still closes it.
 async function stillOpen() {
   const dialog = screen.getByRole('alertdialog');
-  await expect(dialogParts(dialog).content).not.toHaveAttribute('data-exiting');
+  await expect(dialogParts(dialog, 'alert-dialog').content).not.toHaveAttribute(
+    'data-exiting',
+  );
   await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
   await closed('alertdialog');
 }
@@ -112,12 +114,10 @@ export const OutsideClickWhilePending: Story = {
   args: { isDismissable: true },
   play: async () => {
     work.current = Promise.withResolvers<null>();
-    const { overlay } = dialogParts(await openAlert());
+    const { content, overlay } = dialogParts(await openAlert(), 'alert-dialog');
     await pressDelete();
     await userEvent.click(overlay, { skipHover: true });
-    await expect(
-      dialogParts(screen.getByRole('alertdialog')).content,
-    ).not.toHaveAttribute('data-exiting');
+    await expect(content).not.toHaveAttribute('data-exiting');
     work.current.resolve(null);
     await closed('alertdialog');
   },

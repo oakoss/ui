@@ -101,14 +101,11 @@ export const StalePromiseAfterReopen: Story = {
       stale.resolve(null);
       await stale.promise;
     });
+    const { content } = dialogParts(dialog, 'alert-dialog');
     await waitFor(async () => {
-      await expect(dialogParts(dialog).content).not.toHaveAttribute(
-        'data-entering',
-      );
+      await expect(content).not.toHaveAttribute('data-entering');
     });
-    await expect(dialogParts(dialog).content).not.toHaveAttribute(
-      'data-exiting',
-    );
+    await expect(content).not.toHaveAttribute('data-exiting');
     await expect(screen.getByRole('alertdialog')).toBeInTheDocument();
   },
 };

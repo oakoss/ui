@@ -60,9 +60,12 @@ export function Demo({ defaultOpen = false, ...props }: DemoProps) {
   );
 }
 
-export function dialogParts(dialog: HTMLElement) {
-  const content = dialog.closest('[data-slot=dialog-content]');
-  const overlay = dialog.closest('[data-slot=dialog-overlay]');
+export function dialogParts(
+  dialog: HTMLElement,
+  part: 'alert-dialog' | 'dialog' = 'dialog',
+) {
+  const content = dialog.closest(`[data-slot=${CSS.escape(part)}-content]`);
+  const overlay = dialog.closest(`[data-slot=${CSS.escape(part)}-overlay]`);
   if (!(content instanceof HTMLElement) || !(overlay instanceof HTMLElement))
     throw new Error('No dialog parts');
   return { content, overlay };

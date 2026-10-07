@@ -54,6 +54,9 @@ export type DialogProps = {
   children: ReactNode;
   className?: string;
   closeLabel?: string;
+  // Names the dialog's part, and prefixes the overlay's, panel's and close
+  // button's.
+  'data-slot'?: string;
   showCloseButton?: boolean;
   size?: DialogSize;
 } & DialogNameProps &
@@ -108,6 +111,7 @@ export function Dialog({
   children,
   className,
   closeLabel = 'Close',
+  'data-slot': slot = 'dialog',
   isDismissable = true,
   role,
   showCloseButton = true,
@@ -119,6 +123,7 @@ export function Dialog({
     <DialogOverlay
       className={cn(overlay())}
       data-size={size}
+      data-slot={`${slot}-overlay`}
       isDismissable={isDismissable}
       {...props}
     >
@@ -129,6 +134,7 @@ export function Dialog({
         className={cx(content(), className)}
         closeLabel={closeLabel}
         data-size={size}
+        data-slot={slot}
         role={role}
         showCloseButton={showCloseButton}
       >

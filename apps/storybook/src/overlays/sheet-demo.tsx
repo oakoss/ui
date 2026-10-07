@@ -98,7 +98,7 @@ export function px(value: string) {
 export async function settledPanel() {
   const dialog = await screen.findByRole('dialog', { name: 'Filters' });
   const panel = dialog.closest('[data-slot=sheet-content]');
-  const overlay = dialog.closest('[data-slot=dialog-overlay]');
+  const overlay = dialog.closest('[data-slot=sheet-overlay]');
   if (!(panel instanceof HTMLElement) || !(overlay instanceof HTMLElement))
     throw new Error('No panel');
   await settled(panel);
