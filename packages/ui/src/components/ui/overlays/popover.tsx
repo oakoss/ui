@@ -18,18 +18,15 @@ import {
 } from '#/components/ui/overlays/dialog';
 import { cn } from '#/lib/cx';
 
-export type PopoverProps = {
+export type PopoverContentProps = {
   children: ReactNode;
   className?: string;
   showArrow?: boolean;
-} & Omit<
-  AriaPopoverProps,
-  | 'aria-describedby'
-  | 'aria-label'
-  | 'aria-labelledby'
-  | 'children'
-  | 'className'
-  | 'isNonModal'
+} & Omit<AriaPopoverProps, 'children' | 'className'>;
+
+export type PopoverProps = Omit<
+  PopoverContentProps,
+  'aria-describedby' | 'aria-label' | 'aria-labelledby' | 'isNonModal'
 > &
   Pick<AriaDialogProps, 'aria-describedby' | 'aria-label' | 'aria-labelledby'>;
 
@@ -45,27 +42,10 @@ export function Popover({
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledby,
   children,
-  className,
-  offset,
-  placement = 'bottom',
-  showArrow = false,
-  style,
   ...props
 }: PopoverProps) {
   return (
-    <AriaPopover
-      className={cn(popoverStyles(), className)}
-      data-slot="popover-content"
-      offset={offset ?? (showArrow ? 12 : 8)}
-      placement={placement}
-      // Clears React Aria's inline z-index of 100000, so z-(--z-popover) applies.
-      style={composeRenderProps(style, (value) => ({
-        zIndex: undefined,
-        ...value,
-      }))}
-      {...props}
-    >
-      {showArrow ? <PopoverArrow /> : null}
+    <PopoverContent {...props}>
       <AriaDialog
         aria-describedby={ariaDescribedby}
         aria-label={ariaLabel}
@@ -75,22 +55,7 @@ export function Popover({
       >
         {children}
       </AriaDialog>
-    </AriaPopover>
-  );
-}
-
-// Points down; rotated toward the trigger for the other placements.
-export function PopoverArrow() {
-  return (
-    <AriaOverlayArrow className="group" data-slot="popover-arrow">
-      <svg
-        aria-hidden="true"
-        className="block size-3 fill-popover stroke-foreground/10 group-placement-left:-rotate-90 group-placement-right:rotate-90 group-placement-bottom:rotate-180 forced-colors:fill-[Canvas] forced-colors:stroke-[CanvasText]"
-        viewBox="0 0 12 12"
-      >
-        <path d="M0 0 L6 6 L12 0" />
-      </svg>
-    </AriaOverlayArrow>
+    </PopoverContent>
   );
 }
 
@@ -103,6 +68,36 @@ export function PopoverBody({
       className={cn('-mx-popover -my-1.5 px-popover py-1.5', className)}
       {...props}
     />
+  );
+}
+
+// The panel with no dialog inside, for a React Aria popover that brings its
+// own content, as HoverCard does. `className` wins over conflicting classes.
+export function PopoverContent({
+  children,
+  className,
+  offset,
+  placement = 'bottom',
+  showArrow = false,
+  style,
+  ...props
+}: PopoverContentProps) {
+  return (
+    <AriaPopover
+      className={cn(panel, className)}
+      data-slot="popover-content"
+      offset={offset ?? (showArrow ? 12 : 8)}
+      placement={placement}
+      // Clears React Aria's inline z-index of 100000, so z-(--z-popover) applies.
+      style={composeRenderProps(style, (value) => ({
+        zIndex: undefined,
+        ...value,
+      }))}
+      {...props}
+    >
+      {showArrow ? <PopoverArrow /> : null}
+      {children}
+    </AriaPopover>
   );
 }
 
@@ -125,11 +120,6 @@ export function PopoverHeader({
   );
 }
 
-// The panel's look and motion; `className` wins over conflicting classes.
-export function popoverStyles({ className }: { className?: string } = {}) {
-  return cn(panel, className);
-}
-
 export function PopoverTitle({
   className,
   ...props
@@ -145,4 +135,19 @@ export function PopoverTitle({
 
 export function PopoverTrigger(props: ComponentProps<typeof DialogTrigger>) {
   return <DialogTrigger {...props} />;
+}
+
+// Points down; rotated toward the trigger for the other placements.
+function PopoverArrow() {
+  return (
+    <AriaOverlayArrow className="group" data-slot="popover-arrow">
+      <svg
+        aria-hidden="true"
+        className="block size-3 fill-popover stroke-foreground/10 group-placement-left:-rotate-90 group-placement-right:rotate-90 group-placement-bottom:rotate-180 forced-colors:fill-[Canvas] forced-colors:stroke-[CanvasText]"
+        viewBox="0 0 12 12"
+      >
+        <path d="M0 0 L6 6 L12 0" />
+      </svg>
+    </AriaOverlayArrow>
+  );
 }

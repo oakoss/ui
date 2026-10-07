@@ -117,8 +117,29 @@ prefer `top` or `bottom` over `start` and `end` there.
 Dialog's parts with `popover-*` `data-slot`s (`PopoverBody` keeps
 `dialog-body`), sized for a popover.
 
-### popoverStyles, PopoverArrow
+### PopoverContent
 
-The panel's classes (`popoverStyles({ className })`, where `className` wins)
-and its arrow, for another React Aria `Popover` to share, as
-[Hover Card](/docs/components/hover-card) does.
+React Aria's [`Popover`](https://react-aria.adobe.com/Popover#api) with
+Popover's look, motion, offset, z-index and `showArrow`, but no `Dialog`
+inside, for a popover that brings its own content, as
+[Hover Card](/docs/components/hover-card) does. `className` wins over the
+panel's classes.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/overlays/popover.tsx"
+  name="PopoverContentProps"
+/>
+
+Also accepts all [React Aria `Popover` props](https://react-aria.adobe.com/Popover#api);
+`placement` and `offset` default as on Popover.
+
+#### Data attributes
+
+| Attribute        | Present when                                                                              |
+| ---------------- | ----------------------------------------------------------------------------------------- |
+| `data-slot`      | Always: `popover-content`, or the `data-slot` passed in; `popover-arrow` with `showArrow` |
+| `data-placement` | Always; the side the panel opened on (`top`, `bottom`, `left`, `right`)                   |
+| `data-entering`  | The panel is fading in                                                                    |
+| `data-exiting`   | The panel is fading out                                                                   |

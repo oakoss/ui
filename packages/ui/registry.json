@@ -541,11 +541,7 @@
       "meta": {
         "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/popover.tsx"
       },
-      "registryDependencies": [
-        "oakoss/ui/theme",
-        "oakoss/ui/button",
-        "oakoss/ui/dialog"
-      ],
+      "registryDependencies": ["oakoss/ui/theme", "oakoss/ui/dialog"],
       "dependencies": ["cn", "react-aria-components"],
       "files": [
         {
@@ -573,11 +569,7 @@
       "meta": {
         "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/sheet.tsx"
       },
-      "registryDependencies": [
-        "oakoss/ui/theme",
-        "oakoss/ui/button",
-        "oakoss/ui/dialog"
-      ],
+      "registryDependencies": ["oakoss/ui/theme", "oakoss/ui/dialog"],
       "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
       "files": [
         {
