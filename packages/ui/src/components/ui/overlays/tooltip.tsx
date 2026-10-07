@@ -13,7 +13,14 @@ import { useOverlayOpen } from '#/lib/use-overlay-open';
 
 export type TooltipProps = { children: ReactNode; className?: string } & Omit<
   AriaTooltipProps,
-  'children' | 'className'
+  | 'children'
+  | 'className'
+  | 'defaultOpen'
+  | 'isEntering'
+  | 'isExiting'
+  | 'isOpen'
+  | 'onOpenChange'
+  | 'triggerRef'
 >;
 
 const panel = cn(

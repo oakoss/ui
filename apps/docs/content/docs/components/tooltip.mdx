@@ -84,9 +84,10 @@ Tooltip clears the 100000 React Aria sets inline.
   name="TooltipProps"
 />
 
-Also accepts [React Aria `Tooltip` props](https://react-aria.adobe.com/Tooltip#api);
-`children` and `className` take plain values, not render functions. `offset`
-defaults to 10.
+Also accepts [React Aria `Tooltip` props](https://react-aria.adobe.com/Tooltip#api)
+except the open state props and `triggerRef`, which go on `TooltipTrigger`, so
+a disabled trigger's tooltip stays closed; `children` and `className` take
+plain values, not render functions. `offset` defaults to 10.
 
 #### Data attributes
 
