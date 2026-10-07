@@ -1,0 +1,145 @@
+---
+title: Popover
+description: A panel anchored to a trigger, for content and controls that don't need a full dialog.
+item: popover
+reactAria: https://react-aria.adobe.com/Popover
+---
+
+import { PopoverArrow } from '#/components/demos/popover-arrow';
+import { PopoverBodyDemo } from '#/components/demos/popover-body';
+import { PopoverDemo } from '#/components/demos/popover-demo';
+
+<ComponentPreview name="popover-demo">
+  <PopoverDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="popover" />
+
+This also installs [Dialog](/docs/components/dialog), whose parts Popover
+reuses, and [Button](/docs/components/button).
+
+## Usage
+
+```tsx
+import {
+  Popover,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from '#/components/ui/overlays/popover';
+
+<PopoverTrigger>
+  <Button>Open</Button>
+  <Popover>
+    <PopoverHeader>
+      <PopoverTitle>Title</PopoverTitle>
+      <PopoverDescription>Description</PopoverDescription>
+    </PopoverHeader>
+  </Popover>
+</PopoverTrigger>;
+```
+
+## Examples
+
+### Arrow
+
+`showArrow` draws an arrow that points at the trigger from any `placement`.
+
+<ComponentPreview name="popover-arrow">
+  <PopoverArrow />
+</ComponentPreview>
+
+### Scrolling body
+
+`PopoverBody` scrolls tall content between the header and the panel's edge.
+
+<ComponentPreview name="popover-body">
+  <PopoverBodyDemo />
+</ComponentPreview>
+
+## Accessibility
+
+Popover wraps its content in React Aria's
+[Dialog](/docs/components/dialog#accessibility), so `PopoverTitle` names it.
+Like Dialog, the description isn't linked, so screen readers don't read a long
+popover in full when it opens; pass `aria-describedby` with the description's
+`id` to have a short one read. A popover without a title needs an
+`aria-label`.
+
+React Aria moves focus into the popover on open, keeps it there, and returns it
+to the trigger on close. Escape and a click outside close it. `start` and `end`
+placements follow the locale's direction. Tall content without a control in it
+goes in `PopoverBody`, which keyboard users can focus to scroll.
+
+The panel keeps a border in Windows High Contrast, where the arrow takes the
+system colors.
+
+Follows the [WAI-ARIA dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/).
+
+## API
+
+### Popover
+
+Renders React Aria's [`Popover`](https://react-aria.adobe.com/Popover#api)
+with a `Dialog` inside. `className` applies to the panel. Its z-index is the
+`z-(--z-popover)` class, which a `z-*` class in `className` overrides; Popover
+clears the 100000 React Aria sets inline. A dialog opened from an open popover
+renders below it, so close the popover first.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/overlays/popover.tsx"
+  name="PopoverProps"
+/>
+
+Also accepts [React Aria `Popover` props](https://react-aria.adobe.com/Popover#api)
+except `isNonModal`, since the dialog inside always contains focus; `children`
+and `className` take plain values, not render functions.
+`placement` defaults to `bottom`, and `offset` to 8, or 12 with an arrow. On a
+phone, a trigger in the middle of the screen leaves no room beside it, so
+prefer `top` or `bottom` over `start` and `end` there.
+
+#### Data attributes
+
+| Attribute        | Present when                                                                                    |
+| ---------------- | ----------------------------------------------------------------------------------------------- |
+| `data-slot`      | Always: `popover-content` (the panel), `popover` (the dialog); `popover-arrow` with `showArrow` |
+| `data-placement` | Always; the side the panel opened on (`top`, `bottom`, `left`, `right`)                         |
+| `data-entering`  | The panel is fading in                                                                          |
+| `data-exiting`   | The panel is fading out                                                                         |
+
+### PopoverHeader, PopoverTitle, PopoverDescription, PopoverBody, PopoverTrigger
+
+Dialog's parts with `popover-*` `data-slot`s (`PopoverBody` keeps
+`dialog-body`), sized for a popover.
+
+### PopoverContent
+
+React Aria's [`Popover`](https://react-aria.adobe.com/Popover#api) with
+Popover's look, motion, offset, z-index and `showArrow`, but no `Dialog`
+inside, for a popover that brings its own content, as
+[Hover Card](/docs/components/hover-card) does. `className` wins over the
+panel's classes.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/overlays/popover.tsx"
+  name="PopoverContentProps"
+/>
+
+Also accepts all [React Aria `Popover` props](https://react-aria.adobe.com/Popover#api);
+`placement` and `offset` default as on Popover.
+
+#### Data attributes
+
+| Attribute        | Present when                                                                              |
+| ---------------- | ----------------------------------------------------------------------------------------- |
+| `data-slot`      | Always: `popover-content`, or the `data-slot` passed in; `popover-arrow` with `showArrow` |
+| `data-placement` | Always; the side the panel opened on (`top`, `bottom`, `left`, `right`)                   |
+| `data-entering`  | The panel is fading in                                                                    |
+| `data-exiting`   | The panel is fading out                                                                   |

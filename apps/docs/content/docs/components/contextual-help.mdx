@@ -1,0 +1,100 @@
+---
+title: Contextual Help
+description: An icon button beside a label that opens an explanation, for help a tooltip can't hold or touch can't reach.
+item: contextual-help
+reactAria: https://react-aria.adobe.com/Popover
+---
+
+import { ContextualHelpDemo } from '#/components/demos/contextual-help-demo';
+import { ContextualHelpField } from '#/components/demos/contextual-help-field';
+import { ContextualHelpInfo } from '#/components/demos/contextual-help-info';
+
+<ComponentPreview name="contextual-help-demo">
+  <ContextualHelpDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="contextual-help" />
+
+This also installs [Popover](/docs/components/popover), whose parts make up
+the content, and [Button](/docs/components/button).
+
+## Usage
+
+```tsx
+import { ContextualHelp } from '#/components/ui/overlays/contextual-help';
+import {
+  PopoverBody,
+  PopoverHeader,
+  PopoverTitle,
+} from '#/components/ui/overlays/popover';
+
+<ContextualHelp>
+  <PopoverHeader>
+    <PopoverTitle>Title</PopoverTitle>
+  </PopoverHeader>
+  <PopoverBody>Explanation</PopoverBody>
+</ContextualHelp>;
+```
+
+## Examples
+
+### Info
+
+`variant="info"` shows an info icon, named "Information", for background
+rather than instructions.
+
+<ComponentPreview name="contextual-help-info">
+  <ContextualHelpInfo />
+</ComponentPreview>
+
+### Beside a field label
+
+Put ContextualHelp next to the `FieldLabel` in a row, not inside it: inside
+the label, its name joins the field's, so the input is read as "Workspace ID
+Help".
+
+<ComponentPreview name="contextual-help-field">
+  <ContextualHelpField />
+</ComponentPreview>
+
+## Accessibility
+
+The trigger is a [Button](/docs/components/button) named by `helpLabel`
+("Help") or `infoLabel` ("Information"), so it works with a keyboard, a screen
+reader and touch, where a [Tooltip](/docs/components/tooltip) doesn't open.
+Enter or Space opens a [Popover](/docs/components/popover#accessibility),
+which takes its name from a `PopoverTitle` in the content, or the button's
+label without one. Focus moves into it, Tab stays inside, and Escape closes it
+and returns focus to the button. A disabled field keeps its help reachable:
+the button never takes a surrounding field's props, so it stays enabled
+inside a disabled NumberField or Select and opens its own popover.
+
+In Arabic, Persian and Urdu the help icon mirrors, as those scripts write the
+question mark (؟); Hebrew, which uses "?", and the info icon don't.
+
+Follows the [WAI-ARIA dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/).
+
+## API
+
+### ContextualHelp
+
+Renders our [Popover](/docs/components/popover) with a ghost icon Button as
+its trigger. `className` applies to the button.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/overlays/contextual-help.tsx"
+  name="ContextualHelpProps"
+/>
+
+`placement` defaults to `bottom start`, so the popover lines up with the
+button's start edge.
+
+#### Data attributes
+
+| Attribute   | Present when                                     |
+| ----------- | ------------------------------------------------ |
+| `data-slot` | Always, on the button: `contextual-help-trigger` |

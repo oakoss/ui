@@ -19,6 +19,34 @@ test('registryDependencies point at items in this repo', () => {
   expect(deps.filter((dep) => !addresses.has(dep))).toEqual([]);
 });
 
+// Items ported from shadcn's React Aria base; add each new port here.
+const forked = [
+  'alert-dialog',
+  'button',
+  'dialog',
+  'field',
+  'hover-card',
+  'popover',
+  'sheet',
+  'tooltip',
+];
+const upstreams = new Map(
+  ui.items.map((item) => [item.name, item.meta?.upstream]),
+);
+
+// Diffing upstream between this commit and a newer one finds fixes to port.
+test.each(forked)(
+  '%s names the upstream commit and file it came from',
+  (name) => {
+    expect(upstreams.get(name)).toMatch(
+      new RegExp(
+        String.raw`^shadcn-ui/ui@[\da-f]{7,40}:apps/v4/registry/bases/aria/ui/${name}\.tsx$`,
+        'u',
+      ),
+    );
+  },
+);
+
 // TypeScript's scanner also finds side-effect, type-only and multi-line imports.
 function importsOf(path: string): string[] {
   const source = readFileSync(new URL(`../${path}`, import.meta.url), 'utf-8');

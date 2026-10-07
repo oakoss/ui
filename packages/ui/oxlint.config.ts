@@ -44,6 +44,43 @@ const componentVariables = defineConfig({
         ],
       },
     },
+    {
+      files: ['src/components/ui/overlays/sheet.tsx'],
+      rules: {
+        'shadcn/no-arbitrary-values': [
+          'error',
+          // A bottom sheet clears the home indicator on notched phones.
+          {
+            allow: [
+              'pb-[max(var(--spacing-panel),env(safe-area-inset-bottom))]',
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: [
+        'src/components/ui/overlays/popover.tsx',
+        'src/components/ui/overlays/tooltip.tsx',
+      ],
+      rules: {
+        'shadcn/no-arbitrary-values': [
+          'error',
+          // Forced colors repaint borders but not SVG fills, so the arrow
+          // takes the system colors itself.
+          {
+            allow: [
+              'forced-colors:fill-[Canvas]',
+              'forced-colors:stroke-[CanvasText]',
+            ],
+          },
+        ],
+        // The rule can't read composeRenderProps, which clears React Aria's
+        // inline z-index while keeping its style type, and no option exempts
+        // an unreadable style object.
+        'shadcn/no-inline-styles': 'off',
+      },
+    },
   ],
 });
 

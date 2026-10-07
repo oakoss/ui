@@ -1,0 +1,108 @@
+---
+title: Tooltip
+description: A short label for a control, shown on hover or keyboard focus.
+item: tooltip
+reactAria: https://react-aria.adobe.com/Tooltip
+---
+
+import { TooltipDemo } from '#/components/demos/tooltip-demo';
+import { TooltipFocusable } from '#/components/demos/tooltip-focusable';
+import { TooltipPlacement } from '#/components/demos/tooltip-placement';
+
+<ComponentPreview name="tooltip-demo">
+  <TooltipDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="tooltip" />
+
+## Usage
+
+```tsx
+import { Tooltip, TooltipTrigger } from '#/components/ui/overlays/tooltip';
+
+<TooltipTrigger>
+  <Button>Save</Button>
+  <Tooltip>Save your changes</Tooltip>
+</TooltipTrigger>;
+```
+
+## Examples
+
+### Placement
+
+`placement` sets the side, `top` by default, and the arrow turns to point at
+the trigger.
+
+<ComponentPreview name="tooltip-placement">
+  <TooltipPlacement />
+</ComponentPreview>
+
+### Other triggers
+
+`Focusable` lets a focusable element that isn't a React Aria control, here a
+plain link, trigger a tooltip.
+
+<ComponentPreview name="tooltip-focusable">
+  <TooltipFocusable />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria gives the tooltip `role="tooltip"` and describes the trigger with
+it (`aria-describedby`), so the trigger keeps its own name. Hover opens it
+after half a second and leaving closes it after another half second; while
+one is open, or within half a second of one closing, the next opens at once.
+Keyboard focus opens it immediately, and Escape closes it while focus stays on
+the trigger. The tooltip stays open while the pointer is over it, including
+inside an open Dialog or Popover, where it stays out of the content React Aria
+hides behind them.
+
+Tooltips don't open on touch, and a disabled control can't be focused or
+hovered, so keep essential information out of them; use
+[Contextual Help](/docs/components/contextual-help) beside the control for
+content people must be able to reach.
+The tooltip keeps a border in Windows High Contrast, and its arrow takes the
+system colors.
+
+Follows the [WAI-ARIA tooltip pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/).
+
+## API
+
+### Tooltip
+
+Renders React Aria's [`Tooltip`](https://react-aria.adobe.com/Tooltip#api)
+with an arrow. `className` applies to the tooltip. Its z-index is the
+`z-(--z-tooltip)` class, which a `z-*` class in `className` overrides;
+Tooltip clears the 100000 React Aria sets inline.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/overlays/tooltip.tsx"
+  name="TooltipProps"
+/>
+
+Also accepts [React Aria `Tooltip` props](https://react-aria.adobe.com/Tooltip#api)
+except the open state props and `triggerRef`, which go on `TooltipTrigger`, so
+a disabled trigger's tooltip stays closed; `children` and `className` take
+plain values, not render functions. `offset` defaults to 10.
+
+#### Data attributes
+
+| Attribute        | Present when                                                     |
+| ---------------- | ---------------------------------------------------------------- |
+| `data-slot`      | Always: `tooltip-content`, `tooltip-arrow`                       |
+| `data-placement` | Always; the side it opened on (`top`, `bottom`, `left`, `right`) |
+| `data-entering`  | The tooltip is fading in                                         |
+| `data-exiting`   | The tooltip is fading out                                        |
+
+### TooltipTrigger
+
+Renders React Aria's
+[`TooltipTrigger`](https://react-aria.adobe.com/Tooltip#api) with `delay`
+and `closeDelay` of 500ms. Its first child is the trigger: a React Aria
+control, or any element wrapped in `Focusable`. Disabling the trigger closes an
+open tooltip and calls `onOpenChange(false)`, where React Aria alone would
+leave it open.
