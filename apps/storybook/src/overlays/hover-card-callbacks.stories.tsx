@@ -9,7 +9,8 @@ import { Link } from 'react-aria-components';
 import { expect, fn, screen, userEvent, waitFor } from 'storybook/test';
 
 type CallbackDemoProps = {
-  // Disables the trigger and swaps onOpenChange in one render, after a delay.
+  // Disables the trigger and swaps onOpenChange in one render, this long after
+  // the card opens.
   disableAfter?: number;
   // Disables the trigger on close, from inside onOpenChange.
   disableOnClose?: boolean;
@@ -23,9 +24,10 @@ function CallbackDemo({
 }: CallbackDemoProps) {
   const [isDisabled, setIsDisabled] = useState(false);
   const [version, setVersion] = useState(0);
+  const [isShown, setIsShown] = useState(false);
   useEffect(() => {
     const timer =
-      disableAfter === undefined
+      disableAfter === undefined || !isShown
         ? undefined
         : setTimeout(() => {
             setIsDisabled(true);
@@ -34,12 +36,13 @@ function CallbackDemo({
     return () => {
       clearTimeout(timer);
     };
-  }, [disableAfter]);
+  }, [disableAfter, isShown]);
   return (
     <div className="grid min-h-80 place-items-center">
       <HoverCardTrigger
         isDisabled={isDisabled}
         onOpenChange={(isOpen) => {
+          setIsShown(isOpen);
           onOpenChange(version, isOpen);
           if (disableOnClose && !isOpen) setIsDisabled(true);
         }}
@@ -66,7 +69,7 @@ type Story = StoryObj<typeof meta>;
 // The close from disabling goes to the onOpenChange of the render that
 // disabled it, not an earlier one.
 export const DisableReportsToCurrentCallback: Story = {
-  args: { disableAfter: 1500 },
+  args: { disableAfter: 300 },
   play: async ({ args }) => {
     await userEvent.tab();
     await screen.findByRole('dialog');
@@ -74,7 +77,7 @@ export const DisableReportsToCurrentCallback: Story = {
       async () => {
         await expect(args.onOpenChange).toHaveBeenLastCalledWith(1, false);
       },
-      { timeout: 2000 },
+      { timeout: 3000 },
     );
   },
 };

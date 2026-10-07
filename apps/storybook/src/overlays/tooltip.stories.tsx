@@ -153,14 +153,15 @@ export const InsideDialog: Story = {
   ),
 };
 
-function DisablesLater() {
+// Lets a play function disable the trigger once it has seen the tooltip, so
+// no timer races a slow runner.
+const trigger = { disable: undefined as (() => void) | undefined };
+
+function DisablesOnCue() {
   const [isDisabled, setIsDisabled] = useState(false);
   useEffect(() => {
-    const timer = setTimeout(() => {
+    trigger.disable = () => {
       setIsDisabled(true);
-    }, 1000);
-    return () => {
-      clearTimeout(timer);
     };
   }, []);
   return (
@@ -175,12 +176,17 @@ function DisablesLater() {
 export const DisableWhileOpen: Story = {
   play: async () => {
     await userEvent.tab();
-    await expect(screen.getByRole('tooltip')).toBeInTheDocument();
-    await wait(1500);
+    await expect(await screen.findByRole('tooltip')).toBeInTheDocument();
+    trigger.disable?.();
+    await waitFor(
+      async () => {
+        await expect(screen.queryByRole('tooltip')).toBeNull();
+      },
+      { timeout: 3000 },
+    );
     await expect(screen.getByRole('button', { name: 'Save' })).toHaveFocus();
-    await expect(screen.queryByRole('tooltip')).toBeNull();
   },
-  render: () => <DisablesLater />,
+  render: () => <DisablesOnCue />,
 };
 
 // A controlled tooltip shows from isOpen and reports Escape.
