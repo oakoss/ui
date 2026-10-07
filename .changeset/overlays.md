@@ -15,3 +15,5 @@ Popover: a panel anchored to a trigger, built on Dialog's parts, so `PopoverTitl
 Tooltip: a short label on hover or keyboard focus. Hover waits half a second to open and to close, the arrow points at the trigger from any placement, and it sits on the `--z-tooltip` layer above popovers and toasts. Any trigger React Aria can focus works without a wrapper. Install with `npx shadcn@latest add oakoss/ui/tooltip`.
 
 HoverCard: a preview of a link's content on hover, keyboard focus or long press, built on React Aria's `PreviewTrigger` (react-aria-components 1.20 or later) with Popover's styles. It requires a name, keeps React Aria's 600ms and 200ms delays, and stays reachable inside an open Dialog. Install with `npx shadcn@latest add oakoss/ui/hover-card`.
+
+ContextualHelp: a help or info icon button that opens a Popover of explanation, for help a tooltip can't hold or touch can't reach. Its labels are props, and the popover lines up with the button's start edge. Install with `npx shadcn@latest add oakoss/ui/contextual-help`.

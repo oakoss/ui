@@ -472,6 +472,35 @@
       ]
     },
     {
+      "name": "contextual-help",
+      "type": "registry:ui",
+      "title": "Contextual Help",
+      "description": "Help or info icon button that opens a popover of explanation, for content a tooltip can't hold or touch can't reach.",
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/button",
+        "oakoss/ui/popover"
+      ],
+      "dependencies": ["cn", "react-aria-components"],
+      "files": [
+        {
+          "path": "src/components/ui/overlays/contextual-help.tsx",
+          "type": "registry:ui",
+          "target": "@ui/overlays/contextual-help.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
       "name": "hover-card",
       "type": "registry:ui",
       "title": "Hover Card",
