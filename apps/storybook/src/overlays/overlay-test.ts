@@ -41,10 +41,17 @@ export async function expectSlide(element: HTMLElement, translate: string) {
 // down 500ms after a close is requested, never on unmount. So this waits out
 // that cooldown, and a hover story ends with `leave`.
 export async function hoverFresh(element: HTMLElement) {
+  const log = traceOverlay(performance.now(), element.textContent);
+  const isHovered = () => Object.hasOwn(element.dataset, 'hovered');
+  const box = element.getBoundingClientRect();
+  log(
+    `begin hovered=${isHovered()} box=${Math.round(box.x)},${Math.round(box.y)} ${Math.round(box.width)}x${Math.round(box.height)}`,
+  );
   await wait(600);
+  log(`after wait hovered=${isHovered()}`);
   setInteractionModality('pointer');
   const start = performance.now();
-  traceOverlay(start, element.textContent);
+  log('hover');
   await userEvent.hover(element);
   return start;
 }
@@ -101,8 +108,8 @@ function slideStyle(element: HTMLElement) {
   return { opacity, scale, translate };
 }
 
-// TEMP(ui-vqz): logs input events and overlay mounts for 4s after a hover, to
-// see why CI opens or misses hover overlays. Remove once diagnosed.
+// TEMP(ui-vqz): logs input events and overlay mounts from the start of
+// hoverFresh, to see why CI opens hover overlays early. Remove once diagnosed.
 const traces = { count: 0, stop: undefined as (() => void) | undefined };
 
 function traceOverlay(start: number, label: string) {
@@ -129,7 +136,11 @@ function traceOverlay(start: number, label: string) {
   const onEvent = (event: Event) => {
     const target =
       event.target instanceof Element ? event.target.tagName : 'document';
-    log(`${event.type} ${target} trusted=${event.isTrusted}`);
+    const at =
+      event instanceof MouseEvent
+        ? ` at=${event.clientX},${event.clientY}`
+        : '';
+    log(`${event.type} ${target} trusted=${event.isTrusted}${at}`);
   };
   for (const type of events) {
     document.addEventListener(type, onEvent, { capture: true });
@@ -147,6 +158,7 @@ function traceOverlay(start: number, label: string) {
     observer.disconnect();
     traces.stop = undefined;
   };
-  const timer = setTimeout(stop, 4000);
+  const timer = setTimeout(stop, 4600);
   traces.stop = stop;
+  return log;
 }
