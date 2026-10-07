@@ -41,17 +41,9 @@ export async function expectSlide(element: HTMLElement, translate: string) {
 // down 500ms after a close is requested, never on unmount. So this waits out
 // that cooldown, and a hover story ends with `leave`.
 export async function hoverFresh(element: HTMLElement) {
-  const log = traceOverlay(performance.now(), element.textContent);
-  const isHovered = () => Object.hasOwn(element.dataset, 'hovered');
-  const box = element.getBoundingClientRect();
-  log(
-    `begin hovered=${isHovered()} box=${Math.round(box.x)},${Math.round(box.y)} ${Math.round(box.width)}x${Math.round(box.height)}`,
-  );
   await wait(600);
-  log(`after wait hovered=${isHovered()}`);
   setInteractionModality('pointer');
   const start = performance.now();
-  log('hover');
   await userEvent.hover(element);
   return start;
 }
@@ -81,7 +73,6 @@ export async function leave(element: HTMLElement, role: 'dialog' | 'tooltip') {
     },
     { timeout: slowTimeout },
   );
-  traces.stop?.();
 }
 
 // Resolves once the enter transition finishes, so measurements read the
@@ -106,59 +97,4 @@ async function finished(element: HTMLElement) {
 function slideStyle(element: HTMLElement) {
   const { opacity, scale, translate } = getComputedStyle(element);
   return { opacity, scale, translate };
-}
-
-// TEMP(ui-vqz): logs input events and overlay mounts from the start of
-// hoverFresh, to see why CI opens hover overlays early. Remove once diagnosed.
-const traces = { count: 0, stop: undefined as (() => void) | undefined };
-
-function traceOverlay(start: number, label: string) {
-  traces.stop?.();
-  traces.count += 1;
-  const id = `${label}#${traces.count}`;
-  const log = (line: string) => {
-    // oxlint-disable-next-line no-console -- the trace is console output
-    console.warn(
-      `[trace] ${id} +${Math.round(performance.now() - start)} ${line}`,
-    );
-  };
-  const events = [
-    'pointerover',
-    'pointerenter',
-    'pointermove',
-    'pointerout',
-    'pointerleave',
-    'pointerdown',
-    'mousemove',
-    'focusin',
-    'focusout',
-  ];
-  const onEvent = (event: Event) => {
-    const target =
-      event.target instanceof Element ? event.target.tagName : 'document';
-    const at =
-      event instanceof MouseEvent
-        ? ` at=${event.clientX},${event.clientY}`
-        : '';
-    log(`${event.type} ${target} trusted=${event.isTrusted}${at}`);
-  };
-  for (const type of events) {
-    document.addEventListener(type, onEvent, { capture: true });
-  }
-  const observer = new MutationObserver(() => {
-    const overlay = document.querySelector('[role=tooltip], [role=dialog]');
-    log(`overlay=${overlay ? 'open' : 'none'}`);
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
-  const stop = () => {
-    clearTimeout(timer);
-    for (const type of events) {
-      document.removeEventListener(type, onEvent, { capture: true });
-    }
-    observer.disconnect();
-    traces.stop = undefined;
-  };
-  const timer = setTimeout(stop, 4600);
-  traces.stop = stop;
-  return log;
 }

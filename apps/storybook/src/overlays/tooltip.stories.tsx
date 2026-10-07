@@ -18,6 +18,7 @@ import {
   slowTimeout,
 } from './overlay-test';
 import {
+  Centered,
   settledTooltip,
   TooltipDemo,
   type TooltipDemoProps,
@@ -105,6 +106,7 @@ export const StyleFunction: Story = {
 // A consumer's delay and offset reach React Aria. The delay is longer than the
 // default, so a dropped prop or a leftover warm-up opens too soon and fails.
 export const ConsumerDelay: Story = {
+  args: { delay: 1500 },
   play: async () => {
     const trigger = screen.getByRole('button', { name: 'Save' });
     const hovered = await hoverFresh(trigger);
@@ -114,12 +116,6 @@ export const ConsumerDelay: Story = {
     );
     await leave(trigger, 'tooltip');
   },
-  render: () => (
-    <TooltipTrigger delay={1500}>
-      <Button variant="outline">Save</Button>
-      <Tooltip>Save your changes</Tooltip>
-    </TooltipTrigger>
-  ),
 };
 
 export const Offset: Story = {
@@ -165,10 +161,12 @@ function DisablesOnCue() {
     };
   }, []);
   return (
-    <TooltipTrigger isDisabled={isDisabled}>
-      <Button variant="outline">Save</Button>
-      <Tooltip>Save your changes</Tooltip>
-    </TooltipTrigger>
+    <Centered>
+      <TooltipTrigger isDisabled={isDisabled}>
+        <Button variant="outline">Save</Button>
+        <Tooltip>Save your changes</Tooltip>
+      </TooltipTrigger>
+    </Centered>
   );
 }
 
@@ -199,10 +197,12 @@ export const Controlled: Story = {
     await expect(args.onOpenChange).toHaveBeenCalledWith(false);
   },
   render: (args) => (
-    <TooltipTrigger isOpen onOpenChange={args.onOpenChange}>
-      <Button variant="outline">Save</Button>
-      <Tooltip>Save your changes</Tooltip>
-    </TooltipTrigger>
+    <Centered>
+      <TooltipTrigger isOpen onOpenChange={args.onOpenChange}>
+        <Button variant="outline">Save</Button>
+        <Tooltip>Save your changes</Tooltip>
+      </TooltipTrigger>
+    </Centered>
   ),
 };
 
@@ -216,11 +216,13 @@ export const FocusableTrigger: Story = {
     await expect(link).toHaveAccessibleDescription('Every keyboard shortcut');
   },
   render: () => (
-    <TooltipTrigger>
-      <Focusable>
-        <a href="#shortcuts">Shortcuts</a>
-      </Focusable>
-      <Tooltip>Every keyboard shortcut</Tooltip>
-    </TooltipTrigger>
+    <Centered>
+      <TooltipTrigger>
+        <Focusable>
+          <a href="#shortcuts">Shortcuts</a>
+        </Focusable>
+        <Tooltip>Every keyboard shortcut</Tooltip>
+      </TooltipTrigger>
+    </Centered>
   ),
 };

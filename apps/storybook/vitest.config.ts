@@ -48,7 +48,7 @@ export default defineConfig({
         ...(isCI && { sequence: { groupOrder: index } }),
       },
     })),
-    // A failing story's console output, such as a trace, reaches the CI log.
+    // A failing story's console output reaches the CI log.
     silent: 'passed-only',
   },
 });
