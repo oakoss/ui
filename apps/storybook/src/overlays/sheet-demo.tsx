@@ -11,7 +11,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@oakoss/ui/components/ui/overlays/sheet';
-import { expect, screen, waitFor } from 'storybook/test';
+import { expect, screen } from 'storybook/test';
+
+import { inState, settled } from './overlay-test';
 
 export type SheetDemoProps = {
   defaultOpen?: boolean;
@@ -76,8 +78,8 @@ export async function expectEdge(edge: Edge) {
       right: from.left >= innerWidth,
       top: from.bottom <= 0,
     })[edge];
-  await expect(isOffscreen(await stateBox(panel, 'entering'))).toBe(true);
-  await expect(isOffscreen(await stateBox(panel, 'exiting'))).toBe(true);
+  await expect(isOffscreen(await inState(panel, 'entering', rect))).toBe(true);
+  await expect(isOffscreen(await inState(panel, 'exiting', rect))).toBe(true);
 
   // Forced colors repaint every border, transparent ones included.
   if (!matchMedia('(forced-colors: active)').matches) {
@@ -93,27 +95,16 @@ export function px(value: string) {
   return Number(value.replace('px', ''));
 }
 
-// Measured once the slide-in finishes.
 export async function settledPanel() {
   const dialog = await screen.findByRole('dialog', { name: 'Filters' });
   const panel = dialog.closest('[data-slot=sheet-content]');
   const overlay = dialog.closest('[data-slot=dialog-overlay]');
   if (!(panel instanceof HTMLElement) || !(overlay instanceof HTMLElement))
     throw new Error('No panel');
-  await waitFor(async () => {
-    await expect(panel).not.toHaveAttribute('data-entering');
-  });
-  await Promise.all(panel.getAnimations().map((a) => a.finished));
+  await settled(panel);
   return { box: panel.getBoundingClientRect(), dialog, overlay, panel };
 }
 
-// Where the panel sits while entering or exiting, read by setting React Aria's
-// state attribute once the real slide-in has finished.
-async function stateBox(panel: HTMLElement, state: 'entering' | 'exiting') {
-  panel.toggleAttribute(`data-${state}`, true);
-  await Promise.all(panel.getAnimations().map((a) => a.finished));
-  const box = panel.getBoundingClientRect();
-  panel.toggleAttribute(`data-${state}`, false);
-  await Promise.all(panel.getAnimations().map((a) => a.finished));
-  return box;
+function rect(element: HTMLElement) {
+  return element.getBoundingClientRect();
 }

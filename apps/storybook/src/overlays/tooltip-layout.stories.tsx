@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { expect } from 'storybook/test';
 
-import { stateStyle } from './popover-demo';
+import { expectSlide } from './overlay-test';
 import {
   settledTooltip,
   tooltipArrow,
@@ -75,42 +75,34 @@ export const Wraps: Story = {
 };
 
 // The tooltip enters from, and exits toward, 4px nearer the trigger.
-async function expectSlide(translate: string) {
-  const { tooltip } = await settledTooltip();
-  for (const state of ['entering', 'exiting'] as const) {
-    await expect({ state, ...(await stateStyle(tooltip, state)) }).toEqual({
-      opacity: '0',
-      scale: '0.95',
-      state,
-      translate,
-    });
-  }
-}
-
 export const Slide: Story = {
   play: async () => {
-    await expectSlide('0px 4px');
+    const { tooltip } = await settledTooltip();
+    await expectSlide(tooltip, '0px 4px');
   },
 };
 
 export const SlideBottom: Story = {
   args: { placement: 'bottom' },
   play: async () => {
-    await expectSlide('0px -4px');
+    const { tooltip } = await settledTooltip();
+    await expectSlide(tooltip, '0px -4px');
   },
 };
 
 export const SlideLeft: Story = {
   args: { placement: 'left' },
   play: async () => {
-    await expectSlide('4px');
+    const { tooltip } = await settledTooltip();
+    await expectSlide(tooltip, '4px');
   },
 };
 
 export const SlideRight: Story = {
   args: { placement: 'right' },
   play: async () => {
-    await expectSlide('-4px');
+    const { tooltip } = await settledTooltip();
+    await expectSlide(tooltip, '-4px');
   },
 };
 

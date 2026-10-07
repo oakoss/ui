@@ -5,7 +5,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from '@oakoss/ui/components/ui/overlays/dialog';
-import { expect, screen, waitFor } from 'storybook/test';
+import { expect, screen } from 'storybook/test';
 
 import {
   closePosition,
@@ -13,6 +13,7 @@ import {
   type DemoProps,
   dialogParts,
 } from './dialog-demo';
+import { settled } from './overlay-test';
 
 const meta = {
   args: { defaultOpen: true },
@@ -35,10 +36,7 @@ export const Open: Story = {
       await expect(style.transitionDuration).toBe('0.1s');
       await expect(style.transitionProperty).toMatch(/opacity|all/u);
     }
-    await waitFor(async () => {
-      await expect(content).not.toHaveAttribute('data-entering');
-    });
-    await Promise.all(content.getAnimations().map((a) => a.finished));
+    await settled(content);
     await expect(getComputedStyle(content).opacity).toBe('1');
     await expect(getComputedStyle(overlay).zIndex).toBe('1300');
     const close = closePosition(dialog);

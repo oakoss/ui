@@ -9,7 +9,9 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from '@oakoss/ui/components/ui/overlays/popover';
-import { expect, screen, waitFor } from 'storybook/test';
+import { screen } from 'storybook/test';
+
+import { settled } from './overlay-test';
 
 export type PopoverDemoProps = {
   defaultOpen?: boolean;
@@ -54,15 +56,11 @@ export function PopoverDemo({
   );
 }
 
-// Measured once the enter transition finishes.
 export async function settledPopover() {
   const dialog = await screen.findByRole('dialog', { name: 'Dimensions' });
   const panel = dialog.closest('[data-slot=popover-content]');
   if (!(panel instanceof HTMLElement)) throw new Error('No panel');
-  await waitFor(async () => {
-    await expect(panel).not.toHaveAttribute('data-entering');
-  });
-  await Promise.all(panel.getAnimations().map((a) => a.finished));
+  await settled(panel);
   const trigger = screen.getByRole('button', { name: 'Open settings' });
   return {
     box: panel.getBoundingClientRect(),
@@ -70,18 +68,4 @@ export async function settledPopover() {
     panel,
     trigger: trigger.getBoundingClientRect(),
   };
-}
-
-// The panel's style while entering or exiting, read by setting React Aria's
-// state attribute once the real transition has finished.
-export async function stateStyle(
-  panel: HTMLElement,
-  state: 'entering' | 'exiting',
-) {
-  panel.toggleAttribute(`data-${state}`, true);
-  await Promise.all(panel.getAnimations().map((a) => a.finished));
-  const { opacity, scale, translate } = getComputedStyle(panel);
-  panel.toggleAttribute(`data-${state}`, false);
-  await Promise.all(panel.getAnimations().map((a) => a.finished));
-  return { opacity, scale, translate };
 }

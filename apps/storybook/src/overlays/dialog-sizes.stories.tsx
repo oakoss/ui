@@ -7,9 +7,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@oakoss/ui/components/ui/overlays/dialog';
-import { expect, screen, userEvent, waitFor } from 'storybook/test';
+import { expect, screen, userEvent } from 'storybook/test';
 
 import { Demo, type DemoProps, dialogParts } from './dialog-demo';
+import { settled } from './overlay-test';
 
 const meta = {
   args: { defaultOpen: true },
@@ -24,10 +25,7 @@ type Story = StoryObj<typeof meta>;
 // Measured after the enter transition, which scales the panel from 95%.
 async function contentBox() {
   const { content } = dialogParts(await screen.findByRole('dialog'));
-  await waitFor(async () => {
-    await expect(content).not.toHaveAttribute('data-entering');
-  });
-  await Promise.all(content.getAnimations().map((a) => a.finished));
+  await settled(content);
   return { box: content.getBoundingClientRect(), content };
 }
 

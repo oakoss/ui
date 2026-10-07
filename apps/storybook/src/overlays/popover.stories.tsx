@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+import { Dialog, DialogTitle } from '@oakoss/ui/components/ui/overlays/dialog';
 import { expect, screen, userEvent, waitFor } from 'storybook/test';
 
 import { closed, visible } from './dialog-demo';
@@ -82,6 +83,32 @@ export const Offset: Story = {
     const { box, trigger } = await settledPopover();
     await expect(Math.round(box.top - trigger.bottom)).toBe(20);
   },
+};
+
+// Opened from an open Dialog, the popover stacks above it and stays reachable
+// while React Aria hides the dialog behind it.
+export const InsideDialog: Story = {
+  play: async () => {
+    await screen.findByRole('dialog', { name: 'Layers' });
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Open settings' }),
+    );
+    const { dialog, panel } = await settledPopover();
+    await expect(panel.closest('[inert], [aria-hidden=true]')).toBeNull();
+    await expect(getComputedStyle(panel).zIndex).toBe('1400');
+    await expect(
+      screen.getByText('Layers').closest('[inert], [aria-hidden=true]'),
+    ).not.toBeNull();
+    await waitFor(async () => {
+      await expect(dialog.contains(document.activeElement)).toBe(true);
+    });
+  },
+  render: (args) => (
+    <Dialog defaultOpen showCloseButton={false}>
+      <DialogTitle>Layers</DialogTitle>
+      <PopoverDemo {...args} defaultOpen={false} />
+    </Dialog>
+  ),
 };
 
 export const LabelWithoutTitle: Story = {

@@ -19,6 +19,7 @@ import {
 import { expect, screen, userEvent, waitFor } from 'storybook/test';
 
 import { closed } from './dialog-demo';
+import { settled } from './overlay-test';
 
 type DemoProps = Omit<ComponentProps<typeof ContextualHelp>, 'children'>;
 
@@ -59,15 +60,11 @@ function lucideIcon(button: HTMLElement) {
   return button.querySelector('svg')?.getAttribute('class') ?? '';
 }
 
-// Measured once the enter transition finishes.
 async function settledPanel() {
   const dialog = await screen.findByRole('dialog');
   const panel = dialog.closest('[data-slot=popover-content]');
   if (!(panel instanceof HTMLElement)) throw new Error('No panel');
-  await waitFor(async () => {
-    await expect(panel).not.toHaveAttribute('data-entering');
-  });
-  await Promise.all(panel.getAnimations().map((a) => a.finished));
+  await settled(panel);
   return { box: panel.getBoundingClientRect(), dialog, panel };
 }
 

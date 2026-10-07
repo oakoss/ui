@@ -5,7 +5,9 @@ import {
   HoverCardTrigger,
 } from '@oakoss/ui/components/ui/overlays/hover-card';
 import { Link } from 'react-aria-components';
-import { expect, screen, waitFor } from 'storybook/test';
+import { screen } from 'storybook/test';
+
+import { settled } from './overlay-test';
 
 export type HoverCardDemoProps = {
   defaultOpen?: boolean;
@@ -35,13 +37,9 @@ export function HoverCardDemo({
   );
 }
 
-// Measured once the enter transition finishes.
 export async function settledCard() {
   const card = await screen.findByRole('dialog', { name: 'Ada Lovelace' });
-  await waitFor(async () => {
-    await expect(card).not.toHaveAttribute('data-entering');
-  });
-  await Promise.all(card.getAnimations().map((a) => a.finished));
+  await settled(card);
   const trigger = screen.getByRole('link', { name: '@ada' });
   return {
     box: card.getBoundingClientRect(),
