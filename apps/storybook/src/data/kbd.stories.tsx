@@ -50,15 +50,22 @@ export const Label: Story = {
   ),
 };
 
-// An empty label is no label: the glyph stays readable.
+// A blank label is no label: the glyph stays readable.
 export const EmptyLabel: Story = {
   play: async ({ canvas }) => {
-    await expect(canvas.getByRole('button')).toHaveAccessibleName('Close ⌘');
+    for (const button of canvas.getAllByRole('button')) {
+      await expect(button).toHaveAccessibleName('Close ⌘');
+    }
   },
   render: () => (
-    <button type="button">
-      Close <Kbd label="">⌘</Kbd>
-    </button>
+    <div className="flex gap-2">
+      <button type="button">
+        Close <Kbd label="">⌘</Kbd>
+      </button>
+      <button type="button">
+        Close <Kbd label=" ">⌘</Kbd>
+      </button>
+    </div>
   ),
 };
 

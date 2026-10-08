@@ -21,7 +21,7 @@ export function Kbd({ children, className, label, ...props }: KbdProps) {
       data-slot="kbd"
       {...props}
     >
-      {label === undefined || label === '' ? (
+      {label === undefined || label.trim() === '' ? (
         children
       ) : (
         <>
