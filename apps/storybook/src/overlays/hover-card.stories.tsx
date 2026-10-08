@@ -13,7 +13,13 @@ import {
   type HoverCardDemoProps,
   settledCard,
 } from './hover-card-demo';
-import { wait } from './tooltip-demo';
+import {
+  exitStarted,
+  expectAfter,
+  hoverFresh,
+  leave,
+  slowTimeout,
+} from './overlay-test';
 
 const meta = {
   render: (args) => <HoverCardDemo {...args} />,
@@ -70,24 +76,16 @@ export const Keyboard: Story = {
 export const HoverDelays: Story = {
   play: async () => {
     const trigger = screen.getByRole('link', { name: '@ada' });
-    // As with tooltips, wait out the shared warm-up and set pointer input.
-    await wait(600);
-    await userEvent.click(document.body);
-    await userEvent.hover(trigger);
-    await wait(400);
+    const hovered = await hoverFresh(trigger);
     await expect(screen.queryByRole('dialog')).toBeNull();
-    await screen.findByRole('dialog', undefined, { timeout: 600 });
+    const card = await expectAfter(hovered, 600, () =>
+      screen.findByRole('dialog', undefined, { timeout: slowTimeout }),
+    );
+    const left = performance.now();
     await userEvent.unhover(trigger);
-    await wait(100);
-    await expect(screen.getByRole('dialog')).not.toHaveAttribute(
-      'data-exiting',
-    );
-    await waitFor(
-      async () => {
-        await expect(screen.queryByRole('dialog')).toBeNull();
-      },
-      { timeout: 500 },
-    );
+    await expect(card).not.toHaveAttribute('data-exiting');
+    await expectAfter(left, 200, () => exitStarted(card));
+    await leave(trigger, 'dialog');
   },
 };
 

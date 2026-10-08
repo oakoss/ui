@@ -8,6 +8,7 @@ import { defineConfig } from 'vitest/config';
 // panel gets light only: it names every project after the config directory,
 // so two projects collide.
 const isPanel = process.env.VITEST_STORYBOOK === 'true';
+const isCI = process.env.CI === 'true';
 
 const projects = [
   { name: 'light', theme: 'light' },
@@ -21,7 +22,10 @@ const projects = [
 
 export default defineConfig({
   test: {
-    projects: projects.map(({ forcedColors = false, name, theme }) => ({
+    // CI runs story files one at a time, one project after another: on a
+    // shared runner, parallel browser files starve each other's timers.
+    fileParallelism: !isCI,
+    projects: projects.map(({ forcedColors = false, name, theme }, index) => ({
       define: { 'import.meta.env.VITE_STORY_THEME': JSON.stringify(theme) },
       plugins: [
         storybookTest({
@@ -41,7 +45,11 @@ export default defineConfig({
           ),
         },
         name,
+        retry: isCI ? 1 : 0,
+        ...(isCI && { sequence: { groupOrder: index } }),
       },
     })),
+    // A failing story's console output reaches the CI log.
+    silent: 'passed-only',
   },
 });

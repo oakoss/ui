@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { Link } from 'react-aria-components';
 import { expect, fn, screen, userEvent, waitFor } from 'storybook/test';
 
-import { wait } from './tooltip-demo';
+import { hoverFresh, leave, slowTimeout, wait } from './overlay-test';
 
 type ToggleDemoProps = {
   controlled?: boolean;
@@ -117,7 +117,7 @@ export const ReenableAfterFocusControlled: Story = {
 // it closed.
 async function openThenDisable(onOpenChange: unknown) {
   await userEvent.tab();
-  await screen.findByRole('dialog', undefined, { timeout: 1500 });
+  await screen.findByRole('dialog', undefined, { timeout: slowTimeout });
   await userEvent.click(screen.getByRole('button', { name: 'Disable' }));
   await expectClosed();
   await expect(onOpenChange).toHaveBeenLastCalledWith(false);
@@ -131,10 +131,8 @@ async function openThenDisable(onOpenChange: unknown) {
 // Opened by hover, disabled as the pointer moves to the toggle, re-enabled.
 export const DisableWhileHovered: Story = {
   play: async ({ args }) => {
-    await wait(600);
-    await userEvent.click(document.body);
-    await userEvent.hover(link());
-    await screen.findByRole('dialog', undefined, { timeout: 1500 });
+    await hoverFresh(link());
+    await screen.findByRole('dialog', undefined, { timeout: slowTimeout });
     await userEvent.click(screen.getByRole('button', { name: 'Disable' }));
     await expectClosed();
     await expect(args.onOpenChange).toHaveBeenLastCalledWith(false);
@@ -143,6 +141,7 @@ export const DisableWhileHovered: Story = {
     await expect(screen.queryByRole('dialog')).toBeNull();
     await wait(800);
     await expectClosed();
+    await leave(link(), 'dialog');
   },
 };
 
@@ -199,11 +198,11 @@ export const MountedDisabledControlled: Story = {
 export const ControlledClosed: Story = {
   args: { fixedOpen: false },
   play: async () => {
-    await wait(600);
-    await userEvent.click(document.body);
-    await userEvent.hover(link());
+    await hoverFresh(link());
     await wait(1000);
     await expectClosed();
+    // The ignored hover still warmed React Aria up.
+    await leave(link(), 'dialog');
   },
 };
 

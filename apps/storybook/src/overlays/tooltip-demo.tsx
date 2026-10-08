@@ -1,4 +1,4 @@
-import type { ComponentProps } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 
 import { Button } from '@oakoss/ui/components/ui/inputs/button';
 import {
@@ -13,7 +13,16 @@ export type TooltipDemoProps = { text?: string } & Omit<
   ComponentProps<typeof Tooltip>,
   'children'
 > &
-  Pick<ComponentProps<typeof TooltipTrigger>, 'defaultOpen' | 'onOpenChange'>;
+  Pick<
+    ComponentProps<typeof TooltipTrigger>,
+    'defaultOpen' | 'delay' | 'onOpenChange'
+  >;
+
+// Keeps a trigger off the page's top-left corner, where CI's real pointer
+// rests and would hover it as it mounts.
+export function Centered({ children }: { children: ReactNode }) {
+  return <div className="grid min-h-64 place-items-center">{children}</div>;
+}
 
 export async function settledTooltip() {
   const tooltip = await screen.findByRole('tooltip');
@@ -34,22 +43,21 @@ export function tooltipArrow() {
 
 export function TooltipDemo({
   defaultOpen = false,
+  delay,
   onOpenChange,
   text = 'Save your changes',
   ...props
 }: TooltipDemoProps) {
   return (
-    <div className="grid min-h-64 place-items-center">
-      <TooltipTrigger defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
+    <Centered>
+      <TooltipTrigger
+        defaultOpen={defaultOpen}
+        delay={delay}
+        onOpenChange={onOpenChange}
+      >
         <Button variant="outline">Save</Button>
         <Tooltip {...props}>{text}</Tooltip>
       </TooltipTrigger>
-    </div>
+    </Centered>
   );
-}
-
-export function wait(ms: number) {
-  return new Promise<void>((resolve) => {
-    setTimeout(resolve, ms);
-  });
 }

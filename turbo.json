@@ -8,7 +8,7 @@
       "dependsOn": ["^typecheck"],
       "outputs": ["storybook-static/**"]
     },
-    "test": { "dependsOn": ["^typecheck"] },
+    "test": { "dependsOn": ["^typecheck"], "env": ["CI"] },
     "typecheck": { "dependsOn": ["^typecheck"] }
   }
 }
