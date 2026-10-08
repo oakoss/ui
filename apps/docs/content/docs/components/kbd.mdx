@@ -1,0 +1,79 @@
+---
+title: Kbd
+description: A keyboard key, or a combination of keys.
+item: kbd
+reactAria: https://react-aria.adobe.com/Menu
+---
+
+import { KbdDemo } from '#/components/demos/kbd-demo';
+import { KbdText } from '#/components/demos/kbd-text';
+
+<ComponentPreview name="kbd-demo">
+  <KbdDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="kbd" />
+
+## Usage
+
+```tsx
+import { Kbd, KbdGroup } from '#/components/ui/data/kbd';
+
+<KbdGroup>
+  <Kbd label="Command">⌘</Kbd>
+  <Kbd>K</Kbd>
+</KbdGroup>;
+```
+
+## Examples
+
+### In text
+
+A `Kbd` is inline, so it sits in a sentence or a button.
+
+<ComponentPreview name="kbd-text">
+  <KbdText />
+</ComponentPreview>
+
+## Accessibility
+
+`Kbd` renders React Aria's `Keyboard`, a `<kbd>` set left to right, so a
+shortcut reads in key order on a right-to-left page too. Screen readers read
+its text. A glyph like ⌘ may be read as an unrelated symbol or skipped, so
+give glyph keys a `label` ("Command"): the glyph is hidden from screen
+readers and the label read instead.
+
+Inside a React Aria `MenuItem`, the item gives its shortcut an id and names
+it in the item's `aria-describedby`, so screen readers read the shortcut
+after the item. Wrap a combination in `KbdGroup`: the group takes that id
+and its keys get none, so the whole combination is read and no id repeats.
+Give each item one shortcut.
+
+Keys keep an outline in Windows High Contrast. React Aria adds no keys.
+
+## API
+
+### Kbd
+
+Renders React Aria's `Keyboard`, a `<kbd>`.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/kbd.tsx"
+  name="KbdProps"
+/>
+
+Also accepts `kbd` props.
+
+### KbdGroup
+
+A `<kbd>` around the keys of one combination. Accepts `kbd` props.
+
+#### Data attributes
+
+| Attribute   | Present when                                |
+| ----------- | ------------------------------------------- |
+| `data-slot` | Always: `kbd`, and `kbd-group` on the group |

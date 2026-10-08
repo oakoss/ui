@@ -22,12 +22,20 @@ test('registryDependencies point at items in this repo', () => {
 // Items ported from shadcn's React Aria base; add each new port here.
 const forked = [
   'alert-dialog',
+  'avatar',
   'button',
+  'card',
   'dialog',
+  'empty',
   'field',
   'hover-card',
+  'kbd',
   'popover',
+  'scroll-area',
+  'separator',
   'sheet',
+  'skeleton',
+  'spinner',
   'tooltip',
 ];
 const upstreams = new Map(

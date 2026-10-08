@@ -318,23 +318,13 @@
       "meta": {
         "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/button.tsx"
       },
-      "registryDependencies": ["oakoss/ui/theme"],
+      "registryDependencies": ["oakoss/ui/theme", "oakoss/ui/spinner"],
       "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
       "files": [
         {
           "path": "src/components/ui/inputs/button.tsx",
           "type": "registry:ui",
           "target": "@ui/inputs/button.tsx"
-        },
-        {
-          "path": "src/components/icons.tsx",
-          "type": "registry:component",
-          "target": "@components/icons.tsx"
-        },
-        {
-          "path": "src/components/icon-placeholder.tsx",
-          "type": "registry:component",
-          "target": "@components/icon-placeholder.tsx"
         },
         {
           "path": "src/lib/recipes.ts",
@@ -609,6 +599,245 @@
           "path": "src/lib/use-overlay-open.ts",
           "type": "registry:lib",
           "target": "@lib/use-overlay-open.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "avatar",
+      "type": "registry:ui",
+      "title": "Avatar",
+      "description": "A person's image with initials that show until it loads or when it fails, plus a status badge and an overlapping group.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/avatar.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/data/avatar.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/avatar.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "spinner",
+      "type": "registry:ui",
+      "title": "Spinner",
+      "description": "Spinning indicator announced as an indeterminate progress bar named by a label prop, inline so it fits in text and buttons.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/spinner.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/feedback/spinner.tsx",
+          "type": "registry:ui",
+          "target": "@ui/feedback/spinner.tsx"
+        },
+        {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "skeleton",
+      "type": "registry:ui",
+      "title": "Skeleton",
+      "description": "Placeholder shape with a pulse, hidden from screen readers, shown while content loads.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/skeleton.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components"],
+      "files": [
+        {
+          "path": "src/components/ui/feedback/skeleton.tsx",
+          "type": "registry:ui",
+          "target": "@ui/feedback/skeleton.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "card",
+      "type": "registry:ui",
+      "title": "Card",
+      "description": "Surface for related content, with a header that takes an action, a title heading, a description, content and a footer.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/card.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/surfaces/card.tsx",
+          "type": "registry:ui",
+          "target": "@ui/surfaces/card.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "separator",
+      "type": "registry:ui",
+      "title": "Separator",
+      "description": "Horizontal or vertical divider line, drawn as a border so it stays visible in forced colors.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/separator.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/layout/separator.tsx",
+          "type": "registry:ui",
+          "target": "@ui/layout/separator.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "empty",
+      "type": "registry:ui",
+      "title": "Empty",
+      "description": "Empty state with a heading, description, decorative media and actions.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/empty.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/feedback/empty.tsx",
+          "type": "registry:ui",
+          "target": "@ui/feedback/empty.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "kbd",
+      "type": "registry:ui",
+      "title": "Kbd",
+      "description": "Keyboard key and key combination, with a label for glyph keys and unique ids inside menu items.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/kbd.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components"],
+      "files": [
+        {
+          "path": "src/components/ui/data/kbd.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/kbd.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "scroll-area",
+      "type": "registry:ui",
+      "title": "Scroll Area",
+      "description": "Region that scrolls with thin native scrollbars, focusable so keyboard users can scroll it.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/scroll-area.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/layout/scroll-area.tsx",
+          "type": "registry:ui",
+          "target": "@ui/layout/scroll-area.tsx"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
         },
         {
           "path": "src/lib/cx.ts",

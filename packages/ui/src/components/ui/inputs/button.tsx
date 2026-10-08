@@ -2,11 +2,12 @@ import {
   Button as AriaButton,
   type ButtonProps as AriaButtonProps,
   composeRenderProps,
-  ProgressBar,
+  ProgressBarContext,
+  useSlottedContext,
 } from 'react-aria-components';
 import { tv, type VariantProps } from 'tailwind-variants/lite';
 
-import * as Icon from '#/components/icons';
+import { Spinner } from '#/components/ui/feedback/spinner';
 import { cn, cx } from '#/lib/cx';
 import { focusRing, stateLayer, targetSize } from '#/lib/recipes';
 
@@ -110,16 +111,7 @@ export function Button({
           >
             {resolved}
           </span>
-          {isPending ? (
-            <ProgressBar
-              aria-label={pendingLabel}
-              className="absolute inset-0 flex items-center justify-center"
-              data-slot="loader"
-              isIndeterminate
-            >
-              <Icon.Loader className="size-4 animate-spin" />
-            </ProgressBar>
-          ) : null}
+          {isPending ? <PendingLoader label={pendingLabel} /> : null}
         </>
       ))}
     </AriaButton>
@@ -131,4 +123,19 @@ export function buttonStyles({
   ...props
 }: { className?: string } & ButtonStyleProps = {}): string {
   return cn(styles(props), className);
+}
+
+// A pending React Aria Button names itself with its progress bar, by the id it
+// provides through ProgressBarContext. Only the loader takes it, so a Spinner
+// in the button's own content can't claim the same id.
+function PendingLoader({ label }: { label: string }) {
+  const progress = useSlottedContext(ProgressBarContext);
+  return (
+    <Spinner
+      className="absolute inset-0 flex"
+      data-slot="loader"
+      id={progress?.id}
+      label={label}
+    />
+  );
 }

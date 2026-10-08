@@ -1,0 +1,145 @@
+---
+title: Card
+description: A surface that groups related content and actions.
+item: card
+---
+
+import { CardClickable } from '#/components/demos/card-clickable';
+import { CardDemo } from '#/components/demos/card-demo';
+import { CardImage } from '#/components/demos/card-image';
+import { CardSmall } from '#/components/demos/card-small';
+
+<ComponentPreview name="card-demo">
+  <CardDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="card" />
+
+## Usage
+
+```tsx
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '#/components/ui/surfaces/card';
+
+<Card>
+  <CardHeader>
+    <CardTitle>Title</CardTitle>
+    <CardDescription>Description</CardDescription>
+    <CardAction>Action</CardAction>
+  </CardHeader>
+  <CardContent>Content</CardContent>
+  <CardFooter>Footer</CardFooter>
+</Card>;
+```
+
+## Examples
+
+### Small
+
+`size="sm"` tightens the card's padding and the gaps between its parts, and
+sets the title a step smaller.
+
+<ComponentPreview name="card-small">
+  <CardSmall />
+</ComponentPreview>
+
+### Image
+
+An `<img>` as the card's first child sits flush with its top edge. As the
+last child, it sits above the card's bottom padding with its bottom corners
+rounded to match the card. Fix its shape with
+Tailwind's `aspect-*` utilities (`aspect-video`, `aspect-square`,
+`aspect-4/3`) and `object-cover`; CSS `aspect-ratio` does the job, so there's
+no AspectRatio component.
+
+<ComponentPreview name="card-image">
+  <CardImage />
+</ComponentPreview>
+
+### Clickable card
+
+To make the whole card open a link, put the link in the title and stretch it
+over the card with `after:absolute after:inset-0`, on a card with `relative`.
+The link's name stays the title instead of all the card's text, and controls
+inside the card stay clickable when they're `relative` too. Draw the focus
+ring on the card while the link has keyboard focus. Text under the link can't
+be selected.
+
+<ComponentPreview name="card-clickable">
+  <CardClickable />
+</ComponentPreview>
+
+## Accessibility
+
+A card is a group of plain elements with no role: there's no WAI-ARIA card
+pattern, and a landmark on every card in a grid would crowd screen readers'
+landmark lists. Give a card a role from its context when it needs one, such
+as a list item in a list of cards, or `<section>` with `aria-labelledby`
+pointing at the title. `CardTitle` is a heading, level 3 by default, so screen
+reader users can move between cards by heading; set `level` to fit the page's
+outline. Avoid wrapping the whole card in a link, which makes all of its text
+the link's name; use the clickable card above. React Aria adds no keys.
+
+The card keeps a border in Windows High Contrast, where its ring, a shadow,
+isn't drawn.
+
+## API
+
+### Card
+
+A `div` with the card's surface. `className` applies to it.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/surfaces/card.tsx"
+  name="CardProps"
+/>
+
+Also accepts `div` props.
+
+#### Data attributes
+
+| Attribute   | Present when                                                                                                                   |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `data-slot` | Always: `card`, and on the parts `card-header`, `card-title`, `card-description`, `card-action`, `card-content`, `card-footer` |
+| `data-size` | Always: `md` or `sm`                                                                                                           |
+
+#### CSS variables
+
+| Variable            | Value                                                                                        |
+| ------------------- | -------------------------------------------------------------------------------------------- |
+| `--card-spacing`    | The padding and gaps its parts use: `var(--spacing-panel)`, `var(--spacing-popover)` at `sm` |
+| `--card-title-size` | `CardTitle`'s font size: `var(--text-base)`, `var(--text-sm)` at `sm`                        |
+
+A card nested in another keeps its own values, and a part's `className` (such
+as `px-0` for edge-to-edge content) wins over them.
+
+### CardTitle
+
+A heading, `h3` unless `level` says otherwise.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/surfaces/card.tsx"
+  name="CardTitleProps"
+/>
+
+Also accepts heading element props.
+
+### CardHeader, CardDescription, CardAction, CardContent, CardFooter
+
+`div`s with no props of their own; each accepts `div` props. In the header,
+`CardAction` sits at the end beside the title and description. A
+`border-b` on the header or `border-t` on the footer gets the card's spacing
+next to it.

@@ -1,0 +1,75 @@
+---
+title: Scroll Area
+description: A region that scrolls its content with thin native scrollbars.
+item: scroll-area
+---
+
+import { ScrollAreaDemo } from '#/components/demos/scroll-area-demo';
+import { ScrollAreaHorizontal } from '#/components/demos/scroll-area-horizontal';
+
+<ComponentPreview name="scroll-area-demo">
+  <ScrollAreaDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="scroll-area" />
+
+## Usage
+
+```tsx
+import { ScrollArea } from '#/components/ui/layout/scroll-area';
+
+<ScrollArea aria-label="Tags" className="h-72" role="region">
+  …
+</ScrollArea>;
+```
+
+## Examples
+
+### Horizontal
+
+`orientation="horizontal"` scrolls sideways only; `vertical` scrolls up and
+down only, and the default, `both`, scrolls either way. Content that overflows
+the other way is clipped.
+
+<ComponentPreview name="scroll-area-horizontal">
+  <ScrollAreaHorizontal />
+</ComponentPreview>
+
+## Accessibility
+
+The scrollbars are the browser's own, so touch, wheel, keyboard and assistive
+technology scroll it as they would any page. The area is focusable
+(`tabIndex={0}`), so keyboard users can tab to it and scroll with the arrow
+keys, and up and down with Page Up, Page Down, Home and End; its focus ring
+sits inside its edge, where a clipping parent can't hide it. React Aria adds
+no keys.
+
+Give it `role="region"` and a name (`aria-label` or `aria-labelledby`), so
+screen readers announce what the focused area holds. The thumb is the input
+border color, which meets 3:1 against the page, and forced colors repaint
+the scrollbar and the focus ring in system colors.
+
+## API
+
+### ScrollArea
+
+A `div` that scrolls its content. Size it with `className` (`h-72`); the
+scrollbars appear only when the content overflows.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/layout/scroll-area.tsx"
+  name="ScrollAreaProps"
+/>
+
+Also accepts `div` props.
+
+#### Data attributes
+
+| Attribute          | Present when                               |
+| ------------------ | ------------------------------------------ |
+| `data-slot`        | Always: `scroll-area`                      |
+| `data-orientation` | Always: `both`, `horizontal` or `vertical` |

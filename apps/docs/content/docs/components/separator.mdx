@@ -1,0 +1,70 @@
+---
+title: Separator
+description: A line that divides content, horizontally or vertically.
+item: separator
+reactAria: https://react-aria.adobe.com/Separator
+---
+
+import { SeparatorDemo } from '#/components/demos/separator-demo';
+import { SeparatorVertical } from '#/components/demos/separator-vertical';
+
+<ComponentPreview name="separator-demo">
+  <SeparatorDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="separator" />
+
+## Usage
+
+```tsx
+import { Separator } from '#/components/ui/layout/separator';
+
+<Separator />;
+```
+
+## Examples
+
+### Vertical
+
+`orientation="vertical"` divides items in a row and stretches to the row's
+height.
+
+<ComponentPreview name="separator-vertical">
+  <SeparatorVertical />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria renders a horizontal separator as an `<hr>` and a vertical one as
+a `<div>`, both with `role="separator"`; a vertical one adds
+`aria-orientation="vertical"`. Screen readers can
+announce it, but it isn't focusable and has no name: it's structure, not a
+control. Its content is presentational, so a label inside it isn't read; put
+text beside it instead. React Aria adds no keys.
+
+The line is a border, so it stays visible in Windows High Contrast.
+
+## API
+
+### Separator
+
+Renders React Aria's
+[`Separator`](https://react-aria.adobe.com/Separator#api). `className`
+applies to the line, which is a border: recolor it with a `border-*` class
+(`border-primary`) and thicken it with `border-t-2`, or `border-s-2` when
+vertical, not with `bg-*` or `h-*`.
+
+#### Props
+
+Accepts [React Aria `Separator` props](https://react-aria.adobe.com/Separator#api).
+`orientation` defaults to the one a surrounding `SeparatorContext` provides,
+then `horizontal`, and `elementType` swaps the `<hr>` for another element.
+
+#### Data attributes
+
+| Attribute          | Present when                       |
+| ------------------ | ---------------------------------- |
+| `data-slot`        | Always: `separator`                |
+| `data-orientation` | Always: `horizontal` or `vertical` |

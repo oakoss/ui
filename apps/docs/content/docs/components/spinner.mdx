@@ -1,0 +1,74 @@
+---
+title: Spinner
+description: A spinning indicator for work that's under way, named for screen readers.
+item: spinner
+---
+
+import { SpinnerDemo } from '#/components/demos/spinner-demo';
+import { SpinnerSizes } from '#/components/demos/spinner-sizes';
+
+<ComponentPreview name="spinner-demo">
+  <SpinnerDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="spinner" />
+
+## Usage
+
+```tsx
+import { Spinner } from '#/components/ui/feedback/spinner';
+
+<Spinner label="Loading results" />;
+```
+
+## Examples
+
+### Sizes
+
+`size` takes `sm`, `md` (the default) and `lg`, matching Button's sizes.
+
+<ComponentPreview name="spinner-sizes">
+  <SpinnerSizes />
+</ComponentPreview>
+
+## Accessibility
+
+The spinner is an indeterminate progress bar, as React Aria builds one:
+`role="progressbar"` with no `aria-valuenow`, named by `label` ("Loading" by
+default, including when `label` is empty), so screen readers announce what's
+loading rather than an unnamed image. Name it for the work, such as "Loading
+results". The icon is `aria-hidden`. It's a `<span>`, so it can sit inside a
+paragraph or a button. Inside a button its label joins the button's name
+(Chrome reads "Uploading Upload"). It takes no keys.
+
+The icon spins with a CSS animation, which the theme's reduced-motion layer
+stops, leaving a still arc. It takes the text color around it, so set the
+color on the spinner or its parent. Use a [Button](/docs/components/button)'s
+`isPending` for an action in progress rather than a spinner beside or inside
+it.
+
+## API
+
+### Spinner
+
+A `<span role="progressbar">` around the loader icon. `className` applies to
+the span.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/feedback/spinner.tsx"
+  name="SpinnerProps"
+/>
+
+Also accepts `span` props except `aria-label`, `children` and `role`; name it
+with `label`. An `aria-labelledby` you pass takes precedence over `label`.
+
+#### Data attributes
+
+| Attribute   | Present when               |
+| ----------- | -------------------------- |
+| `data-slot` | Always: `spinner`          |
+| `data-size` | Always: `sm`, `md` or `lg` |

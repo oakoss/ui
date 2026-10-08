@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+import * as Icon from '@oakoss/ui/components/icons';
+import { Spinner } from '@oakoss/ui/components/ui/feedback/spinner';
 import { Button, buttonStyles } from '@oakoss/ui/components/ui/inputs/button';
 import { Link } from 'react-aria-components';
 import { expect, fn, userEvent } from 'storybook/test';
@@ -38,6 +40,43 @@ export const PendingLabel: Story = {
     await expect(
       canvas.getByRole('progressbar', { name: 'Saving' }),
     ).toBeVisible();
+  },
+};
+
+// React Aria adds the spinner to a named button's name while it's pending, by
+// id, so an icon-only button still says what it is and that it's busy.
+export const PendingIconOnly: Story = {
+  args: {
+    'aria-label': 'Close',
+    children: <Icon.X />,
+    isPending: true,
+    size: 'icon',
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole('button', { name: 'Close Pending' }),
+    ).toBeVisible();
+  },
+};
+
+// A Spinner in the button's own content doesn't take the loader's id, so the
+// button still names itself with its pending label.
+export const PendingWithSpinnerContent: Story = {
+  args: {
+    'aria-label': 'Sync',
+    children: <Spinner label="Syncing" />,
+    isPending: true,
+    size: 'icon',
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole('button', { name: 'Sync Pending' }),
+    ).toBeVisible();
+    const ids = canvas
+      .getAllByRole('progressbar', { hidden: true })
+      .map((element) => element.id)
+      .filter(Boolean);
+    await expect(new Set(ids).size).toBe(ids.length);
   },
 };
 
