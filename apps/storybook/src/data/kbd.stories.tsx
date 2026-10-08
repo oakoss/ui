@@ -40,13 +40,13 @@ export const Label: Story = {
     );
   },
   render: () => (
-    <button className="inline-flex items-center gap-2" type="button">
+    <Button variant="outline">
       Search
       <KbdGroup>
         <Kbd label="Command">⌘</Kbd>
         <Kbd>K</Kbd>
       </KbdGroup>
-    </button>
+    </Button>
   ),
 };
 
@@ -59,12 +59,12 @@ export const EmptyLabel: Story = {
   },
   render: () => (
     <div className="flex gap-2">
-      <button type="button">
+      <Button variant="outline">
         Close <Kbd label="">⌘</Kbd>
-      </button>
-      <button type="button">
+      </Button>
+      <Button variant="outline">
         Close <Kbd label=" ">⌘</Kbd>
-      </button>
+      </Button>
     </div>
   ),
 };

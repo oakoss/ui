@@ -5,6 +5,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from '@oakoss/ui/components/ui/data/avatar';
+import { Button } from '@oakoss/ui/components/ui/inputs/button';
 import { createRef, useState } from 'react';
 import { expect, fn, userEvent, waitFor } from 'storybook/test';
 
@@ -99,9 +100,9 @@ export const CallbackRef: Story = {
           ) : null}
           <AvatarFallback>AL</AvatarFallback>
         </Avatar>
-        <button onClick={() => setShown(false)} type="button">
+        <Button onPress={() => setShown(false)} size="sm" variant="outline">
           Remove
-        </button>
+        </Button>
       </div>
     );
   },

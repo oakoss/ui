@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+import { Link } from 'react-aria-components';
 import { expect, waitFor } from 'storybook/test';
 
 import { part } from '../parts';
@@ -71,8 +72,8 @@ export const Named: Story = {
   },
 };
 
-// Spans throughout, so an avatar fits inside a link.
-// Once the image loads, the hidden initials drop out of the link's name.
+// Spans throughout, so an avatar fits inside a link. Once the image loads,
+// the hidden initials drop out of the link's name.
 export const InLink: Story = {
   play: async ({ canvas }) => {
     const link = await canvas.findByRole('link', { name: 'Ada Lovelace' });
@@ -82,9 +83,9 @@ export const InLink: Story = {
     }
   },
   render: () => (
-    <a className="inline-flex items-center gap-2 text-sm" href="#ada">
+    <Link className="inline-flex items-center gap-2 text-sm" href="#ada">
       <AvatarDemo src={photo} />
       Ada Lovelace
-    </a>
+    </Link>
   ),
 };

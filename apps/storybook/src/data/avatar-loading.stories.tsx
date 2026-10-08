@@ -5,6 +5,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from '@oakoss/ui/components/ui/data/avatar';
+import { Button } from '@oakoss/ui/components/ui/inputs/button';
 import { type ReactElement, useState } from 'react';
 import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
@@ -197,12 +198,12 @@ export const SourceChange: Story = {
     return (
       <div className="flex items-center gap-3">
         <AvatarDemo src={src} />
-        <button onClick={() => setSrc(broken)} type="button">
+        <Button onPress={() => setSrc(broken)} size="sm" variant="outline">
           Break
-        </button>
-        <button onClick={() => setSrc(photo)} type="button">
+        </Button>
+        <Button onPress={() => setSrc(photo)} size="sm" variant="outline">
           Fix
-        </button>
+        </Button>
       </div>
     );
   },
@@ -220,9 +221,9 @@ export const RemoveImage: Story = {
     return (
       <div className="flex items-center gap-3">
         <AvatarDemo src={src} />
-        <button onClick={() => setSrc(undefined)} type="button">
+        <Button onPress={() => setSrc(undefined)} size="sm" variant="outline">
           Remove
-        </button>
+        </Button>
       </div>
     );
   },
