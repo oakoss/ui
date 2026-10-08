@@ -347,11 +347,11 @@
       "name": "field",
       "type": "registry:ui",
       "title": "Field",
-      "description": "Label, description, error and input parts that wire into any React Aria field, plus fieldset and group layout.",
+      "description": "Label, description, error and input parts that wire into any React Aria field, plus fieldset, group, orientation and separator layout.",
       "meta": {
         "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/field.tsx"
       },
-      "registryDependencies": ["oakoss/ui/theme"],
+      "registryDependencies": ["oakoss/ui/theme", "oakoss/ui/separator"],
       "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
       "files": [
         {

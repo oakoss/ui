@@ -1,5 +1,9 @@
-import type { ComponentProps, ReactNode } from 'react';
-
+import {
+  type ComponentProps,
+  Fragment,
+  isValidElement,
+  type ReactNode,
+} from 'react';
 import {
   FieldError as AriaFieldError,
   type FieldErrorProps as AriaFieldErrorProps,
@@ -14,16 +18,116 @@ import {
 } from 'react-aria-components';
 import { tv, type VariantProps } from 'tailwind-variants/lite';
 
+import { Separator } from '#/components/ui/layout/separator';
 import { cn, cx } from '#/lib/cx';
 import { inputFocusRing } from '#/lib/recipes';
 
 export function FieldSet({ className, ...props }: ComponentProps<'fieldset'>) {
   return (
     <fieldset
-      className={cn('flex flex-col gap-6', className)}
+      className={cn(
+        'flex flex-col gap-6 has-[>[data-slot=checkbox-group]]:gap-3 has-[>[data-slot=radio-group]]:gap-3',
+        className,
+      )}
       data-slot="field-set"
       {...props}
     />
+  );
+}
+
+const fieldStyles = tv({
+  base: 'group/field flex w-full gap-3',
+  variants: {
+    orientation: {
+      horizontal:
+        'items-center has-[>[data-slot=field-content]]:items-start *:data-[slot=field-label]:flex-auto',
+      // A row once the nearest FieldGroup is 28rem wide; stacked below that.
+      responsive:
+        'flex-col *:w-full @md/field-group:flex-row @md/field-group:items-center @md/field-group:*:w-auto @md/field-group:has-[>[data-slot=field-content]]:items-start @md/field-group:*:data-[slot=field-label]:flex-auto [&>.sr-only]:w-auto',
+      vertical: 'flex-col *:w-full [&>.sr-only]:w-auto',
+    },
+  },
+});
+
+export type FieldProps = {
+  orientation?: 'horizontal' | 'responsive' | 'vertical';
+} & ComponentProps<'div'>;
+
+export function Field({
+  className,
+  orientation = 'vertical',
+  ...props
+}: FieldProps) {
+  return (
+    <div
+      data-slot="field"
+      {...props}
+      className={cn(fieldStyles({ orientation }), className)}
+      data-orientation={orientation}
+    />
+  );
+}
+
+export function FieldContent({ className, ...props }: ComponentProps<'div'>) {
+  return (
+    <div
+      className={cn(
+        'group/field-content flex flex-1 flex-col gap-1 leading-snug',
+        className,
+      )}
+      data-slot="field-content"
+      {...props}
+    />
+  );
+}
+
+// With text, the text sits between two lines; screen readers meet only the
+// first.
+export function FieldSeparator({
+  children,
+  className,
+  ...props
+}: ComponentProps<'div'>) {
+  const hasText = !isEmptyNode(children);
+  return (
+    <div
+      className={cn(
+        'flex items-center gap-2 text-sm text-muted-foreground',
+        className,
+      )}
+      data-content={hasText}
+      data-slot="field-separator"
+      {...props}
+    >
+      <Separator className="flex-1" />
+      {hasText ? (
+        <>
+          <span data-slot="field-separator-content">{children}</span>
+          {/* React Aria's Separator drops aria-hidden, so a wrapper hides it. */}
+          <div aria-hidden="true" className="flex flex-1">
+            <Separator />
+          </div>
+        </>
+      ) : null}
+    </div>
+  );
+}
+
+function isEmptyNode(node: ReactNode): boolean {
+  let current = node;
+  while (
+    isValidElement<{ children?: ReactNode }>(current) &&
+    current.type === Fragment
+  ) {
+    current = current.props.children;
+  }
+  if (Array.isArray(current))
+    return current.every((child) => isEmptyNode(child));
+  return (
+    current === undefined ||
+    current === null ||
+    typeof current === 'boolean' ||
+    current === ''
   );
 }
 
@@ -43,7 +147,10 @@ export type FieldLegendProps = ComponentProps<'legend'> &
 export function FieldDescription({ className, ...props }: AriaTextProps) {
   return (
     <AriaText
-      className={cn('text-sm text-muted-foreground', className)}
+      className={cn(
+        'text-sm text-muted-foreground group-data-[orientation=horizontal]/field:text-balance [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-foreground',
+        className,
+      )}
       data-slot="field-description"
       slot="description"
       {...props}
@@ -75,7 +182,10 @@ export function FieldError({
 export function FieldGroup({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div
-      className={cn('flex w-full flex-col gap-7', className)}
+      className={cn(
+        'group/field-group @container/field-group flex w-full flex-col gap-7 *:data-[slot=field-group]:gap-4',
+        className,
+      )}
       data-slot="field-group"
       {...props}
     />
