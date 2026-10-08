@@ -1,0 +1,114 @@
+---
+title: Avatar
+description: A person's image, with initials while it loads or when it fails.
+item: avatar
+---
+
+import { AvatarDemo } from '#/components/demos/avatar-demo';
+import { AvatarFallbackDemo } from '#/components/demos/avatar-fallback';
+import { AvatarGroupDemo } from '#/components/demos/avatar-group';
+
+<ComponentPreview name="avatar-demo">
+  <AvatarDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="avatar" />
+
+## Usage
+
+```tsx
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '#/components/ui/data/avatar';
+
+<Avatar>
+  <AvatarImage src="/ada.png" />
+  <AvatarFallback>AL</AvatarFallback>
+</Avatar>;
+```
+
+## Examples
+
+### Fallback and sizes
+
+`AvatarFallback` shows until the image loads, and stays when it fails or
+there's no `AvatarImage`. `size` takes `sm`, `md` (the default) and `lg`.
+
+<ComponentPreview name="avatar-fallback">
+  <AvatarFallbackDemo />
+</ComponentPreview>
+
+### Group and badge
+
+`AvatarGroup` overlaps its avatars, with `AvatarGroupCount` for the rest;
+name it with `aria-label`. `AvatarBadge` marks a status at the avatar's end
+edge.
+
+<ComponentPreview name="avatar-group">
+  <AvatarGroupDemo />
+</ComponentPreview>
+
+## Accessibility
+
+An avatar next to a visible name is decorative: `AvatarImage`'s `alt` is empty
+by default, and the initials are read as text, so pair them with the name or
+hide them. An avatar on its own needs one name that holds whether the image or
+the initials show: give `Avatar` `role="img"` and an `aria-label`, and the
+image and initials inside aren't read separately.
+
+A badge's color alone doesn't say what it means. Give it an `aria-label`, or
+mark it `aria-hidden` and say the status in nearby text, as the group example
+does. `AvatarGroup` is a `group`; name it with `aria-label`. React Aria adds no
+keys.
+
+The avatar keeps a border in Windows High Contrast, where the initials' fill
+takes the page color. The parts are `<span>`s, so an avatar can sit inside a
+link or a button.
+
+## API
+
+### Avatar
+
+A `span` holding the image and fallback. `className` applies to it.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/avatar.tsx"
+  name="AvatarProps"
+/>
+
+Also accepts `span` props.
+
+#### Data attributes
+
+| Attribute   | Present when                                                                                                               |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `data-slot` | Always: `avatar`, and on the parts `avatar-image`, `avatar-fallback`, `avatar-badge`, `avatar-group`, `avatar-group-count` |
+| `data-size` | Always on `Avatar`: `sm`, `md` or `lg`                                                                                     |
+
+### AvatarImage
+
+An `img`, invisible over the initials until it loads (laid out, so
+`loading="lazy"` still loads it) and hidden if it fails. It reads its state
+when mounted, so a server-rendered image that loaded before hydration still
+shows, and starts over when `src` or `srcSet` changes; removing it brings the
+initials back. While loading it's hidden from screen readers and the pointer.
+`alt` defaults to empty. Also accepts `img` props, including `ref`, `onLoad`
+and `onError`.
+
+| Attribute     | Present when                         |
+| ------------- | ------------------------------------ |
+| `data-status` | Always: `loading`, `loaded`, `error` |
+
+### AvatarFallback, AvatarBadge, AvatarGroup, AvatarGroupCount
+
+`span`s with no props of their own; each accepts `span` props.
+`AvatarFallback` shows until an image in the same avatar has loaded, and is
+hidden, from screen readers too, once one has; keep both as direct children
+of `Avatar`, so an avatar nested in another's badge keeps its own. `AvatarGroup`
+has `role="group"`.
