@@ -13,9 +13,11 @@ import { expect, fn, screen, userEvent, waitFor } from 'storybook/test';
 import {
   exitStarted,
   expectAfter,
+  hoverAt,
   hoverFresh,
   leave,
   slowTimeout,
+  wait,
 } from './overlay-test';
 import {
   Centered,
@@ -151,13 +153,16 @@ export const InsideDialog: Story = {
 
 // Lets a play function disable the trigger once it has seen the tooltip, so
 // no timer races a slow runner.
-const trigger = { disable: undefined as (() => void) | undefined };
+const trigger: { disable?: () => void } = {};
 
 function DisablesOnCue() {
   const [isDisabled, setIsDisabled] = useState(false);
   useEffect(() => {
     trigger.disable = () => {
       setIsDisabled(true);
+    };
+    return () => {
+      trigger.disable = undefined;
     };
   }, []);
   return (
@@ -175,14 +180,44 @@ export const DisableWhileOpen: Story = {
   play: async () => {
     await userEvent.tab();
     await expect(await screen.findByRole('tooltip')).toBeInTheDocument();
-    trigger.disable?.();
+    if (!trigger.disable) throw new Error('DisablesOnCue is not mounted');
+    trigger.disable();
     await waitFor(
       async () => {
         await expect(screen.queryByRole('tooltip')).toBeNull();
       },
-      { timeout: 3000 },
+      { timeout: slowTimeout },
     );
     await expect(screen.getByRole('button', { name: 'Save' })).toHaveFocus();
+  },
+  render: () => <DisablesOnCue />,
+};
+
+// Disabling closes a tooltip that was hovered again during its close delay,
+// which React Aria reopens without animating.
+export const DisableAfterRehover: Story = {
+  play: async () => {
+    const save = screen.getByRole('button', { name: 'Save' });
+    await hoverFresh(save);
+    await screen.findByRole('tooltip', undefined, { timeout: slowTimeout });
+    await userEvent.unhover(save);
+    await hoverAt(save);
+    const tooltip = screen.getByRole('tooltip');
+    await wait(400);
+    await expect(tooltip).toBeInTheDocument();
+    await expect(tooltip).not.toHaveAttribute('data-exiting');
+    if (!trigger.disable) throw new Error('DisablesOnCue is not mounted');
+    trigger.disable();
+    await waitFor(
+      async () => {
+        await expect(screen.queryByRole('tooltip')).toBeNull();
+      },
+      { timeout: slowTimeout },
+    );
+    // A stuck tooltip remounts mid-exit after unmounting.
+    await wait(500);
+    await expect(screen.queryByRole('tooltip')).toBeNull();
+    await leave(save, 'tooltip');
   },
   render: () => <DisablesOnCue />,
 };

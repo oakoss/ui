@@ -15,6 +15,7 @@ How to write a component in `packages/ui`. Each entry is a rule and its reason; 
 - **Apps own the locale.** Components never render `I18nProvider`.
 - **Direction comes from the locale.** There's no `DirectionProvider`: apps set direction with a locale through `I18nProvider`. `dir` on an element flips layout only; React Aria's keyboard and placement direction come from the locale. Forcing a locale's script to flip direction also changes formatting (`ar-EG` forced to Latin script renders Latin digits).
 - **React Aria is the only headless library.** A maintained package is fine when it makes a component easier (`react-resizable-panels`, `embla-carousel-react`, `input-otp`, `sonner`), but not a different headless library such as Base UI.
+- **A trigger that uses `useOverlayOpen` re-provides React Aria's overlay context with `shouldSkipAnimation: false` while disabled,** as `ExitWhenDisabled` does in `TooltipTrigger` and `HoverCardTrigger`. React Aria skips animations when an overlay opens at once (warm, or hovered again while closing). If the hook closes it on disable with the skip still set, the overlay unmounts before its exit starts, then remounts mid-exit and stays mounted: invisible, but still in the accessibility tree.
 - **Links are links.** A link that looks like a button is React Aria's `Link` with `buttonStyles`, which also serves TanStack Router's `createLink`.
 
 ## Component APIs

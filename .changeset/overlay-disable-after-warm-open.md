@@ -1,0 +1,3 @@
+---
+'@oakoss/ui': none
+---

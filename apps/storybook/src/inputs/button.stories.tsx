@@ -190,9 +190,7 @@ export const FocusRing: Story = {
     await expect(style.outlineStyle).toBe('solid');
     await expect(style.outlineWidth).toBe('3px');
     // The transition fades outline-color in from currentColor.
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 300);
-    });
+    await Promise.all(button.getAnimations().map((a) => a.finished));
     await expect(style.outlineColor).toBe(ringColor());
     await expect(style.boxShadow).toBe('none');
   },

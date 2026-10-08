@@ -1,6 +1,8 @@
-import type { ComponentProps } from 'react';
-
-import { PreviewTrigger as AriaPreviewTrigger } from 'react-aria-components';
+import { type ComponentProps, type ReactNode, use } from 'react';
+import {
+  PreviewTrigger as AriaPreviewTrigger,
+  PopoverContext,
+} from 'react-aria-components';
 
 import {
   PopoverContent,
@@ -45,6 +47,7 @@ export function HoverCard({ className, ...props }: HoverCardProps) {
 }
 
 export function HoverCardTrigger({
+  children,
   defaultOpen,
   isDisabled,
   isOpen,
@@ -57,5 +60,30 @@ export function HoverCardTrigger({
     isOpen,
     onOpenChange,
   });
-  return <AriaPreviewTrigger {...props} {...open} />;
+  return (
+    <AriaPreviewTrigger {...props} {...open}>
+      <ExitWhenDisabled isDisabled={open.isDisabled}>
+        {children}
+      </ExitWhenDisabled>
+    </AriaPreviewTrigger>
+  );
+}
+
+// A card that opened warm skips its animations, and closing it by disabling
+// while that holds leaves it mounted mid-exit. A disabled card always exits.
+function ExitWhenDisabled({
+  children,
+  isDisabled,
+}: {
+  children: ReactNode;
+  isDisabled: boolean;
+}) {
+  const popover = use(PopoverContext);
+  return (
+    <PopoverContext
+      value={isDisabled ? { ...popover, shouldSkipAnimation: false } : popover}
+    >
+      {children}
+    </PopoverContext>
+  );
 }
