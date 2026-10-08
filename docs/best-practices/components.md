@@ -22,6 +22,7 @@ How to write a component in `packages/ui`. Each entry is a rule and its reason; 
 
 - **Props or children, not both.** A component with a default layout takes layout props or children, enforced by a union type with `Partial<Record<…, never>>`. Children that render nothing (`null`, booleans) are excluded from the type.
 - **Values that render nothing mount nothing.** `label={show && 'Email'}` or `description=""` must not mount an empty part for `aria-labelledby` or `aria-describedby` to point at.
+- **A blank name is no name.** A prop that switches on a name, such as Empty's `aria-label` or Kbd's `label`, treats `''` and whitespace as absent. Accessible names collapse whitespace, so without that check `aria-label=" "` gives Empty's media an image role with no name, which axe flags, and a blank `label` hides Kbd's glyph behind empty text.
 - **One component plus a `<name>Styles` helper only when needed.** Export a merged helper (`buttonStyles({ className })`, where `className` wins over conflicting base classes) when another element needs the styles, such as a link styled as a button; never export a raw `tv` instance.
 - **A prop that shadows an HTML attribute replaces it in the type.** `Input`'s `size` is the control height, so its props `Omit` the HTML `size`, and a type test pins it.
 - **Icon-only controls require a name in the type.** Icon sizes require `aria-label` or `aria-labelledby`.
@@ -54,6 +55,7 @@ How to write a component in `packages/ui`. Each entry is a rule and its reason; 
 - **Focus is an outline, not a ring box-shadow,** because forced-colors mode removes box-shadows but repaints outlines in a system color. `ring` passes 3:1 on every surface. Use `focusRing` (keyboard focus) for controls and `inputFocusRing` (any focus) for text inputs.
 - **A scrolling region is focusable** (`tabIndex={0}`, axe's `scrollable-region-focusable`), so keyboard users can scroll it, with `focusRing` drawn inside its edge (`-outline-offset-3`) where a clipping parent can't hide it.
 - **Visual-only marks are `aria-hidden`.** A required asterisk would otherwise be read on top of React Aria's own required state.
+- **Decorative parts are hidden unless named, and the consumer's ARIA wins.** A part that's usually decoration, such as Empty's media, is `aria-hidden` until it gets a name, then takes a role (`img`). The consumer's own `aria-hidden` and `role` spread after the computed ones, so media holding its own named content, such as an `<img alt>`, can be exposed with `aria-hidden={false}`.
 - **Several messages in one described-by target need a separator in the text.** `aria-describedby` reads text flat, so layout alone doesn't separate them.
 - **Pointer targets reach 44×44** (WCAG 2.5.5, above AA's 24×24) with the `targetSize` recipe, which grows the hit area without changing the visible size. Turn it off only where controls sit closer than that (toolbars, button groups), or neighbors take each other's clicks.
 - **Lines are borders, not fills.** Forced colors repaint a background as the system's Canvas color, so upstream's `bg-border` separator measured white on white there; a border is repainted in a visible system color.
