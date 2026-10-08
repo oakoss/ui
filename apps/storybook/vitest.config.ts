@@ -49,7 +49,7 @@ export default defineConfig({
         ...(isCI && { sequence: { groupOrder: index } }),
       },
     })),
-    // TEMP(ui-5ty): logs from a retried attempt; back to 'passed-only' after.
-    silent: false,
+    // A failing story's console output reaches the CI log.
+    silent: 'passed-only',
   },
 });

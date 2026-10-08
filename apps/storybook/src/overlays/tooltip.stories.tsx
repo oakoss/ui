@@ -33,16 +33,6 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-// TEMP(ui-5ty): does only a page's first hover fail on CI?
-export const WarmUp: Story = {
-  play: async () => {
-    const trigger = screen.getByRole('button', { name: 'Save' });
-    await hoverFresh(trigger);
-    await screen.findByRole('tooltip', undefined, { timeout: slowTimeout });
-    await leave(trigger, 'tooltip');
-  },
-};
-
 // Keyboard focus opens the tooltip at once, and the trigger is described by
 // it; Escape closes it and focus stays on the trigger.
 export const FocusOpensAtOnce: Story = {

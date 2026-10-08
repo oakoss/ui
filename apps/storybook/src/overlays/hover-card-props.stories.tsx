@@ -33,15 +33,6 @@ function pointerOn() {
   return hoverFresh(link());
 }
 
-// TEMP(ui-5ty): does only a page's first hover fail on CI?
-export const WarmUp: Story = {
-  play: async () => {
-    await pointerOn();
-    await screen.findByRole('dialog', undefined, { timeout: slowTimeout });
-    await leave(link(), 'dialog');
-  },
-};
-
 // A consumer's delays reach PreviewTrigger. Each is longer than the default,
 // so a dropped prop or a leftover warm-up acts too soon and fails.
 export const LongOpenDelay: Story = {
@@ -54,8 +45,6 @@ export const LongOpenDelay: Story = {
     );
     await leave(link(), 'dialog');
   },
-  // Skipped in test runs: on CI the card sometimes never opens (ui-5ty).
-  tags: ['!test'],
 };
 
 export const LongCloseDelay: Story = {

@@ -41,14 +41,14 @@ export async function expectSlide(element: HTMLElement, translate: string) {
 // down 500ms after a close is requested, never on unmount. So this waits out
 // that cooldown, and a hover story ends with `leave`.
 export async function hoverFresh(element: HTMLElement) {
-  const log = traceOverlay(performance.now(), element);
-  log(`begin box=${box(element)}`);
+  // The browser's real pointer rests over the story on CI. Forcing layout now
+  // delivers its pointerover during the wait; arriving after the hover, it
+  // would end the hover before the overlay opens.
+  element.getBoundingClientRect();
   await wait(600);
   setInteractionModality('pointer');
   const start = performance.now();
-  log('hover');
   await userEvent.hover(element);
-  log('hover returned');
   return start;
 }
 
@@ -77,7 +77,6 @@ export async function leave(element: HTMLElement, role: 'dialog' | 'tooltip') {
     },
     { timeout: slowTimeout },
   );
-  traces.stop?.();
 }
 
 // Resolves once the enter transition finishes, so measurements read the
@@ -102,86 +101,4 @@ async function finished(element: HTMLElement) {
 function slideStyle(element: HTMLElement) {
   const { opacity, scale, translate } = getComputedStyle(element);
   return { opacity, scale, translate };
-}
-
-// TEMP(ui-5ty): logs input events, the trigger's hover state and overlay
-// changes from the start of hoverFresh. Remove once diagnosed.
-const traces = { count: 0, stop: undefined as (() => void) | undefined };
-
-function box(element: Element) {
-  const rect = element.getBoundingClientRect();
-  return `${Math.round(rect.x)},${Math.round(rect.y)} ${Math.round(rect.width)}x${Math.round(rect.height)}`;
-}
-
-function traceOverlay(start: number, trigger: HTMLElement) {
-  traces.stop?.();
-  traces.count += 1;
-  const id = `${trigger.textContent}#${traces.count}`;
-  const log = (line: string) => {
-    // oxlint-disable-next-line no-console -- the trace is console output
-    console.warn(
-      `[trace] ${id} +${Math.round(performance.now() - start)} ${line}`,
-    );
-  };
-  const events = [
-    'pointerover',
-    'pointerenter',
-    'pointermove',
-    'pointerout',
-    'pointerleave',
-    'pointerdown',
-    'mousemove',
-    'focusin',
-    'focusout',
-  ];
-  const onEvent = (event: Event) => {
-    const target =
-      event.target instanceof Element ? event.target.tagName : 'document';
-    const at =
-      event instanceof MouseEvent
-        ? ` at=${event.clientX},${event.clientY}`
-        : '';
-    log(`${event.type} ${target} trusted=${event.isTrusted}${at}`);
-  };
-  for (const type of events) {
-    document.addEventListener(type, onEvent, { capture: true });
-  }
-  const observer = watchOverlay(log, trigger);
-  const stop = () => {
-    clearTimeout(timer);
-    for (const type of events) {
-      document.removeEventListener(type, onEvent, { capture: true });
-    }
-    observer.disconnect();
-    traces.stop = undefined;
-  };
-  const timer = setTimeout(stop, 4600);
-  traces.stop = stop;
-  return log;
-}
-
-function watchOverlay(log: (line: string) => void, trigger: HTMLElement) {
-  let last = '';
-  const read = () => {
-    const overlay = document.querySelector('[role=tooltip], [role=dialog]');
-    const isHovered = Object.hasOwn(trigger.dataset, 'hovered');
-    const state = overlay
-      ? `open box=${box(overlay)} exiting=${Object.hasOwn(overlay instanceof HTMLElement ? overlay.dataset : {}, 'exiting')}`
-      : 'none';
-    return `trigger hovered=${isHovered} overlay=${state}`;
-  };
-  const observer = new MutationObserver(() => {
-    const state = read();
-    if (state === last) return;
-    last = state;
-    log(state);
-  });
-  last = read();
-  log(last);
-  observer.observe(document.body, {
-    attributes: true,
-    childList: true,
-    subtree: true,
-  });
-  return observer;
 }
