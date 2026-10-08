@@ -9,6 +9,8 @@ import {
   type LabelProps as AriaLabelProps,
   Text as AriaText,
   type TextProps as AriaTextProps,
+  LabelContext,
+  useSlottedContext,
 } from 'react-aria-components';
 import { tv, type VariantProps } from 'tailwind-variants/lite';
 
@@ -81,7 +83,8 @@ export function FieldGroup({ className, ...props }: ComponentProps<'div'>) {
 }
 
 export function FieldLabel({ className, ...props }: AriaLabelProps) {
-  return (
+  const context = useSlottedContext(LabelContext, props.slot);
+  const label = (
     <AriaLabel
       className={cn(
         'flex w-fit items-center gap-1 text-sm leading-snug font-medium text-foreground select-none in-data-disabled:opacity-50',
@@ -91,6 +94,12 @@ export function FieldLabel({ className, ...props }: AriaLabelProps) {
       {...props}
     />
   );
+  // A label for another control by id would otherwise also take the id of
+  // the React Aria field around it, and name that field too.
+  if (props.htmlFor !== undefined && props.htmlFor !== context?.htmlFor) {
+    return <LabelContext value={null}>{label}</LabelContext>;
+  }
+  return label;
 }
 
 export function FieldLegend({

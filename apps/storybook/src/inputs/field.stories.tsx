@@ -13,6 +13,8 @@ import { TextField } from '@oakoss/ui/components/ui/inputs/text-field';
 import { Button, Form, Link, SearchField } from 'react-aria-components';
 import { expect, userEvent } from 'storybook/test';
 
+import { part } from '../parts';
+
 const meta = { component: FieldError, title: 'Inputs/Field' } satisfies Meta<
   typeof FieldError
 >;
@@ -185,6 +187,48 @@ export const NativeValidation: Story = {
       </TextField>
       <Button type="submit">Submit</Button>
     </Form>
+  ),
+};
+
+// A label pointed at its own control with htmlFor names that control only,
+// not the React Aria field it sits in.
+export const LabelFor: Story = {
+  play: async ({ canvas, canvasElement }) => {
+    await expect(canvas.getByRole('textbox')).toHaveAccessibleName('Name');
+    await expect(canvas.getByRole('checkbox')).toHaveAccessibleName(
+      'Use as display name',
+    );
+    const ids = [...canvasElement.querySelectorAll('[id]')].map(
+      (element) => element.id,
+    );
+    await expect(new Set(ids).size).toBe(ids.length);
+  },
+  render: () => (
+    <TextField>
+      <FieldLabel>Name</FieldLabel>
+      <Input />
+      <div className="flex items-center gap-2">
+        <input id="display-name" type="checkbox" />
+        <FieldLabel htmlFor="display-name">Use as display name</FieldLabel>
+      </div>
+    </TextField>
+  ),
+};
+
+// htmlFor pointing at the field's own input keeps the field's wiring.
+export const LabelForField: Story = {
+  play: async ({ canvas }) => {
+    const input = canvas.getByRole('textbox', { name: 'Email' });
+    await expect(input).toHaveAttribute(
+      'aria-labelledby',
+      part('field-label').id,
+    );
+  },
+  render: () => (
+    <TextField id="email">
+      <FieldLabel htmlFor="email">Email</FieldLabel>
+      <Input />
+    </TextField>
   ),
 };
 
