@@ -29,6 +29,7 @@ const forked = [
   'field',
   'hover-card',
   'popover',
+  'scroll-area',
   'separator',
   'sheet',
   'skeleton',
