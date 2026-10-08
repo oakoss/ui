@@ -1,11 +1,11 @@
-import type { ComponentProps, ReactNode } from 'react';
-
+import { type ComponentProps, type ReactNode, use } from 'react';
 import {
   OverlayArrow as AriaOverlayArrow,
   Tooltip as AriaTooltip,
   type TooltipProps as AriaTooltipProps,
   TooltipTrigger as AriaTooltipTrigger,
   composeRenderProps,
+  TooltipTriggerStateContext,
 } from 'react-aria-components';
 
 import { cn, cx } from '#/lib/cx';
@@ -61,6 +61,7 @@ export function Tooltip({
 // Half a second both ways: long enough that passing over a control doesn't
 // open its tooltip, short enough to read as a response.
 export function TooltipTrigger({
+  children,
   closeDelay = 500,
   defaultOpen,
   delay = 500,
@@ -81,7 +82,32 @@ export function TooltipTrigger({
       delay={delay}
       {...props}
       {...open}
-    />
+    >
+      <ExitWhenDisabled isDisabled={open.isDisabled}>
+        {children}
+      </ExitWhenDisabled>
+    </AriaTooltipTrigger>
+  );
+}
+
+// A tooltip that opened warm skips its animations, and closing it by disabling
+// while that holds leaves it mounted mid-exit. A disabled tooltip always exits.
+function ExitWhenDisabled({
+  children,
+  isDisabled,
+}: {
+  children: ReactNode;
+  isDisabled: boolean;
+}) {
+  const state = use(TooltipTriggerStateContext);
+  return (
+    <TooltipTriggerStateContext
+      value={
+        isDisabled && state ? { ...state, shouldSkipAnimation: false } : state
+      }
+    >
+      {children}
+    </TooltipTriggerStateContext>
   );
 }
 

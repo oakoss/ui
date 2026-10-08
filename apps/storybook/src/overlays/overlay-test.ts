@@ -35,6 +35,16 @@ export async function expectSlide(element: HTMLElement, translate: string) {
   await expect(await inState(element, 'exiting', slideStyle)).toEqual(hidden);
 }
 
+// Moves the pointer onto the element's center. userEvent.hover reports it at
+// (0,0), outside a warm-opened overlay's safe area, which closes the overlay.
+export async function hoverAt(element: HTMLElement) {
+  const { height, left, top, width } = element.getBoundingClientRect();
+  await userEvent.pointer({
+    coords: { clientX: left + width / 2, clientY: top + height / 2 },
+    target: element,
+  });
+}
+
 // Hovers as a fresh pointer and returns when the hover began. React Aria opens
 // a tooltip or hover card on hover only after pointer input, which a
 // pointerenter alone doesn't record, and they share one warm-up that cools

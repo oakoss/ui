@@ -5,11 +5,12 @@ import {
   HoverCard,
   HoverCardTrigger,
 } from '@oakoss/ui/components/ui/overlays/hover-card';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-aria-components';
 import { expect, fn, screen, userEvent, waitFor } from 'storybook/test';
 
-import { hoverFresh, leave, slowTimeout, wait } from './overlay-test';
+import { stayedOpen } from './dialog-demo';
+import { hoverAt, hoverFresh, leave, slowTimeout, wait } from './overlay-test';
 
 type ToggleDemoProps = {
   controlled?: boolean;
@@ -19,6 +20,15 @@ type ToggleDemoProps = {
   fixedOpen?: boolean;
   onOpenChange?: (isOpen: boolean) => void;
 };
+
+// Lets a play function disable the trigger without moving the pointer or
+// focus, either of which would request a close on its own.
+const toggle: { disable?: () => void } = {};
+
+function disable() {
+  if (!toggle.disable) throw new Error('ToggleDemo is not mounted');
+  toggle.disable();
+}
 
 // A button outside the card toggles isDisabled while the story runs.
 function ToggleDemo({
@@ -30,6 +40,7 @@ function ToggleDemo({
 }: ToggleDemoProps) {
   const [isDisabled, setIsDisabled] = useState(disabled);
   const [isOpen, setIsOpen] = useState(false);
+  useDisableCue(setIsDisabled);
   let state: {
     defaultOpen?: boolean;
     isOpen?: boolean;
@@ -63,6 +74,17 @@ function ToggleDemo({
       </Button>
     </div>
   );
+}
+
+function useDisableCue(setIsDisabled: (isDisabled: boolean) => void) {
+  useEffect(() => {
+    toggle.disable = () => {
+      setIsDisabled(true);
+    };
+    return () => {
+      toggle.disable = undefined;
+    };
+  }, [setIsDisabled]);
 }
 
 const meta = {
@@ -140,6 +162,25 @@ export const DisableWhileHovered: Story = {
     // Not even for a moment.
     await expect(screen.queryByRole('dialog')).toBeNull();
     await wait(800);
+    await expectClosed();
+    await leave(link(), 'dialog');
+  },
+};
+
+// Disabling closes a card that opened warm and was staying open.
+export const DisableWarmOpen: Story = {
+  play: async ({ args }) => {
+    await hoverFresh(link());
+    await screen.findByRole('dialog', undefined, { timeout: slowTimeout });
+    await leave(link(), 'dialog');
+    await hoverAt(link());
+    // Present at once: a cold open waits for the delay.
+    await stayedOpen(screen.getByRole('dialog'));
+    disable();
+    await expectClosed();
+    await expect(args.onOpenChange).toHaveBeenLastCalledWith(false);
+    // A stuck card remounts mid-exit after unmounting.
+    await wait(500);
     await expectClosed();
     await leave(link(), 'dialog');
   },
