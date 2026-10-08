@@ -1,0 +1,65 @@
+---
+title: Skeleton
+description: A placeholder shape shown while content loads.
+item: skeleton
+---
+
+import { SkeletonDemo } from '#/components/demos/skeleton-demo';
+import { SkeletonLoading } from '#/components/demos/skeleton-loading';
+
+<ComponentPreview name="skeleton-demo">
+  <SkeletonDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="skeleton" />
+
+## Usage
+
+```tsx
+import { Skeleton } from '#/components/ui/feedback/skeleton';
+
+<Skeleton className="h-4 w-48" />;
+```
+
+## Examples
+
+### Loading region
+
+Mark the region that's loading with `aria-busy` while skeletons stand in for
+its content, and set it back to `false` when the content arrives.
+
+<ComponentPreview name="skeleton-loading">
+  <SkeletonLoading />
+</ComponentPreview>
+
+## Accessibility
+
+A skeleton is `aria-hidden`: its shape carries no information, and a screen
+reader reading a row of empty boxes would only add noise. Say that content is
+loading on the region instead, with `aria-busy="true"`, and replace the
+skeletons with the content when it arrives. React Aria adds no keys.
+
+The pulse is a CSS animation, which the theme's reduced-motion layer stops for
+people who ask for less motion, leaving the shape still. In Windows High
+Contrast the fill takes the page color, and the skeleton's border outlines the
+shape instead.
+
+## API
+
+### Skeleton
+
+A `div` with a muted fill and a pulse. `className` sets its size and shape,
+such as `h-4 w-48` for a line or `size-10 rounded-full` for an avatar.
+
+#### Props
+
+Accepts `div` props. Pass `aria-hidden={false}` only if the skeleton itself
+should be announced.
+
+#### Data attributes
+
+| Attribute   | Present when       |
+| ----------- | ------------------ |
+| `data-slot` | Always: `skeleton` |

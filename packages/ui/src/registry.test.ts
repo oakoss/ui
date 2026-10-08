@@ -30,6 +30,7 @@ const forked = [
   'popover',
   'separator',
   'sheet',
+  'skeleton',
   'tooltip',
 ];
 const upstreams = new Map(
