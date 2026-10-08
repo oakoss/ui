@@ -25,7 +25,7 @@ How to write a component in `packages/ui`. Each entry is a rule and its reason; 
 - **One component plus a `<name>Styles` helper only when needed.** Export a merged helper (`buttonStyles({ className })`, where `className` wins over conflicting base classes) when another element needs the styles, such as a link styled as a button; never export a raw `tv` instance.
 - **A prop that shadows an HTML attribute replaces it in the type.** `Input`'s `size` is the control height, so its props `Omit` the HTML `size`, and a type test pins it.
 - **Icon-only controls require a name in the type.** Icon sizes require `aria-label` or `aria-labelledby`.
-- **Pending keeps the label in place.** A pending control fades its label (`opacity-0`) rather than hiding it, so the width and accessible name stay, and its spinner is a `ProgressBar` named by a label prop read after the control's name ("Save Pending").
+- **Pending keeps the label in place.** A pending control fades its label (`opacity-0`) rather than hiding it, so the width and accessible name stay, and its spinner is our `Spinner` named by a label prop read after the control's name ("Save Pending"). `Spinner` is a `<span role="progressbar">` rather than React Aria's `ProgressBar`, whose `<div>` is invalid inside a button or a paragraph. Button's loader passes it the id a pending React Aria Button provides through `ProgressBarContext`, which is how the button adds the spinner to its name; Spinner itself ignores that context, so a Spinner in a button's content can't claim the same id.
 
 ## Icons
 
