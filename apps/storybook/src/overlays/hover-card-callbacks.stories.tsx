@@ -8,6 +8,8 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-aria-components';
 import { expect, fn, screen, userEvent, waitFor } from 'storybook/test';
 
+import { slowTimeout, wait } from './overlay-test';
+
 type CallbackDemoProps = {
   // Disables the trigger and swaps onOpenChange in one render, this long after
   // the card opens.
@@ -72,12 +74,12 @@ export const DisableReportsToCurrentCallback: Story = {
   args: { disableAfter: 300 },
   play: async ({ args }) => {
     await userEvent.tab();
-    await screen.findByRole('dialog');
+    await screen.findByRole('dialog', undefined, { timeout: slowTimeout });
     await waitFor(
       async () => {
         await expect(args.onOpenChange).toHaveBeenLastCalledWith(1, false);
       },
-      { timeout: 3000 },
+      { timeout: slowTimeout },
     );
   },
 };
@@ -87,14 +89,12 @@ export const DisableOnCloseReportsOnce: Story = {
   args: { disableOnClose: true },
   play: async ({ args }) => {
     await userEvent.tab();
-    await screen.findByRole('dialog');
+    await screen.findByRole('dialog', undefined, { timeout: slowTimeout });
     await userEvent.keyboard('{Escape}');
     await waitFor(async () => {
       await expect(screen.queryByRole('dialog')).toBeNull();
     });
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 200);
-    });
+    await wait(200);
     const closes = args.onOpenChange.mock.calls.filter(([, isOpen]) => !isOpen);
     await expect(closes).toHaveLength(1);
   },

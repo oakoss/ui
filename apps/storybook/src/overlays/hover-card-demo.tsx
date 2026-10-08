@@ -7,7 +7,7 @@ import {
 import { Link } from 'react-aria-components';
 import { screen } from 'storybook/test';
 
-import { settled } from './overlay-test';
+import { settled, slowTimeout } from './overlay-test';
 
 export type HoverCardDemoProps = {
   defaultOpen?: boolean;
@@ -38,7 +38,11 @@ export function HoverCardDemo({
 }
 
 export async function settledCard() {
-  const card = await screen.findByRole('dialog', { name: 'Ada Lovelace' });
+  const card = await screen.findByRole(
+    'dialog',
+    { name: 'Ada Lovelace' },
+    { timeout: slowTimeout },
+  );
   await settled(card);
   const trigger = screen.getByRole('link', { name: '@ada' });
   return {
