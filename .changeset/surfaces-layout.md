@@ -8,6 +8,8 @@ Avatar: a person's image with initials in `AvatarFallback` that show until it lo
 
 Card: a surface for related content, with `CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent` and `CardFooter`. `CardTitle` is a heading (`level`, 3 by default), `size="sm"` tightens every part, and the card keeps a border in Windows High Contrast. The docs show a clickable card built from a stretched link. Install with `npx shadcn@latest add oakoss/ui/card`.
 
+Empty: an empty state, with `EmptyHeader`, `EmptyMedia`, `EmptyTitle`, `EmptyDescription` and `EmptyContent`. `EmptyTitle` is a heading (`level`, 3 by default) and `EmptyDescription` a paragraph. `EmptyMedia` is hidden from screen readers unless named, and its `icon` variant keeps an outline in Windows High Contrast. Its `data-slot` is `empty-media`, where upstream renders `empty-icon`. Install with `npx shadcn@latest add oakoss/ui/empty`.
+
 Kbd: a keyboard key, and `KbdGroup` for a combination. A `label` prop has screen readers say "Command" instead of reading ⌘. Inside a React Aria menu item, the group takes the shortcut's id, so the item's description reads the whole combination and no id repeats. Install with `npx shadcn@latest add oakoss/ui/kbd`.
 
 Scroll Area: a region that scrolls its content with thin native scrollbars, whose thumb meets 3:1 contrast. It's focusable, so keyboard users can scroll it, with the focus ring inside its edge; `orientation` limits scrolling to `vertical` or `horizontal`. Install with `npx shadcn@latest add oakoss/ui/scroll-area`.

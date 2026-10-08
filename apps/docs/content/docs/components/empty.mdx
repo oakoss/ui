@@ -1,0 +1,105 @@
+---
+title: Empty
+description: What to show when there's nothing to show yet.
+item: empty
+---
+
+import { EmptyDemo } from '#/components/demos/empty-demo';
+import { EmptyOutline } from '#/components/demos/empty-outline';
+
+<ComponentPreview name="empty-demo">
+  <EmptyDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="empty" />
+
+## Usage
+
+```tsx
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '#/components/ui/feedback/empty';
+
+<Empty>
+  <EmptyHeader>
+    <EmptyMedia variant="icon">…</EmptyMedia>
+    <EmptyTitle>No projects yet</EmptyTitle>
+    <EmptyDescription>Create a project to start.</EmptyDescription>
+  </EmptyHeader>
+  <EmptyContent>…</EmptyContent>
+</Empty>;
+```
+
+## Examples
+
+### Outline
+
+A `border` class draws a dashed outline around the empty state, such as a
+drop zone. Links in the description are underlined.
+
+<ComponentPreview name="empty-outline">
+  <EmptyOutline />
+</ComponentPreview>
+
+## Accessibility
+
+`EmptyTitle` is a heading, level 3 by default, so screen reader users can
+jump to it; set `level` to fit the page's outline. `EmptyDescription` is a
+paragraph. `EmptyMedia` is hidden from screen readers, since the title says
+what's empty; give it a non-empty `aria-label`, or `aria-labelledby` pointing
+at visible text, and it becomes an image they announce. For media that holds
+its own named content, such as an `<img>` with `alt`, pass
+`aria-hidden={false}`; a `role` of your own replaces `img` on named media.
+The icon tile keeps an outline in Windows High Contrast. React Aria adds no
+keys.
+
+## API
+
+### Empty, EmptyHeader, EmptyContent
+
+`div`s with no props of their own; each accepts `div` props. `className`
+applies to each.
+
+### EmptyMedia
+
+A `div` for an icon or image.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/feedback/empty.tsx"
+  name="EmptyMediaProps"
+/>
+
+Also accepts `div` props.
+
+#### Data attributes
+
+| Attribute      | Present when                                                                                                         |
+| -------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `data-slot`    | Always: `empty`, and on the parts `empty-header`, `empty-media`, `empty-title`, `empty-description`, `empty-content` |
+| `data-variant` | Always on `EmptyMedia`: `default` or `icon`                                                                          |
+
+### EmptyTitle
+
+A heading, `h3` unless `level` says otherwise.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/feedback/empty.tsx"
+  name="EmptyTitleProps"
+/>
+
+Also accepts heading props.
+
+### EmptyDescription
+
+A `p`. Accepts `p` props.
