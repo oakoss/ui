@@ -763,6 +763,34 @@
       ]
     },
     {
+      "name": "kbd",
+      "type": "registry:ui",
+      "title": "Kbd",
+      "description": "Keyboard key and key combination, with a label for glyph keys and unique ids inside menu items.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/kbd.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components"],
+      "files": [
+        {
+          "path": "src/components/ui/data/kbd.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/kbd.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
       "name": "scroll-area",
       "type": "registry:ui",
       "title": "Scroll Area",

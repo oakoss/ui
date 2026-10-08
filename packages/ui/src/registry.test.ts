@@ -28,6 +28,7 @@ const forked = [
   'dialog',
   'field',
   'hover-card',
+  'kbd',
   'popover',
   'scroll-area',
   'separator',
