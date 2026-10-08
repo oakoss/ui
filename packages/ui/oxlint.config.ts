@@ -45,6 +45,24 @@ const componentVariables = defineConfig({
       },
     },
     {
+      files: ['src/components/ui/surfaces/card.tsx'],
+      rules: {
+        'shadcn/no-arbitrary-values': [
+          'error',
+          // Each size sets the variables its parts read, so a nested card's
+          // parts follow their own card rather than an outer one.
+          {
+            allow: [
+              '[--card-spacing:var(--spacing-panel)]',
+              '[--card-spacing:var(--spacing-popover)]',
+              '[--card-title-size:var(--text-base)]',
+              '[--card-title-size:var(--text-sm)]',
+            ],
+          },
+        ],
+      },
+    },
+    {
       files: ['src/components/ui/overlays/sheet.tsx'],
       rules: {
         'shadcn/no-arbitrary-values': [

@@ -23,6 +23,7 @@ test('registryDependencies point at items in this repo', () => {
 const forked = [
   'alert-dialog',
   'button',
+  'card',
   'dialog',
   'field',
   'hover-card',
