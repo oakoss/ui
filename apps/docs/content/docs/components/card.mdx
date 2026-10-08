@@ -6,6 +6,7 @@ item: card
 
 import { CardClickable } from '#/components/demos/card-clickable';
 import { CardDemo } from '#/components/demos/card-demo';
+import { CardImage } from '#/components/demos/card-image';
 import { CardSmall } from '#/components/demos/card-small';
 
 <ComponentPreview name="card-demo">
@@ -49,6 +50,19 @@ sets the title a step smaller.
 
 <ComponentPreview name="card-small">
   <CardSmall />
+</ComponentPreview>
+
+### Image
+
+An `<img>` as the card's first child sits flush with its top edge. As the
+last child, it sits above the card's bottom padding with its bottom corners
+rounded to match the card. Fix its shape with
+Tailwind's `aspect-*` utilities (`aspect-video`, `aspect-square`,
+`aspect-4/3`) and `object-cover`; CSS `aspect-ratio` does the job, so there's
+no AspectRatio component.
+
+<ComponentPreview name="card-image">
+  <CardImage />
 </ComponentPreview>
 
 ### Clickable card
