@@ -74,14 +74,7 @@ jobs:
             exit 1
           fi
 
-      # TEMP(ui-vqz): shows whether Vitest wrote the job summary. Remove once
-      # the Flaky Tests section is confirmed.
-      - run: |
-          status=0
-          pnpm test || status=$?
-          echo "step summary: $(wc -c < "$GITHUB_STEP_SUMMARY") bytes"
-          grep -c 'Flaky Tests' "$GITHUB_STEP_SUMMARY" || true
-          exit "$status"
+      - run: pnpm test
 
   # A squash merge's message is built from the PR's commits and, when there
   # are several, its title; the commit-msg hook never sees it. Steps skip on
