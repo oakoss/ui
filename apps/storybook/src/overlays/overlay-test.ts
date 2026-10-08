@@ -41,6 +41,10 @@ export async function expectSlide(element: HTMLElement, translate: string) {
 // down 500ms after a close is requested, never on unmount. So this waits out
 // that cooldown, and a hover story ends with `leave`.
 export async function hoverFresh(element: HTMLElement) {
+  // The browser's real pointer rests over the story on CI. Forcing layout now
+  // delivers its pointerover during the wait; arriving after the hover, it
+  // would end the hover before the overlay opens.
+  element.getBoundingClientRect();
   await wait(600);
   setInteractionModality('pointer');
   const start = performance.now();

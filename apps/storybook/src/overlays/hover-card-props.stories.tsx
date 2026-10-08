@@ -45,8 +45,6 @@ export const LongOpenDelay: Story = {
     );
     await leave(link(), 'dialog');
   },
-  // Skipped in test runs: on CI the card sometimes never opens (ui-5ty).
-  tags: ['!test'],
 };
 
 export const LongCloseDelay: Story = {
