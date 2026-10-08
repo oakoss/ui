@@ -32,9 +32,3 @@ export function CardDemo(props: CardDemoProps) {
     </Card>
   );
 }
-
-export function part(slot: string) {
-  const element = document.querySelector(`[data-slot=${CSS.escape(slot)}]`);
-  if (!(element instanceof HTMLElement)) throw new Error(`No ${slot}`);
-  return element;
-}

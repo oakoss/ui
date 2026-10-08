@@ -9,7 +9,8 @@ import {
 } from '@oakoss/ui/components/ui/surfaces/card';
 import { expect } from 'storybook/test';
 
-import { CardDemo, type CardDemoProps, part } from './card-demo';
+import { part } from '../parts';
+import { CardDemo, type CardDemoProps } from './card-demo';
 
 const meta = {
   args: { className: 'w-80' },
