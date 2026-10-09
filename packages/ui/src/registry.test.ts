@@ -25,6 +25,7 @@ const forked = [
   'avatar',
   'button',
   'card',
+  'checkbox',
   'dialog',
   'empty',
   'field',

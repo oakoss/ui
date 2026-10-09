@@ -1,0 +1,100 @@
+---
+title: Checkbox
+description: A control that turns an option on or off.
+item: checkbox
+reactAria: https://react-aria.adobe.com/Checkbox
+---
+
+import { CheckboxDemo } from '#/components/demos/checkbox-demo';
+import { CheckboxDescription } from '#/components/demos/checkbox-description';
+import { CheckboxIndeterminate } from '#/components/demos/checkbox-indeterminate';
+
+<ComponentPreview name="checkbox-demo">
+  <CheckboxDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="checkbox" />
+
+## Usage
+
+```tsx
+import { Checkbox } from '#/components/ui/inputs/checkbox';
+
+<Checkbox description="Synced with iCloud Drive.">Sync folders</Checkbox>;
+```
+
+## Examples
+
+### Description and errors
+
+`description` explains the option, and `errorMessage` or `errors` show
+while the checkbox is invalid. Both sit under the label.
+
+<ComponentPreview name="checkbox-description">
+  <CheckboxDescription />
+</ComponentPreview>
+
+### Indeterminate
+
+`isIndeterminate` shows a minus, for a checkbox that selects a group where
+only some options are on.
+
+<ComponentPreview name="checkbox-indeterminate">
+  <CheckboxIndeterminate />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria renders a native checkbox inside a `<label>`, so the label is the
+checkbox's name and its click target. Space toggles it.
+
+- **Description and errors:** `description` and the error describe the
+  checkbox, with no ids to wire. The error shows only while it's invalid.
+  Inside a React Aria `CheckboxGroup`, the group shows the errors, and a
+  checkbox's own `errorMessage` and `errors` don't render.
+- **Required:** the asterisk after a required label is hidden from screen
+  readers, and the checkbox is marked required. Chrome doesn't expose that
+  state for checkboxes, so where it matters, say so in the label or
+  description.
+- **Indeterminate:** screen readers announce it as mixed.
+- **Target size:** the box's hit area grows to 44px. Set `targetSize={false}`
+  where checkboxes sit closer than that, or neighbors take each other's
+  clicks; the label row stays at least 24px tall.
+- **Contrast:** the box's border reaches 3:1 against the page, and an
+  invalid box keeps its error border when checked. In Windows High Contrast
+  the box, fill and check take system colors; an invalid box keeps the
+  normal border there, and the error text carries the state.
+
+## API
+
+### Checkbox
+
+Renders React Aria's
+[`CheckboxField`](https://react-aria.adobe.com/Checkbox#api), with its
+label in a `CheckboxButton`. Children are the label.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/checkbox.tsx"
+  name="CheckboxProps"
+/>
+
+Also accepts React Aria `CheckboxField` props.
+
+#### Data attributes
+
+| Attribute            | Present when                                                                                   |
+| -------------------- | ---------------------------------------------------------------------------------------------- |
+| `data-slot`          | Always: `checkbox-field` on the root, `checkbox` on the label, `checkbox-indicator` on the box |
+| `data-selected`      | It's checked                                                                                   |
+| `data-indeterminate` | It's indeterminate                                                                             |
+| `data-invalid`       | It's invalid                                                                                   |
+| `data-disabled`      | It's disabled                                                                                  |
+| `data-readonly`      | It's read-only                                                                                 |
+| `data-required`      | It's required                                                                                  |
+| `data-hovered`       | On the label, while a pointer hovers it                                                        |
+| `data-pressed`       | On the label, while it's pressed                                                               |
+| `data-focus-visible` | On the label, while it has keyboard focus                                                      |
