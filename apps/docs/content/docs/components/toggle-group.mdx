@@ -1,0 +1,132 @@
+---
+title: Toggle Group
+description: A set of toggles that selects one option, or several.
+item: toggle-group
+reactAria: https://react-aria.adobe.com/ToggleButtonGroup
+---
+
+import { ToggleGroupDemo } from '#/components/demos/toggle-group-demo';
+import { ToggleGroupJoined } from '#/components/demos/toggle-group-joined';
+import { ToggleGroupMultiple } from '#/components/demos/toggle-group-multiple';
+
+<ComponentPreview name="toggle-group-demo">
+  <ToggleGroupDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="toggle-group" />
+
+## Usage
+
+```tsx
+import {
+  ToggleGroup,
+  ToggleGroupItem,
+} from '#/components/ui/inputs/toggle-group';
+
+<ToggleGroup aria-label="Alignment">
+  <ToggleGroupItem id="start">Start</ToggleGroupItem>
+  <ToggleGroupItem id="center">Center</ToggleGroupItem>
+  <ToggleGroupItem id="end">End</ToggleGroupItem>
+</ToggleGroup>;
+```
+
+## Examples
+
+### Multiple
+
+`selectionMode="multiple"` lets any number of items be on, as in a text
+formatting toolbar.
+
+<ComponentPreview name="toggle-group-multiple">
+  <ToggleGroupMultiple />
+</ComponentPreview>
+
+### Joined
+
+`joined` sets the items edge to edge, sharing their borders. Here
+`disallowEmptySelection` keeps one view always chosen.
+
+<ComponentPreview name="toggle-group-joined">
+  <ToggleGroupJoined />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria renders single selection, the default, as a `radiogroup` of
+`radio` items, and multiple selection as a `toolbar` of buttons with
+`aria-pressed`. Name the group with `aria-label` or `aria-labelledby`.
+
+- **Focus:** the group is one Tab stop. Arrow keys move focus between items
+  without changing the selection, and stop at the ends.
+- **Deselecting:** in single selection, pressing the selected item clears it,
+  which a radio group normally can't. Set `disallowEmptySelection` to keep one
+  selected.
+- **Names:** an item can't see its group's size, so an icon-only item's name
+  isn't checked in the type. Give each one an `aria-label`.
+- **Target size:** items sit 8px apart, closer than their 44px targets would
+  allow, so the targets are off inside a group.
+- **Disabled:** `isDisabled` disables every item and marks the group
+  `aria-disabled`.
+
+| Key                        | Action                                                            |
+| -------------------------- | ----------------------------------------------------------------- |
+| `Tab`                      | Moves focus into or out of the group                              |
+| `ArrowLeft` / `ArrowRight` | Moves focus between items when horizontal; reversed right to left |
+| `ArrowUp` / `ArrowDown`    | Moves focus between items when vertical                           |
+| `Space` / `Enter`          | Selects or toggles the focused item                               |
+
+Follows the WAI-ARIA
+[radio group](https://www.w3.org/WAI/ARIA/apg/patterns/radio/) and
+[toolbar](https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/) patterns.
+
+## API
+
+### ToggleGroup
+
+Extends React Aria's
+[`ToggleButtonGroup`](https://react-aria.adobe.com/ToggleButtonGroup#api).
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/toggle-group.tsx"
+  name="ToggleGroupProps"
+/>
+
+Also accepts all
+[React Aria `ToggleButtonGroup` props](https://react-aria.adobe.com/ToggleButtonGroup#api).
+
+#### Data attributes
+
+| Attribute          | Present when                             |
+| ------------------ | ---------------------------------------- |
+| `data-slot`        | `toggle-group`, unless you pass your own |
+| `data-orientation` | Always; `horizontal` or `vertical`       |
+| `data-size`        | Always; the items' default size          |
+| `data-variant`     | Always; the items' default look          |
+| `data-joined`      | `joined` is set                          |
+| `data-disabled`    | `isDisabled` is set                      |
+
+### ToggleGroupItem
+
+Extends React Aria's
+[`ToggleButton`](https://react-aria.adobe.com/ToggleButton#api), styled as a
+[Toggle](/docs/components/toggle).
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/toggle-group.tsx"
+  name="ToggleGroupItemProps"
+/>
+
+Also accepts all
+[React Aria `ToggleButton` props](https://react-aria.adobe.com/ToggleButton#api).
+`id` is required: it's the key the group selects, and an item without one
+isn't part of the group's selection.
+
+#### Data attributes
+
+Toggle's, with `data-slot` set to `toggle-group-item`.

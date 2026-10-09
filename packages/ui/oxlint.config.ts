@@ -22,6 +22,13 @@ const buttonColors = [
   'secondary',
 ];
 
+const selectionColors = [
+  'ButtonText',
+  'GrayText',
+  'Highlight',
+  'HighlightText',
+];
+
 // Button sets its --btn-* variables to named theme colors. Each color is
 // listed because the plugin's `*` also matches `,#f00`, so a `var(--color-*)`
 // entry would let a hardcoded fallback through. The label's gap-[inherit]
@@ -97,6 +104,31 @@ const componentVariables = defineConfig({
         // inline z-index while keeping its style type, and no option exempts
         // an unreadable style object.
         'shadcn/no-inline-styles': 'off',
+      },
+    },
+    {
+      files: [
+        'src/components/ui/inputs/checkbox.tsx',
+        'src/components/ui/inputs/radio-group.tsx',
+        'src/components/ui/inputs/slider.tsx',
+        'src/components/ui/inputs/switch.tsx',
+        'src/components/ui/inputs/toggle-group.tsx',
+        'src/components/ui/inputs/toggle.tsx',
+      ],
+      rules: {
+        'shadcn/no-arbitrary-values': [
+          'error',
+          // Forced colors repaint a selected control's fill as the page
+          // color, so each state takes a system color the mode keeps.
+          {
+            allow: selectionColors.flatMap((color) =>
+              ['bg', 'border', 'text'].flatMap((property) => [
+                `forced-colors:${property}-[${color}]`,
+                `forced-colors:selected:${property}-[${color}]`,
+              ]),
+            ),
+          },
+        ],
       },
     },
   ],

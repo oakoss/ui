@@ -12,6 +12,7 @@ import {
   FieldLabel,
   Input,
   type InputSize,
+  isEmptyNode,
 } from '#/components/ui/inputs/field';
 import { cx } from '#/lib/cx';
 
@@ -52,7 +53,7 @@ export function TextField({
       {children ??
         (({ isRequired }) => (
           <>
-            {isEmpty(label) ? null : (
+            {isEmptyNode(label) ? null : (
               <FieldLabel>
                 {label}
                 {isRequired ? (
@@ -63,21 +64,12 @@ export function TextField({
               </FieldLabel>
             )}
             <Input placeholder={placeholder} size={size} />
-            {isEmpty(description) ? null : (
+            {isEmptyNode(description) ? null : (
               <FieldDescription>{description}</FieldDescription>
             )}
             <FieldError errors={errors}>{errorMessage}</FieldError>
           </>
         ))}
     </AriaTextField>
-  );
-}
-
-function isEmpty(node: ReactNode): boolean {
-  return (
-    node === undefined ||
-    node === null ||
-    typeof node === 'boolean' ||
-    node === ''
   );
 }

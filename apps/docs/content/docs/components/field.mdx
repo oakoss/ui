@@ -9,6 +9,8 @@ import { FieldDemo } from '#/components/demos/field-demo';
 import { FieldErrors } from '#/components/demos/field-errors';
 import { FieldInputSizes } from '#/components/demos/field-input-sizes';
 import { FieldLayout } from '#/components/demos/field-layout';
+import { FieldOrientation } from '#/components/demos/field-orientation';
+import { FieldSeparatorDemo } from '#/components/demos/field-separator';
 
 <ComponentPreview name="field-demo">
   <FieldDemo />
@@ -73,6 +75,28 @@ readers announce, and `FieldGroup` stacks fields with consistent spacing.
   <FieldLayout />
 </ComponentPreview>
 
+### Orientation
+
+`orientation` on `Field` lays out a label beside its control. Put `Field`
+inside the React Aria field, so the field still wires its label and
+description. `horizontal` keeps them in a row, and a `FieldContent` column
+next to a control lines the row up at its top. `responsive` is a row once the
+nearest `FieldGroup` is 28rem wide and stacks below that; outside a
+`FieldGroup` it always stacks. A stacked `Field` stretches every child to its
+width, a Button included.
+
+<ComponentPreview name="field-orientation">
+  <FieldOrientation />
+</ComponentPreview>
+
+### Separator
+
+`FieldSeparator` divides fields, with optional text between two lines.
+
+<ComponentPreview name="field-separator">
+  <FieldSeparatorDemo />
+</ComponentPreview>
+
 ## Accessibility
 
 React Aria links the parts through context:
@@ -84,6 +108,11 @@ React Aria links the parts through context:
   with a space between them so their words don't run together.
 - **Groups:** `FieldSet` is a native `<fieldset>`, and `FieldLegend` its
   `<legend>`, which screen readers announce on entering the group.
+- **Layout parts:** `Field` and `FieldContent` are plain `<div>`s with no role,
+  so they add nothing for screen readers to announce. A `FieldSeparator` with
+  text reads as one separator, then its text.
+- **Other controls:** a `FieldLabel` with `htmlFor` names that control only,
+  even inside a React Aria field.
 
 `Input`'s border reaches 3:1 against the page at rest and when invalid.
 
@@ -153,6 +182,36 @@ A `<legend>`.
 | `data-slot`    | Always `field-legend`                 |
 | `data-variant` | Always; `legend` or `label` text size |
 
+### Field
+
+A `<div>` that lays out a label, description and control.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/field.tsx"
+  name="FieldProps"
+/>
+
+Also accepts `div` props.
+
+#### Data attributes
+
+| Attribute          | Present when                                     |
+| ------------------ | ------------------------------------------------ |
+| `data-slot`        | Always `field`                                   |
+| `data-orientation` | Always; `vertical`, `horizontal` or `responsive` |
+
+### FieldSeparator
+
+A `<div>` around a line, or two lines with text between them. Accepts `div`
+props.
+
+| Attribute      | Present when                                                    |
+| -------------- | --------------------------------------------------------------- |
+| `data-slot`    | Always `field-separator`; `field-separator-content` on the text |
+| `data-content` | Always; `true` when it has text                                 |
+
 ### Other parts
 
 These add no props of their own, and each sets a `data-slot`:
@@ -162,4 +221,5 @@ These add no props of their own, and each sets a `data-slot`:
 | `FieldLabel`       | React Aria's `Label`                          | `field-label`       |
 | `FieldDescription` | React Aria's `Text` with `slot="description"` | `field-description` |
 | `FieldSet`         | `<fieldset>`                                  | `field-set`         |
-| `FieldGroup`       | `<div>`                                       | `field-group`       |
+| `FieldGroup`       | `<div>`, a container for responsive fields    | `field-group`       |
+| `FieldContent`     | `<div>`                                       | `field-content`     |

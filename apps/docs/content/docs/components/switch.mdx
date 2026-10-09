@@ -1,0 +1,99 @@
+---
+title: Switch
+description: A control that turns a setting on or off right away.
+item: switch
+reactAria: https://react-aria.adobe.com/Switch
+---
+
+import { SwitchDemo } from '#/components/demos/switch-demo';
+import { SwitchSettings } from '#/components/demos/switch-settings';
+import { SwitchSizes } from '#/components/demos/switch-sizes';
+
+<ComponentPreview name="switch-demo">
+  <SwitchDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="switch" />
+
+## Usage
+
+```tsx
+import { Switch } from '#/components/ui/inputs/switch';
+
+<Switch description="Turns off wireless connections.">Airplane mode</Switch>;
+```
+
+## Examples
+
+### Settings row
+
+`labelPlacement="start"` puts the label first and the switch at the row's
+end, as in a settings list.
+
+<ComponentPreview name="switch-settings">
+  <SwitchSettings />
+</ComponentPreview>
+
+### Sizes
+
+`size` takes `sm` and `md`.
+
+<ComponentPreview name="switch-sizes">
+  <SwitchSizes />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria renders a native checkbox with `role="switch"` inside a
+`<label>`, so the label is the switch's name and its click target, and
+screen readers announce it as on or off. Space toggles it.
+
+- **Description and errors:** `description` and the error describe the
+  switch, with no ids to wire. The error shows only while it's invalid.
+- **Required:** the asterisk after a required label is hidden from screen
+  readers, and the switch is marked required, but Chrome doesn't expose that
+  state for it and reports it as invalid until it's on, as it does any
+  native one; where it matters, say so in the label or description.
+  `validationBehavior="aria"` avoids the early "invalid", but then the switch
+  no longer blocks a native form submit.
+- **Target size:** the track's hit area grows to 44px. Set
+  `targetSize={false}` where switches sit closer than that; the row stays at
+  least 24px tall.
+- **Contrast:** the off track reaches 3:1 against the page. In Windows High
+  Contrast the track keeps its outline and the thumb takes system colors, so
+  it stays visible on and off. Right to left, the thumb travels the other
+  way and stays inside the track.
+
+## API
+
+### Switch
+
+Renders React Aria's
+[`SwitchField`](https://react-aria.adobe.com/Switch#api), with its label
+in a `SwitchButton`. Children are the label.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/switch.tsx"
+  name="SwitchProps"
+/>
+
+Also accepts React Aria `SwitchField` props.
+
+#### Data attributes
+
+| Attribute            | Present when                                                                                 |
+| -------------------- | -------------------------------------------------------------------------------------------- |
+| `data-slot`          | Always: `switch-field` on the root, `switch` on the label, `switch-track` and `switch-thumb` |
+| `data-size`          | On the label; `sm` or `md`                                                                   |
+| `data-selected`      | It's on                                                                                      |
+| `data-invalid`       | It's invalid                                                                                 |
+| `data-disabled`      | It's disabled                                                                                |
+| `data-readonly`      | It's read-only                                                                               |
+| `data-required`      | It's required                                                                                |
+| `data-hovered`       | On the label, while a pointer hovers it                                                      |
+| `data-pressed`       | On the label, while it's pressed                                                             |
+| `data-focus-visible` | On the label, while it has keyboard focus                                                    |
