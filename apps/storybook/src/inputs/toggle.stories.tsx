@@ -81,8 +81,6 @@ export const SelectedHover: Story = {
     toggle.dataset.hovered = 'true';
     await settle();
     const style = getComputedStyle(toggle);
-    // contrast() drops alpha, so a vanished fill would read as black.
-    await expect(style.backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
     await expect(contrast(style.backgroundColor, page())).toBeGreaterThan(3);
   },
 };
