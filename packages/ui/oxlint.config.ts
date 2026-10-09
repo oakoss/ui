@@ -128,6 +128,7 @@ const componentVariables = defineConfig({
         'src/components/ui/inputs/switch.tsx',
         'src/components/ui/inputs/toggle-group.tsx',
         'src/components/ui/inputs/toggle.tsx',
+        'src/components/ui/navigation/tabs.tsx',
       ],
       rules: {
         'shadcn/no-arbitrary-values': [
@@ -135,12 +136,18 @@ const componentVariables = defineConfig({
           // Forced colors repaint a selected control's fill as the page
           // color, so each state takes a system color the mode keeps.
           {
-            allow: selectionColors.flatMap((color) =>
-              ['bg', 'border', 'text'].flatMap((property) => [
+            allow: selectionColors.flatMap((color) => [
+              ...['bg', 'border', 'text'].flatMap((property) => [
                 `forced-colors:${property}-[${color}]`,
+                `forced-colors:disabled:${property}-[${color}]`,
                 `forced-colors:selected:${property}-[${color}]`,
+                `forced-colors:selected:not-disabled:${property}-[${color}]`,
               ]),
-            ),
+              // A selected control opted out of forced colors sets its own
+              // focus outline color.
+              `forced-colors:selected:focus-visible:outline-[${color}]`,
+              `forced-colors:selected:not-disabled:focus-visible:outline-[${color}]`,
+            ]),
           },
         ],
       },

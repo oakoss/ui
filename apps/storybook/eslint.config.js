@@ -23,5 +23,12 @@ export default defineConfig(
     entryPoint: uiStylesheet,
     tsconfig: path.join(import.meta.dirname, 'tsconfig.json'),
   }),
+  {
+    // vitest/browser throws when loaded outside the Vitest run, so the
+    // screenshot helper imports it on call and story files still open in
+    // plain Storybook.
+    files: ['src/paint.ts'],
+    rules: { 'no-restricted-syntax': 'off' },
+  },
   oxlint(oxlintConfig),
 );

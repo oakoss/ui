@@ -42,6 +42,7 @@ const forked = [
   'slider',
   'spinner',
   'switch',
+  'tabs',
   'toggle',
   'toggle-group',
   'tooltip',
