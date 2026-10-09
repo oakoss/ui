@@ -38,6 +38,7 @@ const forked = [
   'sheet',
   'skeleton',
   'spinner',
+  'switch',
   'tooltip',
 ];
 const upstreams = new Map(
