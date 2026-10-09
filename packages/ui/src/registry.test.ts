@@ -37,6 +37,7 @@ const forked = [
   'separator',
   'sheet',
   'skeleton',
+  'slider',
   'spinner',
   'switch',
   'tooltip',

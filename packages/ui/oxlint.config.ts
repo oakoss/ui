@@ -110,6 +110,7 @@ const componentVariables = defineConfig({
       files: [
         'src/components/ui/inputs/checkbox.tsx',
         'src/components/ui/inputs/radio-group.tsx',
+        'src/components/ui/inputs/slider.tsx',
         'src/components/ui/inputs/switch.tsx',
       ],
       rules: {

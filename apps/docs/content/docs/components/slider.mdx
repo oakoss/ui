@@ -1,0 +1,152 @@
+---
+title: Slider
+description: A control for picking a value, or a range, along a track.
+item: slider
+reactAria: https://react-aria.adobe.com/Slider
+---
+
+import { SliderComposed } from '#/components/demos/slider-composed';
+import { SliderDemo } from '#/components/demos/slider-demo';
+import { SliderRange } from '#/components/demos/slider-range';
+import { SliderVertical } from '#/components/demos/slider-vertical';
+
+<ComponentPreview name="slider-demo">
+  <SliderDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="slider" />
+
+## Usage
+
+```tsx
+import { Slider } from '#/components/ui/inputs/slider';
+
+<Slider defaultValue={40} label="Volume" />;
+```
+
+## Examples
+
+### Range
+
+An array `value` or `defaultValue` gives a thumb per value, and
+`thumbLabels` names each one. The output formats the range with
+`formatOptions`.
+
+<ComponentPreview name="slider-range">
+  <SliderRange />
+</ComponentPreview>
+
+### Vertical
+
+`orientation="vertical"` stands the track upright. The track is at least
+10rem tall and fills any height you give the slider beyond that.
+
+<ComponentPreview name="slider-vertical">
+  <SliderVertical />
+</ComponentPreview>
+
+### Custom layout
+
+`children` replace the layout. Compose `FieldLabel`, `SliderOutput`,
+`SliderTrack` and `FieldDescription` in any order; they still wire up. A
+range still takes `thumbLabels` on the `Slider`.
+
+<ComponentPreview name="slider-composed">
+  <SliderComposed />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria renders a `group` named by the label, with a visually hidden
+`<input type="range">` in each thumb, so screen readers announce each thumb
+as a slider with its formatted value. Pressing the label focuses the first
+thumb, and the output isn't announced as it changes, since each thumb
+already reads its value. Follows the WAI-ARIA
+[Slider](https://www.w3.org/WAI/ARIA/apg/patterns/slider/) and
+[Multi-Thumb Slider](https://www.w3.org/WAI/ARIA/apg/patterns/slider-multithumb/)
+patterns.
+
+- **Thumb names:** a range's thumbs are named by their thumb label and the
+  slider's label ("Minimum Price"). The type requires `thumbLabels` whenever
+  the value may be a range, with or without `children`, though it can't
+  check there's a name per thumb. A generic wrapper (`SliderProps<T>`) has
+  to pin `T` to spread its props into `Slider`.
+- **Description:** React Aria's Slider has no description slot, so the
+  slider links `description`, or a `FieldDescription` in its children, to
+  every thumb, ahead of any `aria-describedby` of your own, and drops the
+  link when the description unmounts.
+- **Target size:** the track takes presses in a 44px band centered on the
+  rail, and moves the nearest thumb to the point pressed.
+- **Contrast:** the rail and fill each reach 3:1 against the page. In
+  Windows High Contrast the fill takes the system's highlight color and the
+  rail thins to an outline, so the fill stands out by shape too.
+- **Disabled:** the label, output and track fade, and the group is marked
+  `aria-disabled` as well as the inputs, so screen readers announce the
+  whole slider as unavailable and contrast checkers treat the faded text as
+  inactive, which WCAG exempts from its minimum.
+
+| Key                 | Action                                                |
+| ------------------- | ----------------------------------------------------- |
+| Arrow keys          | Move the focused thumb one step; with Shift, one page |
+| Page Up / Page Down | Move the focused thumb a page, a tenth of the range   |
+| Home / End          | Move the focused thumb to its minimum or maximum      |
+| Tab                 | Move to the next thumb                                |
+
+Right to left, Left and Right arrows move the other way.
+
+## API
+
+### Slider
+
+Extends React Aria's [`Slider`](https://react-aria.adobe.com/Slider#api).
+With `children`, it renders only them.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/slider.tsx"
+  name="SliderProps"
+/>
+
+Also accepts all [React Aria `Slider` props](https://react-aria.adobe.com/Slider#api).
+
+#### Data attributes
+
+| Attribute          | Present when                       |
+| ------------------ | ---------------------------------- |
+| `data-slot`        | Always `slider`                    |
+| `data-orientation` | Always; `horizontal` or `vertical` |
+| `data-disabled`    | `isDisabled` is set                |
+
+### SliderTrack
+
+Extends React Aria's
+[`SliderTrack`](https://react-aria.adobe.com/Slider#api): the press
+area, which draws the rail, the fill and a thumb per value, named by the
+`Slider`'s `thumbLabels`. Accepts React Aria `SliderTrack` props.
+
+#### Data attributes
+
+| Attribute            | Present when                                                                                  |
+| -------------------- | --------------------------------------------------------------------------------------------- |
+| `data-slot`          | Always: `slider-track` on the track, `slider-rail`, `slider-range` (the fill), `slider-thumb` |
+| `data-orientation`   | On the track and fill; `horizontal` or `vertical`                                             |
+| `data-disabled`      | The slider is disabled                                                                        |
+| `data-hovered`       | On the track, fill or a thumb, while a pointer hovers it                                      |
+| `data-dragging`      | On a thumb, while it's dragged                                                                |
+| `data-focus-visible` | On a thumb, while it has keyboard focus                                                       |
+
+### SliderOutput
+
+Extends React Aria's
+[`SliderOutput`](https://react-aria.adobe.com/Slider#api), which
+shows the value, or the range, formatted for the locale.
+
+#### Data attributes
+
+| Attribute       | Present when           |
+| --------------- | ---------------------- |
+| `data-slot`     | Always `slider-output` |
+| `data-disabled` | The slider is disabled |
