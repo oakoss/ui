@@ -104,6 +104,28 @@ export const DescriptionLink: Story = {
   },
 };
 
+// Nested in other text, a link is still underlined.
+export const DescriptionNestedLink: Story = {
+  play: async ({ canvas }) => {
+    const link = canvas.getByRole('link', { name: 'the docs' });
+    await expect(getComputedStyle(link).textDecorationLine).toBe('underline');
+  },
+  render: () => (
+    <Empty>
+      <EmptyHeader>
+        <EmptyTitle>No results</EmptyTitle>
+        <EmptyDescription>
+          See{' '}
+          <strong>
+            <a href="#docs">the docs</a>
+          </strong>
+          .
+        </EmptyDescription>
+      </EmptyHeader>
+    </Empty>
+  ),
+};
+
 // Forced colors repaint the icon tile's fill as the page color; its border
 // keeps the tile.
 export const ForcedColors: Story = {

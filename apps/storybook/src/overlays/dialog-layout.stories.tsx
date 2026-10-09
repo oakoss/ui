@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import {
   Dialog,
+  DialogDescription,
   DialogFooter,
   DialogTitle,
 } from '@oakoss/ui/components/ui/overlays/dialog';
@@ -73,6 +74,31 @@ export const TallContent: Story = {
         <p key={index}>Clause {index + 1}.</p>
       ))}
       <DialogFooter closeLabel="Done" showCloseButton />
+    </Dialog>
+  ),
+};
+
+// A link in the description is underlined, even nested in other text, so it
+// doesn't rely on color.
+export const DescriptionLinks: Story = {
+  play: async () => {
+    await screen.findByRole('dialog', { name: 'Delete project' });
+    for (const name of ['Learn more', 'backups']) {
+      await expect(
+        getComputedStyle(screen.getByRole('link', { name })).textDecorationLine,
+      ).toBe('underline');
+    }
+  },
+  render: () => (
+    <Dialog defaultOpen>
+      <DialogTitle>Delete project</DialogTitle>
+      <DialogDescription>
+        <a href="#learn">Learn more</a> about{' '}
+        <strong>
+          <a href="#backups">backups</a>
+        </strong>
+        .
+      </DialogDescription>
     </Dialog>
   ),
 };

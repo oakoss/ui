@@ -148,7 +148,7 @@ export function FieldDescription({ className, ...props }: AriaTextProps) {
   return (
     <AriaText
       className={cn(
-        'text-sm text-muted-foreground group-data-[orientation=horizontal]/field:text-balance [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-foreground',
+        'text-sm text-muted-foreground group-data-[orientation=horizontal]/field:text-balance [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-foreground',
         className,
       )}
       data-slot="field-description"

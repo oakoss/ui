@@ -232,6 +232,31 @@ export const LabelForField: Story = {
   ),
 };
 
+// A link in a description is underlined, so it doesn't rely on color, even
+// nested in other text.
+export const DescriptionLinks: Story = {
+  play: async ({ canvas }) => {
+    for (const name of ['Privacy', 'terms']) {
+      await expect(
+        getComputedStyle(canvas.getByRole('link', { name })).textDecorationLine,
+      ).toBe('underline');
+    }
+  },
+  render: () => (
+    <TextField>
+      <FieldLabel>Email</FieldLabel>
+      <Input />
+      <FieldDescription>
+        <a href="#privacy">Privacy</a> and{' '}
+        <strong>
+          <a href="#terms">terms</a>
+        </strong>
+        .
+      </FieldDescription>
+    </TextField>
+  ),
+};
+
 export const FieldSetLayout: Story = {
   play: async ({ canvas }) => {
     const group = canvas.getByRole('group', { name: 'Shipping address' });
