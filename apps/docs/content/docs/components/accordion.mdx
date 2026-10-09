@@ -1,0 +1,140 @@
+---
+title: Accordion
+description: Stacked sections that each show or hide their content.
+item: accordion
+reactAria: https://react-aria.adobe.com/DisclosureGroup
+---
+
+import { AccordionDemo } from '#/components/demos/accordion-demo';
+import { AccordionMultiple } from '#/components/demos/accordion-multiple';
+
+<ComponentPreview name="accordion-demo">
+  <AccordionDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="accordion" />
+
+## Usage
+
+```tsx
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '#/components/ui/layout/accordion';
+
+<Accordion>
+  <AccordionItem id="shipping">
+    <AccordionTrigger>Shipping</AccordionTrigger>
+    <AccordionContent>Orders ship within two days.</AccordionContent>
+  </AccordionItem>
+</Accordion>;
+```
+
+## Examples
+
+### Multiple
+
+`allowsMultipleExpanded` lets several sections stay open at once; by default,
+opening one closes the others.
+
+<ComponentPreview name="accordion-multiple">
+  <AccordionMultiple />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria renders each section's trigger as a button with `aria-expanded`,
+linked to its panel with `aria-controls`, and the panel as a `group` labelled
+by its trigger. A closed panel is `hidden="until-found"`, so the browser's
+find-in-page still searches it and opens the section on a match.
+
+This component adds:
+
+- **Headings:** each trigger sits in a heading, level 3 by default. Set
+  `headingLevel` on `AccordionTrigger` to fit the page's outline.
+- **Target size:** triggers are at least 44px tall.
+- **Focus:** the focus outline shows on triggers. The panel clips only while
+  it's closed or animating, so once open, a control at the content's edge
+  shows its whole outline.
+- **Right to left:** the label starts at the right and the chevron sits at the
+  row's other end. The chevron turns over when open, so it needs no
+  mirroring, and takes the trigger's text color in Windows High Contrast.
+
+| Key     | Action                                                                        |
+| ------- | ----------------------------------------------------------------------------- |
+| `Tab`   | Moves focus to the next focusable element, including content in open sections |
+| `Space` | Opens or closes the focused section                                           |
+| `Enter` | Opens or closes the focused section                                           |
+
+React Aria adds no arrow keys between triggers, which the WAI-ARIA pattern
+lists as optional. Follows the
+[WAI-ARIA accordion pattern](https://www.w3.org/WAI/ARIA/apg/patterns/accordion/).
+
+## API
+
+### Accordion
+
+Extends React Aria's
+[`DisclosureGroup`](https://react-aria.adobe.com/DisclosureGroup#api), and
+accepts all its props.
+
+#### Data attributes
+
+| Attribute       | Present when        |
+| --------------- | ------------------- |
+| `data-slot`     | Always `accordion`  |
+| `data-disabled` | `isDisabled` is set |
+
+### AccordionItem
+
+Extends React Aria's [`Disclosure`](https://react-aria.adobe.com/Disclosure#api),
+and accepts all its props. Its `id` is the key `expandedKeys` refers to.
+
+#### Data attributes
+
+| Attribute       | Present when                    |
+| --------------- | ------------------------------- |
+| `data-slot`     | Always `accordion-item`         |
+| `data-expanded` | It's open                       |
+| `data-disabled` | It or the accordion is disabled |
+
+### AccordionTrigger
+
+Extends React Aria's [`Button`](https://react-aria.adobe.com/Button#api),
+inside a `Heading`.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/layout/accordion.tsx"
+  name="AccordionTriggerProps"
+/>
+
+Also accepts all [React Aria `Button` props](https://react-aria.adobe.com/Button#api).
+
+#### Data attributes
+
+| Attribute            | Present when                                                        |
+| -------------------- | ------------------------------------------------------------------- |
+| `data-slot`          | Always `accordion-trigger`; the chevron is `accordion-trigger-icon` |
+| `data-hovered`       | A pointer hovers it                                                 |
+| `data-focus-visible` | It has keyboard focus                                               |
+| `data-disabled`      | Its item is disabled                                                |
+
+### AccordionContent
+
+Extends React Aria's
+[`DisclosurePanel`](https://react-aria.adobe.com/Disclosure#api), and accepts
+all its props. Its height animates from React Aria's
+`--disclosure-panel-height`.
+
+#### Data attributes
+
+| Attribute                   | Present when                           |
+| --------------------------- | -------------------------------------- |
+| `data-slot`                 | Always `accordion-content`             |
+| `data-focus-visible-within` | Something inside it has keyboard focus |

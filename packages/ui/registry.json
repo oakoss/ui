@@ -1021,6 +1021,82 @@
       ]
     },
     {
+      "name": "accordion",
+      "type": "registry:ui",
+      "title": "Accordion",
+      "description": "Stacked sections that expand one at a time, or several, with triggers in headings, an animated height, and find-in-page that opens a closed section.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/accordion.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components"],
+      "files": [
+        {
+          "path": "src/components/ui/layout/accordion.tsx",
+          "type": "registry:ui",
+          "target": "@ui/layout/accordion.tsx"
+        },
+        {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "collapsible",
+      "type": "registry:ui",
+      "title": "Collapsible",
+      "description": "A trigger that shows and hides one panel, with an animated height and a trigger that takes any button look.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/collapsible.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components"],
+      "files": [
+        {
+          "path": "src/components/ui/layout/collapsible.tsx",
+          "type": "registry:ui",
+          "target": "@ui/layout/collapsible.tsx"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
       "name": "scroll-area",
       "type": "registry:ui",
       "title": "Scroll Area",

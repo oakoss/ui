@@ -85,6 +85,20 @@ const componentVariables = defineConfig({
     },
     {
       files: [
+        'src/components/ui/layout/accordion.tsx',
+        'src/components/ui/layout/collapsible.tsx',
+      ],
+      rules: {
+        'shadcn/no-arbitrary-values': [
+          'error',
+          // A disclosure panel animates the height React Aria sets, and no
+          // transition utility covers height alone.
+          { allow: ['transition-[height]'] },
+        ],
+      },
+    },
+    {
+      files: [
         'src/components/ui/overlays/popover.tsx',
         'src/components/ui/overlays/tooltip.tsx',
       ],

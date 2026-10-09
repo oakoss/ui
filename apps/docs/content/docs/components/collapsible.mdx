@@ -1,0 +1,108 @@
+---
+title: Collapsible
+description: A trigger that shows or hides one panel of content.
+item: collapsible
+reactAria: https://react-aria.adobe.com/Disclosure
+---
+
+import { CollapsibleDemo } from '#/components/demos/collapsible-demo';
+import { CollapsibleOpen } from '#/components/demos/collapsible-open';
+
+<ComponentPreview name="collapsible-demo">
+  <CollapsibleDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="collapsible" />
+
+## Usage
+
+```tsx
+import { buttonStyles } from '#/components/ui/inputs/button';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '#/components/ui/layout/collapsible';
+
+<Collapsible>
+  <CollapsibleTrigger className={buttonStyles({ variant: 'outline' })}>
+    Order details
+  </CollapsibleTrigger>
+  <CollapsibleContent>Ships in two days.</CollapsibleContent>
+</Collapsible>;
+```
+
+`CollapsibleTrigger` has no look of its own beyond the focus outline, so it
+takes any button style. Put vertical padding on the content, not the panel,
+since the panel's own padding would show while it's closed.
+
+## Examples
+
+### Open by default
+
+`defaultExpanded` starts the panel open; `isExpanded` with
+`onExpandedChange` controls it.
+
+<ComponentPreview name="collapsible-open">
+  <CollapsibleOpen />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria renders the trigger as a button with `aria-expanded`, linked to its
+panel with `aria-controls`. A closed panel is `hidden="until-found"`, so the
+browser's find-in-page still searches it and opens it on a match. The panel
+clips only while it's closed or its height animates, so once open, a control
+at the content's edge shows its whole focus outline.
+
+| Key     | Action                    |
+| ------- | ------------------------- |
+| `Space` | Opens or closes the panel |
+| `Enter` | Opens or closes the panel |
+
+Follows the
+[WAI-ARIA disclosure pattern](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/).
+
+## API
+
+### Collapsible
+
+Extends React Aria's [`Disclosure`](https://react-aria.adobe.com/Disclosure#api),
+and accepts all its props.
+
+#### Data attributes
+
+| Attribute       | Present when         |
+| --------------- | -------------------- |
+| `data-slot`     | Always `collapsible` |
+| `data-expanded` | It's open            |
+| `data-disabled` | `isDisabled` is set  |
+
+### CollapsibleTrigger
+
+Extends React Aria's [`Button`](https://react-aria.adobe.com/Button#api), and
+accepts all its props.
+
+#### Data attributes
+
+| Attribute            | Present when                 |
+| -------------------- | ---------------------------- |
+| `data-slot`          | Always `collapsible-trigger` |
+| `data-focus-visible` | It has keyboard focus        |
+| `data-disabled`      | The collapsible is disabled  |
+
+### CollapsibleContent
+
+Extends React Aria's
+[`DisclosurePanel`](https://react-aria.adobe.com/Disclosure#api), and accepts
+all its props. Its height animates from React Aria's
+`--disclosure-panel-height`.
+
+#### Data attributes
+
+| Attribute                   | Present when                           |
+| --------------------------- | -------------------------------------- |
+| `data-slot`                 | Always `collapsible-content`           |
+| `data-focus-visible-within` | Something inside it has keyboard focus |
