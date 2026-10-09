@@ -1,0 +1,135 @@
+---
+title: Radio Group
+description: A set of options where only one can be chosen.
+item: radio-group
+reactAria: https://react-aria.adobe.com/RadioGroup
+---
+
+import { RadioGroupCard } from '#/components/demos/radio-group-card';
+import { RadioGroupDemo } from '#/components/demos/radio-group-demo';
+import { RadioGroupHorizontal } from '#/components/demos/radio-group-horizontal';
+
+<ComponentPreview name="radio-group-demo">
+  <RadioGroupDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="radio-group" />
+
+## Usage
+
+```tsx
+import { RadioGroup, RadioGroupItem } from '#/components/ui/inputs/radio-group';
+
+<RadioGroup label="Plan">
+  <RadioGroupItem value="free">Free</RadioGroupItem>
+  <RadioGroupItem description="Up to 20 seats." value="team">
+    Team
+  </RadioGroupItem>
+</RadioGroup>;
+```
+
+## Examples
+
+### Horizontal
+
+`orientation="horizontal"` lays the options out in a row, and the arrow keys
+follow it.
+
+<ComponentPreview name="radio-group-horizontal">
+  <RadioGroupHorizontal />
+</ComponentPreview>
+
+### Cards
+
+`variant="card"` makes each option a card, with its `description` under the
+title; anywhere on a card selects it.
+
+<ComponentPreview name="radio-group-card">
+  <RadioGroupCard />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria renders a `radiogroup` named by `label`, with a native radio for
+each option inside a `<label>`, so an option's label is its name and its
+click target.
+
+- **Keys:** Tab moves to the selected option, or the first one if none is
+  selected, and the arrow keys move the selection. In a horizontal group
+  right to left, Left and Right follow the reading direction.
+- **Description and errors:** the group's `description` and error describe
+  the group and each of its options, so screen readers repeat them on every
+  option; an option's own `description` describes that option alone. None
+  need ids. The error shows only while the group is invalid.
+- **Required:** the asterisk after a required group's label is hidden from
+  screen readers, which hear the group's own required state. Chrome reports
+  each option as invalid until one is chosen, as it does for any native
+  required radio; `validationBehavior="aria"` avoids that, but then the group
+  no longer blocks a native form submit.
+- **Cards:** the option's label stretches over its card, so the name stays
+  the title, and the card shows focus and selection. A link or button in a
+  card's description sits above the label, so it stays clickable.
+- **Target size:** each dot's hit area grows to 44px, and options sit far
+  enough apart, stacked or in a row, that a dot's area never covers a
+  neighbor. Set `targetSize={false}` for tighter options; the row stays at
+  least 24px tall.
+- **Contrast:** a dot's border reaches 3:1 against the page, and a selected
+  dot is a thick ring. In Windows High Contrast the dots and a selected card
+  take system colors, so the selected option stays visible.
+
+## API
+
+### RadioGroup
+
+Renders React Aria's [`RadioGroup`](https://react-aria.adobe.com/RadioGroup#api).
+Children are its options.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/radio-group.tsx"
+  name="RadioGroupProps"
+/>
+
+Also accepts React Aria `RadioGroup` props.
+
+#### Data attributes
+
+| Attribute          | Present when                       |
+| ------------------ | ---------------------------------- |
+| `data-slot`        | Always `radio-group`               |
+| `data-variant`     | Always; `default` or `card`        |
+| `data-orientation` | Always; `vertical` or `horizontal` |
+| `data-invalid`     | It's invalid                       |
+| `data-disabled`    | It's disabled                      |
+| `data-readonly`    | It's read-only                     |
+| `data-required`    | It's required                      |
+
+### RadioGroupItem
+
+Renders React Aria's `RadioField`, with its label in a `RadioButton`.
+Children are the label.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/radio-group.tsx"
+  name="RadioGroupItemProps"
+/>
+
+Also accepts React Aria `RadioField` props, including `value`.
+
+#### Data attributes
+
+| Attribute            | Present when                                                                                                      |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `data-slot`          | Always: `radio-group-item-field` on the root, `radio-group-item` on the label, `radio-group-indicator` on the dot |
+| `data-selected`      | It's selected                                                                                                     |
+| `data-disabled`      | It's disabled                                                                                                     |
+| `data-invalid`       | Its group is invalid                                                                                              |
+| `data-required`      | Its group is required                                                                                             |
+| `data-hovered`       | On the label, while a pointer hovers it                                                                           |
+| `data-pressed`       | On the label, while it's pressed                                                                                  |
+| `data-focus-visible` | On the label, while it has keyboard focus                                                                         |

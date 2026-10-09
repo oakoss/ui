@@ -118,11 +118,12 @@ const componentVariables = defineConfig({
           // Forced colors repaint a selected control's fill as the page
           // color, so each state takes a system color the mode keeps.
           {
-            allow: selectionColors.flatMap((color) =>
-              ['bg', 'border', 'text'].map(
+            allow: selectionColors.flatMap((color) => [
+              ...['bg', 'border', 'text'].map(
                 (property) => `forced-colors:${property}-[${color}]`,
               ),
-            ),
+              `forced-colors:selected:border-[${color}]`,
+            ]),
           },
         ],
       },

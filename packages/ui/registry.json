@@ -862,6 +862,39 @@
       ]
     },
     {
+      "name": "radio-group",
+      "type": "registry:ui",
+      "title": "Radio Group",
+      "description": "Radio options with a group label, per-option descriptions, and a card layout where the whole option selects.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/radio-group.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme", "oakoss/ui/field"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/radio-group.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/radio-group.tsx"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
       "name": "scroll-area",
       "type": "registry:ui",
       "title": "Scroll Area",
