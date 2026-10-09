@@ -66,17 +66,18 @@ const styles = tv({
 });
 
 export type ButtonProps = { pendingLabel?: string } & AriaButtonProps &
-  Omit<ButtonStyleProps, 'size'> &
-  SizeProps;
+  ButtonSizeProps &
+  Omit<ButtonStyleProps, 'size'>;
+
+// Icon sizes have no text to name the control, so they require a label.
+export type ButtonSizeProps =
+  | { 'aria-label': string; size?: ButtonStyleProps['size'] }
+  | { 'aria-labelledby': string; size?: ButtonStyleProps['size'] }
+  | { size?: Exclude<ButtonStyleProps['size'], IconSize> };
 
 export type ButtonStyleProps = VariantProps<typeof styles>;
 
 type IconSize = 'icon-lg' | 'icon-sm' | 'icon';
-
-type SizeProps =
-  | { 'aria-label': string; size?: ButtonStyleProps['size'] }
-  | { 'aria-labelledby': string; size?: ButtonStyleProps['size'] }
-  | { size?: Exclude<ButtonStyleProps['size'], IconSize> };
 
 export function Button({
   children,

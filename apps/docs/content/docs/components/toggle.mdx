@@ -1,0 +1,95 @@
+---
+title: Toggle
+description: A button that stays pressed until it's pressed again.
+item: toggle
+reactAria: https://react-aria.adobe.com/ToggleButton
+---
+
+import { ToggleDemo } from '#/components/demos/toggle-demo';
+import { ToggleSizes } from '#/components/demos/toggle-sizes';
+
+<ComponentPreview name="toggle-demo">
+  <ToggleDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="toggle" />
+
+## Usage
+
+```tsx
+import { Toggle } from '#/components/ui/inputs/toggle';
+
+<Toggle>Bold</Toggle>;
+```
+
+## Examples
+
+### Sizes
+
+`size` takes Button's sizes, including the square `icon` sizes, which
+require an `aria-label`.
+
+<ComponentPreview name="toggle-sizes">
+  <ToggleSizes />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria renders a native `<button>` with `aria-pressed`, so screen readers
+announce it as a toggle button, pressed or not. Keep its label the same in
+both states; the pressed state already says whether it's on.
+
+This component adds:
+
+- **A clear on state:** on is Button's solid neutral fill, well apart from the
+  faint hover layer, so hover can't pass for on. In Windows High Contrast, on
+  takes the system's selection colors.
+- **Target size:** a 44×44 pointer target around every size. Set
+  `targetSize={false}` where toggles sit closer than that, as in a toolbar.
+- **Names:** icon-only sizes require a name in the type.
+
+| Key     | Action     |
+| ------- | ---------- |
+| `Space` | Toggles it |
+| `Enter` | Toggles it |
+
+Follows the
+[WAI-ARIA button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/button/)
+for toggle buttons.
+
+## API
+
+### Toggle
+
+Extends React Aria's
+[`ToggleButton`](https://react-aria.adobe.com/ToggleButton#api).
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/toggle.tsx"
+  name="ToggleProps"
+/>
+
+Also accepts all
+[React Aria `ToggleButton` props](https://react-aria.adobe.com/ToggleButton#api).
+
+#### Data attributes
+
+| Attribute            | Present when                              |
+| -------------------- | ----------------------------------------- |
+| `data-slot`          | `toggle`, unless a wrapper passes its own |
+| `data-variant`       | Always; `ghost` or `outline`              |
+| `data-size`          | Always; the size                          |
+| `data-selected`      | It's on                                   |
+| `data-hovered`       | A pointer hovers it                       |
+| `data-pressed`       | It's being pressed                        |
+| `data-focus-visible` | It has keyboard focus                     |
+| `data-disabled`      | `isDisabled` is set                       |
+
+#### CSS variables
+
+Takes Button's `--btn-*` variables at the neutral intent; `--btn-bg` and
+`--btn-fg` set the on fill and its text.

@@ -112,6 +112,8 @@ const componentVariables = defineConfig({
         'src/components/ui/inputs/radio-group.tsx',
         'src/components/ui/inputs/slider.tsx',
         'src/components/ui/inputs/switch.tsx',
+        'src/components/ui/inputs/toggle-group.tsx',
+        'src/components/ui/inputs/toggle.tsx',
       ],
       rules: {
         'shadcn/no-arbitrary-values': [
@@ -119,12 +121,12 @@ const componentVariables = defineConfig({
           // Forced colors repaint a selected control's fill as the page
           // color, so each state takes a system color the mode keeps.
           {
-            allow: selectionColors.flatMap((color) => [
-              ...['bg', 'border', 'text'].map(
-                (property) => `forced-colors:${property}-[${color}]`,
-              ),
-              `forced-colors:selected:border-[${color}]`,
-            ]),
+            allow: selectionColors.flatMap((color) =>
+              ['bg', 'border', 'text'].flatMap((property) => [
+                `forced-colors:${property}-[${color}]`,
+                `forced-colors:selected:${property}-[${color}]`,
+              ]),
+            ),
           },
         ],
       },

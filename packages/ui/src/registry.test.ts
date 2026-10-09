@@ -40,6 +40,8 @@ const forked = [
   'slider',
   'spinner',
   'switch',
+  'toggle',
+  'toggle-group',
   'tooltip',
 ];
 const upstreams = new Map(
