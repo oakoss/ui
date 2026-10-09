@@ -130,6 +130,9 @@ export const ChildrenOverErrors: Story = {
     await expect(
       canvas.getByRole('textbox', { name: 'Empty' }),
     ).toHaveAccessibleDescription('From validator.');
+    await expect(
+      canvas.getByRole('textbox', { name: 'Empty fragment' }),
+    ).toHaveAccessibleDescription('From validator.');
   },
   render: () => (
     <div className="flex flex-col gap-4">
@@ -144,6 +147,12 @@ export const ChildrenOverErrors: Story = {
         errors={['From validator.']}
         isInvalid
         label="Empty"
+      />
+      <TextField
+        errorMessage={<>{false}</>}
+        errors={['From validator.']}
+        isInvalid
+        label="Empty fragment"
       />
     </div>
   ),

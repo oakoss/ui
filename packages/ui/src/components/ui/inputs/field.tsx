@@ -113,7 +113,10 @@ export function FieldSeparator({
   );
 }
 
-function isEmptyNode(node: ReactNode): boolean {
+// Whether a node renders nothing, fragments and arrays included, so a part
+// for it can skip mounting. Other iterables count as content: reading one
+// could use it up before it renders.
+export function isEmptyNode(node: ReactNode): boolean {
   let current = node;
   while (
     isValidElement<{ children?: ReactNode }>(current) &&
@@ -164,7 +167,12 @@ export function FieldError({
   errors,
   ...props
 }: FieldErrorProps) {
-  const own = children === '' || children === false ? undefined : children;
+  // Children that render nothing fall through to the errors; a render
+  // function is React Aria's and always counts.
+  const own =
+    typeof children !== 'function' && isEmptyNode(children)
+      ? undefined
+      : children;
   return (
     <AriaFieldError
       {...props}

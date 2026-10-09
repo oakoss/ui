@@ -13,6 +13,7 @@ import {
   FieldDescription,
   FieldError,
   type FieldErrorProps,
+  isEmptyNode,
 } from '#/components/ui/inputs/field';
 import { cn, cx } from '#/lib/cx';
 import { targetSize as targetSizeStyles } from '#/lib/recipes';
@@ -80,7 +81,7 @@ export function Checkbox({
           </>
         )}
       </CheckboxButton>
-      {isEmpty(description) ? null : (
+      {isEmptyNode(description) ? null : (
         <FieldDescription className="ms-6">{description}</FieldDescription>
       )}
       <FieldError className="ms-6" errors={errors}>
@@ -117,14 +118,5 @@ function Box({
         <Icon.Check aria-hidden className="size-3.5" />
       ) : null}
     </span>
-  );
-}
-
-function isEmpty(node: ReactNode): boolean {
-  return (
-    node === undefined ||
-    node === null ||
-    typeof node === 'boolean' ||
-    node === ''
   );
 }

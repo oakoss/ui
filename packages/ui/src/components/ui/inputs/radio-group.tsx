@@ -14,6 +14,7 @@ import {
   FieldError,
   type FieldErrorProps,
   FieldLabel,
+  isEmptyNode,
 } from '#/components/ui/inputs/field';
 import { cn, cx } from '#/lib/cx';
 import { targetSize as targetSizeStyles } from '#/lib/recipes';
@@ -80,7 +81,7 @@ export function RadioGroup({
     >
       {({ isRequired }) => (
         <>
-          {isEmpty(label) ? null : (
+          {isEmptyNode(label) ? null : (
             <FieldLabel>
               {label}
               {isRequired ? (
@@ -93,7 +94,7 @@ export function RadioGroup({
           <Options targetSize={targetSize} variant={variant}>
             {children}
           </Options>
-          {isEmpty(description) ? null : (
+          {isEmptyNode(description) ? null : (
             <FieldDescription>{description}</FieldDescription>
           )}
           <FieldError errors={errors}>{errorMessage}</FieldError>
@@ -141,7 +142,7 @@ export function RadioGroupItem({
           </>
         )}
       </RadioButton>
-      {isEmpty(description) ? null : (
+      {isEmptyNode(description) ? null : (
         <FieldDescription
           className={cn(
             'ms-6',
@@ -179,15 +180,6 @@ function Dot({
       )}
       data-slot="radio-group-indicator"
     />
-  );
-}
-
-function isEmpty(node: ReactNode): boolean {
-  return (
-    node === undefined ||
-    node === null ||
-    typeof node === 'boolean' ||
-    node === ''
   );
 }
 

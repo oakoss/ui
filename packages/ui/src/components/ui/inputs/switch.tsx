@@ -12,6 +12,7 @@ import {
   FieldDescription,
   FieldError,
   type FieldErrorProps,
+  isEmptyNode,
 } from '#/components/ui/inputs/field';
 import { cn, cx } from '#/lib/cx';
 import { targetSize as targetSizeStyles } from '#/lib/recipes';
@@ -97,13 +98,13 @@ export function Switch({
         {(state) => (
           <>
             <Track size={size} state={state} targetSize={targetSize} />
-            {isEmpty(children) && !state.isRequired ? null : (
+            {isEmptyNode(children) && !state.isRequired ? null : (
               <Label isRequired={state.isRequired}>{children}</Label>
             )}
           </>
         )}
       </SwitchButton>
-      {isEmpty(description) ? null : (
+      {isEmptyNode(description) ? null : (
         <FieldDescription className={cn(!isStart && indent[size])}>
           {description}
         </FieldDescription>
@@ -117,15 +118,6 @@ export function Switch({
 
 // Lines the description up under the label, past the track and gap.
 const indent = { md: 'ms-11', sm: 'ms-9' } as const;
-
-function isEmpty(node: ReactNode): boolean {
-  return (
-    node === undefined ||
-    node === null ||
-    typeof node === 'boolean' ||
-    node === ''
-  );
-}
 
 // One flex item, so a settings row's spacing keeps the asterisk by the label.
 function Label({

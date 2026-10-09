@@ -132,6 +132,12 @@ export const NoVisibleLabel: Story = {
   },
 };
 
+// Children that render nothing count as no label, fragments included.
+export const EmptyFragmentLabel: Story = {
+  ...NoVisibleLabel,
+  args: { 'aria-label': 'Airplane mode', children: <>{false}</> },
+};
+
 export const Disabled: Story = {
   args: { isDisabled: true },
   play: async ({ canvas }) => {
