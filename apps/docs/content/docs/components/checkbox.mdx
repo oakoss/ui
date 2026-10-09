@@ -57,7 +57,10 @@ checkbox's name and its click target. Space toggles it.
 - **Required:** the asterisk after a required label is hidden from screen
   readers, and the checkbox is marked required. Chrome doesn't expose that
   state for checkboxes, so where it matters, say so in the label or
-  description.
+  description. Chrome also reports a required checkbox as invalid until it's
+  checked, as it does any native one, so a screen reader may say "invalid"
+  before the user has touched it; `validationBehavior="aria"` avoids that,
+  but then the checkbox no longer blocks a native form submit.
 - **Indeterminate:** screen readers announce it as mixed.
 - **Target size:** the box's hit area grows to 44px. Set `targetSize={false}`
   where checkboxes sit closer than that, or neighbors take each other's
