@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ScrollArea } from '@oakoss/ui/components/ui/layout/scroll-area';
 import { expect, userEvent } from 'storybook/test';
 
+import { contrast, tokenColor } from '../color';
 import { part } from '../parts';
 
 const tags = Array.from({ length: 30 }, (_, index) => `v1.${index}.0`);
@@ -46,45 +47,17 @@ export const Default: Story = {
   },
 };
 
-function luminance(color: string) {
-  const [r = 0, g = 0, b = 0] = rgb(color).map((channel) => {
-    const value = channel / 255;
-    return value <= 0.04 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
-  });
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-}
-
-// Any CSS color as sRGB channels, through a canvas.
-function rgb(color: string) {
-  const context = document
-    .createElement('canvas')
-    .getContext('2d', { willReadFrequently: true });
-  if (!context) throw new Error('No canvas');
-  context.fillStyle = color;
-  context.fillRect(0, 0, 1, 1);
-  const [r = 0, g = 0, b = 0] = context.getImageData(0, 0, 1, 1).data;
-  return [r, g, b];
-}
-
 // A thin native scrollbar on a transparent track, its thumb the input border
 // color, which meets 3:1 against the page.
 export const Scrollbar: Story = {
   play: async ({ canvasElement }) => {
-    const probe = document.createElement('span');
-    probe.style.color = 'var(--color-input)';
-    canvasElement.append(probe);
-    const thumb = getComputedStyle(probe).color;
-    probe.remove();
+    const thumb = tokenColor('--color-input', canvasElement);
     const style = getComputedStyle(part('scroll-area'));
     await expect(style.scrollbarWidth).toBe('thin');
     await expect(style.scrollbarColor).toBe(`${thumb} rgba(0, 0, 0, 0)`);
-    const [light, dark] = [
-      luminance(thumb),
-      luminance(getComputedStyle(document.body).backgroundColor),
-    ].toSorted((a, b) => b - a);
-    await expect(((light ?? 0) + 0.05) / ((dark ?? 0) + 0.05)).toBeGreaterThan(
-      3,
-    );
+    await expect(
+      contrast(thumb, getComputedStyle(document.body).backgroundColor),
+    ).toBeGreaterThan(3);
   },
 };
 
