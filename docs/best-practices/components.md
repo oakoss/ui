@@ -61,6 +61,8 @@ How to write a component in `packages/ui`. Each entry is a rule and its reason; 
 - **Several messages in one described-by target need a separator in the text.** `aria-describedby` reads text flat, so layout alone doesn't separate them.
 - **Pointer targets reach 44×44** (WCAG 2.5.5, above AA's 24×24) with the `targetSize` recipe, which grows the hit area without changing the visible size. Turn it off only where controls sit closer than that (toolbars, button groups), or neighbors take each other's clicks.
 - **Lines are borders, not fills.** Forced colors repaint a background as the system's Canvas color, so upstream's `bg-border` separator measured white on white there; a border is repainted in a visible system color.
+- **A disabled group is marked disabled, not just its inputs.** Where React Aria sets `disabled` only on the inputs inside a group (Slider's thumbs), the component adds `aria-disabled` to the group too, through React Aria's `render` prop when it drops the attribute. axe then treats the group's faded label and value as inactive text, which WCAG exempts from the contrast minimum; without it, axe flagged a disabled Slider's label at 3.73:1.
+- **In forced colors, parts whose system colors can match differ by shape.** A fill and its track can land close together there (Chrome's emulated Highlight measured 1.1:1 against the text color), so the track thins to an outline and the fill stays solid, as Slider's rail does.
 - **Controls and panels stay visible in forced colors.** Every control keeps a border or outline in Windows High Contrast, and a panel drawn with a ring or shadow (a dialog, a popover) adds a transparent border, which forced colors repaints.
 
 ## Strings
