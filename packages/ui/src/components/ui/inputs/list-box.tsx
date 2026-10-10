@@ -1,0 +1,169 @@
+import type { ReactNode } from 'react';
+
+import {
+  Header as AriaHeader,
+  type HeaderProps as AriaHeaderProps,
+  ListBox as AriaListBox,
+  ListBoxItem as AriaListBoxItem,
+  type ListBoxItemProps as AriaListBoxItemProps,
+  ListBoxSection as AriaListBoxSection,
+  type ListBoxSectionProps as AriaListBoxSectionProps,
+  Text as AriaText,
+  composeRenderProps,
+} from 'react-aria-components';
+
+import * as Icon from '#/components/icons';
+import {
+  PopoverContent,
+  type PopoverContentProps,
+} from '#/components/ui/overlays/popover';
+import { cn, cx } from '#/lib/cx';
+import { listItem } from '#/lib/recipes';
+
+export type ListBoxItemProps<T extends object = object> = {
+  children?: ReactNode;
+  description?: ReactNode;
+} & Omit<AriaListBoxItemProps<T>, 'children'>;
+
+// A function child renders each of items; dependencies re-render them when
+// outside state the function reads changes.
+export type ListBoxOptions<T extends object> = (
+  | { children: (item: T) => ReactNode; items: Iterable<T> }
+  | { children?: ReactNode; items?: never }
+) & { dependencies?: readonly unknown[] };
+
+// Each part takes the component it belongs to, which names its data-slot.
+export type ListKind = 'combobox' | 'select';
+
+export function ListBox<T extends object>({
+  children,
+  dependencies,
+  emptyLabel,
+  items,
+  kind,
+}: {
+  children?: ((item: T) => ReactNode) | ReactNode;
+  dependencies?: readonly unknown[];
+  emptyLabel?: string;
+  items?: Iterable<T>;
+  kind: ListKind;
+}) {
+  return (
+    <AriaListBox<T>
+      className="max-h-[inherit] overflow-y-auto outline-hidden"
+      data-slot={`${kind}-list`}
+      dependencies={dependencies}
+      items={items}
+      renderEmptyState={
+        emptyLabel === undefined
+          ? undefined
+          : () => (
+              <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                {emptyLabel}
+              </div>
+            )
+      }
+    >
+      {children}
+    </AriaListBox>
+  );
+}
+
+export function ListBoxHeader({
+  className,
+  kind,
+  ...props
+}: { kind: ListKind } & AriaHeaderProps) {
+  return (
+    <AriaHeader
+      className={cn(
+        'px-2 py-1.5 text-xs font-medium text-muted-foreground',
+        className,
+      )}
+      data-slot={`${kind}-label`}
+      {...props}
+    />
+  );
+}
+
+// Options with a description name themselves by the label slot alone.
+export function ListBoxItem<T extends object>({
+  children,
+  className,
+  description,
+  kind,
+  textValue,
+  ...props
+}: { kind: ListKind } & ListBoxItemProps<T>) {
+  return (
+    <AriaListBoxItem
+      className={cx([listItem, 'pe-8'], className)}
+      data-slot={`${kind}-item`}
+      textValue={
+        textValue ??
+        (typeof children === 'string' || typeof children === 'number'
+          ? String(children)
+          : undefined)
+      }
+      {...props}
+    >
+      {composeRenderProps(
+        <span className="flex flex-col">
+          <AriaText slot="label">{children}</AriaText>
+          {description === undefined ? null : (
+            <AriaText slot="description">{description}</AriaText>
+          )}
+        </span>,
+        (content, { isSelected }) => (
+          <>
+            {content}
+            {isSelected ? (
+              <Icon.Check
+                aria-hidden
+                className="absolute end-2 size-4"
+                data-slot={`${kind}-item-indicator`}
+              />
+            ) : null}
+          </>
+        ),
+      )}
+    </AriaListBoxItem>
+  );
+}
+
+// The list is at least the field's width, so long options aren't cut off.
+export function ListBoxPopover({
+  className,
+  kind,
+  offset = 4,
+  placement = 'bottom start',
+  ...props
+}: { kind: ListKind } & PopoverContentProps) {
+  return (
+    <PopoverContent
+      className={cn('w-auto min-w-(--trigger-width) p-1', className)}
+      data-slot={`${kind}-content`}
+      offset={offset}
+      placement={placement}
+      {...props}
+    />
+  );
+}
+
+// Sections divide themselves: a separator is no valid child of a listbox.
+export function ListBoxSection<T extends object>({
+  className,
+  kind,
+  ...props
+}: { kind: ListKind } & AriaListBoxSectionProps<T>) {
+  return (
+    <AriaListBoxSection
+      className={cn(
+        'not-first:-mx-1 not-first:mt-1 not-first:border-t not-first:border-border not-first:px-1 not-first:pt-1',
+        className,
+      )}
+      data-slot={`${kind}-group`}
+      {...props}
+    />
+  );
+}

@@ -123,7 +123,7 @@ const componentVariables = defineConfig({
       },
     },
     {
-      files: ['src/components/ui/inputs/select.tsx'],
+      files: ['src/components/ui/inputs/list-box.tsx'],
       rules: {
         'shadcn/no-arbitrary-values': [
           'error',

@@ -1143,6 +1143,11 @@
           "target": "@ui/inputs/select.tsx"
         },
         {
+          "path": "src/components/ui/inputs/list-box.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/list-box.tsx"
+        },
+        {
           "path": "src/components/icons.tsx",
           "type": "registry:component",
           "target": "@components/icons.tsx"
