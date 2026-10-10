@@ -7,8 +7,6 @@ import {
 import {
   FieldError as AriaFieldError,
   type FieldErrorProps as AriaFieldErrorProps,
-  Input as AriaInput,
-  type InputProps as AriaInputProps,
   Label as AriaLabel,
   type LabelProps as AriaLabelProps,
   Text as AriaText,
@@ -20,7 +18,6 @@ import { tv, type VariantProps } from 'tailwind-variants/lite';
 
 import { Separator } from '#/components/ui/layout/separator';
 import { cn, cx } from '#/lib/cx';
-import { fieldControl } from '#/lib/recipes';
 
 export function FieldSet({ className, ...props }: ComponentProps<'fieldset'>) {
   return (
@@ -260,27 +257,4 @@ function messageOf(error: unknown): string | undefined {
     return typeof error.message === 'string' ? error.message : undefined;
   }
   return undefined;
-}
-
-const inputStyles = tv({
-  base: [fieldControl, 'py-1'],
-  defaultVariants: { size: 'md' },
-  variants: {
-    size: { lg: 'h-control-lg', md: 'h-control', sm: 'h-control-sm' },
-  },
-});
-
-export type InputProps = { size?: InputSize } & Omit<AriaInputProps, 'size'>;
-
-export type InputSize = NonNullable<VariantProps<typeof inputStyles>['size']>;
-
-export function Input({ className, size = 'md', ...props }: InputProps) {
-  return (
-    <AriaInput
-      className={cx(inputStyles({ size }), className)}
-      data-size={size}
-      data-slot="input"
-      {...props}
-    />
-  );
 }

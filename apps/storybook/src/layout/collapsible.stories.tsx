@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { buttonStyles } from '@oakoss/ui/components/ui/inputs/button';
-import { Input } from '@oakoss/ui/components/ui/inputs/field';
+import { Input } from '@oakoss/ui/components/ui/inputs/input';
 import {
   Collapsible,
   CollapsibleContent,

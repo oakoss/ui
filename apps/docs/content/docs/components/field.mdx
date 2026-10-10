@@ -20,6 +20,8 @@ import { FieldSeparatorDemo } from '#/components/demos/field-separator';
 
 <ComponentInstall item="field" />
 
+This also installs `Input`, which lives in its own file.
+
 ## Usage
 
 `FieldLabel`, `FieldDescription` and `FieldError` find their field through
@@ -30,11 +32,8 @@ input for screen readers with no ids to wire.
 ```tsx
 import { SearchField } from 'react-aria-components';
 
-import {
-  FieldDescription,
-  FieldLabel,
-  Input,
-} from '#/components/ui/inputs/field';
+import { FieldDescription, FieldLabel } from '#/components/ui/inputs/field';
+import { Input } from '#/components/ui/inputs/input';
 
 <SearchField>
   <FieldLabel>Search docs</FieldLabel>
@@ -146,7 +145,7 @@ Extends React Aria's [`Input`](https://react-aria.adobe.com/TextField#api).
 #### Props
 
 <auto-type-table
-  path="../../../../../packages/ui/src/components/ui/inputs/field.tsx"
+  path="../../../../../packages/ui/src/components/ui/inputs/input.tsx"
   name="InputProps"
 />
 

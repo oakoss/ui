@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 
-import type { InputProps } from '#/components/ui/inputs/field';
+import type { InputProps } from '#/components/ui/inputs/input';
 import type {
   TextareaFieldProps,
   TextFieldProps,

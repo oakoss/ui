@@ -351,13 +351,45 @@
       "meta": {
         "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/field.tsx"
       },
-      "registryDependencies": ["oakoss/ui/theme", "oakoss/ui/separator"],
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/separator",
+        "oakoss/ui/input"
+      ],
       "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
       "files": [
         {
           "path": "src/components/ui/inputs/field.tsx",
           "type": "registry:ui",
           "target": "@ui/inputs/field.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "input",
+      "type": "registry:ui",
+      "title": "Input",
+      "description": "Single-line text control built on React Aria Components, in control heights that match Button; use it inside a text field.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/input.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/input.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/input.tsx"
         },
         {
           "path": "src/lib/recipes.ts",
@@ -384,7 +416,7 @@
       "meta": {
         "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/textarea.tsx"
       },
-      "registryDependencies": ["oakoss/ui/theme", "oakoss/ui/field"],
+      "registryDependencies": ["oakoss/ui/theme", "oakoss/ui/input"],
       "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
       "files": [
         {
@@ -417,6 +449,7 @@
       "registryDependencies": [
         "oakoss/ui/theme",
         "oakoss/ui/field",
+        "oakoss/ui/input",
         "oakoss/ui/textarea"
       ],
       "dependencies": ["cn", "react-aria-components"],

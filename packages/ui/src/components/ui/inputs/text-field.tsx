@@ -11,10 +11,9 @@ import {
   FieldError,
   type FieldErrorProps,
   FieldLabel,
-  Input,
-  type InputSize,
   isEmptyNode,
 } from '#/components/ui/inputs/field';
+import { Input, type InputSize } from '#/components/ui/inputs/input';
 import { Textarea, type TextareaProps } from '#/components/ui/inputs/textarea';
 import { cx } from '#/lib/cx';
 

@@ -34,6 +34,7 @@ const forked = [
   'empty',
   'field',
   'hover-card',
+  'input',
   'item',
   'kbd',
   'pagination',
@@ -47,6 +48,7 @@ const forked = [
   'spinner',
   'switch',
   'tabs',
+  'textarea',
   'toggle',
   'toggle-group',
   'tooltip',
@@ -109,6 +111,13 @@ const shipped = ui.items.flatMap(({ dependencies, files, name }) => {
     .map((specifier) => packageName(specifier))
     .filter((pkg) => !provided.has(pkg) && !listed.has(pkg));
   return { name, unlistedFiles, unlistedPackages };
+});
+
+// No field import needs Input; the dependency keeps `add field` installing it
+// for code that imports Input alongside the field parts.
+test('field keeps installing Input', () => {
+  const field = ui.items.find(({ name }) => name === 'field');
+  expect(field?.registryDependencies).toContain('oakoss/ui/input');
 });
 
 // Components use the plugin's pressed:/pending: variants, which Tailwind

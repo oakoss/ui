@@ -7,7 +7,7 @@ import {
 } from 'react-aria-components';
 import { tv } from 'tailwind-variants/lite';
 
-import type { InputSize } from '#/components/ui/inputs/field';
+import type { InputSize } from '#/components/ui/inputs/input';
 
 import { cx } from '#/lib/cx';
 import { fieldControl } from '#/lib/recipes';

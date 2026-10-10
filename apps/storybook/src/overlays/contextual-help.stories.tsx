@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ComponentProps } from 'react';
 
-import { FieldLabel, Input } from '@oakoss/ui/components/ui/inputs/field';
+import { FieldLabel } from '@oakoss/ui/components/ui/inputs/field';
+import { Input } from '@oakoss/ui/components/ui/inputs/input';
 import { TextField } from '@oakoss/ui/components/ui/inputs/text-field';
 import { ContextualHelp } from '@oakoss/ui/components/ui/overlays/contextual-help';
 import {
