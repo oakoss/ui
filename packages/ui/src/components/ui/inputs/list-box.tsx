@@ -6,10 +6,14 @@ import {
   ListBox as AriaListBox,
   ListBoxItem as AriaListBoxItem,
   type ListBoxItemProps as AriaListBoxItemProps,
+  ListBoxLoadMoreItem as AriaListBoxLoadMoreItem,
   ListBoxSection as AriaListBoxSection,
   type ListBoxSectionProps as AriaListBoxSectionProps,
   Text as AriaText,
+  Collection,
   composeRenderProps,
+  ListBoxContext,
+  useSlottedContext,
 } from 'react-aria-components';
 
 import * as Icon from '#/components/icons';
@@ -35,25 +39,38 @@ export type ListBoxOptions<T extends object> = (
 // Each part takes the component it belongs to, which names its data-slot.
 export type ListKind = 'combobox' | 'select';
 
+// With onLoadMore, a row at the end shows loadMore and fetches the next page
+// as it scrolls into view; the options move into a collection beside it.
+type ListBoxProps<T extends object> = {
+  children?: ((item: T) => ReactNode) | ReactNode;
+  dependencies?: readonly unknown[];
+  emptyLabel?: string;
+  isLoadingMore?: boolean;
+  items?: Iterable<T>;
+  kind: ListKind;
+  loadMore?: ReactNode;
+  onLoadMore?: () => void;
+};
+
 export function ListBox<T extends object>({
   children,
   dependencies,
   emptyLabel,
+  isLoadingMore,
   items,
   kind,
-}: {
-  children?: ((item: T) => ReactNode) | ReactNode;
-  dependencies?: readonly unknown[];
-  emptyLabel?: string;
-  items?: Iterable<T>;
-  kind: ListKind;
-}) {
+  loadMore,
+  onLoadMore,
+}: ListBoxProps<T>) {
+  // A ComboBox or Select passes its items through context, which the
+  // collection beside the load-more row doesn't read.
+  const context = useSlottedContext(ListBoxContext);
+  const options = { dependencies, items: items ?? context?.items };
   return (
     <AriaListBox<T>
       className="max-h-[inherit] overflow-y-auto outline-hidden"
       data-slot={`${kind}-list`}
-      dependencies={dependencies}
-      items={items}
+      {...(onLoadMore === undefined ? options : {})}
       renderEmptyState={
         emptyLabel === undefined
           ? undefined
@@ -64,7 +81,20 @@ export function ListBox<T extends object>({
             )
       }
     >
-      {children}
+      {onLoadMore === undefined ? (
+        children
+      ) : (
+        <>
+          <Collection {...options}>{children}</Collection>
+          <AriaListBoxLoadMoreItem
+            className="flex justify-center py-1.5"
+            isLoading={isLoadingMore}
+            onLoadMore={onLoadMore}
+          >
+            {loadMore}
+          </AriaListBoxLoadMoreItem>
+        </>
+      )}
     </AriaListBox>
   );
 }

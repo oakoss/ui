@@ -1,0 +1,169 @@
+---
+title: Combobox
+description: A text input that filters a list of options as you type, with a label, description and validation message.
+item: combobox
+reactAria: https://react-aria.adobe.com/ComboBox
+---
+
+import { ComboboxAsync } from '#/components/demos/combobox-async';
+import { ComboboxCustomLayout } from '#/components/demos/combobox-custom-layout';
+import { ComboboxDemo } from '#/components/demos/combobox-demo';
+import { ComboboxSections } from '#/components/demos/combobox-sections';
+
+<ComponentPreview name="combobox-demo">
+  <ComboboxDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="combobox" />
+
+## Usage
+
+```tsx
+import { Combobox, ComboboxItem } from '#/components/ui/inputs/combobox';
+
+<Combobox label="Fruit">
+  <ComboboxItem id="apple">Apple</ComboboxItem>
+  <ComboboxItem id="pear">Pear</ComboboxItem>
+</Combobox>;
+```
+
+The children are the options, filtered by what's typed. `label`,
+`description`, `errors`, `errorMessage`, `placeholder` and `size` set up the
+field around the input, as on [Text Field](/docs/components/text-field), and
+`start` and `end` add text or icons inside it. A clear button appears once
+there's text, and a list with nothing matching says so; `clearLabel` and
+`emptyLabel` set their text.
+
+Combobox chooses one option. For several, use
+[Select](/docs/components/select) with `selectionMode="multiple"`.
+
+## Examples
+
+### Sections and descriptions
+
+`ComboboxSection` groups options under a `ComboboxHeader`, and each section
+after the first draws a line above it. `description` on `ComboboxItem`
+describes the option in the list.
+
+<ComponentPreview name="combobox-sections">
+  <ComboboxSections />
+</ComponentPreview>
+
+In React 19.2 and later, development builds throw `childNodes is not
+supported` when a list with sections is opened by its button and then filtered
+by typing, and the field stops responding. Production builds aren't affected.
+The bug is React Aria's
+([adobe/react-spectrum#9405](https://github.com/adobe/react-spectrum/issues/9405)).
+
+### Loading from a server
+
+Pass `items` and a function as children for options built from data, and
+control `inputValue` to filter on the server. Without `items`, use
+`defaultItems` and the field filters them itself. `loadingState` takes
+`useAsyncList`'s: `loading` and `filtering` show a spinner in the field after
+500ms, so a fast response doesn't flash one. React Aria's `useAsyncList`
+tracks the text, results and loading state, and cancels requests that a newer
+search replaces. Pass its `loadMore` as `onLoadMore` and a row at the end of
+the list fetches the next page as it scrolls into view, with a spinner while
+`loadingState` is `loadingMore`.
+
+<ComponentPreview name="combobox-async">
+  <ComboboxAsync />
+</ComponentPreview>
+
+### Custom layout
+
+For a layout of your own, use React Aria's `ComboBox` with the parts:
+`ComboboxTrigger`, `ComboboxContent` with `ComboboxList`, `ComboboxItem`,
+`ComboboxSection` and `ComboboxHeader`, `Input` from
+[Text Field](/docs/components/text-field) in an
+[Input Group](/docs/components/input-group), and the
+[Field](/docs/components/field) parts.
+
+<ComponentPreview name="combobox-custom-layout">
+  <ComboboxCustomLayout />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria renders an input with the `combobox` role that opens a listbox in a
+popover, and links it to its parts:
+
+- **Name and description:** the input is named by the label, and described by
+  the description and error; `start` and `end` text is added to the
+  description.
+- **Buttons:** the trigger is named "Show suggestions" by React Aria, and
+  neither it nor the clear button is a Tab stop. Clearing leaves focus in the
+  input, and a disabled or read-only field has no clear button. While the
+  list is open, screen readers see only the input and the list.
+- **Options:** an option's `description` describes it in the list.
+- **Loading:** each spinner is a `progressbar` named by `loadingLabel`.
+
+The field shows the focus outline while the input has focus. In Windows High
+Contrast the focused option takes the system's selection colors.
+
+| Key      | Action                                                  |
+| -------- | ------------------------------------------------------- |
+| Typing   | Opens the list and filters it                           |
+| ↓, ↑     | Opens the list, or moves to the next or previous option |
+| `Enter`  | Chooses the focused option                              |
+| `Escape` | Closes the list and puts back the chosen option's text  |
+
+Deleting all the text clears the choice.
+
+## API
+
+### Combobox
+
+Extends React Aria's [`ComboBox`](https://react-aria.adobe.com/ComboBox#api).
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/combobox.tsx"
+  name="ComboboxProps"
+/>
+
+Also accepts all [React Aria `ComboBox` props](https://react-aria.adobe.com/ComboBox#api).
+
+#### Data attributes
+
+| Attribute       | Present when         |
+| --------------- | -------------------- |
+| `data-slot`     | Always `combobox`    |
+| `data-open`     | The list is open     |
+| `data-invalid`  | The field is invalid |
+| `data-disabled` | `isDisabled` is set  |
+| `data-required` | `isRequired` is set  |
+
+### ComboboxItem
+
+Extends React Aria's [`ListBoxItem`](https://react-aria.adobe.com/ListBox).
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/combobox.tsx"
+  name="ComboboxItemProps"
+/>
+
+#### Data attributes
+
+| Attribute       | Present when           |
+| --------------- | ---------------------- |
+| `data-slot`     | Always `combobox-item` |
+| `data-focused`  | The option has focus   |
+| `data-selected` | The option is selected |
+| `data-disabled` | The option is disabled |
+
+### Other parts
+
+| Part              | Extends                                                    | `data-slot`        |
+| ----------------- | ---------------------------------------------------------- | ------------------ |
+| `ComboboxTrigger` | React Aria's `Button`                                      | `combobox-trigger` |
+| `ComboboxContent` | Our `PopoverContent`                                       | `combobox-content` |
+| `ComboboxList`    | React Aria's `ListBox`, with `emptyLabel` and `onLoadMore` | `combobox-list`    |
+| `ComboboxSection` | React Aria's `ListBoxSection`                              | `combobox-group`   |
+| `ComboboxHeader`  | React Aria's `Header`                                      | `combobox-label`   |
