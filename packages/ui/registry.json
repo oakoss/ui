@@ -1121,6 +1121,163 @@
       ]
     },
     {
+      "name": "combobox",
+      "type": "registry:ui",
+      "title": "Combobox",
+      "description": "A text input that filters a list of options as you type, built on React Aria Components, with a label, description and error, a clear button, sections and async loading.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/combobox.tsx"
+      },
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/button",
+        "oakoss/ui/field",
+        "oakoss/ui/input",
+        "oakoss/ui/input-group",
+        "oakoss/ui/popover",
+        "oakoss/ui/spinner"
+      ],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/combobox.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/combobox.tsx"
+        },
+        {
+          "path": "src/components/ui/inputs/list-box.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/list-box.tsx"
+        },
+        {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "native-select",
+      "type": "registry:ui",
+      "title": "Native Select",
+      "description": "The browser's own select, styled to match the other fields, with a label, description and error from the Field parts; the system picker on phones, and it works before JavaScript loads.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/native-select.tsx"
+      },
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/field",
+        "oakoss/ui/input"
+      ],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/native-select.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/native-select.tsx"
+        },
+        {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "select",
+      "type": "registry:ui",
+      "title": "Select",
+      "description": "Single or multiple selection from a list, built on React Aria Components, with a label, description and error; its children are the options.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/select.tsx"
+      },
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/field",
+        "oakoss/ui/input",
+        "oakoss/ui/input-group",
+        "oakoss/ui/popover"
+      ],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/select.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/select.tsx"
+        },
+        {
+          "path": "src/components/ui/inputs/list-box.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/list-box.tsx"
+        },
+        {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
       "name": "input-group",
       "type": "registry:ui",
       "title": "Input Group",
@@ -1131,6 +1288,7 @@
       "registryDependencies": [
         "oakoss/ui/theme",
         "oakoss/ui/button",
+        "oakoss/ui/field",
         "oakoss/ui/input"
       ],
       "dependencies": ["cn", "react-aria-components", "tailwind-variants"],

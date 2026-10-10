@@ -42,6 +42,7 @@ const forked = [
   'popover',
   'radio-group',
   'scroll-area',
+  'select',
   'separator',
   'sheet',
   'skeleton',

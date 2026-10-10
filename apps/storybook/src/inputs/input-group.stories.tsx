@@ -254,6 +254,8 @@ export const ForcedColors: Story = {
       .closest<HTMLElement>('[data-slot=input-group]');
     if (!group) throw new Error('No group');
     const native = canvas.getByRole('textbox', { name: 'Native' });
+    // A color transition may still be running when the border is read.
+    for (const animation of group.getAnimations()) animation.finish();
     await expect(getComputedStyle(group).borderTopStyle).toBe('solid');
     await expect(getComputedStyle(group).borderTopColor).toBe(
       getComputedStyle(native).borderTopColor,

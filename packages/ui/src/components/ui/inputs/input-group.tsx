@@ -1,5 +1,9 @@
-import type { ComponentProps, MouseEvent } from 'react';
-
+import {
+  type ComponentProps,
+  type MouseEvent,
+  type ReactNode,
+  useId,
+} from 'react';
 import {
   Group as AriaGroup,
   type GroupProps as AriaGroupProps,
@@ -13,6 +17,11 @@ import {
   type ButtonProps,
   ButtonStyleContext,
 } from '#/components/ui/inputs/button';
+import {
+  fieldLayout,
+  type FieldMessages,
+  isEmptyNode,
+} from '#/components/ui/inputs/field';
 import { cn, cx } from '#/lib/cx';
 
 // The group draws the control's border and focus outline, so the Input or
@@ -53,6 +62,39 @@ export type InputGroupProps = { size?: InputSize } & Omit<
   AriaGroupProps,
   'role'
 >;
+
+export type InputGroupSlots = {
+  // Inside the border, before and after the control. Text describes the
+  // field; an element is decoration unless it names itself.
+  end?: ReactNode;
+  start?: ReactNode;
+};
+
+// Takes the decorations useFieldShortcut returns, which carry the ids that
+// describe the field.
+export function DecoratedInputGroup({
+  axis,
+  children,
+  end,
+  size,
+  start,
+}: {
+  axis: 'block' | 'inline';
+  children: ReactNode;
+  size?: InputSize;
+} & InputGroupSlots) {
+  return (
+    <InputGroup size={size}>
+      {isEmptyNode(start) ? null : (
+        <InputGroupAddon align={`${axis}-start`}>{start}</InputGroupAddon>
+      )}
+      {children}
+      {isEmptyNode(end) ? null : (
+        <InputGroupAddon align={`${axis}-end`}>{end}</InputGroupAddon>
+      )}
+    </InputGroup>
+  );
+}
 
 // A named group is announced as one; an unnamed one only lays out its
 // children. Inside a React Aria field it takes the field's invalid and
@@ -135,4 +177,39 @@ export function InputGroupText({
       )}
     />
   );
+}
+
+// Text decorations' ids join the field's own aria-describedby, which React
+// Aria appends after the description and error; on the input they'd replace
+// them. The caller places decorations, in a DecoratedInputGroup or its own
+// control.
+export function useFieldShortcut<Props extends { 'aria-describedby'?: string }>(
+  { end, start, ...messages }: FieldMessages & InputGroupSlots,
+  props: Props,
+) {
+  const startId = useId();
+  const endId = useId();
+  const before = decoration(start, startId);
+  const after = decoration(end, endId);
+  return {
+    decorations: { end: after.node, start: before.node },
+    fieldProps: {
+      ...props,
+      'aria-describedby':
+        [props['aria-describedby'], before.id, after.id]
+          .filter(Boolean)
+          .join(' ') || undefined,
+    },
+    isUndecorated: before.node === null && after.node === null,
+    layout: (control: ReactNode) => fieldLayout(control, messages),
+  };
+}
+
+function decoration(
+  node: ReactNode,
+  id: string,
+): { id?: string; node: ReactNode } {
+  if (isEmptyNode(node)) return { node: null };
+  if (typeof node !== 'string' && typeof node !== 'number') return { node };
+  return { id, node: <InputGroupText id={id}>{node}</InputGroupText> };
 }

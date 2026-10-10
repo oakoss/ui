@@ -158,6 +158,25 @@ export type Shortcut<Layout> =
     >)
   | ({ children?: never } & Layout);
 
+export function errorList(errors: readonly unknown[] | undefined): ReactNode {
+  if (errors === undefined) return undefined;
+  const messages = [
+    ...new Set(
+      errors.flat().flatMap((error) => {
+        const message = messageOf(error)?.trim();
+        return message === undefined || message === '' ? [] : message;
+      }),
+    ),
+  ];
+  if (messages.length < 2) return messages[0];
+  return messages.map((message, index) => (
+    <span key={message}>
+      {index > 0 ? ' ' : null}
+      {message}
+    </span>
+  ));
+}
+
 export function FieldDescription({ className, ...props }: AriaTextProps) {
   return (
     <AriaText
@@ -270,25 +289,6 @@ export function FieldLegend({
       {...props}
     />
   );
-}
-
-function errorList(errors: readonly unknown[] | undefined): ReactNode {
-  if (errors === undefined) return undefined;
-  const messages = [
-    ...new Set(
-      errors.flat().flatMap((error) => {
-        const message = messageOf(error)?.trim();
-        return message === undefined || message === '' ? [] : message;
-      }),
-    ),
-  ];
-  if (messages.length < 2) return messages[0];
-  return messages.map((message, index) => (
-    <span key={message}>
-      {index > 0 ? ' ' : null}
-      {message}
-    </span>
-  ));
 }
 
 function messageOf(error: unknown): string | undefined {

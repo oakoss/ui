@@ -1,0 +1,163 @@
+---
+title: Select
+description: Choose one or several options from a list, with a label, description and validation message.
+item: select
+reactAria: https://react-aria.adobe.com/Select
+---
+
+import { SelectCustomLayout } from '#/components/demos/select-custom-layout';
+import { SelectDemo } from '#/components/demos/select-demo';
+import { SelectMultiple } from '#/components/demos/select-multiple';
+import { SelectSections } from '#/components/demos/select-sections';
+
+<ComponentPreview name="select-demo">
+  <SelectDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="select" />
+
+## Usage
+
+```tsx
+import { Select, SelectItem } from '#/components/ui/inputs/select';
+
+<Select label="Fruit">
+  <SelectItem id="apple">Apple</SelectItem>
+  <SelectItem id="pear">Pear</SelectItem>
+</Select>;
+```
+
+The children are the options. `label`, `description`, `errors`,
+`errorMessage`, `placeholder` and `size` (`sm`, `md`, `lg`, matching Input's
+heights) set up the field around the trigger, as on
+[Text Field](/docs/components/text-field). `start` and `end` put text or an
+`aria-hidden` icon inside the trigger, and text is added to its description.
+They sit inside the trigger's button, so a button or a named element there
+wouldn't be reachable or announced.
+
+## Examples
+
+### Sections and descriptions
+
+`SelectSection` groups options under a `SelectHeader`, and each section after
+the first draws a line above it. `description` on `SelectItem` describes the
+option in the list; the trigger shows its label alone.
+
+<ComponentPreview name="select-sections">
+  <SelectSections />
+</ComponentPreview>
+
+### Multiple selection
+
+`selectionMode="multiple"` takes an array `value`. The list stays open between
+picks, and the trigger lists the picks in the user's language. Pass `items`
+with a function as children for a list built from data, and `dependencies`
+when that function reads other state, so the options re-render when it
+changes.
+
+<ComponentPreview name="select-multiple">
+  <SelectMultiple />
+</ComponentPreview>
+
+### Custom layout
+
+For a layout of your own, use React Aria's `Select` with the parts:
+`SelectTrigger`, `SelectValue`, `SelectContent` with `SelectItem`,
+`SelectSection` and `SelectHeader`, and the [Field](/docs/components/field)
+parts. The trigger still turns destructive when the field is invalid.
+
+<ComponentPreview name="select-custom-layout">
+  <SelectCustomLayout />
+</ComponentPreview>
+
+### Autofill
+
+React Aria renders a hidden native `<select>` so browsers can autofill the
+field and forms submit its value. Give `name` and `autoComplete`, and use the
+values autofill produces as the options' `id`s (country codes for
+`autoComplete="country"`, for example). Above 300 options the hidden select
+becomes a hidden input, and autofill stops.
+
+## Accessibility
+
+React Aria renders a button that opens a listbox in a popover, and links it to
+its parts:
+
+- **Name and description:** the trigger is named by its value and the label,
+  and described by the description and error; `start` and `end` text is added
+  to the description.
+- **Options:** an option's `description` describes it in the list, and is
+  hidden in the trigger, so it isn't read as part of the trigger's name.
+- **Validation:** an invalid field turns the trigger's border destructive.
+
+The trigger shows the focus outline on keyboard focus, and its hit area
+reaches 44px. In Windows High Contrast the focused option takes the system's
+selection colors, and a disabled option takes the system's disabled color.
+
+| Key                 | Action                                                         |
+| ------------------- | -------------------------------------------------------------- |
+| `Enter`, `Space`, ↓ | Opens the list on the selected option, or the first one        |
+| ↑                   | Opens the list on the selected option, or the last one         |
+| ←, →                | Selects the previous or next option without opening (single)   |
+| Typing              | Selects the first option that starts with the letters (single) |
+| `Escape`            | Closes the list                                                |
+
+In the list, the arrow keys move between options and `Enter` or `Space`
+chooses one.
+
+## API
+
+### Select
+
+Extends React Aria's [`Select`](https://react-aria.adobe.com/Select#api).
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/select.tsx"
+  name="SelectProps"
+/>
+
+Also accepts all [React Aria `Select` props](https://react-aria.adobe.com/Select#api).
+
+#### Data attributes
+
+| Attribute       | Present when         |
+| --------------- | -------------------- |
+| `data-slot`     | Always `select`      |
+| `data-open`     | The list is open     |
+| `data-invalid`  | The field is invalid |
+| `data-disabled` | `isDisabled` is set  |
+| `data-required` | `isRequired` is set  |
+
+### SelectItem
+
+Extends React Aria's [`ListBoxItem`](https://react-aria.adobe.com/ListBox).
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/select.tsx"
+  name="SelectItemProps"
+/>
+
+#### Data attributes
+
+| Attribute       | Present when           |
+| --------------- | ---------------------- |
+| `data-slot`     | Always `select-item`   |
+| `data-focused`  | The option has focus   |
+| `data-selected` | The option is selected |
+| `data-disabled` | The option is disabled |
+
+### Other parts
+
+| Part            | Extends                                 | `data-slot`      |
+| --------------- | --------------------------------------- | ---------------- |
+| `SelectTrigger` | React Aria's `Button`, with `size`      | `select-trigger` |
+| `SelectValue`   | React Aria's `SelectValue`              | `select-value`   |
+| `SelectContent` | Our `PopoverContent` around a `ListBox` | `select-content` |
+| `SelectSection` | React Aria's `ListBoxSection`           | `select-group`   |
+| `SelectHeader`  | React Aria's `Header`                   | `select-label`   |

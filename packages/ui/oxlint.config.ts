@@ -123,6 +123,16 @@ const componentVariables = defineConfig({
       },
     },
     {
+      files: ['src/components/ui/inputs/list-box.tsx'],
+      rules: {
+        'shadcn/no-arbitrary-values': [
+          'error',
+          // The list scrolls within the height React Aria gives the popover.
+          { allow: ['max-h-[inherit]'] },
+        ],
+      },
+    },
+    {
       files: ['src/components/ui/data/item.tsx'],
       rules: {
         'shadcn/no-arbitrary-values': [

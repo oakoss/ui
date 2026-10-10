@@ -1,3 +1,5 @@
+import type { Ref } from 'react';
+
 import {
   Input as AriaInput,
   type InputProps as AriaInputProps,
@@ -15,7 +17,10 @@ const styles = tv({
   },
 });
 
-export type InputProps = { size?: InputSize } & Omit<AriaInputProps, 'size'>;
+export type InputProps = {
+  ref?: Ref<HTMLInputElement>;
+  size?: InputSize;
+} & Omit<AriaInputProps, 'size'>;
 
 export type InputSize = NonNullable<VariantProps<typeof styles>['size']>;
 
