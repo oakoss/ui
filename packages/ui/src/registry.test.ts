@@ -24,6 +24,7 @@ const forked = [
   'accordion',
   'alert-dialog',
   'avatar',
+  'breadcrumb',
   'button',
   'card',
   'checkbox',
