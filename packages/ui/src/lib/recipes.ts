@@ -6,7 +6,7 @@ export const inputFocusRing =
 
 // The look text controls share; a trigger button pairs it with focusRing.
 export const fieldSurface =
-  'w-full min-w-0 rounded-control border border-input bg-field px-control-x text-ui text-foreground transition-colors placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 data-invalid:border-destructive-text';
+  'w-full min-w-0 rounded-control border border-input bg-field px-control-x text-ui text-foreground transition-colors placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 data-invalid:border-destructive-text forced-colors:disabled:opacity-100';
 
 export const fieldControl = `${inputFocusRing} ${fieldSurface}`;
 

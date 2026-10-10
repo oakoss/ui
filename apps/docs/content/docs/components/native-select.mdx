@@ -1,0 +1,111 @@
+---
+title: Native Select
+description: The browser's own select, styled to match the other fields, with a label, description and validation message.
+item: native-select
+---
+
+import { NativeSelectDemo } from '#/components/demos/native-select-demo';
+import { NativeSelectMultiple } from '#/components/demos/native-select-multiple';
+import { NativeSelectValidation } from '#/components/demos/native-select-validation';
+
+<ComponentPreview name="native-select-demo">
+  <NativeSelectDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="native-select" />
+
+## Usage
+
+```tsx
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from '#/components/ui/inputs/native-select';
+
+<NativeSelect label="Fruit" name="fruit">
+  <NativeSelectOption value="apple">Apple</NativeSelectOption>
+  <NativeSelectOption value="pear">Pear</NativeSelectOption>
+</NativeSelect>;
+```
+
+The children are the options, `NativeSelectOption` and `NativeSelectOptGroup`.
+`label`, `description`, `errors`, `errorMessage` and `size` (`sm`, `md`, `lg`,
+matching Input's heights) set up the field around the select, as on
+[Text Field](/docs/components/text-field). Every other prop goes to the
+`<select>`, so `name`, `required`, `disabled`, `value`, `onChange` and `ref`
+work as they do on the element, and a form library's field props spread onto
+it.
+
+### Native Select or Select
+
+Native Select is the browser's own control: phones open their system picker,
+it works before JavaScript loads, and it handles long plain lists well. Its
+options are text only, and the open list looks like the browser's, not the
+theme's. [Select](/docs/components/select) draws its own list, so options can
+carry descriptions, sections and icons, and it looks the same everywhere;
+it still renders a hidden native select for autofill and form submission.
+
+## Examples
+
+### Validation
+
+The field doesn't validate on its own. Pass `isInvalid` with `errors` or
+`errorMessage`, from your form library or your own checks; `required` still
+gets the browser's message when the form is submitted. Inside React Aria's
+`Form`, `validationErrors` reach the select by its `name`, as they do the
+other fields.
+
+<ComponentPreview name="native-select-validation">
+  <NativeSelectValidation />
+</ComponentPreview>
+
+### Multiple selection
+
+`multiple` shows the options as a list box, with no chevron.
+
+<ComponentPreview name="native-select-multiple">
+  <NativeSelectMultiple />
+</ComponentPreview>
+
+## Accessibility
+
+The select is a native control, so browsers and screen readers handle it
+fully, and React Aria adds no keys: the browser's own apply. The label names
+it, and the description and error describe it. `isInvalid` sets
+`aria-invalid` and turns the border destructive, and `required` marks the
+label with an asterisk. In Windows High Contrast a disabled select keeps the
+system's disabled color without fading further.
+
+## API
+
+### NativeSelect
+
+Extends the HTML [`select`](https://developer.mozilla.org/docs/Web/HTML/Element/select) element.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/native-select.tsx"
+  name="NativeSelectProps"
+/>
+
+Also accepts all native `<select>` attributes; `size` is ours, not the
+attribute's row count.
+
+#### Data attributes
+
+| Attribute       | Present when              |
+| --------------- | ------------------------- |
+| `data-slot`     | `native-select` (select)  |
+| `data-size`     | Always, on the select     |
+| `data-invalid`  | `isInvalid` is set        |
+| `data-disabled` | `disabled` is set (field) |
+
+### Other parts
+
+| Part                   | Extends         | `data-slot`              |
+| ---------------------- | --------------- | ------------------------ |
+| `NativeSelectOption`   | HTML `option`   | `native-select-option`   |
+| `NativeSelectOptGroup` | HTML `optgroup` | `native-select-optgroup` |
