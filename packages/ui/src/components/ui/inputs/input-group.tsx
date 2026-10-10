@@ -1,5 +1,9 @@
-import type { ComponentProps, MouseEvent } from 'react';
-
+import {
+  type ComponentProps,
+  type MouseEvent,
+  type ReactNode,
+  useId,
+} from 'react';
 import {
   Group as AriaGroup,
   type GroupProps as AriaGroupProps,
@@ -13,6 +17,11 @@ import {
   type ButtonProps,
   ButtonStyleContext,
 } from '#/components/ui/inputs/button';
+import {
+  fieldLayout,
+  type FieldMessages,
+  isEmptyNode,
+} from '#/components/ui/inputs/field';
 import { cn, cx } from '#/lib/cx';
 
 // The group draws the control's border and focus outline, so the Input or
@@ -53,6 +62,13 @@ export type InputGroupProps = { size?: InputSize } & Omit<
   AriaGroupProps,
   'role'
 >;
+
+export type InputGroupSlots = {
+  // Inside the border, before and after the control. Text describes the
+  // field; an element is decoration unless it names itself.
+  end?: ReactNode;
+  start?: ReactNode;
+};
 
 // A named group is announced as one; an unnamed one only lays out its
 // children. Inside a React Aria field it takes the field's invalid and
@@ -135,4 +151,52 @@ export function InputGroupText({
       )}
     />
   );
+}
+
+// Text decorations' ids join the field's own aria-describedby, which React
+// Aria appends after the description and error; on the input they'd replace
+// them.
+export function useFieldShortcut<Props extends { 'aria-describedby'?: string }>(
+  { end, start, ...messages }: FieldMessages & InputGroupSlots,
+  props: Props,
+  { axis, size }: { axis: 'block' | 'inline'; size?: InputSize },
+) {
+  const startId = useId();
+  const endId = useId();
+  const slot = (node: ReactNode, id: string, side: 'end' | 'start') => {
+    if (isEmptyNode(node)) return { addon: null, id: undefined };
+    const isText = typeof node === 'string' || typeof node === 'number';
+    return {
+      addon: (
+        <InputGroupAddon align={`${axis}-${side}`}>
+          {isText ? <InputGroupText id={id}>{node}</InputGroupText> : node}
+        </InputGroupAddon>
+      ),
+      id: isText ? id : undefined,
+    };
+  };
+  const before = slot(start, startId, 'start');
+  const after = slot(end, endId, 'end');
+  return {
+    fieldProps: {
+      ...props,
+      'aria-describedby':
+        [props['aria-describedby'], before.id, after.id]
+          .filter(Boolean)
+          .join(' ') || undefined,
+    },
+    layout: (control: ReactNode) =>
+      fieldLayout(
+        before.addon || after.addon ? (
+          <InputGroup size={size}>
+            {before.addon}
+            {control}
+            {after.addon}
+          </InputGroup>
+        ) : (
+          control
+        ),
+        messages,
+      ),
+  };
 }

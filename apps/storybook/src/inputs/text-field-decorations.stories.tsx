@@ -56,17 +56,32 @@ export const Element: Story = {
   },
 };
 
-// A consumer's own aria-describedby stays alongside the decoration's.
+// An element is decoration even when it has text of its own.
+export const ElementWithText: Story = {
+  args: { end: <kbd>Ctrl K</kbd>, label: 'Search' },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole('textbox', { name: 'Search' }),
+    ).not.toHaveAccessibleDescription();
+  },
+};
+
+// A consumer's own aria-describedby stays alongside the decoration's, on
+// both fields.
 export const OwnDescribedBy: Story = {
   args: { 'aria-describedby': 'weight-hint', end: 'kg' },
   play: async ({ canvas }) => {
     await expect(
       canvas.getByRole('textbox', { name: 'Weight' }),
     ).toHaveAccessibleDescription('Round to the nearest kilo. kg');
+    await expect(
+      canvas.getByRole('textbox', { name: 'Notes' }),
+    ).toHaveAccessibleDescription('Round to the nearest kilo. kg');
   },
   render: (args) => (
     <div className="flex flex-col gap-2">
       <TextField {...args} />
+      <TextareaField aria-describedby="weight-hint" end="kg" label="Notes" />
       <p id="weight-hint">Round to the nearest kilo.</p>
     </div>
   ),

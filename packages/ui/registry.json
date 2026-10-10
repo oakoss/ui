@@ -1131,6 +1131,7 @@
       "registryDependencies": [
         "oakoss/ui/theme",
         "oakoss/ui/button",
+        "oakoss/ui/field",
         "oakoss/ui/input"
       ],
       "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
