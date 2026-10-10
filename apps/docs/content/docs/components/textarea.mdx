@@ -1,0 +1,149 @@
+---
+title: Textarea
+description: A multiline text input that grows with its content, with a label, description and validation message.
+item: textarea
+reactAria: https://react-aria.adobe.com/TextField
+---
+
+import { TextareaCustomLayout } from '#/components/demos/textarea-custom-layout';
+import { TextareaDemo } from '#/components/demos/textarea-demo';
+import { TextareaFixed } from '#/components/demos/textarea-fixed';
+import { TextareaRows } from '#/components/demos/textarea-rows';
+
+<ComponentPreview name="textarea-demo">
+  <TextareaDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="textarea" />
+
+`TextareaField`, which adds the label, description and error, comes with
+[Text Field](/docs/components/text-field): install `text-field` for both.
+
+## Usage
+
+```tsx
+import { TextareaField } from '#/components/ui/inputs/text-field';
+
+<TextareaField description="Shown on your profile." label="Bio" />;
+```
+
+## Examples
+
+### Rows
+
+`minRows` (3 by default) sets the starting height and `maxRows` caps the
+growth, after which the box scrolls. Both are whole numbers of 1 or more, with
+`maxRows` at least `minRows`. One row is exactly an
+[Input](/docs/components/field) of the same `size` (`sm`, `md`, `lg`).
+
+<ComponentPreview name="textarea-rows">
+  <TextareaRows />
+</ComponentPreview>
+
+The box grows with CSS `field-sizing: content`, in Chrome and Edge 123,
+Safari 26.2 and Firefox 152 and later. Older browsers show `minRows` rows and
+keep the resize handle, so users can still drag the box taller.
+
+### Fixed height
+
+`autoGrow={false}` keeps the box at `minRows` rows, scrolling past them, with a
+handle to resize it vertically:
+
+<ComponentPreview name="textarea-fixed">
+  <TextareaFixed />
+</ComponentPreview>
+
+### Custom layout
+
+`children` replace the default layout. Compose the
+[Field](/docs/components/field) parts around a `Textarea`, which wire up the
+label, description and error the same way:
+
+<ComponentPreview name="textarea-custom-layout">
+  <TextareaCustomLayout />
+</ComponentPreview>
+
+Children and the layout props (`label`, `description`, `errorMessage`,
+`errors`, `placeholder`, `size`, `minRows`, `maxRows`, `autoGrow`) can't be
+mixed; set those on the parts instead.
+
+## Accessibility
+
+React Aria renders a native `<textarea>` and links it to its parts:
+
+- **Name and description:** the label names the textarea, and the description
+  and error describe it (`aria-labelledby`, `aria-describedby`), with no ids to
+  wire.
+- **Validation:** an invalid field sets `aria-invalid`, and `isRequired` sets
+  the native `required` attribute. The required asterisk is hidden from screen
+  readers, which already announce the field as required.
+
+The border reaches 3:1 against the page at rest and when invalid, and the focus
+outline shows for any focus, mouse included. Where the box grows on its own,
+the resize handle is hidden, since dragging it would fix the height.
+
+The textarea keeps the browser's own keyboard behavior, Enter included; React
+Aria adds no keys.
+
+## API
+
+### TextareaField
+
+Extends React Aria's [`TextField`](https://react-aria.adobe.com/TextField#api)
+with a `Textarea` in place of the input. With `children`, it renders only them.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/text-field.tsx"
+  name="TextareaFieldProps"
+/>
+
+Also accepts all [React Aria `TextField` props](https://react-aria.adobe.com/TextField#api).
+
+#### Data attributes
+
+| Attribute       | Present when            |
+| --------------- | ----------------------- |
+| `data-slot`     | Always `textarea-field` |
+| `data-disabled` | `isDisabled` is set     |
+| `data-invalid`  | The field is invalid    |
+| `data-readonly` | `isReadOnly` is set     |
+| `data-required` | `isRequired` is set     |
+
+### Textarea
+
+Extends React Aria's
+[`TextArea`](https://react-aria.adobe.com/TextField#textarea). `minRows`
+replaces the HTML `rows` attribute.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/textarea.tsx"
+  name="TextareaProps"
+/>
+
+Also accepts all native `<textarea>` attributes except `rows`.
+
+#### Data attributes
+
+| Attribute            | Present when                     |
+| -------------------- | -------------------------------- |
+| `data-slot`          | Always `textarea`                |
+| `data-size`          | Always: `sm`, `md` or `lg`       |
+| `data-focused`       | The textarea has focus           |
+| `data-focus-visible` | The textarea has keyboard focus  |
+| `data-hovered`       | The pointer is over the textarea |
+| `data-disabled`      | The textarea is disabled         |
+| `data-invalid`       | The field is invalid             |
+
+#### CSS variables
+
+| Variable              | Value                                       |
+| --------------------- | ------------------------------------------- |
+| `--textarea-height`   | The control height for `size`, one row tall |
+| `--textarea-min-rows` | `minRows`                                   |
+| `--textarea-max-rows` | `maxRows`, when set                         |

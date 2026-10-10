@@ -20,7 +20,7 @@ import { tv, type VariantProps } from 'tailwind-variants/lite';
 
 import { Separator } from '#/components/ui/layout/separator';
 import { cn, cx } from '#/lib/cx';
-import { inputFocusRing } from '#/lib/recipes';
+import { fieldControl } from '#/lib/recipes';
 
 export function FieldSet({ className, ...props }: ComponentProps<'fieldset'>) {
   return (
@@ -263,11 +263,7 @@ function messageOf(error: unknown): string | undefined {
 }
 
 const inputStyles = tv({
-  base: [
-    inputFocusRing,
-    'w-full min-w-0 rounded-control border border-input bg-field px-control-x py-1 text-ui text-foreground transition-colors placeholder:text-muted-foreground',
-    'disabled:cursor-not-allowed disabled:opacity-50 data-invalid:border-destructive-text',
-  ],
+  base: [fieldControl, 'py-1'],
   defaultVariants: { size: 'md' },
   variants: {
     size: { lg: 'h-control-lg', md: 'h-control', sm: 'h-control-sm' },
