@@ -51,7 +51,7 @@ const groupStyles = tv({
 // The focused item rises so its outline isn't covered, and a selected item
 // keeps a contrasting border so selected neighbors don't merge into one block.
 const joinedItem =
-  'rounded-none selected:border-background forced-colors:selected:border-[HighlightText] focus-visible:z-10 group-orientation-horizontal/toggle-group:not-first:-ms-px group-orientation-horizontal/toggle-group:first:rounded-s-control group-orientation-horizontal/toggle-group:last:rounded-e-control group-orientation-vertical/toggle-group:not-first:-mt-px group-orientation-vertical/toggle-group:first:rounded-t-control group-orientation-vertical/toggle-group:last:rounded-b-control';
+  'rounded-none selected:border-background forced-colors:selected:not-disabled:border-[HighlightText] focus-visible:z-10 group-orientation-horizontal/toggle-group:not-first:-ms-px group-orientation-horizontal/toggle-group:first:rounded-s-control group-orientation-horizontal/toggle-group:last:rounded-e-control group-orientation-vertical/toggle-group:not-first:-mt-px group-orientation-vertical/toggle-group:first:rounded-t-control group-orientation-vertical/toggle-group:last:rounded-b-control';
 
 export function ToggleGroup({
   children,

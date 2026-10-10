@@ -32,8 +32,9 @@ export type ToggleVariant = Extract<
 
 // Forced colors' text backplate would hide the selected label, so a selected
 // toggle opts out and sets the system colors, focus outline included, itself.
+// A disabled one takes the disabled gray instead, as a native button does.
 const selected =
-  'selected:border-transparent selected:bg-(--btn-bg) selected:text-(--btn-fg) forced-colors:selected:border-[Highlight] forced-colors:selected:bg-[Highlight] forced-colors:selected:bg-none forced-colors:selected:text-[HighlightText] forced-colors:selected:focus-visible:outline-[Highlight] forced-colors:selected:forced-color-adjust-none';
+  'selected:border-transparent selected:bg-(--btn-bg) selected:text-(--btn-fg) forced-colors:selected:not-disabled:border-[Highlight] forced-colors:selected:not-disabled:bg-[Highlight] forced-colors:selected:not-disabled:bg-none forced-colors:selected:not-disabled:text-[HighlightText] forced-colors:selected:not-disabled:focus-visible:outline-[Highlight] forced-colors:selected:not-disabled:forced-color-adjust-none';
 
 export function Toggle({
   className,

@@ -46,6 +46,8 @@ const componentVariables = defineConfig({
               'gap-[inherit]',
               // Neutral has no hover role: its fill fades instead.
               '[--btn-hover:color-mix(in_oklab,var(--color-foreground)_90%,transparent)]',
+              // Forced colors gray a disabled link styled as a button too.
+              'forced-colors:disabled:text-[GrayText]',
             ],
           },
         ],

@@ -142,3 +142,47 @@ export const DisabledLink: Story = {
     </Link>
   ),
 };
+
+// In forced colors a disabled button, or a link styled as one, paints like a
+// native disabled button: the system's disabled color, unfaded.
+export const ForcedColorsDisabled: Story = {
+  parameters: {
+    a11y: { config: { rules: [{ enabled: false, id: 'color-contrast' }] } },
+  },
+  play: async ({ canvas }) => {
+    await expect(matchMedia('(forced-colors: active)').matches).toBe(true);
+    const native = getComputedStyle(canvas.getByText('Native'));
+    const live = getComputedStyle(canvas.getByText('Live'));
+    await expect(native.color).not.toBe(live.color);
+    for (const element of [
+      canvas.getByRole('button', { name: 'Save' }),
+      canvas.getByRole('link', { name: 'Docs' }),
+    ]) {
+      const style = getComputedStyle(element);
+      await expect(style.color).toBe(native.color);
+      await expect(style.borderTopColor).toBe(native.color);
+      await expect(style.opacity).toBe('1');
+    }
+  },
+  render: () => (
+    <div className="flex gap-3">
+      <Button isDisabled variant="outline">
+        Save
+      </Button>
+      <Link
+        className={buttonStyles({ variant: 'outline' })}
+        href="#"
+        isDisabled
+      >
+        Docs
+      </Link>
+      <Link className={buttonStyles({ variant: 'outline' })} href="#">
+        Live
+      </Link>
+      <button disabled type="button">
+        Native
+      </button>
+    </div>
+  ),
+  tags: ['forced-colors'],
+};
