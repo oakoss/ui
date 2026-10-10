@@ -1,0 +1,158 @@
+---
+title: Breadcrumb
+description: A trail of links from the top of the site to the current page.
+item: breadcrumb
+reactAria: https://react-aria.adobe.com/Breadcrumbs
+---
+
+import { BreadcrumbDemo } from '#/components/demos/breadcrumb-demo';
+import { BreadcrumbEllipsisDemo } from '#/components/demos/breadcrumb-ellipsis';
+
+<ComponentPreview name="breadcrumb-demo">
+  <BreadcrumbDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="breadcrumb" />
+
+## Usage
+
+```tsx
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+} from '#/components/ui/navigation/breadcrumb';
+
+<Breadcrumb>
+  <BreadcrumbList>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="/">Home</BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+      <BreadcrumbPage>Settings</BreadcrumbPage>
+    </BreadcrumbItem>
+  </BreadcrumbList>
+</Breadcrumb>;
+```
+
+Links take an `href`, and follow your router when the app sets up React Aria's
+[`RouterProvider`](https://react-aria.adobe.com/frameworks).
+
+## Examples
+
+### Ellipsis
+
+`BreadcrumbEllipsis` stands in for the levels left out of a long trail. It's
+decorative, so screen readers skip it.
+
+<ComponentPreview name="breadcrumb-ellipsis">
+  <BreadcrumbEllipsisDemo />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria renders the trail as an ordered list named "Breadcrumbs" in the
+user's language. The last item is the current page: its link gets
+`aria-current="page"` and is disabled, so it leaves the Tab order.
+
+This component adds:
+
+- **Landmark:** the trail sits in a `nav` landmark named after the list, so it
+  takes the same translated name. Give `Breadcrumb` an `aria-label` or
+  `aria-labelledby` to name it yourself.
+- **Current page:** it's semibold as well as darker, so the cue isn't color
+  alone.
+- **Separators:** the chevrons between items are hidden from screen readers,
+  and point the other way right to left.
+- **Focus:** links show the focus outline on keyboard focus, and none at rest,
+  so Windows High Contrast draws no box around each one.
+- **Target size:** links are text height, spaced so each still meets the 24px
+  minimum.
+
+| Key     | Action                                            |
+| ------- | ------------------------------------------------- |
+| `Tab`   | Moves to the next link, skipping the current page |
+| `Enter` | Follows the focused link                          |
+
+React Aria adds no keys. Follows the
+[WAI-ARIA breadcrumb pattern](https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/).
+
+## API
+
+### Breadcrumb
+
+A `nav` element, and accepts all its props.
+
+#### Data attributes
+
+| Attribute   | Present when        |
+| ----------- | ------------------- |
+| `data-slot` | Always `breadcrumb` |
+
+### BreadcrumbList
+
+Extends React Aria's
+[`Breadcrumbs`](https://react-aria.adobe.com/Breadcrumbs#api), and accepts all
+its props except `id`, which names the nav. `onAction` gets the key of the
+item whose link was pressed.
+
+#### Data attributes
+
+| Attribute   | Present when             |
+| ----------- | ------------------------ |
+| `data-slot` | Always `breadcrumb-list` |
+
+### BreadcrumbItem
+
+Extends React Aria's
+[`Breadcrumb`](https://react-aria.adobe.com/Breadcrumbs#api), and renders the
+separator after every item but the last.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/navigation/breadcrumb.tsx"
+  name="BreadcrumbItemProps"
+/>
+
+Also accepts all [React Aria `Breadcrumb` props](https://react-aria.adobe.com/Breadcrumbs#api).
+
+#### Data attributes
+
+| Attribute       | Present when                                                      |
+| --------------- | ----------------------------------------------------------------- |
+| `data-slot`     | Always `breadcrumb-item`; the separator is `breadcrumb-separator` |
+| `data-current`  | It's the last item                                                |
+| `data-disabled` | It's the last item, or the list is disabled                       |
+
+### BreadcrumbLink and BreadcrumbPage
+
+Extend React Aria's [`Link`](https://react-aria.adobe.com/Link#api), and
+accept all its props. `BreadcrumbPage` is styled as the current page; a
+`BreadcrumbLink` in the last item takes the same look.
+
+#### Data attributes
+
+| Attribute            | Present when                                   |
+| -------------------- | ---------------------------------------------- |
+| `data-slot`          | Always `breadcrumb-link` or `breadcrumb-page`  |
+| `data-current`       | It's in the last item                          |
+| `data-disabled`      | It's in the last item, or the list is disabled |
+| `data-hovered`       | A pointer hovers it                            |
+| `data-pressed`       | It's being pressed                             |
+| `data-focused`       | It has focus                                   |
+| `data-focus-visible` | It has keyboard focus                          |
+
+### BreadcrumbEllipsis
+
+A `span` hidden from screen readers, and accepts all its props.
+
+#### Data attributes
+
+| Attribute   | Present when                 |
+| ----------- | ---------------------------- |
+| `data-slot` | Always `breadcrumb-ellipsis` |

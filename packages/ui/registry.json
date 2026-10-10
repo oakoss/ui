@@ -834,6 +834,34 @@
       ]
     },
     {
+      "name": "item",
+      "type": "registry:ui",
+      "title": "Item",
+      "description": "A row of media, title, description and actions, in a list that passes axe, with a linked title stretched over the row so its actions stay pressable and a default look that stays borderless in Windows High Contrast.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/item.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/data/item.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/item.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
       "name": "kbd",
       "type": "registry:ui",
       "title": "Kbd",
@@ -961,6 +989,39 @@
       ]
     },
     {
+      "name": "tabs",
+      "type": "registry:ui",
+      "title": "Tabs",
+      "description": "Tabbed panels in a filled or line look, horizontal or vertical, with a selected tab that stays distinct in Windows High Contrast and focusable panels.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/tabs.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/navigation/tabs.tsx",
+          "type": "registry:ui",
+          "target": "@ui/navigation/tabs.tsx"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
       "name": "toggle",
       "type": "registry:ui",
       "title": "Toggle",
@@ -975,6 +1036,38 @@
           "path": "src/components/ui/inputs/toggle.tsx",
           "type": "registry:ui",
           "target": "@ui/inputs/toggle.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "button-group",
+      "type": "registry:ui",
+      "title": "Button Group",
+      "description": "Buttons, inputs and text joined into one control, horizontal or vertical, with corners that follow the reading direction, a separator that stays visible in Windows High Contrast, and a size and variant set once for its Buttons.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/button-group.tsx"
+      },
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/button",
+        "oakoss/ui/separator"
+      ],
+      "dependencies": ["cn", "react-aria-components"],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/button-group.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/button-group.tsx"
         },
         {
           "path": "src/lib/cx.ts",
@@ -1007,6 +1100,158 @@
           "path": "src/components/ui/inputs/toggle-group.tsx",
           "type": "registry:ui",
           "target": "@ui/inputs/toggle-group.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "accordion",
+      "type": "registry:ui",
+      "title": "Accordion",
+      "description": "Stacked sections that expand one at a time, or several, with triggers in headings, an animated height, and find-in-page that opens a closed section.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/accordion.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components"],
+      "files": [
+        {
+          "path": "src/components/ui/layout/accordion.tsx",
+          "type": "registry:ui",
+          "target": "@ui/layout/accordion.tsx"
+        },
+        {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "collapsible",
+      "type": "registry:ui",
+      "title": "Collapsible",
+      "description": "A trigger that shows and hides one panel, with an animated height and a trigger that takes any button look.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/collapsible.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components"],
+      "files": [
+        {
+          "path": "src/components/ui/layout/collapsible.tsx",
+          "type": "registry:ui",
+          "target": "@ui/layout/collapsible.tsx"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "breadcrumb",
+      "type": "registry:ui",
+      "title": "Breadcrumb",
+      "description": "A trail of links to the current page, named in the user's language, with the current page marked for screen readers and a separator that follows the reading direction.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/breadcrumb.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components"],
+      "files": [
+        {
+          "path": "src/components/ui/navigation/breadcrumb.tsx",
+          "type": "registry:ui",
+          "target": "@ui/navigation/breadcrumb.tsx"
+        },
+        {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "pagination",
+      "type": "registry:ui",
+      "title": "Pagination",
+      "description": "Page links named \"Page N\", a current page marked by more than color and kept distinct in Windows High Contrast, Previous and Next that disable at the ends, and an announced ellipsis.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/pagination.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme", "oakoss/ui/button"],
+      "dependencies": ["cn", "react-aria-components"],
+      "files": [
+        {
+          "path": "src/components/ui/navigation/pagination.tsx",
+          "type": "registry:ui",
+          "target": "@ui/navigation/pagination.tsx"
+        },
+        {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
         },
         {
           "path": "src/lib/cx.ts",

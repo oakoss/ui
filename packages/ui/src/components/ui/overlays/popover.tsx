@@ -9,6 +9,7 @@ import {
   composeRenderProps,
 } from 'react-aria-components';
 
+import { ButtonStyleContext } from '#/components/ui/inputs/button';
 import {
   DialogBody,
   DialogDescription,
@@ -96,7 +97,8 @@ export function PopoverContent({
       {...props}
     >
       {showArrow ? <PopoverArrow /> : null}
-      {children}
+      {/* A ButtonGroup around the trigger styles its own Buttons, not these. */}
+      <ButtonStyleContext value={{}}>{children}</ButtonStyleContext>
     </AriaPopover>
   );
 }

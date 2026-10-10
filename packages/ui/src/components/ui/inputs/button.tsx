@@ -1,3 +1,4 @@
+import { createContext, use } from 'react';
 import {
   Button as AriaButton,
   type ButtonProps as AriaButtonProps,
@@ -24,6 +25,9 @@ const styles = tv({
     focusRing,
     'relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-control border border-transparent text-ui font-medium whitespace-nowrap transition select-none',
     'not-data-rac:active:scale-97 disabled:pointer-events-none disabled:opacity-50 pending:cursor-default pressed:scale-97',
+    // Forced colors gray a disabled button but not a disabled link styled as
+    // one, and the fade would dim the gray past a native disabled button's.
+    'forced-colors:disabled:text-[GrayText] forced-colors:disabled:opacity-100',
     "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   ],
   defaultVariants: defaults,
@@ -79,17 +83,26 @@ export type ButtonStyleProps = VariantProps<typeof styles>;
 
 type IconSize = 'icon-lg' | 'icon-sm' | 'icon';
 
+// A group sets these for the Buttons inside it; a Button's own props win.
+export const ButtonStyleContext = createContext<
+  Pick<ButtonStyleProps, 'size' | 'targetSize' | 'variant'>
+>({});
+
 export function Button({
   children,
   className,
   fullWidth,
   intent,
   pendingLabel = 'Pending',
-  size,
-  targetSize,
-  variant,
+  size: ownSize,
+  targetSize: ownTargetSize,
+  variant: ownVariant,
   ...props
 }: ButtonProps) {
+  const group = use(ButtonStyleContext);
+  const size = ownSize ?? group.size;
+  const targetSize = ownTargetSize ?? group.targetSize;
+  const variant = ownVariant ?? group.variant;
   return (
     <AriaButton
       data-slot="button"

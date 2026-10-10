@@ -1,0 +1,162 @@
+---
+title: Tabs
+description: Panels of content shown one at a time, chosen from a row of tabs.
+item: tabs
+reactAria: https://react-aria.adobe.com/Tabs
+---
+
+import { TabsDemo } from '#/components/demos/tabs-demo';
+import { TabsLine } from '#/components/demos/tabs-line';
+import { TabsVertical } from '#/components/demos/tabs-vertical';
+
+<ComponentPreview name="tabs-demo">
+  <TabsDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="tabs" />
+
+## Usage
+
+```tsx
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '#/components/ui/navigation/tabs';
+
+<Tabs>
+  <TabsList aria-label="Account">
+    <TabsTrigger id="profile">Profile</TabsTrigger>
+    <TabsTrigger id="billing">Billing</TabsTrigger>
+  </TabsList>
+  <TabsContent id="profile">Your name and photo.</TabsContent>
+  <TabsContent id="billing">Your card and invoices.</TabsContent>
+</Tabs>;
+```
+
+Each `TabsContent` shares its `id` with a `TabsTrigger`.
+
+## Examples
+
+### Line
+
+`variant="line"` marks the selected tab with a line under it instead of a
+filled chip.
+
+<ComponentPreview name="tabs-line">
+  <TabsLine />
+</ComponentPreview>
+
+### Vertical
+
+`orientation="vertical"` stacks the tabs beside the panel. In the line look,
+the line runs along the side facing the panel, on the right or, right to left,
+the left.
+
+<ComponentPreview name="tabs-vertical">
+  <TabsVertical />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria renders a `tablist` of `tab`s, each linked to its `tabpanel`, and
+the selected tab is the list's one Tab stop. Name the list with `aria-label`
+or `aria-labelledby`; the type doesn't require it, since a visible heading
+often names the section instead.
+
+This component adds:
+
+- **Selected state:** in Windows High Contrast the default look's selected
+  tab takes the system's selection colors, and the line look's line is a
+  border, which the mode keeps. The selected tab opts out of the text
+  backplate the mode draws, which would hide its label. A disabled tab takes
+  the system's disabled color, selected or not.
+- **Focus:** tabs show the focus outline. A panel with nothing focusable
+  inside is a Tab stop, so it shows the outline too, drawn inside its edge.
+- **Target size:** tabs sit close together, so they don't grow to 44px; each
+  is at least 24px tall.
+
+| Key                        | Action                                                           |
+| -------------------------- | ---------------------------------------------------------------- |
+| `Tab`                      | Moves into the selected tab, then into the panel                 |
+| `ArrowLeft` / `ArrowRight` | Moves between tabs in either orientation; reversed right to left |
+| `ArrowUp` / `ArrowDown`    | Moves between tabs when vertical                                 |
+| `Home` / `End`             | Moves to the first or last tab                                   |
+| `Space` / `Enter`          | Selects the focused tab, when `keyboardActivation="manual"`      |
+
+Arrow keys select the tab they move to; with `keyboardActivation="manual"`
+they only move focus. Follows the
+[WAI-ARIA tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/).
+
+## API
+
+### Tabs
+
+Extends React Aria's [`Tabs`](https://react-aria.adobe.com/Tabs#api), and
+sets the look for its list and tabs.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/navigation/tabs.tsx"
+  name="TabsProps"
+/>
+
+Also accepts all [React Aria `Tabs` props](https://react-aria.adobe.com/Tabs#api).
+
+#### Data attributes
+
+| Attribute            | Present when                        |
+| -------------------- | ----------------------------------- |
+| `data-slot`          | Always `tabs`                       |
+| `data-variant`       | Always; `default` or `line`         |
+| `data-orientation`   | Always; `horizontal` or `vertical`  |
+| `data-disabled`      | `isDisabled` is set                 |
+| `data-focus-visible` | Something inside has keyboard focus |
+
+### TabsList
+
+Extends React Aria's [`TabList`](https://react-aria.adobe.com/Tabs#api), and
+accepts all its props.
+
+#### Data attributes
+
+| Attribute          | Present when                       |
+| ------------------ | ---------------------------------- |
+| `data-slot`        | Always `tabs-list`                 |
+| `data-variant`     | Always; the look from `Tabs`       |
+| `data-orientation` | Always; `horizontal` or `vertical` |
+
+### TabsTrigger
+
+Extends React Aria's [`Tab`](https://react-aria.adobe.com/Tabs#api), and
+accepts all its props. Its `id` is the key `selectedKey` refers to.
+
+#### Data attributes
+
+| Attribute            | Present when          |
+| -------------------- | --------------------- |
+| `data-slot`          | Always `tabs-trigger` |
+| `data-selected`      | It's selected         |
+| `data-hovered`       | A pointer hovers it   |
+| `data-pressed`       | It's being pressed    |
+| `data-focus-visible` | It has keyboard focus |
+| `data-disabled`      | It's disabled         |
+
+### TabsContent
+
+Extends React Aria's [`TabPanel`](https://react-aria.adobe.com/Tabs#api), and
+accepts all its props.
+
+#### Data attributes
+
+| Attribute            | Present when                                                             |
+| -------------------- | ------------------------------------------------------------------------ |
+| `data-slot`          | Always `tabs-content`                                                    |
+| `data-focus-visible` | It has keyboard focus                                                    |
+| `data-inert`         | Its tab isn't selected, while it's kept by `shouldForceMount` or exiting |
+| `data-entering`      | It's appearing                                                           |
+| `data-exiting`       | It's leaving                                                             |

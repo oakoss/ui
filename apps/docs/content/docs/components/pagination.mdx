@@ -1,0 +1,177 @@
+---
+title: Pagination
+description: Links between the pages of a long list.
+item: pagination
+reactAria: https://react-aria.adobe.com/Link
+---
+
+import { PaginationDemo } from '#/components/demos/pagination-demo';
+import { PaginationDisabled } from '#/components/demos/pagination-disabled';
+
+<ComponentPreview name="pagination-demo">
+  <PaginationDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="pagination" />
+
+## Usage
+
+```tsx
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '#/components/ui/navigation/pagination';
+
+<Pagination>
+  <PaginationContent>
+    <PaginationItem>
+      <PaginationPrevious href="?page=1" />
+    </PaginationItem>
+    <PaginationItem>
+      <PaginationLink href="?page=2" isActive>
+        2
+      </PaginationLink>
+    </PaginationItem>
+    <PaginationItem>
+      <PaginationNext href="?page=3" />
+    </PaginationItem>
+  </PaginationContent>
+</Pagination>;
+```
+
+The parts are presentational: work out which pages to show in your app.
+Links take an `href`, and follow your router when the app sets up React
+Aria's [`RouterProvider`](https://react-aria.adobe.com/frameworks).
+
+## Examples
+
+### Disabled ends
+
+`isDisabled` on `PaginationPrevious` or `PaginationNext` turns it off at the
+first or last page.
+
+<ComponentPreview name="pagination-disabled">
+  <PaginationDisabled />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria renders each link with an `href` as an `<a>`. Without one, or when
+disabled, it's a `span` with the `link` role, and a disabled link leaves the
+Tab order.
+
+This component adds:
+
+- **Landmark:** a `nav` named "Pagination". Set `label` to rename it.
+- **Page names:** a page link whose text is its number is named "Page 2",
+  through `pageLabel`. A link's own `aria-label` wins.
+- **Current page:** `isActive` sets `aria-current="page"`. It's semibold with a
+  border, so the cue isn't color alone, and in Windows High Contrast it takes
+  the system's selection colors.
+- **Previous and Next:** `rel="prev"` and `rel="next"`. On small screens their
+  text is hidden visually but stays their name.
+- **Ellipsis:** screen readers announce "More pages". Set `label` on
+  `PaginationEllipsis` to reword it.
+- **Target size:** links are 44px targets, spaced so they don't overlap.
+
+| Key     | Action                   |
+| ------- | ------------------------ |
+| `Tab`   | Moves to the next link   |
+| `Enter` | Follows the focused link |
+
+React Aria adds no keys.
+
+## API
+
+### Pagination
+
+A `nav` element, and accepts all its props except `aria-label`, which
+`label` sets.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/navigation/pagination.tsx"
+  name="PaginationProps"
+/>
+
+#### Data attributes
+
+| Attribute   | Present when        |
+| ----------- | ------------------- |
+| `data-slot` | Always `pagination` |
+
+### PaginationContent and PaginationItem
+
+A `ul` and an `li`, accepting all their props.
+
+#### Data attributes
+
+| Attribute   | Present when                                     |
+| ----------- | ------------------------------------------------ |
+| `data-slot` | Always `pagination-content` or `pagination-item` |
+
+### PaginationLink
+
+Extends React Aria's [`Link`](https://react-aria.adobe.com/Link#api), styled
+as a button.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/navigation/pagination.tsx"
+  name="PaginationLinkProps"
+/>
+
+Also accepts all [React Aria `Link` props](https://react-aria.adobe.com/Link#api).
+
+#### Data attributes
+
+| Attribute            | Present when             |
+| -------------------- | ------------------------ |
+| `data-slot`          | Always `pagination-link` |
+| `data-current`       | `isActive` is set        |
+| `data-disabled`      | `isDisabled` is set      |
+| `data-hovered`       | A pointer hovers it      |
+| `data-pressed`       | It's being pressed       |
+| `data-focused`       | It has focus             |
+| `data-focus-visible` | It has keyboard focus    |
+
+### PaginationPrevious and PaginationNext
+
+`PaginationLink`s with a chevron, and accept its props except `children`,
+`isActive` and `pageLabel`.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/navigation/pagination.tsx"
+  name="PaginationStepProps"
+/>
+
+#### Data attributes
+
+The same as `PaginationLink`'s, `data-slot` included, as upstream's are.
+
+### PaginationEllipsis
+
+A `span`, and accepts all its props.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/navigation/pagination.tsx"
+  name="PaginationEllipsisProps"
+/>
+
+#### Data attributes
+
+| Attribute   | Present when                 |
+| ----------- | ---------------------------- |
+| `data-slot` | Always `pagination-ellipsis` |

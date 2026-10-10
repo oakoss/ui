@@ -5,6 +5,7 @@ import { Toggle } from '@oakoss/ui/components/ui/inputs/toggle';
 import { expect, fn, userEvent } from 'storybook/test';
 
 import { contrast, tokenColor } from '../color';
+import { paintedColor } from '../paint';
 
 const onChange = fn<(isSelected: boolean) => void>();
 
@@ -205,6 +206,80 @@ export const ForcedColors: Story = {
     await expect(contrast(style.backgroundColor, page())).toBeGreaterThan(3);
     await expect(contrast(style.color, style.backgroundColor)).toBeGreaterThan(
       4.5,
+    );
+  },
+  tags: ['forced-colors'],
+};
+
+// Opted out of forced colors, a selected toggle sets its focus outline to the
+// system's selection color itself.
+export const ForcedColorsFocus: Story = {
+  args: { defaultSelected: true },
+  parameters: ForcedColors.parameters,
+  play: async ({ canvas }) => {
+    await userEvent.tab();
+    const toggle = canvas.getByRole('button', { name: 'Bold' });
+    await settle();
+    const style = getComputedStyle(toggle);
+    await expect(style.outlineStyle).toBe('solid');
+    await expect(style.outlineColor).toBe(style.backgroundColor);
+  },
+  tags: ['forced-colors'],
+};
+
+// The hover layer would wash over the selection fill, so a selected toggle
+// drops it in forced colors.
+export const ForcedColorsSelectedHover: Story = {
+  args: { defaultSelected: true },
+  parameters: ForcedColors.parameters,
+  play: async ({ canvas }) => {
+    const toggle = canvas.getByRole('button', { name: 'Bold' });
+    toggle.dataset.hovered = 'true';
+    await settle();
+    await expect(getComputedStyle(toggle).backgroundImage).toBe('none');
+  },
+  tags: ['forced-colors'],
+};
+
+// A disabled toggle, on or not, paints like a native disabled button rather
+// than in the selection colors, which would make it look live.
+export const ForcedColorsSelectedDisabled: Story = {
+  parameters: ForcedColors.parameters,
+  play: async ({ canvas }) => {
+    const native = getComputedStyle(canvas.getByText('Native'));
+    const live = getComputedStyle(canvas.getByRole('button', { name: 'Live' }));
+    const toggle = getComputedStyle(
+      canvas.getByRole('button', { name: 'Bold' }),
+    );
+    await expect(toggle.color).toBe(native.color);
+    await expect(toggle.borderTopColor).toBe(native.color);
+    await expect(toggle.backgroundColor).not.toBe(live.backgroundColor);
+    await expect(toggle.opacity).toBe('1');
+  },
+  render: (args) => (
+    <div className="flex gap-3">
+      <Toggle {...args} defaultSelected isDisabled />
+      <Toggle defaultSelected>Live</Toggle>
+      <button aria-pressed="true" disabled type="button">
+        Native
+      </button>
+    </div>
+  ),
+  tags: ['forced-colors'],
+};
+
+// Forced colors draw a page-colored backplate behind text, which would paint
+// over the selected fill and hide its light label; on, a toggle opts out.
+export const ForcedColorsLabel: Story = {
+  args: {
+    children: <span data-testid="label">Bold text</span>,
+    defaultSelected: true,
+  },
+  parameters: ForcedColors.parameters,
+  play: async ({ canvas }) => {
+    await settle();
+    await expect(await paintedColor(canvas.getByTestId('label'))).toBe(
+      await paintedColor(canvas.getByRole('button')),
     );
   },
   tags: ['forced-colors'],

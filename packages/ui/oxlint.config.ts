@@ -46,6 +46,8 @@ const componentVariables = defineConfig({
               'gap-[inherit]',
               // Neutral has no hover role: its fill fades instead.
               '[--btn-hover:color-mix(in_oklab,var(--color-foreground)_90%,transparent)]',
+              // Forced colors gray a disabled link styled as a button too.
+              'forced-colors:disabled:text-[GrayText]',
             ],
           },
         ],
@@ -85,6 +87,31 @@ const componentVariables = defineConfig({
     },
     {
       files: [
+        'src/components/ui/layout/accordion.tsx',
+        'src/components/ui/layout/collapsible.tsx',
+      ],
+      rules: {
+        'shadcn/no-arbitrary-values': [
+          'error',
+          // A disclosure panel animates the height React Aria sets, and no
+          // transition utility covers height alone.
+          { allow: ['transition-[height]'] },
+        ],
+      },
+    },
+    {
+      files: ['src/components/ui/data/item.tsx'],
+      rules: {
+        'shadcn/no-arbitrary-values': [
+          'error',
+          // Forced colors repaint a transparent border, so the default look
+          // takes the page color to stay borderless.
+          { allow: ['forced-colors:border-[Canvas]'] },
+        ],
+      },
+    },
+    {
+      files: [
         'src/components/ui/overlays/popover.tsx',
         'src/components/ui/overlays/tooltip.tsx',
       ],
@@ -114,6 +141,8 @@ const componentVariables = defineConfig({
         'src/components/ui/inputs/switch.tsx',
         'src/components/ui/inputs/toggle-group.tsx',
         'src/components/ui/inputs/toggle.tsx',
+        'src/components/ui/navigation/pagination.tsx',
+        'src/components/ui/navigation/tabs.tsx',
       ],
       rules: {
         'shadcn/no-arbitrary-values': [
@@ -121,12 +150,20 @@ const componentVariables = defineConfig({
           // Forced colors repaint a selected control's fill as the page
           // color, so each state takes a system color the mode keeps.
           {
-            allow: selectionColors.flatMap((color) =>
-              ['bg', 'border', 'text'].flatMap((property) => [
+            allow: selectionColors.flatMap((color) => [
+              ...['bg', 'border', 'text'].flatMap((property) => [
                 `forced-colors:${property}-[${color}]`,
+                `forced-colors:current:${property}-[${color}]`,
+                `forced-colors:disabled:${property}-[${color}]`,
                 `forced-colors:selected:${property}-[${color}]`,
+                `forced-colors:selected:not-disabled:${property}-[${color}]`,
               ]),
-            ),
+              // A selected or current control opted out of forced colors sets
+              // its own focus outline color.
+              `forced-colors:current:focus-visible:outline-[${color}]`,
+              `forced-colors:selected:focus-visible:outline-[${color}]`,
+              `forced-colors:selected:not-disabled:focus-visible:outline-[${color}]`,
+            ]),
           },
         ],
       },
