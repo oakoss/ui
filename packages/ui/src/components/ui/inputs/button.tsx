@@ -1,3 +1,4 @@
+import { createContext, use } from 'react';
 import {
   Button as AriaButton,
   type ButtonProps as AriaButtonProps,
@@ -82,17 +83,26 @@ export type ButtonStyleProps = VariantProps<typeof styles>;
 
 type IconSize = 'icon-lg' | 'icon-sm' | 'icon';
 
+// A group sets these for the Buttons inside it; a Button's own props win.
+export const ButtonStyleContext = createContext<
+  Pick<ButtonStyleProps, 'size' | 'targetSize' | 'variant'>
+>({});
+
 export function Button({
   children,
   className,
   fullWidth,
   intent,
   pendingLabel = 'Pending',
-  size,
-  targetSize,
-  variant,
+  size: ownSize,
+  targetSize: ownTargetSize,
+  variant: ownVariant,
   ...props
 }: ButtonProps) {
+  const group = use(ButtonStyleContext);
+  const size = ownSize ?? group.size;
+  const targetSize = ownTargetSize ?? group.targetSize;
+  const variant = ownVariant ?? group.variant;
   return (
     <AriaButton
       data-slot="button"

@@ -1,0 +1,129 @@
+---
+title: Button Group
+description: Related buttons, inputs and text joined into one control.
+item: button-group
+reactAria: https://react-aria.adobe.com/Group
+---
+
+import { ButtonGroupDemo } from '#/components/demos/button-group-demo';
+import { ButtonGroupInput } from '#/components/demos/button-group-input';
+import { ButtonGroupVertical } from '#/components/demos/button-group-vertical';
+
+<ComponentPreview name="button-group-demo">
+  <ButtonGroupDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="button-group" />
+
+## Usage
+
+```tsx
+import { Button } from '#/components/ui/inputs/button';
+import { ButtonGroup } from '#/components/ui/inputs/button-group';
+
+<ButtonGroup aria-label="Message actions" variant="outline">
+  <Button>Archive</Button>
+  <Button>Report</Button>
+</ButtonGroup>;
+```
+
+`size` and `variant` on the group reach every `Button` inside, a nested group
+included, and a `Button`'s own props win. They stop at a popover or dialog
+opened from the group, whose Buttons keep their own defaults. A `Toggle` or a
+link styled with `buttonStyles` doesn't read them, so pass its props directly.
+An icon size goes on each icon `Button`, whose type then requires a name.
+
+## Examples
+
+### Vertical
+
+`orientation="vertical"` stacks the children, joined top to bottom.
+
+<ComponentPreview name="button-group-vertical">
+  <ButtonGroupVertical />
+</ComponentPreview>
+
+### With an input and text
+
+Any direct child joins, so an `Input` and `ButtonGroupText` take the shared
+edges too. A `Select` and `InputGroup` aren't supported inside a group yet.
+
+<ComponentPreview name="button-group-input">
+  <ButtonGroupInput />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria renders a `div` for the group.
+
+This component adds:
+
+- **Role:** a group with `aria-label` or `aria-labelledby` has the `group`
+  role, so screen readers announce its name. An unnamed group only lays its
+  children out, with the `presentation` role. It's never a `toolbar`, which
+  would take arrow keys from an input inside it.
+- **Joining:** only direct children join, so a `Kbd` or icon inside a button
+  keeps its own corners, and the corners follow the reading direction.
+- **Focus:** the focused child rises over its neighbors, so its whole outline
+  shows.
+- **Target size:** the children sit edge to edge, so their 44px hit areas are
+  off, and a pressed child keeps its size.
+- **Separator:** `ButtonGroupSeparator` runs across the group and is drawn as
+  a border, so it stays visible in Windows High Contrast.
+
+| Key   | Action                      |
+| ----- | --------------------------- |
+| `Tab` | Moves to each child in turn |
+
+React Aria adds no keys.
+
+## API
+
+### ButtonGroup
+
+Extends React Aria's [`Group`](https://react-aria.adobe.com/Group#api), and
+accepts all its props except `role`, which follows whether it's named.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/button-group.tsx"
+  name="ButtonGroupProps"
+/>
+
+#### Data attributes
+
+| Attribute            | Present when                        |
+| -------------------- | ----------------------------------- |
+| `data-slot`          | Always `button-group`               |
+| `data-orientation`   | Always; `horizontal` or `vertical`  |
+| `data-disabled`      | `isDisabled` is set                 |
+| `data-invalid`       | `isInvalid` is set                  |
+| `data-readonly`      | `isReadOnly` is set                 |
+| `data-hovered`       | A pointer hovers it                 |
+| `data-focus-within`  | Something inside has focus          |
+| `data-focus-visible` | Something inside has keyboard focus |
+
+### ButtonGroupSeparator
+
+Our [`Separator`](/docs/components/separator), turned across the group, and
+accepts all its props.
+
+#### Data attributes
+
+| Attribute          | Present when                           |
+| ------------------ | -------------------------------------- |
+| `data-slot`        | Always `button-group-separator`        |
+| `data-orientation` | Always; across the group's orientation |
+
+### ButtonGroupText
+
+A `div` for a label or icon inside the group, and accepts all its props.
+
+#### Data attributes
+
+| Attribute   | Present when               |
+| ----------- | -------------------------- |
+| `data-slot` | Always `button-group-text` |

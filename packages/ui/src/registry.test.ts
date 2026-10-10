@@ -26,6 +26,7 @@ const forked = [
   'avatar',
   'breadcrumb',
   'button',
+  'button-group',
   'card',
   'checkbox',
   'collapsible',

@@ -27,7 +27,7 @@ export default defineConfig(
     // vitest/browser throws when loaded outside the Vitest run, so the
     // helpers that use it import it on call and story files still open in
     // plain Storybook.
-    files: ['src/paint.ts', 'src/viewport.ts'],
+    files: ['src/paint.ts', 'src/press.ts', 'src/viewport.ts'],
     rules: { 'no-restricted-syntax': 'off' },
   },
   oxlint(oxlintConfig),

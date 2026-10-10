@@ -16,7 +16,11 @@ import {
 import { tv, type VariantProps } from 'tailwind-variants/lite';
 
 import * as Icon from '#/components/icons';
-import { Button, type ButtonProps } from '#/components/ui/inputs/button';
+import {
+  Button,
+  type ButtonProps,
+  ButtonStyleContext,
+} from '#/components/ui/inputs/button';
 import { cn, cx } from '#/lib/cx';
 import { focusRing } from '#/lib/recipes';
 
@@ -54,8 +58,7 @@ export type DialogProps = {
   children: ReactNode;
   className?: string;
   closeLabel?: string;
-  // Names the dialog's part, and prefixes the overlay's, panel's and close
-  // button's.
+  // Names the dialog's part, a prefix for its overlay, panel and close button.
   'data-slot'?: string;
   showCloseButton?: boolean;
   size?: DialogSize;
@@ -71,8 +74,7 @@ type DialogNameProps = Pick<
   'aria-describedby' | 'aria-label' | 'aria-labelledby' | 'role'
 >;
 
-// Below `sm` the panel sits on the bottom edge and slides up; from `sm` it's
-// centered and scales in. `full` fills the screen at every width.
+// A bottom sheet below `sm`, centered from `sm`; `full` fills every width.
 const styles = tv({
   compoundVariants: [
     {
@@ -199,7 +201,7 @@ export function DialogContent({
         data-slot={slot}
         role={role}
       >
-        {children}
+        <ButtonStyleContext value={{}}>{children}</ButtonStyleContext>
         {showCloseButton ? (
           <DialogClose
             aria-label={closeLabel}
