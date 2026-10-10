@@ -15,6 +15,7 @@ import {
   type ToggleVariant,
 } from '#/components/ui/inputs/toggle';
 import { cx } from '#/lib/cx';
+import { joined } from '#/lib/recipes';
 
 // An item without an id isn't part of the group's selection, so it's
 // required. An item can't see its group's size, so an icon item's name isn't
@@ -44,14 +45,14 @@ const ToggleGroupContext = createContext<GroupStyle>({
 });
 
 const groupStyles = tv({
-  base: 'group/toggle-group flex w-fit items-center orientation-vertical:flex-col orientation-vertical:items-stretch',
-  variants: { joined: { false: 'gap-2', true: '' } },
+  base: 'flex w-fit items-center orientation-vertical:flex-col orientation-vertical:items-stretch',
+  variants: { joined: { false: 'gap-2', true: joined } },
 });
 
-// The focused item rises so its outline isn't covered, and a selected item
-// keeps a contrasting border so selected neighbors don't merge into one block.
+// A selected joined item keeps a contrasting border so selected neighbors
+// don't merge into one block.
 const joinedItem =
-  'rounded-none selected:border-background forced-colors:selected:not-disabled:border-[HighlightText] focus-visible:z-10 group-orientation-horizontal/toggle-group:not-first:-ms-px group-orientation-horizontal/toggle-group:first:rounded-s-control group-orientation-horizontal/toggle-group:last:rounded-e-control group-orientation-vertical/toggle-group:not-first:-mt-px group-orientation-vertical/toggle-group:first:rounded-t-control group-orientation-vertical/toggle-group:last:rounded-b-control';
+  'selected:border-background forced-colors:selected:not-disabled:border-[HighlightText]';
 
 export function ToggleGroup({
   children,

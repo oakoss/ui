@@ -168,6 +168,22 @@ export const Joined: Story = {
   },
 };
 
+// A pressed joined item keeps its size, so it doesn't pull away from its
+// neighbors.
+export const JoinedPress: Story = {
+  args: { joined: true, variant: 'outline' },
+  play: async () => {
+    const center = document.querySelectorAll<HTMLElement>(
+      '[data-slot=toggle-group-item]',
+    )[1];
+    if (!center) throw new Error('No item');
+    const rest = center.getBoundingClientRect().width;
+    center.dataset.pressed = 'true';
+    await Promise.all(center.getAnimations().map((a) => a.finished));
+    await expect(center.getBoundingClientRect().width).toBe(rest);
+  },
+};
+
 // Right to left, the first item's rounded corners are on the right.
 export const JoinedRightToLeft: Story = {
   args: { joined: true, variant: 'outline' },
