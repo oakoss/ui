@@ -34,6 +34,7 @@ const forked = [
   'field',
   'hover-card',
   'kbd',
+  'pagination',
   'popover',
   'radio-group',
   'scroll-area',
