@@ -1,17 +1,12 @@
-import type { ReactNode } from 'react';
-
 import {
   TextField as AriaTextField,
   type TextFieldProps as AriaTextFieldProps,
-  type TextFieldRenderProps,
 } from 'react-aria-components';
 
 import {
-  FieldDescription,
-  FieldError,
-  type FieldErrorProps,
-  FieldLabel,
-  isEmptyNode,
+  fieldLayout,
+  type FieldMessages,
+  type Shortcut,
 } from '#/components/ui/inputs/field';
 import { Input, type InputSize } from '#/components/ui/inputs/input';
 import { Textarea, type TextareaProps } from '#/components/ui/inputs/textarea';
@@ -28,27 +23,7 @@ export type TextareaFieldProps = Omit<
 export type TextFieldProps = Omit<AriaTextFieldProps, 'children'> &
   Shortcut<LayoutProps>;
 
-type LayoutProps = {
-  children?: never;
-  description?: ReactNode;
-  errorMessage?: FieldErrorProps['children'];
-  errors?: FieldErrorProps['errors'];
-  label?: ReactNode;
-  placeholder?: string;
-  size?: InputSize;
-};
-
-type Messages = Pick<
-  LayoutProps,
-  'description' | 'errorMessage' | 'errors' | 'label'
->;
-
-// Children replace the layout, so they can't be mixed with its props.
-type Shortcut<Layout extends LayoutProps> =
-  | ({ children: Exclude<ReactNode, boolean | null | undefined> } & Partial<
-      Record<Exclude<keyof Layout, 'children'>, never>
-    >)
-  | Layout;
+type LayoutProps = { placeholder?: string; size?: InputSize } & FieldMessages;
 
 export function TextareaField({
   autoGrow,
@@ -71,7 +46,7 @@ export function TextareaField({
       data-slot="textarea-field"
     >
       {children ??
-        layout(
+        fieldLayout(
           <Textarea
             autoGrow={autoGrow}
             maxRows={maxRows}
@@ -103,7 +78,7 @@ export function TextField({
       data-slot="text-field"
     >
       {children ??
-        layout(<Input placeholder={placeholder} size={size} />, {
+        fieldLayout(<Input placeholder={placeholder} size={size} />, {
           description,
           errorMessage,
           errors,
@@ -111,31 +86,4 @@ export function TextField({
         })}
     </AriaTextField>
   );
-}
-
-function layout(
-  control: ReactNode,
-  { description, errorMessage, errors, label }: Messages,
-) {
-  return function Layout({ isRequired }: TextFieldRenderProps) {
-    return (
-      <>
-        {isEmptyNode(label) ? null : (
-          <FieldLabel>
-            {label}
-            {isRequired ? (
-              <span aria-hidden className="text-destructive-text">
-                *
-              </span>
-            ) : null}
-          </FieldLabel>
-        )}
-        {control}
-        {isEmptyNode(description) ? null : (
-          <FieldDescription>{description}</FieldDescription>
-        )}
-        <FieldError errors={errors}>{errorMessage}</FieldError>
-      </>
-    );
-  };
 }

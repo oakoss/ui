@@ -23,29 +23,21 @@ import {
 import {
   FieldDescription,
   FieldLabel,
+  type FieldMessages,
   isEmptyNode,
+  type Shortcut,
 } from '#/components/ui/inputs/field';
 import { cn, cx } from '#/lib/cx';
 import { focusRing } from '#/lib/recipes';
 
-export type SliderProps<T extends SliderValue = number> = (
-  | ComposedProps
-  | LayoutProps
-) &
-  Omit<AriaSliderProps<T>, 'children'> &
+export type SliderProps<T extends SliderValue = number> = Omit<
+  AriaSliderProps<T>,
+  'children'
+> &
+  Shortcut<Pick<FieldMessages, 'description' | 'label'>> &
   ThumbLabels<T>;
 
 export type SliderTrackProps = Omit<AriaSliderTrackProps, 'children'>;
-
-type ComposedProps = {
-  children: Exclude<ReactNode, boolean | null | undefined>;
-} & Partial<Record<'description' | 'label', never>>;
-
-type LayoutProps = {
-  children?: never;
-  description?: ReactNode;
-  label?: ReactNode;
-};
 
 type SliderValue = number | number[];
 

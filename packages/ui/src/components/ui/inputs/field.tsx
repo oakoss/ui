@@ -144,6 +144,20 @@ export type FieldErrorProps = {
 export type FieldLegendProps = ComponentProps<'legend'> &
   VariantProps<typeof legendStyles>;
 
+export type FieldMessages = {
+  description?: ReactNode;
+  errorMessage?: FieldErrorProps['children'];
+  errors?: FieldErrorProps['errors'];
+  label?: ReactNode;
+};
+
+// Children replace the default layout, so they can't mix with its props.
+export type Shortcut<Layout> =
+  | ({ children: Exclude<ReactNode, boolean | null | undefined> } & Partial<
+      Record<keyof Layout, never>
+    >)
+  | ({ children?: never } & Layout);
+
 export function FieldDescription({ className, ...props }: AriaTextProps) {
   return (
     <AriaText
@@ -215,6 +229,32 @@ export function FieldLabel({ className, ...props }: AriaLabelProps) {
     return <LabelContext value={null}>{label}</LabelContext>;
   }
   return label;
+}
+
+// React Aria render-prop children for a field; reads only isRequired.
+export function fieldLayout(
+  control: ReactNode,
+  { description, errorMessage, errors, label }: FieldMessages,
+) {
+  return ({ isRequired }: { isRequired: boolean }) => (
+    <>
+      {isEmptyNode(label) ? null : (
+        <FieldLabel>
+          {label}
+          {isRequired ? (
+            <span aria-hidden className="text-destructive-text">
+              *
+            </span>
+          ) : null}
+        </FieldLabel>
+      )}
+      {control}
+      {isEmptyNode(description) ? null : (
+        <FieldDescription>{description}</FieldDescription>
+      )}
+      <FieldError errors={errors}>{errorMessage}</FieldError>
+    </>
+  );
 }
 
 export function FieldLegend({

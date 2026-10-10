@@ -4,7 +4,7 @@ import {
   RadioGroup,
   RadioGroupItem,
 } from '@oakoss/ui/components/ui/inputs/radio-group';
-import { expect, fn, userEvent } from 'storybook/test';
+import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { part } from '../parts';
 
@@ -84,6 +84,24 @@ export const Validation: Story = {
       'Up to 20 seats. Choose a plan. Billed monthly.',
     );
     await expect(group).toHaveAttribute('aria-invalid', 'true');
+    const label = part('field-label', group);
+    await expect(within(label).getByText('*')).toBeVisible();
+    // The layout TextField and RadioGroup share: label, control, description,
+    // then error.
+    await expect(
+      [...group.children].map((child) =>
+        child instanceof HTMLElement ? child.dataset.slot : undefined,
+      ),
+    ).toEqual(['field-label', undefined, 'field-description', 'field-error']);
+  },
+};
+
+export const Errors: Story = {
+  args: { errors: ['Choose a plan.'], isInvalid: true },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole('radiogroup', { name: 'Plan' }),
+    ).toHaveAccessibleDescription('Choose a plan.');
   },
 };
 
