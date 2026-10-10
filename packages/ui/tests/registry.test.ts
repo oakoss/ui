@@ -148,7 +148,7 @@ test('the base item sets the icon library and installs the theme', () => {
 // The theme item's cssVars can't carry color-scheme, so the base item does.
 test('the base item sets the color-scheme theme.css sets', () => {
   const theme = readFileSync(
-    new URL('styles/theme.css', import.meta.url),
+    new URL('../src/styles/theme.css', import.meta.url),
     'utf-8',
   );
   const scheme = (selector: string) =>
@@ -192,7 +192,7 @@ function stylesheet(rules: unknown): string {
 test('the base item ships base.css', () => {
   const layer = baseLayer();
   const source = readFileSync(
-    new URL('styles/base.css', import.meta.url),
+    new URL('../src/styles/base.css', import.meta.url),
     'utf-8',
   );
   expect(minified(stylesheet({ '@layer base': layer }))).toBe(minified(source));
