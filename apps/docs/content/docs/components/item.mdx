@@ -1,0 +1,173 @@
+---
+title: Item
+description: A row of media, title, description and actions.
+item: item
+reactAria: https://react-aria.adobe.com/Link
+---
+
+import { ItemDemo } from '#/components/demos/item-demo';
+import { ItemGroupDemo } from '#/components/demos/item-group';
+import { ItemLink } from '#/components/demos/item-link';
+
+<ComponentPreview name="item-demo">
+  <ItemDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="item" />
+
+## Usage
+
+```tsx
+import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemTitle,
+} from '#/components/ui/data/item';
+
+<Item variant="outline">
+  <ItemContent>
+    <ItemTitle>Billing updated</ItemTitle>
+    <ItemDescription>Your card is now the default.</ItemDescription>
+  </ItemContent>
+</Item>;
+```
+
+## Examples
+
+### Group
+
+`ItemGroup` makes its Items a list. Put the Items directly inside it;
+`ItemSeparator` can sit between them.
+
+<ComponentPreview name="item-group">
+  <ItemGroupDemo />
+</ComponentPreview>
+
+### Link
+
+`href` on `Item` turns its `ItemTitle` into a link stretched over the whole
+row. Buttons in `ItemActions` and links in `ItemDescription` stay pressable
+above it. A linked Item needs an `ItemTitle`, which carries the link.
+
+<ComponentPreview name="item-link">
+  <ItemLink />
+</ComponentPreview>
+
+## Accessibility
+
+A linked Item's title is a React Aria `Link`, so it follows your router when
+the app sets up React Aria's
+[`RouterProvider`](https://react-aria.adobe.com/frameworks). To use your
+router's own link component, pass `render` to `Item`; it reaches the title
+link. Don't wrap `Item` in a router's `createLink`: the row is a `div`, not
+the link.
+
+This component adds:
+
+- **Lists:** `ItemGroup` is a `list` whose direct Items are its list items,
+  and `ItemSeparator` is hidden from screen readers, since a list allows only
+  list items.
+- **Links:** the row is never a link itself. The title is, so the link's name
+  is the title alone, and buttons in the row aren't nested inside a link.
+- **Focus:** keyboard focus on the title link outlines the whole row.
+- **Media:** `ItemMedia` is decorative and hidden from screen readers unless
+  you name it with `aria-label`, which makes it an image.
+- **Titles:** `ItemTitle` is text by default; set `level` to make it a
+  heading. A long title stays on one line.
+- **Windows High Contrast:** outline and muted Items keep their border, and
+  the default look stays borderless, so a list doesn't become a stack of
+  boxes.
+
+| Key     | Action                                    |
+| ------- | ----------------------------------------- |
+| `Tab`   | Moves to the title link, then each action |
+| `Enter` | Follows the focused link                  |
+
+React Aria adds no keys.
+
+## API
+
+### Item
+
+A `div`, and accepts all its props.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/item.tsx"
+  name="ItemProps"
+/>
+
+Also accepts `href`, `rel`, `target`, `routerOptions` and `render` from React
+Aria's [`Link`](https://react-aria.adobe.com/Link#api), which go to the title
+link.
+
+#### Data attributes
+
+| Attribute      | Present when                            |
+| -------------- | --------------------------------------- |
+| `data-slot`    | Always `item`                           |
+| `data-size`    | Always; `md`, `sm` or `xs`              |
+| `data-variant` | Always; `default`, `outline` or `muted` |
+
+### ItemGroup
+
+A `div` with the `list` role, and accepts all its props.
+
+#### Data attributes
+
+| Attribute   | Present when        |
+| ----------- | ------------------- |
+| `data-slot` | Always `item-group` |
+
+### ItemTitle
+
+A `div`, or a heading with `level`. In a linked Item it holds a React Aria
+[`Link`](https://react-aria.adobe.com/Link#api), which takes the `item-title`
+slot.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/item.tsx"
+  name="ItemTitleProps"
+/>
+
+#### Data attributes
+
+| Attribute            | Present when                                |
+| -------------------- | ------------------------------------------- |
+| `data-slot`          | Always `item-title`                         |
+| `data-hovered`       | On the link, while a pointer hovers the row |
+| `data-focus-visible` | On the link, while it has keyboard focus    |
+
+### ItemMedia
+
+A `div`, and accepts all its props.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/item.tsx"
+  name="ItemMediaProps"
+/>
+
+#### Data attributes
+
+| Attribute      | Present when                         |
+| -------------- | ------------------------------------ |
+| `data-slot`    | Always `item-media`                  |
+| `data-variant` | Always; `default`, `icon` or `image` |
+
+### ItemContent, ItemDescription, ItemActions and ItemSeparator
+
+A `div`, a `p`, a `div` and an `hr`, accepting all their props.
+
+#### Data attributes
+
+| Attribute   | Present when                                                                  |
+| ----------- | ----------------------------------------------------------------------------- |
+| `data-slot` | Always `item-content`, `item-description`, `item-actions` or `item-separator` |

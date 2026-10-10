@@ -100,6 +100,17 @@ const componentVariables = defineConfig({
       },
     },
     {
+      files: ['src/components/ui/data/item.tsx'],
+      rules: {
+        'shadcn/no-arbitrary-values': [
+          'error',
+          // Forced colors repaint a transparent border, so the default look
+          // takes the page color to stay borderless.
+          { allow: ['forced-colors:border-[Canvas]'] },
+        ],
+      },
+    },
+    {
       files: [
         'src/components/ui/overlays/popover.tsx',
         'src/components/ui/overlays/tooltip.tsx',
