@@ -35,6 +35,7 @@ const forked = [
   'field',
   'hover-card',
   'input',
+  'input-group',
   'item',
   'kbd',
   'pagination',

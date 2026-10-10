@@ -6,6 +6,7 @@ reactAria: https://react-aria.adobe.com/TextField
 ---
 
 import { TextFieldCustomLayout } from '#/components/demos/text-field-custom-layout';
+import { TextFieldDecorations } from '#/components/demos/text-field-decorations';
 import { TextFieldDemo } from '#/components/demos/text-field-demo';
 import { TextFieldSizes } from '#/components/demos/text-field-sizes';
 import { TextFieldValidation } from '#/components/demos/text-field-validation';
@@ -47,6 +48,21 @@ the same size line up.
   <TextFieldSizes />
 </ComponentPreview>
 
+### Decorations
+
+`start` and `end` put text or an icon inside the border, in an
+[Input Group](/docs/components/input-group). Text, such as a unit, is added to
+the input's description after the field's own, so screen readers hear it; name
+the unit in the label too. An element is decoration: mark an icon
+`aria-hidden`, or name it. A button passed as `end` isn't disabled with the
+field, so compose an Input Group in `children` for one.
+
+<ComponentPreview name="text-field-decorations">
+  <TextFieldDecorations />
+</ComponentPreview>
+
+On `TextareaField`, `start` and `end` sit above and below the textarea.
+
 ### Validation
 
 `errors` takes a form library's errors: strings, or objects with a `message`,
@@ -76,7 +92,7 @@ error the same way:
 </ComponentPreview>
 
 Children and the layout props (`label`, `description`, `errorMessage`,
-`errors`, `placeholder`, `size`) can't be mixed; set those on the parts
+`errors`, `placeholder`, `size`, `start`, `end`) can't be mixed; set those on the parts
 instead.
 
 ## Accessibility

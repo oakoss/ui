@@ -45,6 +45,15 @@ test("TextareaField's children and layout props are exclusive", () => {
   expect([...valid, ...mixed]).toHaveLength(4);
 });
 
+test('decorations belong to the default layout', () => {
+  const valid: TextFieldProps[] = [{ end: 'kg', start: '$' }];
+  // @ts-expect-error children replace the layout
+  const text: TextFieldProps = { children: 'Custom', end: 'kg' };
+  // @ts-expect-error children replace the layout
+  const area: TextareaFieldProps = { children: 'Custom', start: 'To' };
+  expect([...valid, text, area]).toHaveLength(3);
+});
+
 test('each field takes only its own control props', () => {
   // @ts-expect-error rows belong to TextareaField
   const rows: TextFieldProps = { minRows: 2 };

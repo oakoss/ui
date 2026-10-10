@@ -450,6 +450,7 @@
         "oakoss/ui/theme",
         "oakoss/ui/field",
         "oakoss/ui/input",
+        "oakoss/ui/input-group",
         "oakoss/ui/textarea"
       ],
       "dependencies": ["cn", "react-aria-components"],
@@ -1106,6 +1107,38 @@
           "path": "src/components/ui/inputs/toggle.tsx",
           "type": "registry:ui",
           "target": "@ui/inputs/toggle.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "input-group",
+      "type": "registry:ui",
+      "title": "Input Group",
+      "description": "Text, icons and buttons inside an input's or textarea's border, built on React Aria's Group; clicking an addon focuses the control.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/input-group.tsx"
+      },
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/button",
+        "oakoss/ui/input"
+      ],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/input-group.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/input-group.tsx"
         },
         {
           "path": "src/lib/cx.ts",
