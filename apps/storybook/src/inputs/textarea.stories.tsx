@@ -158,6 +158,8 @@ export const ForcedColors: Story = {
   play: async ({ canvas }) => {
     const textarea = canvas.getByRole('textbox', { name: 'Bio' });
     const native = canvas.getByRole('textbox', { name: 'Native' });
+    // A color transition may still be running when the border is read.
+    for (const animation of textarea.getAnimations()) animation.finish();
     await expect(getComputedStyle(textarea).borderTopStyle).toBe('solid');
     await expect(getComputedStyle(textarea).borderTopColor).toBe(
       getComputedStyle(native).borderTopColor,
