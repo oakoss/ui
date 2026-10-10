@@ -100,7 +100,7 @@ export function BreadcrumbLink({ className, ...props }: AriaLinkProps) {
       className={cx(
         [
           linkStyles,
-          'hover:text-foreground disabled:not-current:opacity-50 current:text-foreground',
+          'hover:text-foreground disabled:not-current:opacity-50 current:font-semibold current:text-foreground',
         ],
         className,
       )}
@@ -125,12 +125,13 @@ export function BreadcrumbList<T extends object>({
 }
 
 // React Aria marks the last item's link as the current page and disables it.
+// Weight as well as color marks it, so the cue isn't color alone.
 export function BreadcrumbPage({ className, ...props }: AriaLinkProps) {
   return (
     <AriaLink
       data-slot="breadcrumb-page"
       {...props}
-      className={cx([linkStyles, 'font-normal text-foreground'], className)}
+      className={cx([linkStyles, 'font-semibold text-foreground'], className)}
     />
   );
 }

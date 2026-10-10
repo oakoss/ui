@@ -48,8 +48,9 @@ async function settle(element: Element) {
   await Promise.all(element.getAnimations().map((a) => a.finished));
 }
 
-// The current page reads as the foreground at full strength, not faded like
-// a disabled link, whichever part renders it.
+// The current page reads as the foreground at full strength and semibold, so
+// the cue isn't color alone, and isn't faded like a disabled link, whichever
+// part renders it.
 export const CurrentPage: Story = {
   play: async ({ canvas }) => {
     const link = getComputedStyle(canvas.getByRole('link', { name: 'Home' }));
@@ -57,7 +58,9 @@ export const CurrentPage: Story = {
       const current = getComputedStyle(canvas.getByRole('link', { name }));
       await expect(current.opacity).toBe('1');
       await expect(current.color).not.toBe(link.color);
+      await expect(current.fontWeight).toBe('600');
     }
+    await expect(link.fontWeight).not.toBe('600');
   },
   render: (args) => (
     <div className="flex flex-col gap-4">
@@ -205,7 +208,8 @@ export const TargetSpacing: Story = {
   ),
 };
 
-// Forced colors draw no box around a link at rest.
+// Forced colors draw no box around a link at rest, and the current page's
+// weight, the cue that isn't color, survives them.
 export const ForcedColors: Story = {
   parameters: {
     a11y: { config: { rules: [{ enabled: false, id: 'color-contrast' }] } },
@@ -214,6 +218,10 @@ export const ForcedColors: Story = {
     await expect(matchMedia('(forced-colors: active)').matches).toBe(true);
     const home = getComputedStyle(canvas.getByRole('link', { name: 'Home' }));
     await expect(home.outlineStyle).toBe('none');
+    await expect(
+      getComputedStyle(canvas.getByRole('link', { name: 'Breadcrumb' }))
+        .fontWeight,
+    ).toBe('600');
   },
   tags: ['forced-colors'],
 };
