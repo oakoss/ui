@@ -15,6 +15,7 @@ import {
   type AsyncListData,
   ButtonContext,
   ComboBoxStateContext,
+  useSlottedContext,
 } from 'react-aria-components';
 
 import type { FieldMessages } from '#/components/ui/inputs/field';
@@ -113,11 +114,7 @@ export function Combobox<T extends object>({
     >
       {layout(
         <>
-          <Field
-            {...parts}
-            decorations={decorations}
-            isClearable={props.isDisabled !== true && props.isReadOnly !== true}
-          />
+          <Field {...parts} decorations={decorations} />
           <ComboboxContent>
             <ComboboxList<T> {...parts} dependencies={dependencies}>
               {children}
@@ -182,10 +179,12 @@ export function ComboboxTrigger({ className }: { className?: string }) {
   );
 }
 
-// Empties the input and the value with it, leaving focus in the input: taking
-// focus itself would drop it to the page when the button unmounts. It isn't a
-// Tab stop, since deleting the text does the same, and it opts out of the
-// field's button context, which belongs to the trigger.
+// Empties the input and the value, which a controlled pair keeps otherwise,
+// leaving focus in the input: taking focus would drop it to the page when the
+// button unmounts. It isn't a Tab stop, since deleting the text does the same.
+// It hides when React Aria disables the trigger, as it does for a disabled or
+// read-only field from props or context, then opts out of the trigger's
+// button context.
 function ClearButton({
   inputRef,
   label,
@@ -194,7 +193,14 @@ function ClearButton({
   label: string;
 }) {
   const state = use(ComboBoxStateContext);
-  if (state === null || state.inputValue === '') return null;
+  const trigger = useSlottedContext(ButtonContext);
+  if (
+    state === null ||
+    state.inputValue === '' ||
+    trigger?.isDisabled === true
+  ) {
+    return null;
+  }
   return (
     <ButtonContext value={null}>
       <AriaButton
@@ -203,6 +209,7 @@ function ClearButton({
         data-slot="combobox-clear"
         excludeFromTabOrder
         onPress={() => {
+          state.setValue(null);
           state.setInputValue('');
           inputRef.current?.focus();
         }}
@@ -217,12 +224,11 @@ function ClearButton({
 function Field({
   clearLabel = 'Clear',
   decorations,
-  isClearable,
   loadingLabel = 'Loading',
   loadingState,
   placeholder,
   size,
-}: { decorations: InputGroupSlots; isClearable: boolean } & Omit<
+}: { decorations: InputGroupSlots } & Omit<
   Parts,
   'emptyLabel' | 'onLoadMore'
 >) {
@@ -237,9 +243,7 @@ function Field({
           {useDelayed(isLoading) ? (
             <Spinner data-slot="combobox-spinner" label={loadingLabel} />
           ) : null}
-          {isClearable ? (
-            <ClearButton inputRef={inputRef} label={clearLabel} />
-          ) : null}
+          <ClearButton inputRef={inputRef} label={clearLabel} />
           <ComboboxTrigger />
         </>
       }

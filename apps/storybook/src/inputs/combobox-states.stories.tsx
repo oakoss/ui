@@ -6,6 +6,7 @@ import {
   ComboboxItem,
 } from '@oakoss/ui/components/ui/inputs/combobox';
 import { useState } from 'react';
+import { ComboBoxContext, type Key } from 'react-aria-components';
 import { expect, fn, screen, userEvent, waitFor, within } from 'storybook/test';
 
 const FruitCombobox = Combobox<Fruit>;
@@ -68,6 +69,55 @@ export const ReadOnly: Story = {
     await expect(
       canvas.queryByRole('button', { hidden: true, name: 'Clear' }),
     ).toBeNull();
+  },
+};
+
+// Read-only from a ComboBoxContext hides the clear button too.
+export const ReadOnlyFromContext: Story = {
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole('combobox', { name: 'Fruit' })).toHaveValue(
+      'Pear',
+    );
+    await expect(
+      canvas.queryByRole('button', { hidden: true, name: 'Clear' }),
+    ).toBeNull();
+  },
+  render: () => (
+    <ComboBoxContext value={{ isReadOnly: true }}>
+      <FruitCombobox defaultItems={fruits} defaultValue="pear" label="Fruit">
+        {(fruit) => <ComboboxItem>{fruit.name}</ComboboxItem>}
+      </FruitCombobox>
+    </ComboBoxContext>
+  ),
+};
+
+// With value and inputValue both controlled, clearing still clears the value.
+export const ControlledClear: Story = {
+  play: async ({ canvas }) => {
+    const input = canvas.getByRole('combobox', { name: 'Fruit' });
+    await expect(input).toHaveValue('Pear');
+    await userEvent.click(canvas.getByRole('button', { name: 'Clear' }));
+    await expect(input).toHaveValue('');
+    await expect(canvas.getByText('Value: none')).toBeVisible();
+  },
+  render: function Render() {
+    const [value, setValue] = useState<Key | null>('pear');
+    const [inputValue, setInputValue] = useState('Pear');
+    return (
+      <div className="flex flex-col gap-2">
+        <FruitCombobox
+          defaultItems={fruits}
+          inputValue={inputValue}
+          label="Fruit"
+          onChange={setValue}
+          onInputChange={setInputValue}
+          value={value}
+        >
+          {(fruit) => <ComboboxItem>{fruit.name}</ComboboxItem>}
+        </FruitCombobox>
+        <p>Value: {value ?? 'none'}</p>
+      </div>
+    );
   },
 };
 

@@ -93,7 +93,11 @@ export function NativeSelect({
     onChange: props.onChange,
   });
   return (
-    <FieldContexts ids={field.ids} isInvalid={field.isInvalid}>
+    <FieldContexts
+      errors={field.errors}
+      ids={field.ids}
+      isInvalid={field.isInvalid}
+    >
       <div
         className={cn('flex flex-col gap-2', className)}
         data-disabled={props.disabled === true || undefined}
@@ -179,13 +183,19 @@ function Control({
 // select, and FieldDescription and FieldError describe it.
 function FieldContexts({
   children,
+  errors,
   ids,
   isInvalid,
 }: {
   children: ReactNode;
+  errors?: readonly unknown[];
   ids: Ids;
   isInvalid: boolean;
 }) {
+  // What an errorMessage render function receives as validationErrors.
+  const validationErrors = (errors ?? []).filter(
+    (error): error is string => typeof error === 'string',
+  );
   return (
     <Provider
       values={[
@@ -201,7 +211,7 @@ function FieldContexts({
         ],
         [
           FieldErrorContext,
-          { isInvalid, validationDetails: valid, validationErrors: [] },
+          { isInvalid, validationDetails: valid, validationErrors },
         ],
       ]}
     >

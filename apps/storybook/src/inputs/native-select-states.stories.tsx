@@ -87,6 +87,24 @@ export const FormErrors: Story = {
   ),
 };
 
+// An errorMessage render function receives the Form's errors.
+export const FormErrorRenderFunction: Story = {
+  args: {
+    errorMessage: ({ validationErrors }) => validationErrors.join(' '),
+    name: 'fruit',
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole('combobox', { name: 'Fruit' }),
+    ).toHaveAccessibleDescription('Choose a fruit.');
+  },
+  render: (args) => (
+    <Form validationErrors={{ fruit: 'Choose a fruit.' }}>
+      <NativeSelect {...args} />
+    </Form>
+  ),
+};
+
 // Choosing an option clears the Form's error, as on React Aria's own fields.
 export const FormErrorClears: Story = {
   args: { name: 'fruit' },
