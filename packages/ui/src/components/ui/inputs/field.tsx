@@ -7,8 +7,6 @@ import {
 import {
   FieldError as AriaFieldError,
   type FieldErrorProps as AriaFieldErrorProps,
-  Input as AriaInput,
-  type InputProps as AriaInputProps,
   Label as AriaLabel,
   type LabelProps as AriaLabelProps,
   Text as AriaText,
@@ -20,7 +18,6 @@ import { tv, type VariantProps } from 'tailwind-variants/lite';
 
 import { Separator } from '#/components/ui/layout/separator';
 import { cn, cx } from '#/lib/cx';
-import { inputFocusRing } from '#/lib/recipes';
 
 export function FieldSet({ className, ...props }: ComponentProps<'fieldset'>) {
   return (
@@ -147,6 +144,20 @@ export type FieldErrorProps = {
 export type FieldLegendProps = ComponentProps<'legend'> &
   VariantProps<typeof legendStyles>;
 
+export type FieldMessages = {
+  description?: ReactNode;
+  errorMessage?: FieldErrorProps['children'];
+  errors?: FieldErrorProps['errors'];
+  label?: ReactNode;
+};
+
+// Children replace the default layout, so they can't mix with its props.
+export type Shortcut<Layout> =
+  | ({ children: Exclude<ReactNode, boolean | null | undefined> } & Partial<
+      Record<keyof Layout, never>
+    >)
+  | ({ children?: never } & Layout);
+
 export function FieldDescription({ className, ...props }: AriaTextProps) {
   return (
     <AriaText
@@ -220,6 +231,32 @@ export function FieldLabel({ className, ...props }: AriaLabelProps) {
   return label;
 }
 
+// React Aria render-prop children for a field; reads only isRequired.
+export function fieldLayout(
+  control: ReactNode,
+  { description, errorMessage, errors, label }: FieldMessages,
+) {
+  return ({ isRequired }: { isRequired: boolean }) => (
+    <>
+      {isEmptyNode(label) ? null : (
+        <FieldLabel>
+          {label}
+          {isRequired ? (
+            <span aria-hidden className="text-destructive-text">
+              *
+            </span>
+          ) : null}
+        </FieldLabel>
+      )}
+      {control}
+      {isEmptyNode(description) ? null : (
+        <FieldDescription>{description}</FieldDescription>
+      )}
+      <FieldError errors={errors}>{errorMessage}</FieldError>
+    </>
+  );
+}
+
 export function FieldLegend({
   className,
   variant = 'legend',
@@ -260,31 +297,4 @@ function messageOf(error: unknown): string | undefined {
     return typeof error.message === 'string' ? error.message : undefined;
   }
   return undefined;
-}
-
-const inputStyles = tv({
-  base: [
-    inputFocusRing,
-    'w-full min-w-0 rounded-control border border-input bg-field px-control-x py-1 text-ui text-foreground transition-colors placeholder:text-muted-foreground',
-    'disabled:cursor-not-allowed disabled:opacity-50 data-invalid:border-destructive-text',
-  ],
-  defaultVariants: { size: 'md' },
-  variants: {
-    size: { lg: 'h-control-lg', md: 'h-control', sm: 'h-control-sm' },
-  },
-});
-
-export type InputProps = { size?: InputSize } & Omit<AriaInputProps, 'size'>;
-
-export type InputSize = NonNullable<VariantProps<typeof inputStyles>['size']>;
-
-export function Input({ className, size = 'md', ...props }: InputProps) {
-  return (
-    <AriaInput
-      className={cx(inputStyles({ size }), className)}
-      data-size={size}
-      data-slot="input"
-      {...props}
-    />
-  );
 }

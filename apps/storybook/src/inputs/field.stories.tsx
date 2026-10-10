@@ -7,8 +7,8 @@ import {
   FieldLabel,
   FieldLegend,
   FieldSet,
-  Input,
 } from '@oakoss/ui/components/ui/inputs/field';
+import { Input } from '@oakoss/ui/components/ui/inputs/input';
 import { TextField } from '@oakoss/ui/components/ui/inputs/text-field';
 import { Button, Form, Link, SearchField } from 'react-aria-components';
 import { expect, userEvent } from 'storybook/test';

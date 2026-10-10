@@ -1,8 +1,8 @@
 import {
   FieldDescription,
   FieldLabel,
-  Input,
 } from '@oakoss/ui/components/ui/inputs/field';
+import { Input } from '@oakoss/ui/components/ui/inputs/input';
 import { SearchField } from 'react-aria-components';
 
 export function FieldDemo() {

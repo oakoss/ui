@@ -351,13 +351,78 @@
       "meta": {
         "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/field.tsx"
       },
-      "registryDependencies": ["oakoss/ui/theme", "oakoss/ui/separator"],
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/separator",
+        "oakoss/ui/input"
+      ],
       "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
       "files": [
         {
           "path": "src/components/ui/inputs/field.tsx",
           "type": "registry:ui",
           "target": "@ui/inputs/field.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "input",
+      "type": "registry:ui",
+      "title": "Input",
+      "description": "Single-line text control built on React Aria Components, in control heights that match Button; use it inside a text field.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/input.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/input.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/input.tsx"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "textarea",
+      "type": "registry:ui",
+      "title": "Textarea",
+      "description": "Multiline text control built on React Aria Components that grows with its content between minRows and maxRows; use it inside a text field.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/textarea.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme", "oakoss/ui/input"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/textarea.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/textarea.tsx"
         },
         {
           "path": "src/lib/recipes.ts",
@@ -380,8 +445,14 @@
       "name": "text-field",
       "type": "registry:ui",
       "title": "Text Field",
-      "description": "Text input with a label, description and error, built on React Aria Components; pass children to compose the field parts.",
-      "registryDependencies": ["oakoss/ui/theme", "oakoss/ui/field"],
+      "description": "Text input or multiline textarea with a label, description and error, built on React Aria Components; pass children to compose the field parts.",
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/field",
+        "oakoss/ui/input",
+        "oakoss/ui/input-group",
+        "oakoss/ui/textarea"
+      ],
       "dependencies": ["cn", "react-aria-components"],
       "files": [
         {
@@ -1036,6 +1107,38 @@
           "path": "src/components/ui/inputs/toggle.tsx",
           "type": "registry:ui",
           "target": "@ui/inputs/toggle.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "input-group",
+      "type": "registry:ui",
+      "title": "Input Group",
+      "description": "Text, icons and buttons inside an input's or textarea's border, built on React Aria's Group; clicking an addon focuses the control.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/input-group.tsx"
+      },
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/button",
+        "oakoss/ui/input"
+      ],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/input-group.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/input-group.tsx"
         },
         {
           "path": "src/lib/cx.ts",

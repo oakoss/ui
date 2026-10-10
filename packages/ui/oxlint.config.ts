@@ -100,6 +100,29 @@ const componentVariables = defineConfig({
       },
     },
     {
+      files: ['src/components/ui/inputs/textarea.tsx'],
+      rules: {
+        'shadcn/no-arbitrary-values': [
+          'error',
+          // Heights and padding derive from the control height and line
+          // height, so one row lines up with an Input of the same size.
+          {
+            allow: [
+              '[--textarea-height:var(--spacing-control)]',
+              '[--textarea-height:var(--spacing-control-lg)]',
+              '[--textarea-height:var(--spacing-control-sm)]',
+              'max-h-[calc(var(--textarea-height)+(var(--textarea-max-rows)-1)*1lh)]',
+              'min-h-[calc(var(--textarea-height)+(var(--textarea-min-rows)-1)*1lh)]',
+              'py-[calc((var(--textarea-height)-1lh-2px)/2)]',
+            ],
+          },
+        ],
+        // The rule can't read composeRenderProps, which sets the row counts
+        // while keeping React Aria's style type.
+        'shadcn/no-inline-styles': 'off',
+      },
+    },
+    {
       files: ['src/components/ui/data/item.tsx'],
       rules: {
         'shadcn/no-arbitrary-values': [

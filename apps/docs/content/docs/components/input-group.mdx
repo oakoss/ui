@@ -1,0 +1,133 @@
+---
+title: Input Group
+description: Text, icons and buttons inside an input's border.
+item: input-group
+reactAria: https://react-aria.adobe.com/Group
+---
+
+import { InputGroupDemo } from '#/components/demos/input-group-demo';
+import { InputGroupTextarea } from '#/components/demos/input-group-textarea';
+
+<ComponentPreview name="input-group-demo">
+  <InputGroupDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="input-group" />
+
+## Usage
+
+```tsx
+import { TextField } from 'react-aria-components';
+
+import { FieldLabel } from '#/components/ui/inputs/field';
+import { Input } from '#/components/ui/inputs/input';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
+} from '#/components/ui/inputs/input-group';
+
+<TextField>
+  <FieldLabel>Price</FieldLabel>
+  <InputGroup>
+    <InputGroupAddon>
+      <InputGroupText>$</InputGroupText>
+    </InputGroupAddon>
+    <Input />
+  </InputGroup>
+</TextField>;
+```
+
+Put the `Input` or `Textarea` directly inside the group: the group draws the
+border and focus outline, and the control drops its own. `size` on the group
+(`sm`, `md`, `lg`) sets the height. For text or an icon alone,
+[Text Field](/docs/components/text-field#decorations)'s `start` and `end` do the
+same without composing. To attach a label outside the border, use
+[Button Group](/docs/components/button-group) with `ButtonGroupText`.
+
+## Examples
+
+### With a textarea
+
+`align="block-start"` or `"block-end"` puts an addon above or below a
+`Textarea`, and the group grows with it.
+
+<ComponentPreview name="input-group-textarea">
+  <InputGroupTextarea />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria renders a `div` for the group.
+
+This component adds:
+
+- **Role:** a group with `aria-label` or `aria-labelledby` has the `group`
+  role, and an unnamed one the `presentation` role, so it adds nothing for
+  screen readers. Inside a React Aria field, leave it unnamed: the input keeps
+  the field's name and description.
+- **Addon text:** an addon's text isn't part of the input's name, so a unit or
+  prefix belongs in the label too ("Weight, in kilograms"), or use Text Field's
+  `end`, which adds it to the description.
+- **Focus:** the outline wraps the whole group while the input has focus, and a
+  focused addon button shows only its own.
+- **Pointer:** clicking an addon focuses the input, except on something
+  interactive of its own. Buttons in an addon are small and ghost, with no 44px
+  hit area, which would cover the input.
+- **State:** the border turns destructive when the input is invalid, and the
+  group fades once when it's disabled.
+
+The input keeps the browser's own keyboard behavior; React Aria adds no keys.
+
+## API
+
+### InputGroup
+
+Extends React Aria's [`Group`](https://react-aria.adobe.com/Group#api), and
+accepts all its props except `role`, which follows whether it's named.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/input-group.tsx"
+  name="InputGroupProps"
+/>
+
+#### Data attributes
+
+| Attribute            | Present when                        |
+| -------------------- | ----------------------------------- |
+| `data-slot`          | Always `input-group`                |
+| `data-size`          | Always: `sm`, `md` or `lg`          |
+| `data-disabled`      | Its field is disabled               |
+| `data-invalid`       | Its field is invalid                |
+| `data-hovered`       | A pointer hovers it                 |
+| `data-focus-within`  | Something inside has focus          |
+| `data-focus-visible` | Something inside has keyboard focus |
+
+### InputGroupAddon
+
+A `div` beside or around the control, and accepts all its props.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/input-group.tsx"
+  name="InputGroupAddonProps"
+/>
+
+#### Data attributes
+
+| Attribute    | Present when                                                     |
+| ------------ | ---------------------------------------------------------------- |
+| `data-slot`  | Always `input-group-addon`                                       |
+| `data-align` | Always: `inline-start`, `inline-end`, `block-start`, `block-end` |
+
+### Other parts
+
+| Part               | Extends                                 | `data-slot`          |
+| ------------------ | --------------------------------------- | -------------------- |
+| `InputGroupButton` | Our [`Button`](/docs/components/button) | `input-group-button` |
+| `InputGroupText`   | `<span>`                                | `input-group-text`   |

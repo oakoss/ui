@@ -3,7 +3,7 @@ import {
   ButtonGroup,
   ButtonGroupText,
 } from '@oakoss/ui/components/ui/inputs/button-group';
-import { Input } from '@oakoss/ui/components/ui/inputs/field';
+import { Input } from '@oakoss/ui/components/ui/inputs/input';
 
 export function ButtonGroupInput() {
   return (

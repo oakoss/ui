@@ -1,6 +1,7 @@
 import * as Icon from '@oakoss/ui/components/icons';
 import { Button } from '@oakoss/ui/components/ui/inputs/button';
-import { FieldLabel, Input } from '@oakoss/ui/components/ui/inputs/field';
+import { FieldLabel } from '@oakoss/ui/components/ui/inputs/field';
+import { Input } from '@oakoss/ui/components/ui/inputs/input';
 import { TextField } from '@oakoss/ui/components/ui/inputs/text-field';
 import { type ReactNode, useState } from 'react';
 import {

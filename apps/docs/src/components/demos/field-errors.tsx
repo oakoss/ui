@@ -1,8 +1,5 @@
-import {
-  FieldError,
-  FieldLabel,
-  Input,
-} from '@oakoss/ui/components/ui/inputs/field';
+import { FieldError, FieldLabel } from '@oakoss/ui/components/ui/inputs/field';
+import { Input } from '@oakoss/ui/components/ui/inputs/input';
 import { TextField } from '@oakoss/ui/components/ui/inputs/text-field';
 
 // Duplicates and blank entries are dropped.

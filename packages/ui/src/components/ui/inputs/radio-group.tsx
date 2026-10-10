@@ -11,9 +11,8 @@ import { tv } from 'tailwind-variants/lite';
 
 import {
   FieldDescription,
-  FieldError,
-  type FieldErrorProps,
-  FieldLabel,
+  fieldLayout,
+  type FieldMessages,
   isEmptyNode,
 } from '#/components/ui/inputs/field';
 import { cn, cx } from '#/lib/cx';
@@ -26,16 +25,13 @@ export type RadioGroupItemProps = {
 
 export type RadioGroupProps = {
   children?: ReactNode;
-  description?: ReactNode;
-  errorMessage?: FieldErrorProps['children'];
-  errors?: FieldErrorProps['errors'];
-  label?: ReactNode;
   // A 44px hit area around each dot; turn it off where options sit closer
   // than that, or neighbors take each other's clicks.
   targetSize?: boolean;
   // Cards make each whole option the click target.
   variant?: 'card' | 'default';
-} & Omit<AriaRadioGroupProps, 'children'>;
+} & FieldMessages &
+  Omit<AriaRadioGroupProps, 'children'>;
 
 const GroupContext = createContext<{
   targetSize: boolean;
@@ -79,26 +75,11 @@ export function RadioGroup({
       data-slot="radio-group"
       data-variant={variant}
     >
-      {({ isRequired }) => (
-        <>
-          {isEmptyNode(label) ? null : (
-            <FieldLabel>
-              {label}
-              {isRequired ? (
-                <span aria-hidden className="text-destructive-text">
-                  *
-                </span>
-              ) : null}
-            </FieldLabel>
-          )}
-          <Options targetSize={targetSize} variant={variant}>
-            {children}
-          </Options>
-          {isEmptyNode(description) ? null : (
-            <FieldDescription>{description}</FieldDescription>
-          )}
-          <FieldError errors={errors}>{errorMessage}</FieldError>
-        </>
+      {fieldLayout(
+        <Options targetSize={targetSize} variant={variant}>
+          {children}
+        </Options>,
+        { description, errorMessage, errors, label },
       )}
     </AriaRadioGroup>
   );

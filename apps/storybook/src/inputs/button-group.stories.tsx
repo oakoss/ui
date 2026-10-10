@@ -7,7 +7,7 @@ import {
   ButtonGroupSeparator,
   ButtonGroupText,
 } from '@oakoss/ui/components/ui/inputs/button-group';
-import { Input } from '@oakoss/ui/components/ui/inputs/field';
+import { Input } from '@oakoss/ui/components/ui/inputs/input';
 import { expect } from 'storybook/test';
 
 import { part } from '../parts';

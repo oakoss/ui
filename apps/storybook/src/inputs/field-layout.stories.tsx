@@ -7,8 +7,8 @@ import {
   FieldGroup,
   FieldLabel,
   FieldSeparator,
-  Input,
 } from '@oakoss/ui/components/ui/inputs/field';
+import { Input } from '@oakoss/ui/components/ui/inputs/input';
 import { TextField } from '@oakoss/ui/components/ui/inputs/text-field';
 import { expect } from 'storybook/test';
 
