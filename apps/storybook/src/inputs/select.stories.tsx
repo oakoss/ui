@@ -229,5 +229,7 @@ export const Selected: Story = {
     await expect(
       pear.querySelector('[data-slot=select-item-indicator]'),
     ).not.toBeNull();
+    // Options leave room at the end for the check, so a label can't run under it.
+    await expect(getComputedStyle(pear).paddingInlineEnd).toBe('32px');
   },
 };

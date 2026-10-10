@@ -70,6 +70,32 @@ export type InputGroupSlots = {
   start?: ReactNode;
 };
 
+// Takes the decorations useFieldShortcut returns, which carry the ids that
+// describe the field.
+export function DecoratedInputGroup({
+  axis,
+  children,
+  end,
+  size,
+  start,
+}: {
+  axis: 'block' | 'inline';
+  children: ReactNode;
+  size?: InputSize;
+} & InputGroupSlots) {
+  return (
+    <InputGroup size={size}>
+      {isEmptyNode(start) ? null : (
+        <InputGroupAddon align={`${axis}-start`}>{start}</InputGroupAddon>
+      )}
+      {children}
+      {isEmptyNode(end) ? null : (
+        <InputGroupAddon align={`${axis}-end`}>{end}</InputGroupAddon>
+      )}
+    </InputGroup>
+  );
+}
+
 // A named group is announced as one; an unnamed one only lays out its
 // children. Inside a React Aria field it takes the field's invalid and
 // disabled state. Clicking an addon focuses the control, unless the click
@@ -155,11 +181,11 @@ export function InputGroupText({
 
 // Text decorations' ids join the field's own aria-describedby, which React
 // Aria appends after the description and error; on the input they'd replace
-// them. Without a group axis, the caller places decorations itself.
+// them. The caller places decorations, in a DecoratedInputGroup or its own
+// control.
 export function useFieldShortcut<Props extends { 'aria-describedby'?: string }>(
   { end, start, ...messages }: FieldMessages & InputGroupSlots,
   props: Props,
-  { group, size }: { group?: 'block' | 'inline'; size?: InputSize },
 ) {
   const startId = useId();
   const endId = useId();
@@ -174,27 +200,8 @@ export function useFieldShortcut<Props extends { 'aria-describedby'?: string }>(
           .filter(Boolean)
           .join(' ') || undefined,
     },
-    layout: (control: ReactNode) =>
-      fieldLayout(
-        group !== undefined && (before.node !== null || after.node !== null) ? (
-          <InputGroup size={size}>
-            {before.node === null ? null : (
-              <InputGroupAddon align={`${group}-start`}>
-                {before.node}
-              </InputGroupAddon>
-            )}
-            {control}
-            {after.node === null ? null : (
-              <InputGroupAddon align={`${group}-end`}>
-                {after.node}
-              </InputGroupAddon>
-            )}
-          </InputGroup>
-        ) : (
-          control
-        ),
-        messages,
-      ),
+    isUndecorated: before.node === null && after.node === null,
+    layout: (control: ReactNode) => fieldLayout(control, messages),
   };
 }
 

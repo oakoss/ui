@@ -98,7 +98,6 @@ export function Select<T extends object, M extends Mode = 'single'>({
   const shortcut = useFieldShortcut(
     { description, end, errorMessage, errors, label, start },
     props,
-    { size },
   );
   return (
     <AriaSelect<T, M>
@@ -163,7 +162,7 @@ export function SelectItem<T extends object>({
 }: SelectItemProps<T>) {
   return (
     <AriaListBoxItem
-      className={cx(['group/select-item', listItem], className)}
+      className={cx([listItem, 'pe-8'], className)}
       data-slot="select-item"
       textValue={
         textValue ??
@@ -178,12 +177,7 @@ export function SelectItem<T extends object>({
           <span className="flex flex-col">
             <AriaText slot="label">{children}</AriaText>
             {description === undefined ? null : (
-              <AriaText
-                className="text-xs text-muted-foreground group-focus/select-item:text-inherit"
-                slot="description"
-              >
-                {description}
-              </AriaText>
+              <AriaText slot="description">{description}</AriaText>
             )}
           </span>
         </>,

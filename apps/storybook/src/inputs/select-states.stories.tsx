@@ -186,7 +186,7 @@ export const FocusedOption: Story = {
   },
 };
 
-// Each size keeps its height, with a 44px hit area around it.
+// The trigger keeps its height, with a 44px hit area around it.
 export const HitArea: Story = {
   play: async ({ canvas }) => {
     const button = trigger(canvas);

@@ -10,9 +10,10 @@ export const fieldSurface =
 
 export const fieldControl = `${inputFocusRing} ${fieldSurface}`;
 
-// Forced colors' backplate would cover the focused option's text.
+// Forced colors' backplate would cover the focused option's text. A
+// description stays muted until its own option has focus, not the list.
 export const listItem =
-  'relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 ps-2 pe-8 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground disabled:opacity-50 forced-colors:focus:bg-[Highlight] forced-colors:focus:text-[HighlightText] forced-colors:focus:forced-color-adjust-none forced-colors:disabled:text-[GrayText] forced-colors:disabled:opacity-100';
+  'relative flex w-full cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground disabled:opacity-50 forced-colors:focus:bg-[Highlight] forced-colors:focus:text-[HighlightText] forced-colors:focus:forced-color-adjust-none forced-colors:disabled:text-[GrayText] forced-colors:disabled:opacity-100 [&_[slot=description]]:text-xs [&_[slot=description]]:text-muted-foreground focus:[&_[slot=description]]:text-inherit';
 
 export const stateLayer =
   'bg-linear-to-b from-transparent to-transparent hover:from-current/8 hover:to-current/8 pressed:from-current/12 pressed:to-current/12 not-data-rac:active:from-current/12 not-data-rac:active:to-current/12';

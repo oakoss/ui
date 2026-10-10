@@ -9,6 +9,7 @@ import {
 } from '#/components/ui/inputs/field';
 import { Input, type InputSize } from '#/components/ui/inputs/input';
 import {
+  DecoratedInputGroup,
   type InputGroupSlots,
   useFieldShortcut,
 } from '#/components/ui/inputs/input-group';
@@ -45,26 +46,34 @@ export function TextareaField({
   start,
   ...props
 }: TextareaFieldProps) {
-  const shortcut = useFieldShortcut(
+  const { decorations, fieldProps, isUndecorated, layout } = useFieldShortcut(
     { description, end, errorMessage, errors, label, start },
     props,
-    { group: 'block', size },
+  );
+  const control = (
+    <Textarea
+      autoGrow={autoGrow}
+      maxRows={maxRows}
+      minRows={minRows}
+      placeholder={placeholder}
+      size={size}
+    />
   );
   return (
     <AriaTextField
-      {...shortcut.fieldProps}
+      {...fieldProps}
       className={cx('flex flex-col gap-2', className)}
       data-slot="textarea-field"
     >
       {children ??
-        shortcut.layout(
-          <Textarea
-            autoGrow={autoGrow}
-            maxRows={maxRows}
-            minRows={minRows}
-            placeholder={placeholder}
-            size={size}
-          />,
+        layout(
+          isUndecorated ? (
+            control
+          ) : (
+            <DecoratedInputGroup axis="block" size={size} {...decorations}>
+              {control}
+            </DecoratedInputGroup>
+          ),
         )}
     </AriaTextField>
   );
@@ -83,19 +92,27 @@ export function TextField({
   start,
   ...props
 }: TextFieldProps) {
-  const shortcut = useFieldShortcut(
+  const { decorations, fieldProps, isUndecorated, layout } = useFieldShortcut(
     { description, end, errorMessage, errors, label, start },
     props,
-    { group: 'inline', size },
   );
+  const control = <Input placeholder={placeholder} size={size} />;
   return (
     <AriaTextField
-      {...shortcut.fieldProps}
+      {...fieldProps}
       className={cx('flex flex-col gap-2', className)}
       data-slot="text-field"
     >
       {children ??
-        shortcut.layout(<Input placeholder={placeholder} size={size} />)}
+        layout(
+          isUndecorated ? (
+            control
+          ) : (
+            <DecoratedInputGroup axis="inline" size={size} {...decorations}>
+              {control}
+            </DecoratedInputGroup>
+          ),
+        )}
     </AriaTextField>
   );
 }
