@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react';
 import { fumadocsMdx } from 'fumadocs-mdx/vite';
 import { defineConfig } from 'vite';
 
-import { staticPages } from './src/lib/static-pages';
+import { staticPages } from './src/lib/static-pages.ts';
 
 export default defineConfig({
   plugins: [
