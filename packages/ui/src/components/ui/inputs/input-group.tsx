@@ -155,29 +155,18 @@ export function InputGroupText({
 
 // Text decorations' ids join the field's own aria-describedby, which React
 // Aria appends after the description and error; on the input they'd replace
-// them.
+// them. Without a group axis, the caller places decorations itself.
 export function useFieldShortcut<Props extends { 'aria-describedby'?: string }>(
   { end, start, ...messages }: FieldMessages & InputGroupSlots,
   props: Props,
-  { axis, size }: { axis: 'block' | 'inline'; size?: InputSize },
+  { group, size }: { group?: 'block' | 'inline'; size?: InputSize },
 ) {
   const startId = useId();
   const endId = useId();
-  const slot = (node: ReactNode, id: string, side: 'end' | 'start') => {
-    if (isEmptyNode(node)) return { addon: null, id: undefined };
-    const isText = typeof node === 'string' || typeof node === 'number';
-    return {
-      addon: (
-        <InputGroupAddon align={`${axis}-${side}`}>
-          {isText ? <InputGroupText id={id}>{node}</InputGroupText> : node}
-        </InputGroupAddon>
-      ),
-      id: isText ? id : undefined,
-    };
-  };
-  const before = slot(start, startId, 'start');
-  const after = slot(end, endId, 'end');
+  const before = decoration(start, startId);
+  const after = decoration(end, endId);
   return {
+    decorations: { end: after.node, start: before.node },
     fieldProps: {
       ...props,
       'aria-describedby':
@@ -187,11 +176,19 @@ export function useFieldShortcut<Props extends { 'aria-describedby'?: string }>(
     },
     layout: (control: ReactNode) =>
       fieldLayout(
-        before.addon || after.addon ? (
+        group !== undefined && (before.node !== null || after.node !== null) ? (
           <InputGroup size={size}>
-            {before.addon}
+            {before.node === null ? null : (
+              <InputGroupAddon align={`${group}-start`}>
+                {before.node}
+              </InputGroupAddon>
+            )}
             {control}
-            {after.addon}
+            {after.node === null ? null : (
+              <InputGroupAddon align={`${group}-end`}>
+                {after.node}
+              </InputGroupAddon>
+            )}
           </InputGroup>
         ) : (
           control
@@ -199,4 +196,13 @@ export function useFieldShortcut<Props extends { 'aria-describedby'?: string }>(
         messages,
       ),
   };
+}
+
+function decoration(
+  node: ReactNode,
+  id: string,
+): { id?: string; node: ReactNode } {
+  if (isEmptyNode(node)) return { node: null };
+  if (typeof node !== 'string' && typeof node !== 'number') return { node };
+  return { id, node: <InputGroupText id={id}>{node}</InputGroupText> };
 }

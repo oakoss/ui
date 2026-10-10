@@ -48,7 +48,7 @@ export function TextareaField({
   const shortcut = useFieldShortcut(
     { description, end, errorMessage, errors, label, start },
     props,
-    { axis: 'block', size },
+    { group: 'block', size },
   );
   return (
     <AriaTextField
@@ -86,7 +86,7 @@ export function TextField({
   const shortcut = useFieldShortcut(
     { description, end, errorMessage, errors, label, start },
     props,
-    { axis: 'inline', size },
+    { group: 'inline', size },
   );
   return (
     <AriaTextField
