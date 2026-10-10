@@ -39,8 +39,8 @@ export type ListBoxOptions<T extends object> = (
 // Each part takes the component it belongs to, which names its data-slot.
 export type ListKind = 'combobox' | 'select';
 
-// With onLoadMore, a row at the end shows loadMore and fetches the next page
-// as it scrolls into view; the options move into a collection beside it.
+// With onLoadMore, a row after the options shows loadMore and fetches the next
+// page as it scrolls into view.
 type ListBoxProps<T extends object> = {
   children?: ((item: T) => ReactNode) | ReactNode;
   dependencies?: readonly unknown[];
@@ -63,14 +63,12 @@ export function ListBox<T extends object>({
   onLoadMore,
 }: ListBoxProps<T>) {
   // A ComboBox or Select passes its items through context, which the
-  // collection beside the load-more row doesn't read.
+  // collection doesn't read.
   const context = useSlottedContext(ListBoxContext);
-  const options = { dependencies, items: items ?? context?.items };
   return (
     <AriaListBox<T>
       className="max-h-[inherit] overflow-y-auto outline-hidden"
       data-slot={`${kind}-list`}
-      {...(onLoadMore === undefined ? options : {})}
       renderEmptyState={
         emptyLabel === undefined
           ? undefined
@@ -81,19 +79,17 @@ export function ListBox<T extends object>({
             )
       }
     >
-      {onLoadMore === undefined ? (
-        children
-      ) : (
-        <>
-          <Collection {...options}>{children}</Collection>
-          <AriaListBoxLoadMoreItem
-            className="flex justify-center py-1.5"
-            isLoading={isLoadingMore}
-            onLoadMore={onLoadMore}
-          >
-            {loadMore}
-          </AriaListBoxLoadMoreItem>
-        </>
+      <Collection dependencies={dependencies} items={items ?? context?.items}>
+        {children}
+      </Collection>
+      {onLoadMore === undefined ? null : (
+        <AriaListBoxLoadMoreItem
+          className="flex justify-center py-1.5"
+          isLoading={isLoadingMore}
+          onLoadMore={onLoadMore}
+        >
+          {loadMore}
+        </AriaListBoxLoadMoreItem>
       )}
     </AriaListBox>
   );

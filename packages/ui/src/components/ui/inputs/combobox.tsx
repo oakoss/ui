@@ -1,4 +1,11 @@
-import { type ReactNode, use, useEffect, useState } from 'react';
+import {
+  type ReactNode,
+  type RefObject,
+  use,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   Button as AriaButton,
   ComboBox as AriaComboBox,
@@ -32,6 +39,12 @@ import {
   ListBoxSection,
 } from '#/components/ui/inputs/list-box';
 import { cn, cx } from '#/lib/cx';
+
+const fieldButton = buttonStyles({
+  size: 'icon-sm',
+  targetSize: false,
+  variant: 'ghost',
+});
 
 export type ComboboxItemProps<T extends object = object> = ListBoxItemProps<T>;
 
@@ -158,7 +171,7 @@ export function ComboboxTrigger({ className }: { className?: string }) {
   return (
     <AriaButton
       className={cn(
-        buttonStyles({ size: 'icon-sm', targetSize: false, variant: 'ghost' }),
+        fieldButton,
         'pressed:scale-100 pressed:from-transparent pressed:to-transparent',
         className,
       )}
@@ -173,28 +186,25 @@ export function ComboboxTrigger({ className }: { className?: string }) {
 // focus itself would drop it to the page when the button unmounts. It isn't a
 // Tab stop, since deleting the text does the same, and it opts out of the
 // field's button context, which belongs to the trigger.
-function ClearButton({ label }: { label: string }) {
+function ClearButton({
+  inputRef,
+  label,
+}: {
+  inputRef: RefObject<HTMLInputElement | null>;
+  label: string;
+}) {
   const state = use(ComboBoxStateContext);
   if (state === null || state.inputValue === '') return null;
   return (
     <ButtonContext value={null}>
       <AriaButton
         aria-label={label}
-        className={cn(
-          buttonStyles({
-            size: 'icon-sm',
-            targetSize: false,
-            variant: 'ghost',
-          }),
-        )}
+        className={cn(fieldButton)}
         data-slot="combobox-clear"
         excludeFromTabOrder
-        onPress={(event) => {
+        onPress={() => {
           state.setInputValue('');
-          event.target
-            .closest('[data-slot=input-group]')
-            ?.querySelector<HTMLElement>('[role=combobox]')
-            ?.focus();
+          inputRef.current?.focus();
         }}
         preventFocusOnPress
       >
@@ -217,6 +227,7 @@ function Field({
   'emptyLabel' | 'onLoadMore'
 >) {
   const isLoading = loadingState === 'loading' || loadingState === 'filtering';
+  const inputRef = useRef<HTMLInputElement>(null);
   return (
     <DecoratedInputGroup
       axis="inline"
@@ -226,14 +237,16 @@ function Field({
           {useDelayed(isLoading) ? (
             <Spinner data-slot="combobox-spinner" label={loadingLabel} />
           ) : null}
-          {isClearable ? <ClearButton label={clearLabel} /> : null}
+          {isClearable ? (
+            <ClearButton inputRef={inputRef} label={clearLabel} />
+          ) : null}
           <ComboboxTrigger />
         </>
       }
       size={size}
       start={decorations.start}
     >
-      <Input placeholder={placeholder} size={size} />
+      <Input placeholder={placeholder} ref={inputRef} size={size} />
     </DecoratedInputGroup>
   );
 }
