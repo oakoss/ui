@@ -8,8 +8,8 @@ import {
   PopoverContent,
   type PopoverContentProps,
 } from '#/components/ui/overlays/popover';
+import { useOverlayOpen } from '#/hooks/use-overlay-open';
 import { cn } from '#/lib/cx';
-import { useOverlayOpen } from '#/lib/use-overlay-open';
 
 export type HoverCardProps = HoverCardName &
   Omit<
