@@ -12,6 +12,8 @@ import * as lucide from 'lucide-react';
 import { type ComponentType, type ReactNode, useEffect } from 'react';
 import { I18nProvider, isRTL } from 'react-aria-components';
 
+import { parkPointer } from '../src/pointer';
+
 // Installs swap icons at `shadcn add` time; Storybook resolves them live.
 const lucideIcons = new Map<string, unknown>(Object.entries(lucide));
 
@@ -152,6 +154,9 @@ const withLocale: Decorator = (Story, context) => {
 };
 
 const preview: Preview = {
+  beforeEach: async () => {
+    await parkPointer();
+  },
   decorators: [withTheme, withPalette, withLocale, withIcons],
   globalTypes: {
     family: {
