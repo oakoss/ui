@@ -8,8 +8,8 @@ import {
   TooltipTriggerStateContext,
 } from 'react-aria-components';
 
+import { useOverlayOpen } from '#/hooks/use-overlay-open';
 import { cn, cx } from '#/lib/cx';
-import { useOverlayOpen } from '#/lib/use-overlay-open';
 
 export type TooltipProps = { children: ReactNode; className?: string } & Omit<
   AriaTooltipProps,

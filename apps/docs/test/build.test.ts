@@ -111,6 +111,8 @@ describe('component pages', () => {
       // cx.ts, which every component installs; e2e checks the page shows it.
       expect(read(markdown)).toContain('/blob/main/packages/ui/src/lib/cx.ts');
       expect(read(markdown)).not.toContain('createCn');
+      // Every registry target alias maps to a folder in the project.
+      expect(read(markdown)).not.toMatch(/\[`@\w+\//u);
     },
   );
 

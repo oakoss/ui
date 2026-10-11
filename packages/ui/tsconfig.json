@@ -5,5 +5,11 @@
     "@oakoss/tsconfig/react.json",
     "@oakoss/tsconfig/node.json"
   ],
-  "include": ["src", "vitest.config.ts", "eslint.config.js", "oxlint.config.ts"]
+  "include": [
+    "src",
+    "tests",
+    "vitest.config.ts",
+    "eslint.config.js",
+    "oxlint.config.ts"
+  ]
 }

@@ -116,6 +116,7 @@ function tabs(entries: [string, Node[]][]): Node {
 // shadcn's default alias directories.
 const aliasDirectories: Record<string, string> = {
   components: 'components',
+  hooks: 'hooks',
   lib: 'lib',
   ui: 'components/ui',
 };

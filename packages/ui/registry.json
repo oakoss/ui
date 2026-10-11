@@ -578,9 +578,9 @@
           "target": "@ui/overlays/hover-card.tsx"
         },
         {
-          "path": "src/lib/use-overlay-open.ts",
-          "type": "registry:lib",
-          "target": "@lib/use-overlay-open.ts"
+          "path": "src/hooks/use-overlay-open.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-overlay-open.ts"
         },
         {
           "path": "src/lib/cx.ts",
@@ -667,9 +667,9 @@
           "target": "@ui/overlays/tooltip.tsx"
         },
         {
-          "path": "src/lib/use-overlay-open.ts",
-          "type": "registry:lib",
-          "target": "@lib/use-overlay-open.ts"
+          "path": "src/hooks/use-overlay-open.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-overlay-open.ts"
         },
         {
           "path": "src/lib/cx.ts",
