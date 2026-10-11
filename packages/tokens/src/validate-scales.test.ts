@@ -6,7 +6,7 @@ import type { AuthoredScale } from '#/scale';
 import { oklch } from '#/color';
 import { tailwindScales } from '#/families/tailwind-scales';
 import { resolveFlavor } from '#/resolve';
-import { base, dark, withFlavors, withScale } from '#/testing';
+import { base, dark, untyped, withFlavors, withScale } from '#/testing';
 import { validateFamily } from '#/validate';
 
 const { red, yellow } = tailwindScales;
@@ -112,10 +112,11 @@ describe('validateFamily: references across palettes', () => {
 
 describe('validateFamily: ramp charts', () => {
   it('reports a ramp intent that does not exist', () => {
-    const charts = JSON.parse(
-      '{ "kind": "ramp", "source": { "intent": "brand" }, "steps": [300, 500, 600, 700, 800] }',
-      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the type forbids this; the runtime check covers untyped data
-    ) as Family['charts'];
+    const charts = untyped<Family['charts']>({
+      kind: 'ramp',
+      source: { intent: 'brand' },
+      steps: [300, 500, 600, 700, 800],
+    });
     expect(validateFamily({ ...base, charts })).toEqual([
       `chart intent "brand" doesn't exist`,
     ]);
@@ -151,8 +152,7 @@ describe('validateFamily: anchors', () => {
 
   it('reports a missing anchor from untyped data', () => {
     const { anchor: _missing, ...rest } = red;
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the type requires an anchor; the runtime check covers untyped data
-    const scale = rest as AuthoredScale;
+    const scale = untyped<AuthoredScale>(rest);
     expect(validateFamily(withScale('red', scale))).toEqual([
       `scale "red" has no dark anchor`,
       `scale "red" has no light anchor`,
@@ -185,8 +185,7 @@ describe('validateFamily: authored scales', () => {
 
   it('reports missing core steps from untyped data', () => {
     const { 500: _missing, ...partial } = red.steps;
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the type forbids this; the runtime check covers untyped data
-    const steps = partial as AuthoredScale['steps'];
+    const steps = untyped<AuthoredScale['steps']>(partial);
     // Red is a primary choice, and the primary ramp chart reads step 500 too.
     expect(validateFamily(withScale('red', { ...red, steps }))).toEqual([
       `scale "red" is missing steps 500`,

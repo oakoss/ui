@@ -4,7 +4,7 @@ import type { Family } from '#/family';
 import type { AuthoredScale, Scale } from '#/scale';
 
 import { tailwindScales } from '#/families/tailwind-scales';
-import { base, withScale } from '#/testing';
+import { base, untyped, withScale } from '#/testing';
 import { validateFamily } from '#/validate';
 
 // Each case breaks a type on purpose, as untyped data (such as JSON) can.
@@ -12,11 +12,10 @@ const { red } = tailwindScales;
 
 describe('validateFamily: untyped steps', () => {
   it('treats a step set to undefined as missing', () => {
-    const steps = {
+    const steps = untyped<AuthoredScale['steps']>({
       ...red.steps,
       500: undefined,
-      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- deliberately untyped
-    } as unknown as AuthoredScale['steps'];
+    });
     // Orange is a primary choice, and the primary ramp chart reads step 500.
     expect(validateFamily(withScale('orange', { ...red, steps }))).toEqual([
       `scale "orange" is missing steps 500`,
@@ -25,19 +24,17 @@ describe('validateFamily: untyped steps', () => {
   });
 
   it('treats inherited steps as missing', () => {
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- deliberately untyped
-    const steps = Object.create(red.steps) as AuthoredScale['steps'];
+    const steps = untyped<AuthoredScale['steps']>(Object.create(red.steps));
     expect(validateFamily(withScale('teal', { ...red, steps }))).toContain(
       `scale "teal" is missing steps 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950`,
     );
   });
 
   it('reports an anchor that is not a step', () => {
-    const anchor = {
+    const anchor = untyped<AuthoredScale['anchor']>({
       dark: 'constructor',
       light: 700,
-      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- deliberately untyped
-    } as unknown as AuthoredScale['anchor'];
+    });
     expect(validateFamily(withScale('teal', { ...red, anchor }))).toEqual([
       `scale "teal" dark anchor is missing step constructor`,
     ]);
@@ -50,12 +47,11 @@ describe('validateFamily: untyped steps', () => {
     ],
     [[300], 'charts need 5 entries, not 1'],
   ])('reports untyped chart steps %j', (rampSteps, error) => {
-    const charts = {
+    const charts = untyped<Family['charts']>({
       kind: 'ramp',
       source: { hue: 'neutral' },
       steps: rampSteps,
-      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- deliberately untyped
-    } as unknown as Family['charts'];
+    });
     expect(validateFamily({ ...base, charts })).toEqual([error]);
   });
 });
@@ -63,19 +59,17 @@ describe('validateFamily: untyped steps', () => {
 describe('validateFamily: untyped intents, neutrals and scales', () => {
   it('reports a missing intent', () => {
     const { info: _missing, ...rest } = base.intents;
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- deliberately untyped
-    const intents = rest as Family['intents'];
+    const intents = untyped<Family['intents']>(rest);
     expect(validateFamily({ ...base, intents })).toEqual([
       `intent "info" is missing`,
     ]);
   });
 
   it('reports an intent set to undefined', () => {
-    const intents = {
+    const intents = untyped<Family['intents']>({
       ...base.intents,
       primary: undefined,
-      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- deliberately untyped
-    } as unknown as Family['intents'];
+    });
     expect(validateFamily({ ...base, intents })).toEqual([
       `intent "primary" is missing`,
       `chart intent "primary" doesn't exist`,
@@ -84,19 +78,14 @@ describe('validateFamily: untyped intents, neutrals and scales', () => {
 
   it('reports a reference to a neutral set to undefined', () => {
     const neutrals = { ...base.palette.neutrals, white: undefined };
-    const palette = {
-      ...base.palette,
-      neutrals,
-      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- deliberately untyped
-    } as unknown as Family['palette'];
+    const palette = untyped<Family['palette']>({ ...base.palette, neutrals });
     expect(validateFamily({ ...base, palette })).toContain(
       `flavor "light" role "background": unknown neutral "white"`,
     );
   });
 
   it('skips a scale set to undefined', () => {
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- deliberately untyped
-    const scale = undefined as unknown as Scale<string, string>;
+    const scale = untyped<Scale<string, string>>(undefined);
     expect(validateFamily(withScale('ghost', scale))).toEqual([]);
   });
 });
