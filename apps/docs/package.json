@@ -36,7 +36,7 @@
     "@oakoss/eslint-config": "workspace:*",
     "@oakoss/oxlint-config": "workspace:*",
     "@oakoss/tsconfig": "workspace:*",
-    "@playwright/test": "^1.63.0",
+    "@playwright/test": "^1.64.0",
     "@react-aria/optimize-locales-plugin": "^2.1.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/mdx": "^2.0.14",
