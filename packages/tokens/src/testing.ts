@@ -9,6 +9,13 @@ export const base: Family = neutral;
 export const light: Flavor<string, string> = neutral.flavors.light;
 export const dark: Flavor<string, string> = neutral.flavors.dark;
 
+// Types data that breaks T on purpose, as untyped input such as JSON can.
+// oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- the point of the helper
+export function untyped<T>(value: unknown): T {
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the point of the helper
+  return value as T;
+}
+
 export function withFlavors(
   flavors: Record<string, Flavor<string, string>>,
 ): Family {

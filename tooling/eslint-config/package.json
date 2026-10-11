@@ -19,7 +19,7 @@
     "@vitest/eslint-plugin": "^1.6.27",
     "eslint-plugin-better-tailwindcss": "^4.7.0",
     "eslint-plugin-import-x": "^4.17.1",
-    "eslint-plugin-oxlint": "^1.86.0",
+    "eslint-plugin-oxlint": "^1.87.0",
     "eslint-plugin-perfectionist": "^5.12.1",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-storybook": "^10.6.1",
