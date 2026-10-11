@@ -18,8 +18,6 @@ export type TooltipDemoProps = { text?: string } & Omit<
     'defaultOpen' | 'delay' | 'onOpenChange'
   >;
 
-// Keeps a trigger off the page's top-left corner, where CI's real pointer
-// rests and would hover it as it mounts.
 export function Centered({ children }: { children: ReactNode }) {
   return <div className="grid min-h-64 place-items-center">{children}</div>;
 }
