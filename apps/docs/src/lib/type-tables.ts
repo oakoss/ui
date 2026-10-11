@@ -46,6 +46,8 @@ export const typeTableOptions: RemarkAutoTypeTableOptions = {
       }
     },
   },
+  // remarkTypeTableMarkdown reads the tables above, not a JSON copy.
+  remarkStringify: false,
 };
 
 /**
