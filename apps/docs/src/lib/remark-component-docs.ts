@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { type File, type Node, recordExpansion } from './expansion-output';
 import { manualSources } from './manual-sources';
 import { githubUrl } from './site';
 
@@ -12,17 +13,6 @@ const ui = path.dirname(
 const demos = path.join(import.meta.dirname, '../components/demos');
 
 type Item = (typeof registry.items)[number];
-
-type Node = {
-  attributes?: { name: string; value: unknown }[];
-  children?: Node[];
-  lang?: string;
-  meta?: string;
-  name?: string;
-  type: string;
-  url?: string;
-  value?: string;
-};
 
 type PackageManager = { add: string; dlx: string; name: string };
 
@@ -127,14 +117,16 @@ Markdown at build time, so the demo source and install steps also reach the
 `.md` and llms.txt output, and the install steps' text reaches search.
 */
 export function remarkComponentDocs() {
-  return (tree: Node, file: { data: object }) => {
+  return (tree: Node, file: File) => {
     const compiler = '_compiler' in file.data ? file.data._compiler : undefined;
     // Registered so the dev server recompiles the page when a source changes.
     const read: Read = (source) => {
       if (hasAddDependency(compiler)) compiler.addDependency(source);
       return readFileSync(source, 'utf-8');
     };
-    transform(tree, read);
+    transform(tree, read, (node, expanded) =>
+      recordExpansion(file, node, expanded),
+    );
   };
 }
 
@@ -275,17 +267,23 @@ function targetPath(target: string): string {
   );
 }
 
-function transform(node: Node, read: Read): Node {
+function transform(
+  node: Node,
+  read: Read,
+  expand: (node: Node, expanded: Node) => Node,
+): Node {
   if (node.type === 'mdxJsxFlowElement' && node.name === 'ComponentPreview') {
-    return preview(node, read);
+    return expand(node, preview(node, read));
   }
   if (node.type === 'mdxJsxFlowElement' && node.name === 'ComponentInstall') {
     const item = attribute(node, 'item');
     if (item === undefined) throw new Error('<ComponentInstall> needs an item');
-    return install(item, read);
+    return expand(node, install(item, read));
   }
   if (node.children) {
-    node.children = node.children.map((child) => transform(child, read));
+    node.children = node.children.map((child) =>
+      transform(child, read, expand),
+    );
   }
   return node;
 }
