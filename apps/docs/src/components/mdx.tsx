@@ -1,6 +1,7 @@
 import type { MDXComponents } from 'mdx/types';
-import type { ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 
+import { CodeBlock, Pre } from 'fumadocs-ui/components/codeblock';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import {
   Tabs,
@@ -17,6 +18,7 @@ export function getMDXComponents(components?: MDXComponents) {
   return {
     ...defaultMdxComponents,
     ManualSources,
+    pre: CodePre,
     Step,
     Steps,
     Tabs,
@@ -26,6 +28,16 @@ export function getMDXComponents(components?: MDXComponents) {
     TypeTable: OwnPropsTable,
     ...components,
   } satisfies MDXComponents;
+}
+
+// Paints each block in its Shiki theme's background, which the token colors
+// meet WCAG AA against; Fumadocs' card gray drops some under 4.5:1.
+function CodePre(props: ComponentProps<typeof CodeBlock>) {
+  return (
+    <CodeBlock {...props} keepBackground>
+      <Pre>{props.children}</Pre>
+    </CodeBlock>
+  );
 }
 
 function ManualSources({ children }: { children: ReactNode }) {
