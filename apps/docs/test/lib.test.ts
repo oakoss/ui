@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { INHERITED_PREFIX, ownProps } from '../src/lib/props';
+import { INHERITED_PREFIX, NO_OWN_PROPS, ownEntries } from '../src/lib/props';
 import {
   decodeMarkdownUrl,
   githubSourceUrl,
   markdownUrl,
 } from '../src/lib/site';
+import { typeTableMarkdown } from '../src/lib/type-tables';
 
 describe('markdownUrl', () => {
   it.each([
@@ -32,10 +33,42 @@ describe('githubSourceUrl', () => {
   });
 });
 
-describe('ownProps', () => {
+describe('ownEntries', () => {
   it('drops entries tagged as inherited', () => {
     expect(
-      ownProps({ [`${INHERITED_PREFIX}onPress`]: 1, intent: 2, size: 3 }),
-    ).toEqual({ intent: 2, size: 3 });
+      ownEntries([
+        { name: `${INHERITED_PREFIX}onPress` },
+        { name: 'intent' },
+        { name: 'size' },
+      ]),
+    ).toEqual([{ name: 'intent' }, { name: 'size' }]);
+  });
+});
+
+describe('typeTableMarkdown', () => {
+  const size = {
+    deprecated: false,
+    description: 'How large it renders.',
+    name: 'size',
+    required: false,
+    simplifiedType: 'union',
+    tags: [],
+    type: "'sm' | 'md'",
+  };
+
+  it('writes the table without its heading', () => {
+    const markdown = typeTableMarkdown({
+      entries: [size],
+      id: 'button.tsx-ButtonProps',
+      name: 'ButtonProps',
+    });
+    expect(markdown).not.toContain('### ButtonProps');
+    expect(markdown).toContain('| `size?`');
+  });
+
+  it('writes the page sentence for a table with no own props', () => {
+    expect(
+      typeTableMarkdown({ entries: [], id: 'x.tsx-XProps', name: 'XProps' }),
+    ).toBe(NO_OWN_PROPS);
   });
 });

@@ -1,36 +1,19 @@
 import { defineConfig } from 'fumadocs-mdx/config';
-import {
-  createFileSystemGeneratorCache,
-  createGenerator,
-  remarkAutoTypeTable,
-  type RemarkAutoTypeTableOptions,
-} from 'fumadocs-typescript';
+import { remarkAutoTypeTable } from 'fumadocs-typescript';
 
-import { INHERITED_PREFIX, isInheritedDeclaration } from './src/lib/props';
 import { remarkComponentDocs } from './src/lib/remark-component-docs';
-
-const typeTable: RemarkAutoTypeTableOptions = {
-  generator: createGenerator({
-    cache: createFileSystemGeneratorCache(
-      'node_modules/.cache/fumadocs-typescript',
-    ),
-    tsconfigPath: 'tsconfig.json',
-  }),
-  options: {
-    transform(entry, _type, prop) {
-      if (isInheritedDeclaration(prop.declarations[0]?.path)) {
-        entry.name = `${INHERITED_PREFIX}${entry.name}`;
-      }
-    },
-  },
-  // Otherwise the full prop JSON (inherited props included) lands in the
-  // search index and the Markdown/llms.txt output.
-  remarkStringify: false,
-};
+import {
+  remarkTypeTableMarkdown,
+  typeTableOptions,
+} from './src/lib/type-tables';
 
 export default defineConfig({
   mdxOptions: {
     remarkNpmOptions: { persist: { id: 'package-manager' } },
-    remarkPlugins: [[remarkAutoTypeTable, typeTable], remarkComponentDocs],
+    remarkPlugins: [
+      [remarkAutoTypeTable, typeTableOptions],
+      remarkTypeTableMarkdown,
+      remarkComponentDocs,
+    ],
   },
 });

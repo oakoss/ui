@@ -4,19 +4,13 @@ import { pageSchema } from 'fumadocs-core/source/schema';
 import { defineDocs } from 'fumadocs-mdx/macro';
 import { z } from 'zod';
 
-import { manualSources } from '#/lib/manual-sources';
 import { docsRoute } from '#/lib/site';
 
 export const docs = defineDocs({
   dir: 'content/docs',
   docs: {
     async: true,
-    postprocess: {
-      includeProcessedMarkdown: {
-        filterElement: (node) =>
-          !('name' in node && node.name === manualSources),
-      },
-    },
+    postprocess: { includeProcessedMarkdown: true },
     // A component page names its registry item and React Aria docs page for
     // the links under its title.
     schema: pageSchema.extend({

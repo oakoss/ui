@@ -116,10 +116,21 @@ describe('component pages', () => {
     },
   );
 
+  it.each(componentPages)(
+    'writes type tables under the page heading on $slug',
+    ({ markdown }) => {
+      // Authored headings carry an `[#id]`; auto-type-table's own `###`
+      // heading, which would sit under the page's `#### Props`, doesn't.
+      expect(read(markdown)).not.toMatch(/^### (?!.*\[#).+$/mu);
+    },
+  );
+
   it.each(componentPages)('shows the demo source on $slug', ({ markdown }) => {
     // The Code tab's source reaches the Markdown output, imports rewritten.
     expect(read(markdown)).toContain("from '#/components/ui/");
     expect(read(markdown)).not.toContain('@oakoss/ui');
+    // An unexpanded element means its Markdown wasn't recorded.
+    expect(read(markdown)).not.toMatch(/<Component(?:Preview|Install)\b/u);
   });
 });
 
@@ -140,7 +151,9 @@ describe('prerendered site files', () => {
     const cache = path.join(client, '__tsr/staticServerFnCache');
     expect(readdirSync(cache)).toHaveLength(pages.length);
   });
+});
 
+describe('props, search and llms output', () => {
   it.each([
     'api/search',
     'llms-full.txt',
@@ -158,6 +171,25 @@ describe('prerendered site files', () => {
     expect(section).toContain(ownProp);
     expect(section).not.toContain('onBlur');
     expect(section).not.toContain(INHERITED_PREFIX);
+  });
+
+  it.each([
+    ['docs/components/button.md', 'intent'],
+    ['docs/components/text-field.md', 'errorMessage'],
+    ['docs/components/field.md', 'errors'],
+  ])('writes only own props into %s', (file, ownProp) => {
+    expect(read(file)).toContain(`| \`${ownProp}`);
+    expect(read(file)).not.toContain('`onBlur');
+  });
+
+  it('indexes the install steps for search', () => {
+    expect(read('api/search')).toContain('Copy each file into your project');
+    // Search records keep link text, not link syntax.
+    expect(read('api/search')).not.toContain('](');
+  });
+
+  it('lists the pages in llms.txt', () => {
+    expect(read('llms.txt')).toContain('[Button](/docs/components/button)');
   });
 });
 
