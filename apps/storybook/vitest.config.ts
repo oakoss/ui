@@ -1,7 +1,14 @@
+import type { BrowserCommand } from 'vitest/node';
+
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 import { playwright } from '@vitest/browser-playwright';
 import path from 'node:path';
 import { defineConfig } from 'vitest/config';
+
+// Hover checks run only while the pointer is in the viewport, so parking it
+// outside leaves nothing hovered; Playwright parks a reused page at (-1, -1).
+const movePointerOffscreen: BrowserCommand = ({ page }) =>
+  page.mouse.move(-10, -10);
 
 // The CLI and CI run, and axe-check, every story in both themes, plus stories
 // tagged forced-colors under Windows High Contrast emulation. Storybook's test
@@ -37,6 +44,7 @@ export default defineConfig({
       ],
       test: {
         browser: {
+          commands: { movePointerOffscreen },
           enabled: true,
           headless: true,
           instances: [{ browser: 'chromium' }],
