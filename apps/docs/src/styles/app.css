@@ -3,6 +3,11 @@
 @import 'fumadocs-ui/css/preset.css';
 @source '../../content';
 
+/* Fumadocs' 45.1% gray reads 4.12:1 on its secondary surfaces, under WCAG AA's 4.5:1; dark mode sets its own. */
+@theme {
+  --color-fd-muted-foreground: hsl(0, 0%, 40%);
+}
+
 /* Stops the sidebar stretching across Fumadocs' centering gutter; 100vw would shrink content when it collapses. */
 :root {
   --fd-layout-width: 9999px;

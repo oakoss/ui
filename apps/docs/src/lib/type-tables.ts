@@ -6,6 +6,7 @@ import {
   typeTableToMarkdown,
 } from 'fumadocs-typescript';
 
+import { codeThemes } from './code-themes';
 import { type File, type Node, recordMarkdown } from './expansion-output';
 import {
   INHERITED_PREFIX,
@@ -48,6 +49,7 @@ export const typeTableOptions: RemarkAutoTypeTableOptions = {
   },
   // remarkTypeTableMarkdown reads the tables above, not a JSON copy.
   remarkStringify: false,
+  shiki: { themes: codeThemes },
 };
 
 /**

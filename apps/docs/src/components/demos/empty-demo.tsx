@@ -16,7 +16,7 @@ export function EmptyDemo() {
         <EmptyMedia variant="icon">
           <Icon.Search />
         </EmptyMedia>
-        <EmptyTitle>No projects yet</EmptyTitle>
+        <EmptyTitle level={2}>No projects yet</EmptyTitle>
         <EmptyDescription>
           Create a project to start tracking your work.
         </EmptyDescription>

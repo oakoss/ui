@@ -2,6 +2,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
+import { agentInstructions, pagePreamble } from '../src/lib/llms';
 import { INHERITED_PREFIX } from '../src/lib/props';
 import { staticPages } from '../src/lib/static-pages';
 
@@ -153,7 +154,7 @@ describe('prerendered site files', () => {
   });
 });
 
-describe('props, search and llms output', () => {
+describe('props and search output', () => {
   it.each([
     'api/search',
     'llms-full.txt',
@@ -187,9 +188,26 @@ describe('props, search and llms output', () => {
     // Search records keep link text, not link syntax.
     expect(read('api/search')).not.toContain('](');
   });
+});
 
+describe('llms output', () => {
   it('lists the pages in llms.txt', () => {
     expect(read('llms.txt')).toContain('[Button](/docs/components/button)');
+  });
+
+  it.each(['llms.txt', 'llms-full.txt'])(
+    'opens %s with the agent instructions',
+    (file) => {
+      expect(read(file).startsWith(agentInstructions)).toBe(true);
+    },
+  );
+
+  it('gives llms.txt one H1', () => {
+    expect(read('llms.txt').match(/^# /gmu)).toHaveLength(1);
+  });
+
+  it.each(pages)('opens $slug.md with the preamble', ({ markdown }) => {
+    expect(read(markdown).split('\n\n', 2)[1]).toBe(pagePreamble);
   });
 });
 

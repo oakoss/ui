@@ -13,7 +13,7 @@ export function CardDemo() {
   return (
     <Card className="not-prose w-full max-w-sm">
       <CardHeader>
-        <CardTitle>Team plan</CardTitle>
+        <CardTitle level={2}>Team plan</CardTitle>
         <CardDescription>Billed yearly, renews on 1 March.</CardDescription>
         <CardAction>
           <Button size="sm" variant="outline">

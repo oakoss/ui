@@ -4,6 +4,7 @@ import { pageSchema } from 'fumadocs-core/source/schema';
 import { defineDocs } from 'fumadocs-mdx/macro';
 import { z } from 'zod';
 
+import { agentInstructions, pagePreamble } from '#/lib/llms';
 import { docsRoute } from '#/lib/site';
 
 export const docs = defineDocs({
@@ -29,5 +30,16 @@ export const source = loader({
 export const docsLlms = llms(source, {
   renderPage: async (page) => `# ${page.data.title} (${page.url})
 
+${pagePreamble}
+
 ${await page.data.getText('processed')}`,
 });
+
+// llms.txt: the instructions, then the page links under one heading, as the
+// llms.txt format expects one H1 followed by sections.
+export function llmsIndex() {
+  const links = source
+    .getPageTree()
+    .children.map((node) => docsLlms.indexNode(node));
+  return `${agentInstructions}\n\n## Pages\n\n${links.join('\n')}\n`;
+}
