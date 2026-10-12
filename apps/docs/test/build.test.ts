@@ -126,7 +126,8 @@ describe('component pages', () => {
   it.each(componentPages)(
     'links manual-install files instead of inlining them on $slug',
     ({ markdown }) => {
-      // cx.ts, which every component installs; e2e checks the page shows it.
+      // cx.ts, which every component installs. The .md lists links only (its
+      // sources are stripped); e2e checks the Manual tab loads them.
       expect(read(markdown)).toContain('/blob/main/packages/ui/src/lib/cx.ts');
       expect(read(markdown)).not.toContain('createCn');
       // Every registry target alias maps to a folder in the project.
