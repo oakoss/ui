@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { agentInstructions, pagePreamble } from '../src/lib/llms';
 import { INHERITED_PREFIX } from '../src/lib/props';
+import { siteUrl } from '../src/lib/site';
 import { staticPages } from '../src/lib/static-pages';
 
 const client = path.join(import.meta.dirname, '../dist/client');
@@ -15,6 +16,10 @@ type ContentPage = {
   slug: string;
   source: string;
 };
+
+function byPath(a: string, b: string) {
+  return a.localeCompare(b);
+}
 
 // Each content page with its source file and the files it prerenders to.
 function contentPages(dir = content, prefix = ''): ContentPage[] {
@@ -31,6 +36,18 @@ function contentPages(dir = content, prefix = ''): ContentPage[] {
       source: path.join(dir, entry.name),
     };
   });
+}
+
+function llmsArea(slug: string) {
+  const [folder = '', ...rest] = slug.split('/');
+  if (rest.length === 0) return 'Overview';
+  return `${folder.charAt(0).toUpperCase()}${folder.slice(1)}`;
+}
+
+function llmsSection(title: string) {
+  return (
+    read('llms.txt').split(`## ${title}\n`, 2)[1]?.split('\n## ', 1)[0] ?? ''
+  );
 }
 
 // The rendered text between the Props heading and the React Aria link.
@@ -190,11 +207,38 @@ describe('props and search output', () => {
   });
 });
 
-describe('llms output', () => {
-  it('lists the pages in llms.txt', () => {
-    expect(read('llms.txt')).toContain('[Button](/docs/components/button)');
+describe('llms.txt page list', () => {
+  // Each page-list link, as the path below the site URL.
+  const listed = read('llms.txt')
+    .matchAll(/\]\((\S+?)\)/gu)
+    .map(([, url = '']) => url.replace(siteUrl, ''))
+    .filter((url) => url.endsWith('.md'))
+    .toArray();
+
+  it('links every page once in llms.txt, by absolute Markdown URL', () => {
+    expect(read('llms.txt')).toContain(
+      `- [Button](${siteUrl}/docs/components/button.md): A pressable button built on React Aria.`,
+    );
+    expect(listed.toSorted(byPath)).toEqual(
+      pages.map(({ markdown }) => `/${markdown}`).toSorted(byPath),
+    );
   });
 
+  it('groups llms.txt by area', () => {
+    expect(read('llms.txt').match(/^## .+$/gmu)).toEqual([
+      '## Instructions for agents',
+      '## Overview',
+      '## Components',
+      '## Guides',
+    ]);
+  });
+
+  it.each(pages)('lists $slug under its area', ({ markdown, slug }) => {
+    expect(llmsSection(llmsArea(slug))).toContain(`(${siteUrl}/${markdown})`);
+  });
+});
+
+describe('llms output', () => {
   it.each(['llms.txt', 'llms-full.txt'])(
     'opens %s with the agent instructions',
     (file) => {
