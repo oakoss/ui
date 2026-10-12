@@ -1,6 +1,8 @@
 export const appName = 'oakoss/ui';
 export const docsRoute = '/docs';
 export const githubUrl = 'https://github.com/oakoss/ui';
+// The deployed site, as wrangler.jsonc's custom domain serves it.
+export const siteUrl = 'https://ui.oakoss.dev';
 
 // Inverse of markdownUrl: the page slugs for a Markdown URL's segments.
 export function decodeMarkdownUrl(segments: string[]) {

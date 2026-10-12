@@ -1,3 +1,5 @@
+import type * as PageTree from 'fumadocs-core/page-tree';
+
 import { llms, loader } from 'fumadocs-core/source';
 import { lucideIconsPlugin } from 'fumadocs-core/source/lucide-icons';
 import { pageSchema } from 'fumadocs-core/source/schema';
@@ -5,7 +7,7 @@ import { defineDocs } from 'fumadocs-mdx/macro';
 import { z } from 'zod';
 
 import { agentInstructions, pagePreamble } from '#/lib/llms';
-import { docsRoute } from '#/lib/site';
+import { docsRoute, markdownUrl, siteUrl } from '#/lib/site';
 
 export const docs = defineDocs({
   dir: 'content/docs',
@@ -35,11 +37,54 @@ ${pagePreamble}
 ${await page.data.getText('processed')}`,
 });
 
-// llms.txt: the instructions, then the page links under one heading, as the
-// llms.txt format expects one H1 followed by sections.
+/**
+llms.txt: the instructions, then a section per area: Overview for the root
+pages, then each top-level folder. Each line links the page's Markdown by
+absolute URL, so an agent fetches Markdown and the list works pasted
+anywhere.
+*/
 export function llmsIndex() {
-  const links = source
-    .getPageTree()
-    .children.map((node) => docsLlms.indexNode(node));
-  return `${agentInstructions}\n\n## Pages\n\n${links.join('\n')}\n`;
+  const { children } = source.getPageTree();
+  const root = children.filter((node) => node.type === 'page');
+  const folders = children.filter((node) => node.type === 'folder');
+  const sections = [
+    section('Overview', root),
+    ...folders.map((folder) =>
+      section(folderTitle(folder), [
+        ...(folder.index ? [folder.index] : []),
+        ...folder.children,
+      ]),
+    ),
+  ];
+  return `${agentInstructions}\n\n${sections.join('\n\n')}\n`;
+}
+
+// A folder's name is a ReactNode; Fumadocs titles ours from the folder name.
+function folderTitle(folder: PageTree.Folder): string {
+  if (typeof folder.name !== 'string') {
+    throw new TypeError('a docs folder needs a plain-text title');
+  }
+  return folder.name;
+}
+
+function pageLine(node: PageTree.Node): string[] {
+  if (node.type === 'folder') {
+    const pages = node.index ? [node.index, ...node.children] : node.children;
+    return pages.flatMap((child) => pageLine(child));
+  }
+  if (node.type !== 'page') return [];
+  const page = source.getNodePage(node);
+  if (page === undefined) throw new Error(`no page for ${node.url}`);
+  const link = `[${page.data.title}](${siteUrl}${markdownUrl(page.slugs)})`;
+  const { description } = page.data;
+  return [
+    description === undefined || description === ''
+      ? `- ${link}`
+      : `- ${link}: ${description}`,
+  ];
+}
+
+function section(title: string, nodes: PageTree.Node[]) {
+  const lines = nodes.flatMap((node) => pageLine(node));
+  return `## ${title}\n\n${lines.join('\n')}`;
 }
