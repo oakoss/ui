@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react';
 import { fumadocsMdx } from 'fumadocs-mdx/vite';
 import { defineConfig } from 'vite';
 
+import { manualSourcesPlugin } from './src/lib/manual-sources-plugin.ts';
 import { staticPages } from './src/lib/static-pages.ts';
 
 export default defineConfig({
@@ -12,6 +13,7 @@ export default defineConfig({
     // The site is English; the localization guide's demo switches to Arabic.
     optimizeLocales.vite({ locales: ['en', 'ar'] }),
     fumadocsMdx(),
+    manualSourcesPlugin(),
     tailwindcss(),
     tanstackStart({
       // autoSubfolderIndex false writes /404 to 404.html, which the host

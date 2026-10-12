@@ -1,12 +1,12 @@
 import type * as PageTree from 'fumadocs-core/page-tree';
 
 import { llms, loader } from 'fumadocs-core/source';
-import { lucideIconsPlugin } from 'fumadocs-core/source/lucide-icons';
 import { pageSchema } from 'fumadocs-core/source/schema';
 import { defineDocs } from 'fumadocs-mdx/macro';
 import { z } from 'zod';
 
 import { agentInstructions, pagePreamble } from '#/lib/llms';
+import { pageIcon } from '#/lib/page-icons';
 import { docsRoute, markdownUrl, siteUrl } from '#/lib/site';
 
 export const docs = defineDocs({
@@ -25,7 +25,7 @@ export const docs = defineDocs({
 
 export const source = loader({
   baseUrl: docsRoute,
-  plugins: [lucideIconsPlugin()],
+  icon: pageIcon,
   source: docs.toFumadocsSource(),
 });
 

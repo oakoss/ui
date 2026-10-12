@@ -29,6 +29,9 @@ export const restrictedSyntax = [
 const tail = [
   // oxlint runs the unicorn rules it enables; the finisher disables those here.
   eslintPluginUnicorn.configs.recommended,
+  // perfectionist/sort-classes owns class member order; the two disagree on
+  // where static methods and private members go.
+  { rules: { 'unicorn/consistent-class-member-order': 'off' } },
   {
     // Tools require a config module's top-level `export default defineConfig(…)`.
     files: [

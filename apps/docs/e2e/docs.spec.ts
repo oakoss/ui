@@ -1,6 +1,27 @@
 import { expect, test } from '@playwright/test';
+import { readdirSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 
 import { gotoHydrated } from './hydrated';
+
+const components = path.join(
+  import.meta.dirname,
+  '../dist/client/docs/components',
+);
+
+// Each component page with a Manual tab, and the file paths its .md links.
+function manualInstalls() {
+  return readdirSync(components)
+    .filter((file) => file.endsWith('.md'))
+    .map((file) => ({
+      files: readFileSync(path.join(components, file), 'utf-8')
+        .matchAll(/\[`([^`]+)`\]\([^)]*\/blob\/main\/packages\/ui\//gu)
+        .map(([, target = '']) => target)
+        .toArray(),
+      slug: `components/${file.replace(/\.md$/u, '')}`,
+    }))
+    .filter(({ files }) => files.length > 0);
+}
 
 test('a component demo responds after hydration', async ({ page }) => {
   await gotoHydrated(page, '/docs/components/button');
@@ -89,7 +110,72 @@ test('the Code tab shows the example source', async ({ page }) => {
 test('the Manual tab shows each file it installs', async ({ page }) => {
   await gotoHydrated(page, '/docs/components/button');
   await page.getByRole('tab', { name: 'Manual' }).click();
-  await expect(page.getByText('createCn').first()).toBeVisible();
+  // Each file loads on open as a titled, copyable code block.
+  const cx = page.getByRole('figure').filter({ hasText: 'createCn' });
+  await expect(cx).toBeVisible();
+  await expect(cx.locator('figcaption')).toHaveText('lib/cx.ts');
+  await expect(cx.getByRole('button', { name: 'Copy Text' })).toBeVisible();
+});
+
+for (const { files, slug } of manualInstalls()) {
+  test(`the Manual tab loads every file it lists on ${slug}`, async ({
+    page,
+  }) => {
+    await gotoHydrated(page, `/docs/${slug}`);
+    await page.getByRole('tab', { name: 'Manual' }).click();
+    const panel = page.getByRole('tabpanel', { name: 'Manual' });
+    await expect(panel.locator('figure figcaption')).toHaveText(files);
+  });
+}
+
+test('a page that fails to load keeps the sidebar', async ({ page }) => {
+  await gotoHydrated(page, '/docs/components/button');
+  // As when a later deploy has replaced the page's chunk.
+  await page.route('**/assets/text-field.mdx*', (route) => route.abort());
+  const sidebar = page.getByRole('complementary');
+  await sidebar.getByRole('link', { name: 'Text Field' }).click();
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'This page couldn’t load' }),
+  ).toBeVisible();
+  await expect(sidebar.getByRole('link', { name: 'Checkbox' })).toBeVisible();
+  await expect(
+    page.getByText('The site may have been updated since you opened it.'),
+  ).toBeVisible();
+  await page.unroute('**/assets/text-field.mdx*');
+  await page.getByRole('button', { name: 'Reload the page' }).click();
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Text Field' }),
+  ).toBeVisible();
+});
+
+test('a page whose data fails to load offers no reload', async ({ page }) => {
+  await gotoHydrated(page, '/docs/components/button');
+  await page.route('**/__tsr/staticServerFnCache/**', (route) => route.abort());
+  await page
+    .getByRole('complementary')
+    .getByRole('link', { name: 'Text Field' })
+    .click();
+  await expect(
+    page.getByText('Something went wrong showing this page.'),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Reload the page' }),
+  ).toHaveCount(0);
+});
+
+test('a Manual tab whose files fail to load keeps the page', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/docs/components/button');
+  // As when a later deploy has replaced the chunks the page was built with.
+  await page.route('**/assets/*.js', (route) => route.abort());
+  await page.getByRole('tab', { name: 'Manual' }).click();
+  await expect(page.getByRole('alert')).toContainText(
+    'The files couldn’t be shown.',
+  );
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Button' }),
+  ).toBeVisible();
 });
 
 test('search finds a component page', async ({ page }) => {

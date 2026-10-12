@@ -1,15 +1,12 @@
 import registry from '@oakoss/ui/registry.json';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { type File, type Node, recordExpansion } from './expansion-output';
 import { manualSources } from './manual-sources';
+import { targetPath } from './registry-paths';
 import { githubUrl } from './site';
 
-const ui = path.dirname(
-  fileURLToPath(import.meta.resolve('@oakoss/ui/registry.json')),
-);
 const demos = path.join(import.meta.dirname, '../components/demos');
 
 type Item = (typeof registry.items)[number];
@@ -25,13 +22,43 @@ const packageManagers: PackageManager[] = [
   { add: 'bun add', dlx: 'bunx --bun', name: 'bun' },
 ];
 
+/**
+Expands `<ComponentPreview name>` and `<ComponentInstall item>` into
+Markdown at build time, so the demo source and install steps also reach the
+`.md` and llms.txt output, and the install steps' text reaches search.
+*/
+export function remarkComponentDocs() {
+  return (tree: Node, file: File) => {
+    const compiler = '_compiler' in file.data ? file.data._compiler : undefined;
+    // Registered so the dev server recompiles the page when a source changes.
+    const read: Read = (source) => {
+      if (hasAddDependency(compiler)) compiler.addDependency(source);
+      return readFileSync(source, 'utf-8');
+    };
+    transform(tree, read, (node, expanded) =>
+      recordExpansion(file, node, expanded),
+    );
+  };
+}
+
 function attribute(node: Node, name: string): string | undefined {
   const value = node.attributes?.find((entry) => entry.name === name)?.value;
   return typeof value === 'string' ? value : undefined;
 }
 
-function code(lang: string, value: string, meta?: string): Node {
-  return { lang, meta, type: 'code', value };
+// The item and every item it depends on, dependencies first.
+function closure(name: string, seen = new Set<string>()): Item[] {
+  if (seen.has(name)) return [];
+  seen.add(name);
+  const item = findItem(name);
+  const deps = (item.registryDependencies ?? []).flatMap((dep) =>
+    closure(dep.replace('oakoss/ui/', ''), seen),
+  );
+  return [...deps, item];
+}
+
+function code(lang: string, value: string): Node {
+  return { lang, type: 'code', value };
 }
 
 // Package-manager tabs whose choice persists across pages.
@@ -74,71 +101,6 @@ function element(
     name,
     type: 'mdxJsxFlowElement',
   };
-}
-
-// A paragraph from plain strings and inline nodes.
-function paragraph(...parts: (Node | string)[]): Node {
-  return {
-    children: parts.map((part) =>
-      typeof part === 'string' ? { type: 'text', value: part } : part,
-    ),
-    type: 'paragraph',
-  };
-}
-
-function tabs(entries: [string, Node[]][]): Node {
-  return element('Tabs', { defaultValue: entries[0]?.[0] ?? '' }, [
-    element(
-      'TabsList',
-      {},
-      entries.map(([label]) =>
-        element('TabsTrigger', { value: label }, [
-          { type: 'text', value: label },
-        ]),
-      ),
-    ),
-    ...entries.map(([label, children]) =>
-      element('TabsContent', { value: label }, children),
-    ),
-  ]);
-}
-
-// shadcn's default alias directories.
-const aliasDirectories: Record<string, string> = {
-  components: 'components',
-  hooks: 'hooks',
-  lib: 'lib',
-  ui: 'components/ui',
-};
-
-/**
-Expands `<ComponentPreview name>` and `<ComponentInstall item>` into
-Markdown at build time, so the demo source and install steps also reach the
-`.md` and llms.txt output, and the install steps' text reaches search.
-*/
-export function remarkComponentDocs() {
-  return (tree: Node, file: File) => {
-    const compiler = '_compiler' in file.data ? file.data._compiler : undefined;
-    // Registered so the dev server recompiles the page when a source changes.
-    const read: Read = (source) => {
-      if (hasAddDependency(compiler)) compiler.addDependency(source);
-      return readFileSync(source, 'utf-8');
-    };
-    transform(tree, read, (node, expanded) =>
-      recordExpansion(file, node, expanded),
-    );
-  };
-}
-
-// The item and every item it depends on, dependencies first.
-function closure(name: string, seen = new Set<string>()): Item[] {
-  if (seen.has(name)) return [];
-  seen.add(name);
-  const item = findItem(name);
-  const deps = (item.registryDependencies ?? []).flatMap((dep) =>
-    closure(dep.replace('oakoss/ui/', ''), seen),
-  );
-  return [...deps, item];
 }
 
 function fileList(files: { path: string; target: string }[]): Node {
@@ -188,17 +150,17 @@ function iconStep(): Node {
   ]);
 }
 
-function install(name: string, read: Read): Node {
+function install(name: string): Node {
   return tabs([
     [
       'CLI',
       [commandTabs(({ dlx }) => `${dlx} shadcn@latest add oakoss/ui/${name}`)],
     ],
-    ['Manual', [manualSteps(closure(name), read)]],
+    ['Manual', [manualSteps(closure(name))]],
   ]);
 }
 
-function manualSteps(items: Item[], read: Read): Node {
+function manualSteps(items: Item[]): Node {
   const packages = [
     ...new Set(items.flatMap((item) => item.dependencies ?? [])),
   ].toSorted((a, b) => a.localeCompare(b));
@@ -207,12 +169,9 @@ function manualSteps(items: Item[], read: Read): Node {
   )
     .values()
     .toArray();
+  // Placeholders the Manual tab fills by loading each file's own module.
   const sources = files.map((file) =>
-    code(
-      'tsx',
-      read(path.join(ui, file.path)),
-      `title="${targetPath(file.target)}"`,
-    ),
+    element('ManualSource', { file: file.path }, []),
   );
   return element('Steps', {}, [
     element('Step', {}, [
@@ -245,6 +204,16 @@ function manualSteps(items: Item[], read: Read): Node {
   ]);
 }
 
+// A paragraph from plain strings and inline nodes.
+function paragraph(...parts: (Node | string)[]): Node {
+  return {
+    children: parts.map((part) =>
+      typeof part === 'string' ? { type: 'text', value: part } : part,
+    ),
+    type: 'paragraph',
+  };
+}
+
 function preview(node: Node, read: Read): Node {
   const name = attribute(node, 'name');
   if (name === undefined) throw new Error('<ComponentPreview> needs a name');
@@ -259,12 +228,21 @@ function preview(node: Node, read: Read): Node {
   ]);
 }
 
-function targetPath(target: string): string {
-  return target.replace(/^@(\w+)\//u, (match, alias: string) =>
-    aliasDirectories[alias] === undefined
-      ? match
-      : `${aliasDirectories[alias]}/`,
-  );
+function tabs(entries: [string, Node[]][]): Node {
+  return element('Tabs', { defaultValue: entries[0]?.[0] ?? '' }, [
+    element(
+      'TabsList',
+      {},
+      entries.map(([label]) =>
+        element('TabsTrigger', { value: label }, [
+          { type: 'text', value: label },
+        ]),
+      ),
+    ),
+    ...entries.map(([label, children]) =>
+      element('TabsContent', { value: label }, children),
+    ),
+  ]);
 }
 
 function transform(
@@ -278,7 +256,7 @@ function transform(
   if (node.type === 'mdxJsxFlowElement' && node.name === 'ComponentInstall') {
     const item = attribute(node, 'item');
     if (item === undefined) throw new Error('<ComponentInstall> needs an item');
-    return expand(node, install(item, read));
+    return expand(node, install(item));
   }
   if (node.children) {
     node.children = node.children.map((child) =>
