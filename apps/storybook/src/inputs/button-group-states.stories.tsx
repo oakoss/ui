@@ -16,7 +16,7 @@ import {
 } from '@oakoss/ui/components/ui/overlays/popover';
 import { expect, screen, userEvent } from 'storybook/test';
 
-import { whilePressed } from '../press';
+import { whilePressed } from '#/press';
 
 const meta = {
   args: { variant: 'outline' },

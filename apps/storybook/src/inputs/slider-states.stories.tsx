@@ -3,8 +3,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Slider } from '@oakoss/ui/components/ui/inputs/slider';
 import { expect, userEvent } from 'storybook/test';
 
-import { contrast } from '../color';
-import { part } from '../parts';
+import { contrast } from '#/color';
+import { part } from '#/parts';
 
 // Storybook reads props from a component, not a generic one.
 const SingleSlider = Slider<number>;

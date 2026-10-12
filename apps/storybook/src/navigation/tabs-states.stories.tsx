@@ -8,9 +8,9 @@ import {
 } from '@oakoss/ui/components/ui/navigation/tabs';
 import { expect, userEvent } from 'storybook/test';
 
-import { contrast } from '../color';
-import { paintedColor } from '../paint';
-import { part } from '../parts';
+import { contrast } from '#/color';
+import { paintedColor } from '#/paint';
+import { part } from '#/parts';
 
 const meta = {
   args: { disabledKeys: ['team'] },

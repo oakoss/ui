@@ -9,7 +9,7 @@ import {
 import { Menu, MenuItem, Text } from 'react-aria-components';
 import { expect, waitFor } from 'storybook/test';
 
-import { part } from '../parts';
+import { part } from '#/parts';
 
 const meta = {
   args: { children: 'K' },

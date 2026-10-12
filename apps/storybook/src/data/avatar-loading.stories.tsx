@@ -11,7 +11,8 @@ import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { expect, userEvent, waitFor } from 'storybook/test';
 
-import { part } from '../parts';
+import { part } from '#/parts';
+
 import { AvatarDemo, type AvatarDemoProps, broken, photo } from './avatar-demo';
 import servedPhoto from './avatar-photo.svg?url';
 

@@ -13,7 +13,7 @@ import {
 import { Button } from '@oakoss/ui/components/ui/inputs/button';
 import { expect } from 'storybook/test';
 
-import { part } from '../parts';
+import { part } from '#/parts';
 
 function EmptyDemo(props: EmptyMediaProps) {
   return (
