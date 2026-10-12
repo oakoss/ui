@@ -128,6 +128,41 @@ for (const { files, slug } of manualInstalls()) {
   });
 }
 
+test('a page that fails to load keeps the sidebar', async ({ page }) => {
+  await gotoHydrated(page, '/docs/components/button');
+  // As when a later deploy has replaced the page's chunk.
+  await page.route('**/assets/text-field.mdx*', (route) => route.abort());
+  const sidebar = page.getByRole('complementary');
+  await sidebar.getByRole('link', { name: 'Text Field' }).click();
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'This page couldn’t load' }),
+  ).toBeVisible();
+  await expect(sidebar.getByRole('link', { name: 'Checkbox' })).toBeVisible();
+  await expect(
+    page.getByText('The site may have been updated since you opened it.'),
+  ).toBeVisible();
+  await page.unroute('**/assets/text-field.mdx*');
+  await page.getByRole('button', { name: 'Reload the page' }).click();
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Text Field' }),
+  ).toBeVisible();
+});
+
+test('a page whose data fails to load offers no reload', async ({ page }) => {
+  await gotoHydrated(page, '/docs/components/button');
+  await page.route('**/__tsr/staticServerFnCache/**', (route) => route.abort());
+  await page
+    .getByRole('complementary')
+    .getByRole('link', { name: 'Text Field' })
+    .click();
+  await expect(
+    page.getByText('Something went wrong showing this page.'),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Reload the page' }),
+  ).toHaveCount(0);
+});
+
 test('a Manual tab whose files fail to load keeps the page', async ({
   page,
 }) => {

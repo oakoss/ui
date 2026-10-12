@@ -1,4 +1,9 @@
-import { createFileRoute, Link, notFound } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  type ErrorComponentProps,
+  Link,
+  notFound,
+} from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { staticFunctionMiddleware } from '@tanstack/start-static-server-functions';
 import { useFumadocsLoader } from 'fumadocs-core/source/client';
@@ -23,6 +28,7 @@ import { docs, source } from '#/lib/source';
 
 export const Route = createFileRoute('/docs/$')({
   component: Page,
+  errorComponent: PageError,
   loader: async ({ params }) => {
     const slugs = params._splat?.split('/') ?? [];
     // The 404 page hydrates on unknown URLs; with no baked data for them, the
@@ -120,6 +126,49 @@ function Page() {
           sourceUrl={sourceUrl}
         />
       </Suspense>
+    </DocsLayout>
+  );
+}
+
+// A page that fails, such as one whose chunk a later deploy replaced, keeps
+// the sidebar. Its loader may be what failed, so the tree comes from source.
+function PageError({ error }: ErrorComponentProps) {
+  const message = error instanceof Error ? error.message : String(error);
+  // Reloading fixes only a failed chunk import, which each browser words
+  // differently (Chromium and Firefox, then Safari).
+  const isStale =
+    /dynamically imported module|Importing a module script failed/u.test(
+      message,
+    );
+  return (
+    <DocsLayout {...baseOptions()} tree={source.getPageTree()}>
+      <DocsPage>
+        <DocsTitle>This page couldn’t load</DocsTitle>
+        <DocsDescription>
+          {isStale
+            ? 'The site may have been updated since you opened it.'
+            : 'Something went wrong showing this page.'}
+        </DocsDescription>
+        <DocsBody>
+          {isStale ? (
+            <p>
+              <button
+                className="underline"
+                onClick={() => location.reload()}
+                type="button"
+              >
+                Reload the page
+              </button>{' '}
+              or pick another page from the sidebar.
+            </p>
+          ) : (
+            <p>Pick another page from the sidebar.</p>
+          )}
+          {import.meta.env.DEV ? (
+            <pre>{error instanceof Error ? error.stack : message}</pre>
+          ) : null}
+        </DocsBody>
+      </DocsPage>
     </DocsLayout>
   );
 }
