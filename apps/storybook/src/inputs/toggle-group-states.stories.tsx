@@ -6,7 +6,7 @@ import {
 } from '@oakoss/ui/components/ui/inputs/toggle-group';
 import { expect } from 'storybook/test';
 
-import { contrast } from '../color';
+import { contrast } from '#/color';
 
 const meta = {
   args: { 'aria-label': 'Text style', selectionMode: 'multiple' },

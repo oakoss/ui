@@ -4,8 +4,8 @@ import * as Icon from '@oakoss/ui/components/icons';
 import { Toggle } from '@oakoss/ui/components/ui/inputs/toggle';
 import { expect, fn, userEvent } from 'storybook/test';
 
-import { contrast, tokenColor } from '../color';
-import { paintedColor } from '../paint';
+import { contrast, tokenColor } from '#/color';
+import { paintedColor } from '#/paint';
 
 const onChange = fn<(isSelected: boolean) => void>();
 

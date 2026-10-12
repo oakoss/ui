@@ -8,8 +8,8 @@ import {
 } from '@oakoss/ui/components/ui/navigation/pagination';
 import { expect, userEvent } from 'storybook/test';
 
-import { contrast } from '../color';
-import { paintedColor } from '../paint';
+import { contrast } from '#/color';
+import { paintedColor } from '#/paint';
 
 const meta = {
   component: Pagination,

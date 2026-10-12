@@ -10,7 +10,8 @@ import {
 } from '@oakoss/ui/components/ui/data/avatar';
 import { expect, waitFor } from 'storybook/test';
 
-import { part } from '../parts';
+import { part } from '#/parts';
+
 import { AvatarDemo, type AvatarDemoProps, broken, photo } from './avatar-demo';
 
 const meta = {

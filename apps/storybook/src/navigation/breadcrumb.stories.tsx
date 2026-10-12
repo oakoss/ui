@@ -10,7 +10,7 @@ import {
 } from '@oakoss/ui/components/ui/navigation/breadcrumb';
 import { expect, fn, userEvent } from 'storybook/test';
 
-import { part } from '../parts';
+import { part } from '#/parts';
 
 const meta = {
   component: Breadcrumb,

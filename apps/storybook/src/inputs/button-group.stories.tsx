@@ -10,7 +10,7 @@ import {
 import { Input } from '@oakoss/ui/components/ui/inputs/input';
 import { expect } from 'storybook/test';
 
-import { part } from '../parts';
+import { part } from '#/parts';
 
 const meta = {
   args: { variant: 'outline' },

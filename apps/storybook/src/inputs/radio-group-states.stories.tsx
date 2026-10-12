@@ -6,8 +6,8 @@ import {
 } from '@oakoss/ui/components/ui/inputs/radio-group';
 import { expect, fn, userEvent } from 'storybook/test';
 
-import { contrast, tokenColor } from '../color';
-import { part } from '../parts';
+import { contrast, tokenColor } from '#/color';
+import { part } from '#/parts';
 
 const meta = {
   args: {
