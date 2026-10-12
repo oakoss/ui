@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { expect, test } from 'vitest';
 
-import { lucideIcons } from '../src/components/icon-resolver';
+import { lucideIcons } from '#/components/icon-resolver';
 
 const icons = readFileSync(
   path.join(

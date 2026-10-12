@@ -2,10 +2,10 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-import { agentInstructions, pagePreamble } from '../src/lib/llms';
-import { INHERITED_PREFIX } from '../src/lib/props';
-import { siteUrl } from '../src/lib/site';
-import { staticPages } from '../src/lib/static-pages';
+import { agentInstructions, pagePreamble } from '#/lib/llms';
+import { INHERITED_PREFIX } from '#/lib/props';
+import { siteUrl } from '#/lib/site';
+import { staticPages } from '#/lib/static-pages';
 
 const client = path.join(import.meta.dirname, '../dist/client');
 const content = path.join(import.meta.dirname, '../content/docs');

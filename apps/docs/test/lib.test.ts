@@ -1,12 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { INHERITED_PREFIX, NO_OWN_PROPS, ownEntries } from '../src/lib/props';
-import {
-  decodeMarkdownUrl,
-  githubSourceUrl,
-  markdownUrl,
-} from '../src/lib/site';
-import { typeTableMarkdown } from '../src/lib/type-tables';
+import { INHERITED_PREFIX, NO_OWN_PROPS, ownEntries } from '#/lib/props';
+import { decodeMarkdownUrl, githubSourceUrl, markdownUrl } from '#/lib/site';
+import { typeTableMarkdown } from '#/lib/type-tables';
 
 describe('markdownUrl', () => {
   it.each([
