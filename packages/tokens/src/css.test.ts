@@ -10,7 +10,7 @@ import {
 } from '#/css';
 import { tailwindScales } from '#/families/tailwind-scales';
 import { families, styles, typographies } from '#/index';
-import { registryCssVars } from '#/registry';
+import { familyCssVars, registryCssVars } from '#/registry';
 
 const { vega } = styles;
 
@@ -169,5 +169,21 @@ describe('registryCssVars', () => {
     expect(
       Object.values(vars.dark).every((value) => value.startsWith('oklch')),
     ).toBe(true);
+  });
+});
+
+describe('familyCssVars', () => {
+  it('holds literal colors per polarity and nothing from the style', () => {
+    const { dark, light } = familyCssVars(families.mauve, vega);
+    expect(light).toMatchObject({
+      background: 'oklch(1 0 0)',
+      field: 'oklch(0 0 0 / 0%)',
+      primary: 'oklch(0.212 0.019 322.12)',
+    });
+    expect(dark).toMatchObject({
+      background: 'oklch(0.145 0.008 326)',
+      field: 'oklch(0.985 0 0 / 4.5%)',
+    });
+    expect(light).not.toHaveProperty('radius');
   });
 });

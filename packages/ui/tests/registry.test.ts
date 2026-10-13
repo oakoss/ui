@@ -209,6 +209,13 @@ test('every component depends on the theme', () => {
   expect(ui.items.filter(isThemeless).map(({ name }) => name)).toEqual([]);
 });
 
+test('item names are unique', () => {
+  const names = ui.items.map(({ name }) => name);
+  expect(names.filter((name, index) => names.indexOf(name) !== index)).toEqual(
+    [],
+  );
+});
+
 describe.each(shipped)('$name', ({ unlistedFiles, unlistedPackages }) => {
   test('lists every local file it imports', () => {
     expect(unlistedFiles).toEqual([]);

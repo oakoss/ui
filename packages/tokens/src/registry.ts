@@ -20,6 +20,23 @@ export type CssVars = {
 };
 
 /**
+A family's colors alone, for a `theme-<family>` item that depends on the
+`theme` item: shadcn installs the dependency first and the family's values
+win, while style and type tokens stay single-sourced in `theme`.
+*/
+export function familyCssVars(
+  family: Family,
+  style: Style,
+): Pick<CssVars, 'dark' | 'light'> {
+  const light = resolved(family, 'light');
+  const dark = resolved(family, 'dark');
+  return {
+    dark: { field: fieldColor(style, 'dark', dark), ...colors(dark) },
+    light: { field: fieldColor(style, 'light', light), ...colors(light) },
+  };
+}
+
+/**
 The default theme as a shadcn `registry:theme` item's `cssVars`. shadcn
 writes `light` to `:root` and `dark` to `.dark`, bridging only literal
 colors to `--color-*`, so values are resolved rather than `var()` aliases.
@@ -31,15 +48,13 @@ export function registryCssVars(
   style: Style,
   typography: Typography,
 ): CssVars {
-  const light = resolved(family, 'light');
-  const dark = resolved(family, 'dark');
+  const { dark, light } = familyCssVars(family, style);
   const styleVars = styleDeclarations(style);
   return {
-    dark: { field: fieldColor(style, 'dark', dark), ...colors(dark) },
+    dark,
     light: {
       ...unprefix(styleVars.root.filter((entry) => isRadius(entry))),
-      field: fieldColor(style, 'light', light),
-      ...colors(light),
+      ...light,
     },
     theme: {
       'color-field': 'var(--field)',
