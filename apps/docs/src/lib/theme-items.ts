@@ -52,6 +52,7 @@ export function themeOptions(): ThemeOptions {
       name: entry.name,
       primaries: entry.intents.primary.choices.map((primary) => ({
         id: primary,
+        label: `${primary.charAt(0).toUpperCase()}${primary.slice(1)}`,
         swatch: swatch(themeItem({ family: entry, primary, radius }, style)),
       })),
       primary: entry.intents.primary.default,

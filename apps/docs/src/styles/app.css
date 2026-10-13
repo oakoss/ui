@@ -10,6 +10,33 @@
   --color-fd-muted-foreground: hsl(0, 0%, 40%);
 }
 
+/* The theme panel's radius. Tokens like --radius-control resolve on <html>,
+   so <html> takes the preview radius; body returns to the site's, and our
+   components (overlays portaled to body included) take the preview's again. */
+:root[data-radius] {
+  --radius: var(--preview-radius);
+}
+
+:root[data-radius] body {
+  --radius: var(--site-radius);
+}
+
+:root[data-radius] [data-slot] {
+  --radius: var(--preview-radius);
+}
+
+/* The scale resolves where it's declared, and CSS like Fumadocs' prose tables
+   reads it directly, so it follows each --radius change. Matches theme.css. */
+:root[data-radius] :is(body, [data-slot]) {
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
 /* Stops the sidebar stretching across Fumadocs' centering gutter; 100vw would shrink content when it collapses. */
 :root {
   --fd-layout-width: 9999px;

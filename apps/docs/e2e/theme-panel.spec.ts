@@ -56,7 +56,20 @@ test('the theme reaches previews and their popovers, not the site', async ({
     page.locator('html'),
     '--color-fd-background',
   );
+  const pageAction = page.getByRole('button', { name: 'Copy Markdown' });
+  const siteRadius = await pageAction.evaluate(
+    (element) => getComputedStyle(element).borderTopLeftRadius,
+  );
+  expect(siteRadius).not.toBe('0px');
+  // Fumadocs' prose tables read --radius-lg itself, not a utility.
+  const table = page.locator('.prose table').first();
+  const tableRadius = await table.evaluate(
+    (element) => getComputedStyle(element).borderTopLeftRadius,
+  );
+  expect(tableRadius).not.toBe('0px');
   await gotoHydrated(page, shared);
+  await expect(pageAction).toHaveCSS('border-top-left-radius', siteRadius);
+  await expect(table).toHaveCSS('border-top-left-radius', tableRadius);
   const trigger = page.getByRole('button', { name: 'Dimensions' });
   await expect(trigger).toHaveCSS('border-top-left-radius', '0px');
   await trigger.click();
@@ -71,6 +84,26 @@ test('the theme reaches previews and their popovers, not the site', async ({
   expect(await cssVar(page.locator('html'), '--color-fd-background')).toBe(
     siteBackground,
   );
+});
+
+// An option's rounded-sm reads --radius where it renders, in body.
+test('the radius reaches parts rounded on their own element', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/docs/components/select?family=zinc&radius=none');
+  await page.getByRole('button', { name: /Fruit/u }).first().click();
+  const option = page.getByRole('option', { name: 'Apple' });
+  await expect(option).toHaveCSS('border-top-left-radius', '0px');
+});
+
+test('a shared link leaves the address bar once applied', async ({ page }) => {
+  await gotoHydrated(page, `${shared}#usage`);
+  await expect(page).toHaveURL(/\/docs\/components\/popover#usage$/u);
+  const panel = await openPanel(page);
+  await panel.getByRole('radio', { name: 'Large' }).click();
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-radius', 'large');
+  await expect(page.locator('html')).toHaveAttribute('data-family', 'mauve');
 });
 
 test('a chosen theme stays on the next page', async ({ page }) => {
@@ -93,7 +126,7 @@ test('the panel restyles the page and builds the install command', async ({
   await expect(page.locator('html')).toHaveAttribute('data-radius', 'large');
 
   // Mauve's own gray isn't one of Olive's primaries, so the primary resets.
-  await panel.getByRole('radio', { name: 'mauve' }).click();
+  await panel.getByRole('radio', { exact: true, name: 'Mauve' }).click();
   await panel.getByRole('button', { name: /Family/u }).click();
   await page.getByRole('option', { name: 'Olive' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-family', 'olive');
@@ -109,6 +142,83 @@ test('a choice made in the panel stays on the next page', async ({ page }) => {
   await panel.getByRole('radio', { name: 'Large' }).click();
   await gotoHydrated(page, '/docs/components/popover');
   await expect(page.locator('html')).toHaveAttribute('data-radius', 'large');
+});
+
+test('the command uses the package manager picked in the install tabs', async ({
+  page,
+}) => {
+  // This tab's pick (session storage) wins over the remembered one, as in
+  // Fumadocs' tabs.
+  await page.addInitScript(() => {
+    localStorage.setItem('package-manager', 'pnpm');
+    sessionStorage.setItem('package-manager', 'bun');
+  });
+  await gotoHydrated(page, '/docs/components/button');
+  const panel = await openPanel(page);
+  await expect(panel.getByRole('code')).toHaveText(
+    /^bunx --bun shadcn@latest add /u,
+  );
+});
+
+test('reset returns to the default theme and forgets the choice', async ({
+  page,
+}) => {
+  await gotoHydrated(page, shared);
+  const panel = await openPanel(page);
+  await panel.getByRole('button', { name: 'Reset' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-family', 'zinc');
+  await expect(panel.getByRole('code')).toHaveText(/zinc-zinc-medium\.json$/u);
+  expect(
+    await page.evaluate(() => localStorage.getItem('oakoss-theme')),
+  ).toBeNull();
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-family', 'zinc');
+  await expect(page.locator('html')).toHaveAttribute('data-radius', 'medium');
+});
+
+test('swatches keep their color in forced colors', async ({ page }) => {
+  await gotoHydrated(page, '/docs/components/button');
+  const panel = await openPanel(page);
+  const swatch = panel
+    .getByRole('radio', { exact: true, name: 'Red' })
+    .locator('span');
+  const color = await swatch.evaluate(
+    (element) => getComputedStyle(element).backgroundColor,
+  );
+  await page.emulateMedia({ forcedColors: 'active' });
+  await expect(swatch).toHaveCSS('background-color', color);
+});
+
+test('the theme button names itself in a tooltip', async ({ page }) => {
+  await gotoHydrated(page, '/docs/components/button');
+  // A tooltip opens on keyboard focus; a test's hover doesn't set React
+  // Aria's pointer modality.
+  await page.getByRole('button', { exact: true, name: 'Theme' }).focus();
+  await page.keyboard.press('Shift+Tab');
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('tooltip', { name: 'Theme' })).toBeVisible();
+});
+
+test('a swatch names its color in a tooltip', async ({ page }) => {
+  await gotoHydrated(page, '/docs/components/button');
+  const panel = await openPanel(page);
+  await panel.getByRole('radio', { exact: true, name: 'Red' }).focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(
+    page.getByRole('tooltip', { exact: true, name: 'Orange' }),
+  ).toBeVisible();
+});
+
+test('the panel opens from the sidebar on a phone', async ({ page }) => {
+  await page.setViewportSize({ height: 700, width: 375 });
+  await gotoHydrated(page, '/docs/components/button');
+  await page.getByRole('button', { name: 'Open Sidebar' }).first().click();
+  const panel = await openPanel(page);
+  const { left, right } = await panel.evaluate((element) =>
+    element.getBoundingClientRect().toJSON(),
+  );
+  expect(left).toBeGreaterThanOrEqual(0);
+  expect(right).toBeLessThanOrEqual(375);
 });
 
 test('a refused clipboard write says so', async ({ page }) => {

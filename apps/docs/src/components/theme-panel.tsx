@@ -11,11 +11,16 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from '@oakoss/ui/components/ui/overlays/popover';
+import {
+  Tooltip,
+  TooltipTrigger,
+} from '@oakoss/ui/components/ui/overlays/tooltip';
 import { Palette } from 'lucide-react';
 import { type ReactNode, useEffect, useId, useRef, useState } from 'react';
 import { type Key } from 'react-aria-components';
 import { themeOptions } from 'virtual:theme-options';
 
+import { packageManagerKey, packageManagers } from '#/lib/package-managers';
 import { siteUrl } from '#/lib/site';
 import {
   applyTheme,
@@ -27,18 +32,22 @@ import {
 
 type CopyResult = 'Copied' | 'Copy failed';
 
-type Update = (change: Partial<ThemeState>) => void;
+type Update = (change: null | Partial<ThemeState>) => void;
 
 export function ThemePanel() {
   const [theme, setTheme] = useState(themeOptions.defaults);
 
-  // Any primary the new family lacks falls back to its default.
+  // Any primary the new family lacks falls back to its default; null resets.
   const update: Update = (change) => {
-    const next = pickTheme(themeOptions, [{ ...theme, ...change }]);
+    const next =
+      change === null
+        ? themeOptions.defaults
+        : pickTheme(themeOptions, [{ ...theme, ...change }]);
     setTheme(next);
     applyTheme(themeOptions, next);
     try {
-      localStorage.setItem(themeStorageKey, JSON.stringify(next));
+      if (change === null) localStorage.removeItem(themeStorageKey);
+      else localStorage.setItem(themeStorageKey, JSON.stringify(next));
     } catch {
       // Storage can be blocked; the theme still applies to this page.
     }
@@ -50,19 +59,21 @@ export function ThemePanel() {
         if (open) setTheme(current());
       }}
     >
-      <Button aria-label="Theme" size="icon-sm" variant="ghost">
-        <Palette aria-hidden />
-      </Button>
+      <TooltipTrigger>
+        <Button aria-label="Theme" size="icon-sm" variant="ghost">
+          <Palette aria-hidden />
+        </Button>
+        <Tooltip>Theme</Tooltip>
+      </TooltipTrigger>
       <Popover aria-label="Theme" className="w-80">
         <PopoverHeader>
           <PopoverTitle>Theme</PopoverTitle>
           <PopoverDescription>
-            Restyles the component previews. The site keeps its own colors but
-            shares the radius.
+            Restyles the component previews. The site keeps its own theme.
           </PopoverDescription>
         </PopoverHeader>
         <Controls theme={theme} update={update} />
-        <Install theme={theme} />
+        <Install theme={theme} update={update} />
       </Popover>
     </PopoverTrigger>
   );
@@ -129,13 +140,8 @@ function Controls({ theme, update }: { theme: ThemeState; update: Update }) {
       >
         {themeOptions.families
           .find(({ id }) => id === theme.family)
-          ?.primaries.map(({ id, swatch }) => (
-            <ToggleGroupItem aria-label={id} id={id} key={id}>
-              <span
-                className="size-4 rounded-full"
-                style={{ background: swatch }}
-              />
-            </ToggleGroupItem>
+          ?.primaries.map((primary) => (
+            <Swatch key={primary.id} {...primary} />
           ))}
       </Choices>
       <Choices
@@ -202,8 +208,21 @@ function current(): ThemeState {
   return pickTheme(themeOptions, [{ family, primary, radius }]);
 }
 
-function Install({ theme }: { theme: ThemeState }) {
-  const command = `npx shadcn@latest add ${siteUrl}${themeItemPath(theme)}`;
+// Fumadocs keeps the install tabs' pick in session storage, then local storage.
+function dlx(): string {
+  let name: null | string = null;
+  try {
+    name =
+      sessionStorage.getItem(packageManagerKey) ??
+      localStorage.getItem(packageManagerKey);
+  } catch {
+    // Storage can be blocked; npm is the tabs' default too.
+  }
+  return packageManagers.find((manager) => manager.name === name)?.dlx ?? 'npx';
+}
+
+function Install({ theme, update }: { theme: ThemeState; update: Update }) {
+  const command = `${dlx()} shadcn@latest add ${siteUrl}${themeItemPath(theme)}`;
   return (
     <div className="flex flex-col gap-2">
       <code className="rounded-md bg-muted p-2 font-mono text-xs break-all">
@@ -212,6 +231,14 @@ function Install({ theme }: { theme: ThemeState }) {
       <div className="flex gap-2">
         <CopyButton text={() => command}>Copy command</CopyButton>
         <CopyButton text={() => shareUrl(theme)}>Copy link</CopyButton>
+        <Button
+          className="ms-auto"
+          onPress={() => update(null)}
+          size="sm"
+          variant="ghost"
+        >
+          Reset
+        </Button>
       </div>
     </div>
   );
@@ -219,4 +246,28 @@ function Install({ theme }: { theme: ThemeState }) {
 
 function shareUrl(theme: ThemeState): string {
   return `${location.origin}${location.pathname}?${new URLSearchParams(theme)}`;
+}
+
+function Swatch({
+  id,
+  label,
+  swatch,
+}: {
+  id: string;
+  label: string;
+  swatch: string;
+}) {
+  return (
+    <TooltipTrigger>
+      <ToggleGroupItem aria-label={label} id={id}>
+        {/* Forced colors would drop the background, leaving every swatch
+            blank. */}
+        <span
+          className="size-4 rounded-full border border-foreground/15 forced-color-adjust-none"
+          style={{ background: swatch }}
+        />
+      </ToggleGroupItem>
+      <Tooltip>{label}</Tooltip>
+    </TooltipTrigger>
+  );
 }

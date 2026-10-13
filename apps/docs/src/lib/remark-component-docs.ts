@@ -4,6 +4,11 @@ import path from 'node:path';
 
 import { type File, type Node, recordExpansion } from './expansion-output';
 import { manualSources } from './manual-sources';
+import {
+  type PackageManager,
+  packageManagerKey,
+  packageManagers,
+} from './package-managers';
 import { targetPath } from './registry-paths';
 import { githubUrl } from './site';
 
@@ -11,16 +16,7 @@ const demos = path.join(import.meta.dirname, '../components/demos');
 
 type Item = (typeof registry.items)[number];
 
-type PackageManager = { add: string; dlx: string; name: string };
-
 type Read = (file: string) => string;
-
-const packageManagers: PackageManager[] = [
-  { add: 'npm install', dlx: 'npx', name: 'npm' },
-  { add: 'pnpm add', dlx: 'pnpm dlx', name: 'pnpm' },
-  { add: 'yarn add', dlx: 'yarn dlx', name: 'yarn' },
-  { add: 'bun add', dlx: 'bunx --bun', name: 'bun' },
-];
 
 /**
 Expands `<ComponentPreview name>` and `<ComponentInstall item>` into
@@ -65,7 +61,7 @@ function code(lang: string, value: string): Node {
 function commandTabs(command: (manager: PackageManager) => string): Node {
   return element(
     'CodeBlockTabs',
-    { defaultValue: 'npm', groupId: 'package-manager', persist: null },
+    { defaultValue: 'npm', groupId: packageManagerKey, persist: null },
     [
       element(
         'CodeBlockTabsList',

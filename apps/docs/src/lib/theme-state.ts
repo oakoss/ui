@@ -3,7 +3,7 @@ export type ThemeOptions = {
   families: {
     id: string;
     name: string;
-    primaries: { id: string; swatch: string }[];
+    primaries: { id: string; label: string; swatch: string }[];
     // The family's default primary.
     primary: string;
   }[];
@@ -14,13 +14,17 @@ export type ThemeState = { family: string; primary: string; radius: string };
 
 export const themeStorageKey = 'oakoss-theme';
 
+// app.css gives the preview radius to our components and the site radius
+// to the rest of the page.
 export function applyTheme(options: ThemeOptions, state: ThemeState): void {
   const root = document.documentElement;
-  const radius = options.radii.find(({ name }) => name === state.radius);
+  const value = (name: string) =>
+    options.radii.find((radius) => radius.name === name)?.value ?? null;
   root.dataset.family = state.family;
   root.dataset.primary = state.primary;
   root.dataset.radius = state.radius;
-  root.style.setProperty('--radius', radius?.value ?? null);
+  root.style.setProperty('--preview-radius', value(state.radius));
+  root.style.setProperty('--site-radius', value(options.defaults.radius));
 }
 
 /**
@@ -50,7 +54,8 @@ export function pickTheme(
   return options.defaults;
 }
 
-// URL parameters win over the stored choice, and replace it.
+// URL parameters win over the stored choice and replace it. Once stored,
+// they leave the address bar, so a reload keeps changes made in the panel.
 export function startTheme(
   options: ThemeOptions,
   key: string,
@@ -68,10 +73,23 @@ export function startTheme(
   const state = pick(options, [fromUrl, stored]);
   apply(options, state);
   if (fromUrl === null) return;
+  // The script runs again before hydration, so the parameters stay until the
+  // theme is stored.
   try {
     localStorage.setItem(key, JSON.stringify(state));
   } catch {
-    // The theme still applies to this page.
+    return;
+  }
+  for (const name of ['family', 'primary', 'radius']) params.delete(name);
+  const query = params.toString();
+  try {
+    history.replaceState(
+      history.state,
+      '',
+      `${location.pathname}${query === '' ? '' : `?${query}`}${location.hash}`,
+    );
+  } catch {
+    // History can be blocked; the parameters stay in the URL.
   }
 }
 
@@ -87,9 +105,9 @@ uses only its arguments and browser globals.
 */
 export function themeScript(options: ThemeOptions): string {
   const args = [
-    // Swatches are only for the panel.
+    // Labels and swatches are only for the panel.
     JSON.stringify(options, (key, value: unknown) =>
-      key === 'swatch' ? undefined : value,
+      key === 'label' || key === 'swatch' ? undefined : value,
     ),
     JSON.stringify(themeStorageKey),
     pickTheme.toString(),
