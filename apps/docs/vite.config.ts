@@ -7,6 +7,8 @@ import { defineConfig } from 'vite';
 
 import { manualSourcesPlugin } from './src/lib/manual-sources-plugin.ts';
 import { staticPages } from './src/lib/static-pages.ts';
+import { themeItemPaths } from './src/lib/theme-items.ts';
+import { themeOptionsPlugin } from './src/lib/theme-options-plugin.ts';
 
 export default defineConfig({
   plugins: [
@@ -14,14 +16,14 @@ export default defineConfig({
     optimizeLocales.vite({ locales: ['en', 'ar'] }),
     fumadocsMdx(),
     manualSourcesPlugin(),
+    themeOptionsPlugin(),
     tailwindcss(),
     tanstackStart({
       // autoSubfolderIndex false writes /404 to 404.html, which the host
       // serves for unknown URLs.
-      pages: staticPages.map(({ path }) => ({
-        path,
-        prerender: { autoSubfolderIndex: false },
-      })),
+      pages: [...staticPages.map(({ path }) => path), ...themeItemPaths].map(
+        (path) => ({ path, prerender: { autoSubfolderIndex: false } }),
+      ),
       prerender: { crawlLinks: true, enabled: true, failOnError: true },
     }),
     react(),

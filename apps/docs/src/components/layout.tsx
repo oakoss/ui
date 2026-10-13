@@ -1,5 +1,6 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 
+import { ThemePanel } from '#/components/theme-panel';
 import { appName, githubUrl } from '#/lib/site';
 
 export function baseOptions(): BaseLayoutProps {
@@ -21,5 +22,18 @@ export function baseOptions(): BaseLayoutProps {
       },
     ],
     nav: { title: appName },
+  };
+}
+
+// The home layout lists custom links in a <ul> without an <li>, which fails
+// axe's list rule, so only docs pages get the theme panel.
+export function docsOptions(): BaseLayoutProps {
+  const options = baseOptions();
+  return {
+    ...options,
+    links: [
+      ...(options.links ?? []),
+      { children: <ThemePanel />, type: 'custom' },
+    ],
   };
 }

@@ -16,6 +16,7 @@ import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as ApiSearchRouteImport } from './routes/api/search'
 import { Route as DocsSplatRouteImport } from './routes/docs/$'
 import { Route as DocsChar123Char125DotmdRouteImport } from './routes/docs/{$}[.]md'
+import { Route as RThemesChar123nameChar125DotjsonRouteImport } from './routes/r/themes/{$name}[.]json'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,6 +53,12 @@ const DocsChar123Char125DotmdRoute = DocsChar123Char125DotmdRouteImport.update({
   path: '/docs/{$}.md',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RThemesChar123nameChar125DotjsonRoute =
+  RThemesChar123nameChar125DotjsonRouteImport.update({
+    id: '/r/themes/{$name}.json',
+    path: '/r/themes/{$name}.json',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -61,6 +68,7 @@ export interface FileRoutesByFullPath {
   '/api/search': typeof ApiSearchRoute
   '/docs/$': typeof DocsSplatRoute
   '/docs/{$}.md': typeof DocsChar123Char125DotmdRoute
+  '/r/themes/{$name}.json': typeof RThemesChar123nameChar125DotjsonRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +78,7 @@ export interface FileRoutesByTo {
   '/api/search': typeof ApiSearchRoute
   '/docs/$': typeof DocsSplatRoute
   '/docs/{$}.md': typeof DocsChar123Char125DotmdRoute
+  '/r/themes/{$name}.json': typeof RThemesChar123nameChar125DotjsonRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +89,7 @@ export interface FileRoutesById {
   '/api/search': typeof ApiSearchRoute
   '/docs/$': typeof DocsSplatRoute
   '/docs/{$}.md': typeof DocsChar123Char125DotmdRoute
+  '/r/themes/{$name}.json': typeof RThemesChar123nameChar125DotjsonRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +101,7 @@ export interface FileRouteTypes {
     | '/api/search'
     | '/docs/$'
     | '/docs/{$}.md'
+    | '/r/themes/{$name}.json'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +111,7 @@ export interface FileRouteTypes {
     | '/api/search'
     | '/docs/$'
     | '/docs/{$}.md'
+    | '/r/themes/{$name}.json'
   id:
     | '__root__'
     | '/'
@@ -109,6 +121,7 @@ export interface FileRouteTypes {
     | '/api/search'
     | '/docs/$'
     | '/docs/{$}.md'
+    | '/r/themes/{$name}.json'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,6 +132,7 @@ export interface RootRouteChildren {
   ApiSearchRoute: typeof ApiSearchRoute
   DocsSplatRoute: typeof DocsSplatRoute
   DocsChar123Char125DotmdRoute: typeof DocsChar123Char125DotmdRoute
+  RThemesChar123nameChar125DotjsonRoute: typeof RThemesChar123nameChar125DotjsonRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -172,6 +186,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsChar123Char125DotmdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/r/themes/{$name}.json': {
+      id: '/r/themes/{$name}.json'
+      path: '/r/themes/{$name}.json'
+      fullPath: '/r/themes/{$name}.json'
+      preLoaderRoute: typeof RThemesChar123nameChar125DotjsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -183,6 +204,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiSearchRoute: ApiSearchRoute,
   DocsSplatRoute: DocsSplatRoute,
   DocsChar123Char125DotmdRoute: DocsChar123Char125DotmdRoute,
+  RThemesChar123nameChar125DotjsonRoute: RThemesChar123nameChar125DotjsonRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

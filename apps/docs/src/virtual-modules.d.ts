@@ -1,3 +1,9 @@
+declare module 'virtual:theme-options' {
+  import type { ThemeOptions } from '#/lib/theme-state';
+
+  export const themeOptions: ThemeOptions;
+}
+
 declare module 'virtual:manual-sources' {
   import type { MDXContent } from 'mdx/types';
 
