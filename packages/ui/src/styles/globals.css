@@ -2,6 +2,8 @@
 @import './theme.css';
 @import './base.css';
 @plugin 'tailwindcss-react-aria-components';
+/* The component sources, packages/ui/src: apps import this file from outside
+   their own root, where Tailwind's automatic detection doesn't look. */
 @source '..';
 
 @custom-variant dark (&:where(.dark, .dark *));
