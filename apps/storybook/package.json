@@ -19,7 +19,6 @@
     "react-dom": "catalog:"
   },
   "devDependencies": {
-    "@chromatic-com/storybook": "^5.4.0",
     "@oakoss/eslint-config": "workspace:*",
     "@oakoss/oxlint-config": "workspace:*",
     "@oakoss/tokens": "workspace:*",
