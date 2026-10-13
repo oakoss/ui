@@ -69,6 +69,35 @@ export const Keyboard: Story = {
   },
 };
 
+const textItems = (
+  <>
+    <SelectItem id="copy" textValue=" ">
+      Copy
+    </SelectItem>
+    <SelectItem id="delete">Delete {3} files</SelectItem>
+  </>
+);
+
+// Typeahead reads an interpolated label as one string.
+export const TypeaheadInterpolated: Story = {
+  args: { children: textItems },
+  play: async ({ canvas }) => {
+    canvas.getByRole('button', { name: /Fruit/u }).focus();
+    await userEvent.keyboard('d');
+    await expect(onChange).toHaveBeenLastCalledWith('delete');
+  },
+};
+
+// A blank textValue falls back to the label for typeahead.
+export const TypeaheadBlankTextValue: Story = {
+  args: { children: textItems },
+  play: async ({ canvas }) => {
+    canvas.getByRole('button', { name: /Fruit/u }).focus();
+    await userEvent.keyboard('c');
+    await expect(onChange).toHaveBeenLastCalledWith('copy');
+  },
+};
+
 export const WithDescription: Story = {
   args: { description: 'Picked fresh daily.' },
   play: async ({ canvas }) => {

@@ -23,6 +23,7 @@ import {
 } from '#/components/ui/overlays/popover';
 import { cn, cx } from '#/lib/cx';
 import { listItem } from '#/lib/recipes';
+import { itemTextValue } from '#/lib/text-value';
 
 export type ListBoxItemProps<T extends object = object> = {
   children?: ReactNode;
@@ -70,7 +71,7 @@ export function ListBox<T extends object>({
       className="max-h-[inherit] overflow-y-auto outline-hidden"
       data-slot={`${kind}-list`}
       renderEmptyState={
-        emptyLabel === undefined
+        (emptyLabel ?? '').trim() === ''
           ? undefined
           : () => (
               <div className="px-2 py-1.5 text-sm text-muted-foreground">
@@ -125,12 +126,7 @@ export function ListBoxItem<T extends object>({
     <AriaListBoxItem
       className={cx([listItem, 'pe-8'], className)}
       data-slot={`${kind}-item`}
-      textValue={
-        textValue ??
-        (typeof children === 'string' || typeof children === 'number'
-          ? String(children)
-          : undefined)
-      }
+      textValue={itemTextValue(textValue, children)}
       {...props}
     >
       {composeRenderProps(

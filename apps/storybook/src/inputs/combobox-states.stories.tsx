@@ -152,6 +152,37 @@ export const Filtering: Story = {
   },
 };
 
+// An interpolated label filters as one string, and a blank textValue falls
+// back to the label.
+export const ItemText: Story = {
+  play: async ({ canvas }) => {
+    const input = canvas.getByRole('combobox', { name: 'Action' });
+    await userEvent.type(input, 'delete 3');
+    const list = await screen.findByRole('listbox');
+    await expect(within(list).getByRole('option')).toHaveAccessibleName(
+      'Delete 3 files',
+    );
+    await userEvent.clear(input);
+    await userEvent.type(input, 'copy');
+    await waitFor(async () => {
+      await expect(within(list).getByRole('option')).toHaveAccessibleName(
+        'Copy',
+      );
+    });
+  },
+  render: () => {
+    const count = 3;
+    return (
+      <Combobox label="Action">
+        <ComboboxItem id="delete">Delete {count} files</ComboboxItem>
+        <ComboboxItem id="copy" textValue=" ">
+          Copy
+        </ComboboxItem>
+      </Combobox>
+    );
+  },
+};
+
 // With nothing matching and no emptyLabel, the list says "No results".
 export const EmptyDefault: Story = {
   play: async ({ canvas }) => {
@@ -160,6 +191,17 @@ export const EmptyDefault: Story = {
     await expect(within(list).getByRole('option')).toHaveTextContent(
       'No results',
     );
+  },
+};
+
+// A blank emptyLabel shows nothing, rather than an unnamed option.
+export const BlankEmptyLabel: Story = {
+  args: { emptyLabel: ' ' },
+  play: async ({ canvas }) => {
+    await userEvent.type(canvas.getByRole('combobox', { name: 'Fruit' }), 'zz');
+    const list = await screen.findByRole('listbox');
+    await expect(within(list).queryByRole('option')).toBeNull();
+    await expect(list).toBeEmptyDOMElement();
   },
 };
 

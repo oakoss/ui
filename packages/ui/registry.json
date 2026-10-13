@@ -2852,6 +2852,11 @@
           "target": "@lib/recipes.ts"
         },
         {
+          "path": "src/lib/text-value.ts",
+          "type": "registry:lib",
+          "target": "@lib/text-value.ts"
+        },
+        {
           "path": "src/lib/cx.ts",
           "type": "registry:lib",
           "target": "@lib/cx.ts"
@@ -2951,6 +2956,11 @@
           "path": "src/lib/recipes.ts",
           "type": "registry:lib",
           "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/text-value.ts",
+          "type": "registry:lib",
+          "target": "@lib/text-value.ts"
         },
         {
           "path": "src/lib/cx.ts",
