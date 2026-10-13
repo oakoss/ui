@@ -188,6 +188,16 @@ export const Empty: Story = {
   },
 };
 
+// A blank empty label shows nothing, rather than an unnamed row.
+export const BlankEmptyLabel: Story = {
+  args: { children: [], emptyLabel: ' ' },
+  play: async () => {
+    const { menu } = await openMenu();
+    await expect(within(menu).queryByRole('menuitem')).toBeNull();
+    await expect(menu).toBeEmptyDOMElement();
+  },
+};
+
 // A passed placement wins, and an undefined offset keeps the 4px default.
 export const Placement: Story = {
   play: async () => {

@@ -108,7 +108,7 @@ export function MenuContent<T extends object>({
         className="max-h-[inherit] overflow-y-auto outline-hidden"
         data-slot={`${kind}-list`}
         renderEmptyState={
-          emptyLabel === undefined
+          (emptyLabel ?? '').trim() === ''
             ? undefined
             : () => (
                 <div className="px-2 py-1.5 text-sm text-muted-foreground">
