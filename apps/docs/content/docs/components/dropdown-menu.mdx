@@ -142,12 +142,13 @@ Extends React Aria's [`MenuItem`](https://react-aria.adobe.com/Menu#api). A
 text label, values in it included, is its typeahead text; any other label
 needs `textValue`, which the type requires. A wrapper that leaves out some of
 the item's props types them as `Omit<MenuItemBaseProps, …> & MenuItemLabel`,
-since `Omit` on `DropdownMenuItemProps` would drop that requirement.
+both from `overlays/menu-item.tsx`, since `Omit` on `DropdownMenuItemProps`
+would drop that requirement.
 
 #### Props
 
 <auto-type-table
-  path="../../../../../packages/ui/src/components/ui/overlays/menu.tsx"
+  path="../../../../../packages/ui/src/components/ui/overlays/menu-item.tsx"
   name="MenuItemProps"
 />
 

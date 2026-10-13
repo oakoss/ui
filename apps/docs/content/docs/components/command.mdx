@@ -1,0 +1,181 @@
+---
+title: Command
+description: A searchable list of commands, inline or in a dialog.
+item: command
+reactAria: https://react-aria.adobe.com/Autocomplete
+---
+
+import { CommandDemo } from '#/components/demos/command-demo';
+import { CommandDescriptions } from '#/components/demos/command-descriptions';
+import { CommandDialogDemo } from '#/components/demos/command-dialog';
+
+<ComponentPreview name="command-demo">
+  <CommandDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="command" />
+
+This also installs [Dialog](/docs/components/dialog) and
+[Input Group](/docs/components/input-group), and the item parts it shares
+with [Dropdown Menu](/docs/components/dropdown-menu).
+
+## Usage
+
+```tsx
+import {
+  Command,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '#/components/ui/overlays/command';
+
+<Command>
+  <CommandInput placeholder="Type a command" />
+  <CommandList aria-label="Commands" onAction={(key) => run(key)}>
+    <CommandItem id="new" keywords={['create']} shortcut="⌘N">
+      New file
+    </CommandItem>
+  </CommandList>
+</Command>;
+```
+
+What's typed filters the list, ignoring case and accents, and matches an
+item's label and its `keywords`. Items take Dropdown Menu's item props:
+`shortcut`, `description`, `intent` and `href`. `CommandGroup` sections the
+list under a `CommandHeader`, each section after the first drawing a line
+above it.
+
+## Examples
+
+### In a dialog
+
+`CommandDialog` puts a command in a modal, named by `title` and focused on
+the input when it opens. This demo also opens it with `⌘J` or `Ctrl` + `J`
+while it's on the page; the library binds no shortcut itself, so an app picks
+one that its own keys don't use.
+
+<ComponentPreview name="command-dialog">
+  <CommandDialogDemo />
+</ComponentPreview>
+
+### Descriptions and links
+
+`description` adds a line under the label, and `href` makes an item a link.
+
+<ComponentPreview name="command-descriptions">
+  <CommandDescriptions />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria links a search field to a `menu` of results:
+
+- **Focus:** focus stays in the input. The highlighted item is the input's
+  `aria-activedescendant`, so screen readers read it as the arrow keys move.
+- **Names:** the input is named `Search` unless you name it with
+  `aria-label` or `aria-labelledby`, and the list by its own `aria-label`.
+  A group is named by its `CommandHeader`, and a shortcut or description
+  describes its item.
+- **Results:** items are `menuitem`s, since they run commands. When nothing
+  matches, the list shows `emptyLabel`.
+
+In Windows High Contrast the highlighted item takes the system's selection
+colors.
+
+| Key      | Action                                           |
+| -------- | ------------------------------------------------ |
+| Typing   | Filters the list                                 |
+| ↓, ↑     | Moves the highlight through the results          |
+| `Enter`  | Runs the highlighted command                     |
+| `Escape` | Clears the search, then closes a `CommandDialog` |
+
+## API
+
+### Command
+
+A `div` around React Aria's
+[`Autocomplete`](https://react-aria.adobe.com/Autocomplete#api), which links
+the input to the list.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/overlays/command.tsx"
+  name="CommandProps"
+/>
+
+Also accepts all [React Aria `Autocomplete` props](https://react-aria.adobe.com/Autocomplete#api),
+such as a controlled `inputValue` and a `filter` that replaces the default.
+
+### CommandList
+
+Extends React Aria's [`Menu`](https://react-aria.adobe.com/Menu#api). It
+scrolls past 18rem.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/overlays/command.tsx"
+  name="CommandListProps"
+/>
+
+Also accepts all [React Aria `Menu` props](https://react-aria.adobe.com/Menu#api),
+such as `onAction` and `items`.
+
+### CommandItem
+
+Dropdown Menu's [item](/docs/components/dropdown-menu#dropdownmenuitem), with
+`keywords`.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/overlays/command.tsx"
+  name="CommandItemProps"
+/>
+
+#### Data attributes
+
+| Attribute             | Present when                                           |
+| --------------------- | ------------------------------------------------------ |
+| `data-slot`           | Always `command-item`                                  |
+| `data-intent`         | Always: `neutral` or `destructive`                     |
+| `data-focused`        | The item is highlighted                                |
+| `data-selected`       | The item is checked in a selection group               |
+| `data-selection-mode` | The item is in a selection group: `single`, `multiple` |
+| `data-disabled`       | The item is disabled                                   |
+
+#### CSS variables
+
+| Variable        | Set by                 | Used for                    |
+| --------------- | ---------------------- | --------------------------- |
+| `--menu-text`   | `intent="destructive"` | The item's text             |
+| `--menu-subtle` | `intent="destructive"` | The highlighted item's fill |
+
+### CommandDialog
+
+[Dialog](/docs/components/dialog#dialog), with no close button and the panel
+nearer the top from `sm` up.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/overlays/command.tsx"
+  name="CommandDialogProps"
+/>
+
+### Other parts
+
+| Part               | Extends                                          | `data-slot`             |
+| ------------------ | ------------------------------------------------ | ----------------------- |
+| `CommandInput`     | React Aria's `SearchField`, with an `InputGroup` | `command-input-wrapper` |
+| `CommandGroup`     | React Aria's `MenuSection`                       | `command-group`         |
+| `CommandHeader`    | React Aria's `Header`, with `inset`              | `command-label`         |
+| `CommandSeparator` | React Aria's `Separator`                         | `command-separator`     |
+
+`CommandInput`'s input is `command-input`, and `Command` is `command`.
+`CommandInput` takes React Aria's `SearchField` props except `value` and
+`defaultValue`: `Command` owns what's typed, through `inputValue`,
+`defaultInputValue` and `onInputChange`.

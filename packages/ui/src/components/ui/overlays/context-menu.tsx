@@ -10,16 +10,18 @@ import {
 import {
   MenuContent,
   type MenuContentProps,
+  MenuSubContent,
+} from '#/components/ui/overlays/menu';
+import {
   MenuGroup,
   MenuItem,
   type MenuItemProps,
   MenuLabel,
   type MenuLabelProps,
   MenuSeparator,
-  MenuSubContent,
   MenuSubTrigger,
   type MenuSubTriggerProps,
-} from '#/components/ui/overlays/menu';
+} from '#/components/ui/overlays/menu-item';
 
 export type ContextMenuItemProps<T extends object = object> = MenuItemProps<T>;
 

@@ -127,11 +127,19 @@ const componentVariables = defineConfig({
       rules: {
         'shadcn/no-arbitrary-values': [
           'error',
-          // The menu scrolls within the height React Aria gives the popover,
-          // and a destructive item sets its --menu-* colors.
+          // The menu scrolls within the height React Aria gives the popover.
+          { allow: ['max-h-[inherit]'] },
+        ],
+      },
+    },
+    {
+      files: ['src/components/ui/overlays/menu-item.tsx'],
+      rules: {
+        'shadcn/no-arbitrary-values': [
+          'error',
+          // A destructive item sets its --menu-* colors.
           {
             allow: [
-              'max-h-[inherit]',
               '[--menu-subtle:var(--color-destructive-subtle)]',
               '[--menu-text:var(--color-destructive-text)]',
             ],

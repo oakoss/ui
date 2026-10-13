@@ -86,6 +86,35 @@ export const Keyboard: Story = {
   },
 };
 
+// A blank textValue falls back to a text label, so typeahead still reaches
+// the item.
+export const BlankTextValue: Story = {
+  args: {
+    children: (
+      <>
+        <DropdownMenuItem id="edit">Edit</DropdownMenuItem>
+        <DropdownMenuItem id="copy" textValue=" ">
+          Copy
+        </DropdownMenuItem>
+      </>
+    ),
+  },
+  play: async () => {
+    screen.getByRole('button', { name: 'Options' }).focus();
+    await userEvent.keyboard('{ArrowDown}');
+    const menu = await screen.findByRole('menu');
+    await waitFor(async () => {
+      await expect(
+        within(menu).getByRole('menuitem', { name: 'Edit' }),
+      ).toHaveFocus();
+    });
+    await userEvent.keyboard('c');
+    await expect(
+      within(menu).getByRole('menuitem', { name: 'Copy' }),
+    ).toHaveFocus();
+  },
+};
+
 // A shortcut describes its item instead of joining its name, including one
 // built from several keys.
 export const Shortcuts: Story = {
@@ -156,6 +185,16 @@ export const Empty: Story = {
   play: async () => {
     const { menu } = await openMenu();
     await expect(within(menu).getByText('No actions available')).toBeVisible();
+  },
+};
+
+// A blank empty label shows nothing, rather than an unnamed row.
+export const BlankEmptyLabel: Story = {
+  args: { children: [], emptyLabel: ' ' },
+  play: async () => {
+    const { menu } = await openMenu();
+    await expect(within(menu).queryByRole('menuitem')).toBeNull();
+    await expect(menu).toBeEmptyDOMElement();
   },
 };
 
