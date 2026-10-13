@@ -4,6 +4,7 @@ import { tv, type VariantProps } from 'tailwind-variants/lite';
 
 import * as Icon from '#/components/icons';
 import { cn } from '#/lib/cx';
+import { isEmptyNode } from '#/lib/empty-node';
 
 const styles = tv({
   base: [
@@ -54,11 +55,7 @@ export function Alert({
   ...props
 }: AlertProps) {
   const shown = icon === undefined ? defaultIcons[intent] : icon;
-  const isWithIcon =
-    shown !== null &&
-    shown !== undefined &&
-    typeof shown !== 'boolean' &&
-    shown !== '';
+  const isWithIcon = !isEmptyNode(shown);
   return (
     <div
       data-slot="alert"

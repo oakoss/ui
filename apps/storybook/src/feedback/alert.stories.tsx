@@ -91,7 +91,7 @@ export const IconOverride: Story = {
   play: async ({ canvas }) => {
     const [custom, ...none] =
       document.querySelectorAll<HTMLElement>('[data-slot=alert]');
-    if (!custom || none.length !== 3) throw new Error('No alerts');
+    if (!custom || none.length !== 5) throw new Error('No alerts');
     await expect(part('alert-icon', custom)).toContainElement(
       canvas.getByTestId('custom-icon'),
     );
@@ -110,6 +110,8 @@ export const IconOverride: Story = {
       <AlertDemo {...args} icon={null} intent="warning" />
       <AlertDemo {...args} icon={false} intent="warning" />
       <AlertDemo {...args} icon="" intent="warning" />
+      <AlertDemo {...args} icon={[null, false]} intent="warning" />
+      <AlertDemo {...args} icon={<></>} intent="warning" />
     </div>
   ),
 };

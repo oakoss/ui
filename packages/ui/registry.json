@@ -2613,6 +2613,11 @@
           "target": "@ui/feedback/alert.tsx"
         },
         {
+          "path": "src/lib/empty-node.ts",
+          "type": "registry:lib",
+          "target": "@lib/empty-node.ts"
+        },
+        {
           "path": "src/components/icons.tsx",
           "type": "registry:component",
           "target": "@components/icons.tsx"
