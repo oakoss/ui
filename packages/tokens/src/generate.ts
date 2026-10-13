@@ -13,8 +13,12 @@ const typography = typographies[axes.typography.default];
 
 const registryUrl = new URL('registry.json', ui);
 const registry: unknown = JSON.parse(readFileSync(registryUrl, 'utf-8'));
-if (typeof registry !== 'object' || registry === null) {
-  throw new Error('registry has no items');
+if (
+  typeof registry !== 'object' ||
+  registry === null ||
+  Array.isArray(registry)
+) {
+  throw new Error("registry.json isn't a JSON object");
 }
 const items = registryItems('items' in registry ? registry.items : undefined, {
   families: Object.values(families),
