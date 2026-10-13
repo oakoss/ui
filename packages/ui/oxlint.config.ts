@@ -61,6 +61,26 @@ const componentVariables = defineConfig({
       },
     },
     {
+      files: ['src/components/ui/feedback/alert.tsx'],
+      rules: {
+        'shadcn/no-arbitrary-values': [
+          'error',
+          {
+            allow: [
+              ...colorVariables('alert', [
+                'border',
+                'card',
+                'card-foreground',
+                'muted-foreground',
+              ]),
+              // The icon column, beside text that a long word can't widen.
+              'grid-cols-[auto_minmax(0,1fr)]',
+            ],
+          },
+        ],
+      },
+    },
+    {
       files: ['src/components/ui/surfaces/card.tsx'],
       rules: {
         'shadcn/no-arbitrary-values': [
