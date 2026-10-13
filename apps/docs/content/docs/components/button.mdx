@@ -97,6 +97,11 @@ visible border in Windows High Contrast, where a disabled button, or a link
 styled with `buttonStyles`, takes the system's disabled color like a native
 one. Icon-only sizes require a name in the type.
 
+A pressed button shrinks slightly. React Aria holds a menu or listbox
+trigger pressed while its popup is open, so a button with `aria-expanded` and
+`aria-haspopup` stays full size then, and its popup stays where it was placed.
+A custom trigger for a menu or listbox sets `aria-haspopup` too.
+
 | Key     | Action             |
 | ------- | ------------------ |
 | `Space` | Presses the button |
@@ -128,7 +133,7 @@ Also accepts all [React Aria `Button` props](https://react-aria.adobe.com/Button
 | `data-intent`        | Always; the color                         |
 | `data-size`          | Always; the size                          |
 | `data-hovered`       | A pointer hovers it                       |
-| `data-pressed`       | It's being pressed                        |
+| `data-pressed`       | It's being pressed, or its popup is open  |
 | `data-focused`       | It has focus                              |
 | `data-focus-visible` | It has keyboard focus                     |
 | `data-disabled`      | `isDisabled` is set                       |

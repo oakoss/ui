@@ -1,0 +1,118 @@
+---
+title: Context Menu
+description: A menu of actions opened at the pointer by right-click, long press or the keyboard.
+item: context-menu
+reactAria: https://react-aria.adobe.com/Menu
+---
+
+import { ContextMenuDemo } from '#/components/demos/context-menu-demo';
+import { ContextMenuVisible } from '#/components/demos/context-menu-visible';
+
+<ComponentPreview name="context-menu-demo">
+  <ContextMenuDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="context-menu" />
+
+This also installs [Popover](/docs/components/popover), whose panel the menu
+opens in.
+
+## Usage
+
+```tsx
+import {
+  ContextMenu,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from '#/components/ui/overlays/context-menu';
+import { Pressable } from 'react-aria-components';
+
+<ContextMenuTrigger>
+  <Pressable>
+    <div aria-label="report.pdf" role="button" tabIndex={0}>
+      report.pdf
+    </div>
+  </Pressable>
+  <ContextMenu onAction={(key) => run(key)}>
+    <ContextMenuItem id="open">Open</ContextMenuItem>
+    <ContextMenuItem id="delete" intent="destructive">
+      Delete
+    </ContextMenuItem>
+  </ContextMenu>
+</ContextMenuTrigger>;
+```
+
+The target is a React Aria component, or a focusable element inside React
+Aria's `Pressable`, so the keyboard can reach it. Its items, groups, labels,
+separators and submenus are [Dropdown Menu](/docs/components/dropdown-menu)'s
+with `context-menu-*` slots, so they take the same props.
+
+## Examples
+
+### With a visible menu
+
+A context menu is a shortcut, not the only way to an action, so the same
+actions also sit in a Dropdown Menu on the item.
+
+<ComponentPreview name="context-menu-visible">
+  <ContextMenuVisible />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria opens the menu on the browser's `contextmenu` event, which a
+right-click, `Ctrl` + click on macOS and a long press on Android fire. On iOS,
+which doesn't fire it, a long press opens the menu. The menu opens with its
+corner on the pointer, and from the keyboard where the browser places the
+event; on macOS, in browsers that fire no event for `Ctrl` + `Enter`, it opens
+at the middle of the target. It's named by its target.
+
+The target announces no popup, since opening a menu isn't its main action. The
+menu keeps focus while open and returns it to the target on close; inside it,
+the keys are [Dropdown Menu](/docs/components/dropdown-menu#accessibility)'s,
+and the menu itself has focus first, so ↓ moves to the first item.
+
+| Key                                   | Action                              |
+| ------------------------------------- | ----------------------------------- |
+| `Shift` + `F10`, the context menu key | Opens the menu on Windows and Linux |
+| `Ctrl` + `Enter`                      | Opens the menu on macOS             |
+| `Escape`                              | Closes the menu                     |
+
+## API
+
+### ContextMenuTrigger
+
+Renders React Aria's [`MenuTrigger`](https://react-aria.adobe.com/Menu#api)
+with `trigger="contextMenu"`. Accepts its props except `trigger`.
+
+### ContextMenu
+
+The popover and its menu, as [`DropdownMenu`](/docs/components/dropdown-menu#dropdownmenu),
+with an `offset` of 0 so it sits on the pointer.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/overlays/menu.tsx"
+  name="MenuContentProps"
+/>
+
+Also accepts all [React Aria `Menu` props](https://react-aria.adobe.com/Menu#api).
+
+#### Data attributes
+
+| Attribute       | Present when                                                    |
+| --------------- | --------------------------------------------------------------- |
+| `data-slot`     | Always: `context-menu-content` (the panel), `context-menu-list` |
+| `data-entering` | The panel is fading in                                          |
+| `data-exiting`  | The panel is fading out                                         |
+
+### Other parts
+
+`ContextMenuItem`, `ContextMenuGroup`, `ContextMenuLabel`,
+`ContextMenuSeparator`, `ContextMenuSub`, `ContextMenuSubTrigger` and
+`ContextMenuSubContent` take [Dropdown Menu's
+props](/docs/components/dropdown-menu#api), with `context-menu-*` in place of
+`dropdown-menu-*` in their `data-slot`s.

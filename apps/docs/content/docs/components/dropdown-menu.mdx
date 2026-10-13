@@ -1,0 +1,183 @@
+---
+title: Dropdown Menu
+description: A menu of actions or options opened from a button.
+item: dropdown-menu
+reactAria: https://react-aria.adobe.com/Menu
+---
+
+import { DropdownMenuDemo } from '#/components/demos/dropdown-menu-demo';
+import { DropdownMenuDescriptions } from '#/components/demos/dropdown-menu-descriptions';
+import { DropdownMenuSelection } from '#/components/demos/dropdown-menu-selection';
+import { DropdownMenuSubmenu } from '#/components/demos/dropdown-menu-submenu';
+
+<ComponentPreview name="dropdown-menu-demo">
+  <DropdownMenuDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="dropdown-menu" />
+
+This also installs [Popover](/docs/components/popover), whose panel the menu
+opens in.
+
+## Usage
+
+```tsx
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '#/components/ui/overlays/dropdown-menu';
+
+<DropdownMenuTrigger>
+  <Button>Options</Button>
+  <DropdownMenu onAction={(key) => run(key)}>
+    <DropdownMenuItem id="edit" shortcut="⌘E">
+      Edit
+    </DropdownMenuItem>
+    <DropdownMenuItem id="delete" intent="destructive">
+      Delete
+    </DropdownMenuItem>
+  </DropdownMenu>
+</DropdownMenuTrigger>;
+```
+
+An item's children are its label. `shortcut` and `description` sit beside the
+label and describe the item without joining its name. `intent="destructive"`
+colors an item that removes something.
+
+## Examples
+
+### Checkbox and radio groups
+
+`selectionMode` on a `DropdownMenuGroup` makes its items checkboxes
+(`multiple`) or radios (`single`), marked with a check or a dot. Action groups
+and selection groups mix in one menu.
+
+<ComponentPreview name="dropdown-menu-selection">
+  <DropdownMenuSelection />
+</ComponentPreview>
+
+### Submenus
+
+`DropdownMenuSub` wraps a `DropdownMenuSubTrigger` and the
+`DropdownMenuSubContent` it opens beside it.
+
+<ComponentPreview name="dropdown-menu-submenu">
+  <DropdownMenuSubmenu />
+</ComponentPreview>
+
+### Descriptions and links
+
+`description` adds a line under the label, and `href` makes an item a link.
+
+<ComponentPreview name="dropdown-menu-descriptions">
+  <DropdownMenuDescriptions />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria renders a button that opens a `menu` in a popover, and links them:
+
+- **Name:** the menu is named by its trigger. A shortcut and a description
+  describe their item rather than joining its name, and a group is named by its
+  `DropdownMenuLabel`.
+- **Roles:** items are `menuitem`, or `menuitemcheckbox` and `menuitemradio`
+  in a group with `selectionMode`, with `aria-checked`. An item with `href` is a
+  link.
+- **Focus:** opened from the keyboard or a screen reader, the menu focuses
+  its first item; opened with a pointer, it focuses the menu itself, so ↓
+  moves to the first item. It keeps focus inside and returns it to the
+  trigger on close.
+
+Items in a selection group leave room at the start for the check or dot, which
+are hidden from assistive technology. In Windows High Contrast the focused item
+takes the system's selection colors.
+
+| Key                 | Action                                              |
+| ------------------- | --------------------------------------------------- |
+| `Enter`, `Space`, ↓ | Opens the menu on its first item                    |
+| ↑                   | Opens the menu on its last item                     |
+| ↑, ↓                | Moves between items                                 |
+| Typing              | Moves to the next item that starts with the letters |
+| `Enter`, `Space`    | Runs an item, or toggles it in a selection group    |
+| →, ←                | Opens or closes a submenu (reversed right to left)  |
+| `Escape`            | Closes the menu, or only the submenu that's open    |
+
+Follows the [WAI-ARIA menu button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/).
+
+## API
+
+### DropdownMenu
+
+The popover and its menu. Renders our
+[`PopoverContent`](/docs/components/popover#popovercontent) around React Aria's
+[`Menu`](https://react-aria.adobe.com/Menu#api). `className` applies to the
+panel, which is at least 8rem wide and grows with its items.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/overlays/menu.tsx"
+  name="MenuContentProps"
+/>
+
+Also accepts all [React Aria `Menu` props](https://react-aria.adobe.com/Menu#api),
+such as `onAction`, `selectionMode` and `disabledKeys`. `placement` defaults
+to `bottom start` and `offset` to 4.
+
+#### Data attributes
+
+| Attribute        | Present when                                                            |
+| ---------------- | ----------------------------------------------------------------------- |
+| `data-slot`      | Always: `dropdown-menu-content` (the panel), `dropdown-menu-list`       |
+| `data-placement` | Always; the side the panel opened on (`top`, `bottom`, `left`, `right`) |
+| `data-entering`  | The panel is fading in                                                  |
+| `data-exiting`   | The panel is fading out                                                 |
+
+### DropdownMenuItem
+
+Extends React Aria's [`MenuItem`](https://react-aria.adobe.com/Menu#api). A
+text label, values in it included, is its typeahead text; any other label
+needs `textValue`, which the type requires. A wrapper that leaves out some of
+the item's props types them as `Omit<MenuItemBaseProps, …> & MenuItemLabel`,
+since `Omit` on `DropdownMenuItemProps` would drop that requirement.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/overlays/menu.tsx"
+  name="MenuItemProps"
+/>
+
+#### Data attributes
+
+| Attribute             | Present when                                           |
+| --------------------- | ------------------------------------------------------ |
+| `data-slot`           | Always `dropdown-menu-item`                            |
+| `data-intent`         | Always: `neutral` or `destructive`                     |
+| `data-focused`        | The item has focus                                     |
+| `data-selected`       | The item is checked in a selection group               |
+| `data-selection-mode` | The item is in a selection group: `single`, `multiple` |
+| `data-open`           | A submenu trigger's submenu is open                    |
+| `data-disabled`       | The item is disabled                                   |
+
+#### CSS variables
+
+| Variable        | Set by                 | Used for                |
+| --------------- | ---------------------- | ----------------------- |
+| `--menu-text`   | `intent="destructive"` | The item's text         |
+| `--menu-subtle` | `intent="destructive"` | The focused item's fill |
+
+### Other parts
+
+| Part                     | Extends                                   | `data-slot`                 |
+| ------------------------ | ----------------------------------------- | --------------------------- |
+| `DropdownMenuTrigger`    | React Aria's `MenuTrigger`                | none                        |
+| `DropdownMenuGroup`      | React Aria's `MenuSection`                | `dropdown-menu-group`       |
+| `DropdownMenuLabel`      | React Aria's `Header`, with `inset`       | `dropdown-menu-label`       |
+| `DropdownMenuSeparator`  | React Aria's `Separator`                  | `dropdown-menu-separator`   |
+| `DropdownMenuSub`        | React Aria's `SubmenuTrigger`             | none                        |
+| `DropdownMenuSubTrigger` | `DropdownMenuItem`, with a chevron        | `dropdown-menu-sub-trigger` |
+| `DropdownMenuSubContent` | `DropdownMenu`, placed beside its trigger | `dropdown-menu-sub-content` |

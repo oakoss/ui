@@ -6,6 +6,8 @@ import {
 } from '@oakoss/ui/components/ui/inputs/combobox';
 import { expect, fn, screen, userEvent, waitFor, within } from 'storybook/test';
 
+import { whilePressed } from '#/press';
+
 const FruitCombobox = Combobox<object>;
 
 const onChange = fn<(value: unknown) => void>();
@@ -78,8 +80,15 @@ export const Trigger: Story = {
     await userEvent.unhover(trigger);
     await expect(trigger).toHaveAttribute('data-pressed', 'true');
     for (const animation of trigger.getAnimations()) animation.finish();
-    await expect(getComputedStyle(trigger).scale).toBe('1');
+    await expect(['1', 'none']).toContain(getComputedStyle(trigger).scale);
     await expect(getComputedStyle(trigger).backgroundImage).toBe(resting);
+    // The press that closes the list doesn't shrink it either.
+    const closing = await whilePressed(
+      trigger,
+      () => getComputedStyle(trigger).scale,
+    );
+    await expect(screen.queryByRole('listbox')).toBeNull();
+    await expect(['1', 'none']).toContain(closing);
   },
 };
 
