@@ -6,7 +6,6 @@ import {
   themeChoices,
   themeItem,
   type ThemeItem,
-  themeItemJson,
 } from '@oakoss/tokens';
 
 import { themeItemPath, type ThemeOptions } from './theme-state.ts';
@@ -31,7 +30,7 @@ export function themeItemAt(path: string): string | undefined {
   const choice = choices.get(path);
   return choice === undefined
     ? undefined
-    : themeItemJson(themeItem(choice, style));
+    : JSON.stringify(themeItem(choice, style));
 }
 
 // Each swatch is the primary's light-mode color, read from the item that

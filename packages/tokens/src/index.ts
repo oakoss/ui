@@ -34,7 +34,6 @@ export {
   themeChoices,
   type ThemeItem,
   themeItem,
-  themeItemJson,
 } from '#/registry-items';
 export { type ResolvedFlavor, resolveFlavor } from '#/resolve';
 export type {

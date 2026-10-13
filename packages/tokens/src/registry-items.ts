@@ -104,54 +104,27 @@ export function themeItem(choice: ThemeChoice, style: Style): ThemeItem {
   if (!kebabCase.test(name)) {
     throw new Error(`theme item name "${name}" isn't kebab-case`);
   }
-  return {
+  return themeRegistryItem({
     cssVars: { dark, light: { radius: radius.value, ...light } },
     description: `The ${family.name} theme family with a ${primary} primary and ${radius.name} radius.`,
     name,
-    registryDependencies: ['oakoss/ui/theme'],
     title: `${family.name} theme, ${primary} primary`,
-    type: 'registry:theme',
-  };
-}
-
-// In the key order of the items in registry.json.
-export function themeItemJson(item: ThemeItem): string {
-  return JSON.stringify(ordered(item));
+  });
 }
 
 export function themeSlug({ family, primary, radius }: ThemeChoice): string {
   return `${family.id}-${primary}-${radius.name}`;
 }
 
-// The JSON's key order, like the hand-written items; lint sorts literals.
-const familyItemKeys = everyKey([
-  'name',
-  'type',
-  'title',
-  'description',
-  'registryDependencies',
-  'cssVars',
-]);
-
-// The argument fails to compile when it leaves out a ThemeItem field.
-function everyKey<Key extends keyof ThemeItem>(
-  keys: ([Exclude<keyof ThemeItem, Key>] extends [never] ? unknown : never) &
-    readonly Key[],
-): readonly Key[] {
-  return keys;
-}
-
-function familyItem(entry: Family, style: Style): Item {
+function familyItem(entry: Family, style: Style): ThemeItem {
   if (!kebabCase.test(entry.id)) {
     throw new Error(`family id "${entry.id}" isn't a registry item name`);
   }
-  return ordered({
+  return themeRegistryItem({
     cssVars: familyCssVars(entry, style),
     description: `The ${entry.name} theme family's colors, light and dark.`,
     name: `theme-${entry.id}`,
-    registryDependencies: ['oakoss/ui/theme'],
     title: `${entry.name} theme`,
-    type: 'registry:theme',
   });
 }
 
@@ -171,9 +144,22 @@ function namedItems(items: unknown): Item[] {
   });
 }
 
-function ordered(item: ThemeItem): Item {
-  return {
-    name: item.name,
-    ...Object.fromEntries(familyItemKeys.map((key) => [key, item[key]])),
-  };
+/**
+A theme item that depends on the `theme` item, keyed in the JSON order of
+the hand-written items. Lint sorts object literals, so each key is assigned
+on its own, nested because `Object.assign` with more than three sources
+returns `any` and the return type would check nothing.
+*/
+function themeRegistryItem({
+  cssVars,
+  description,
+  name,
+  title,
+}: Pick<ThemeItem, 'cssVars' | 'description' | 'name' | 'title'>): ThemeItem {
+  return Object.assign(
+    Object.assign({ name }, { type: 'registry:theme' as const }, { title }),
+    { description },
+    { registryDependencies: ['oakoss/ui/theme'] },
+    { cssVars },
+  );
 }

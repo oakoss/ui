@@ -9,7 +9,6 @@ import {
   registryItems,
   themeChoices,
   themeItem,
-  themeItemJson,
   themeSlug,
 } from '#/registry-items';
 
@@ -221,7 +220,7 @@ describe('themeItem', () => {
 describe('themeChoices', () => {
   it('writes item JSON in the registry key order', () => {
     const choice = { family: families.zinc, primary: 'zinc', radius: radii[0] };
-    expect(themeItemJson(themeItem(choice, styles.vega))).toMatch(
+    expect(JSON.stringify(themeItem(choice, styles.vega))).toMatch(
       /^\{"name":.*,"type":.*,"title":.*,"description":.*,"registryDependencies":.*,"cssVars":/u,
     );
   });
