@@ -1,8 +1,16 @@
-import type { ColorRef, Family, Flavor, Palette, Polarity } from '#/family';
+import type { Color } from '#/color';
+import type { ColorRef, Family, Flavor, Polarity } from '#/family';
 import type { NeutralRole } from '#/roles';
+import type { AuthoredScale, Scale } from '#/scale';
 
+import { expandSeeded } from '#/seeded';
+
+// Seeded scales arrive expanded, so downstream code reads authored steps.
 export type ResolvedFlavor = {
-  palette: Palette<string, string>;
+  palette: {
+    neutrals: Readonly<Record<string, Color>>;
+    scales: Readonly<Record<string, AuthoredScale<string, string>>>;
+  };
   polarity: Polarity;
   roles: Partial<Record<NeutralRole, ColorRef<string, string>>>;
 };
@@ -47,7 +55,11 @@ export function resolveFlavor(
     Object.assign(palette.scales, defined(flavor.palette?.scales));
     Object.assign(roles, defined(flavor.roles));
   }
-  return { palette, polarity: requested.polarity, roles };
+  return {
+    palette: { neutrals: palette.neutrals, scales: expanded(palette.scales) },
+    polarity: requested.polarity,
+    roles,
+  };
 }
 
 // The types allow an explicit `undefined`; treat it as "not overridden".
@@ -58,5 +70,17 @@ function defined<Value>(
     Object.entries(record ?? {}).filter(
       (entry): entry is [string, Value] => entry[1] !== undefined,
     ),
+  );
+}
+
+// Untyped data can set a base scale to `undefined`, which `defined` skips.
+function expanded(
+  scales: Readonly<Partial<Record<string, Scale<string, string>>>>,
+): Record<string, AuthoredScale<string, string>> {
+  return Object.fromEntries(
+    Object.entries(defined(scales)).map(([name, scale]) => [
+      name,
+      scale.kind === 'seeded' ? expandSeeded(scale) : scale,
+    ]),
   );
 }

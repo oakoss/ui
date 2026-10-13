@@ -1,5 +1,5 @@
 import type { Color } from '#/color';
-import type { ColorRef, Family, Palette, Polarity } from '#/family';
+import type { ColorRef, Family, Polarity } from '#/family';
 
 import { parseColorPath } from '#/color-path';
 import { isOpaque } from '#/contrast';
@@ -25,7 +25,7 @@ the roles, plus each intent's scale (`primary-50` … `primary-950`).
 */
 export type ThemeTokens = Readonly<Record<string, Color>>;
 
-type AnyPalette = Palette<string, string>;
+type AnyPalette = ResolvedFlavor['palette'];
 
 type AnyScale = AuthoredScale<string, string>;
 
@@ -54,7 +54,6 @@ export function resolveTheme(
       : family.intents[intent].default;
 
   const tokens = neutralTokens(resolved);
-  if (Array.isArray(tokens)) return tokens.map((error) => at(error));
   const page = tokens.background;
   if (page === undefined) return [at('has no background')];
   if (!isOpaque(page)) return [at('role "background" is translucent')];
@@ -87,10 +86,8 @@ function addIntent(
   hue: string,
   context: { page: Color; palette: AnyPalette; polarity: Polarity },
 ): string[] {
-  const scale = authoredScale(context.palette, hue);
-  if (scale === undefined) {
-    return [`${intent} (${hue}): no authored scale`];
-  }
+  const scale = scaleOf(context.palette, hue);
+  if (scale === undefined) return [`${intent} (${hue}): no scale`];
   if (scale.foreground !== undefined) {
     return [
       `${intent} (${hue}): hand-written foregrounds aren't generated yet`,
@@ -108,13 +105,6 @@ function addIntent(
   return [];
 }
 
-function authoredScale(palette: AnyPalette, hue: string): AnyScale | undefined {
-  const scale = Object.hasOwn(palette.scales, hue)
-    ? palette.scales[hue]
-    : undefined;
-  return scale?.kind === 'authored' ? scale : undefined;
-}
-
 // A ramp reads fixed steps of one scale.
 function chartColors(
   family: Family,
@@ -129,44 +119,35 @@ function chartColors(
     charts.source.intent === undefined
       ? charts.source.hue
       : hueOf(charts.source.intent);
-  const scale = authoredScale(palette, hue);
-  if (scale === undefined) return `chart hue "${hue}" has no authored scale`;
+  const scale = scaleOf(palette, hue);
+  if (scale === undefined) return `chart hue "${hue}" has no scale`;
   return charts.steps.map((step) => stepColor(scale, step));
 }
 
-function neutralTokens(
-  resolved: ResolvedFlavor,
-): Record<string, Color> | string[] {
+function neutralTokens(resolved: ResolvedFlavor): Record<string, Color> {
   const tokens: Record<string, Color> = {};
-  const errors: string[] = [];
   for (const role of neutralRoles) {
     const ref = resolved.roles[role];
-    const color =
-      ref === undefined ? undefined : resolveRef(ref, resolved.palette);
-    if (typeof color === 'string') errors.push(`role "${role}": ${color}`);
-    else if (color !== undefined) tokens[role] = color;
+    if (ref !== undefined) tokens[role] = resolveRef(ref, resolved.palette);
   }
-  return errors.length > 0 ? errors : tokens;
+  return tokens;
 }
 
-// `validateFamily` has checked the path; it accepts any step of a seeded scale.
-function resolveRef(
-  ref: ColorRef<string, string>,
-  palette: AnyPalette,
-): Color | string {
+// `validateFamily` has checked the path against the expanded scale.
+function resolveRef(ref: ColorRef<string, string>, palette: AnyPalette): Color {
   const parsed = parseColorPath(ref.ref);
   if (parsed === undefined) throw new Error(`invalid reference ${ref.ref}`);
   const step = parsed.step === undefined ? undefined : Number(parsed.step);
   let color: Color | undefined;
   if (step === undefined) color = palette.neutrals[parsed.name];
-  else if (palette.scales[parsed.name]?.kind === 'seeded') {
-    return `scale "${parsed.name}" is seeded, which isn't generated yet`;
-  } else if (isStep(step)) {
-    color = authoredScale(palette, parsed.name)?.steps[step];
-  }
+  else if (isStep(step)) color = scaleOf(palette, parsed.name)?.steps[step];
   if (color === undefined) throw new Error(`unresolved reference ${ref.ref}`);
   if (ref.alpha === undefined) return color;
   return { ...color, alpha: (color.alpha ?? 1) * ref.alpha };
+}
+
+function scaleOf(palette: AnyPalette, hue: string): AnyScale | undefined {
+  return Object.hasOwn(palette.scales, hue) ? palette.scales[hue] : undefined;
 }
 
 function stepColor(scale: AnyScale, step: Step): Color {

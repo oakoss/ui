@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { oklch } from '#/color';
 import { tailwindScales } from '#/families/tailwind-scales';
 import { families } from '#/index';
+import { expandSeeded } from '#/seeded';
 import { withLightRole, withScale } from '#/testing';
 import { resolveTheme, type Theme } from '#/theme';
 
@@ -84,23 +85,30 @@ describe('resolveTheme across families', () => {
   });
 });
 
+describe('resolveTheme with a seeded scale', () => {
+  it('fills an intent from the expanded scale', () => {
+    const { tokens } = theme(
+      resolveTheme(withScale('blue', seeded), 'light', 'blue'),
+    );
+    // Lightness 0.6 is nearest Tailwind's 600.
+    expect(tokens['primary-600']).toEqual(seeded.seed);
+    expect(tokens.primary).toBeDefined();
+  });
+
+  it('resolves a role reference into the expanded scale', () => {
+    const family = {
+      ...withScale('brand', seeded),
+      flavors: withLightRole('accent', { ref: 'color.brand.100' }).flavors,
+    };
+    const { tokens } = theme(resolveTheme(family, 'light'));
+    expect(tokens.accent).toEqual(
+      expandSeeded<string, string>(seeded).steps[100],
+    );
+  });
+});
+
 describe('resolveTheme errors for valid but ungenerated data', () => {
   it.each([
-    [
-      'a seeded intent hue',
-      withScale('blue', seeded),
-      'blue',
-      'primary (blue): no authored scale',
-    ],
-    [
-      'a role reference into a seeded scale',
-      {
-        ...withScale('brand', seeded),
-        flavors: withLightRole('accent', { ref: 'color.brand.100' }).flavors,
-      },
-      undefined,
-      `role "accent": scale "brand" is seeded, which isn't generated yet`,
-    ],
     [
       'a hand-written foreground',
       withScale('red', { ...red, foreground: oklch(0, 0, null) }),

@@ -57,6 +57,22 @@ export function authored(
   return { anchor, kind: 'authored', steps: scaleSteps };
 }
 
+// A seeded scale expands to every core step, plus the extras it overrides.
+export function hasScaleStep(
+  scale: Scale<string, string>,
+  step: unknown,
+): step is Step {
+  if (scale.kind === 'authored') return hasStep(scale.steps, step);
+  const overrides: Partial<Record<Step, Color>> = scale.overrides ?? {};
+  return (
+    typeof step === 'number' &&
+    ((steps as readonly number[]).includes(step) ||
+      (isStep(step) &&
+        Object.hasOwn(overrides, step) &&
+        overrides[step] !== undefined))
+  );
+}
+
 // Untyped data can inherit a key, use a string key or set a step to `undefined`.
 export function hasStep(
   scaleSteps: AuthoredScale['steps'],

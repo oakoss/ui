@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
+import type { Family } from '#/family';
+
 import { oklch } from '#/color';
 import { colorDifference, contrastRatio, isOpaque, overlay } from '#/contrast';
+import { tailwindScales } from '#/families/tailwind-scales';
 import { families, styles } from '#/index';
 import { contrastMinimum, contrastPairs } from '#/roles';
+import { withScale } from '#/testing';
 import { resolveTheme } from '#/theme';
 
 const themes = Object.values(families).flatMap((family) =>
@@ -19,6 +23,14 @@ const checkedPairs = contrastPairs.filter(({ kind }) => kind !== 'decorative');
 function failures(familyId: string, flavor: string, primary: string): string[] {
   const family = Object.values(families).find(({ id }) => id === familyId);
   if (family === undefined) return [`no family ${familyId}`];
+  return pairFailures(family, flavor, primary);
+}
+
+function pairFailures(
+  family: Family,
+  flavor: string,
+  primary: string,
+): string[] {
   const theme = resolveTheme(family, flavor, primary);
   if (Array.isArray(theme)) return theme;
   return checkedPairs.flatMap(({ background, foreground, kind }) => {
@@ -63,6 +75,40 @@ describe('overlay', () => {
 describe('WCAG 2.2 AA contrast', () => {
   it.each(themes)('%s %s with a %s primary', (familyId, flavor, primary) => {
     expect(failures(familyId, flavor, primary)).toEqual([]);
+  });
+});
+
+// Each Tailwind accent replaced by a scale seeded from one of its steps, so
+// the role-step picks run over generated steps.
+const seededThemes = families.zinc.intents.primary.choices
+  .filter((hue) => hue !== 'zinc')
+  .flatMap((hue) =>
+    ([400, 500, 600] as const).flatMap((step) =>
+      (['light', 'dark'] as const).map(
+        (flavor) => [hue, step, flavor] as const,
+      ),
+    ),
+  );
+
+describe('WCAG 2.2 AA contrast with seeded scales', () => {
+  it.each(seededThemes)('%s seeded from %s, %s', (hue, step, flavor) => {
+    const seed = tailwindScales[hue].steps[step];
+    const family = withScale(hue, { kind: 'seeded', seed });
+    expect(pairFailures(family, flavor, hue)).toEqual([]);
+  });
+
+  // Pastel and extreme seeds, as primary through the blue slot.
+  it.each([
+    ['Nord frost', oklch(78.24, 0.0617, 214.9)],
+    ['Mocha mauve', oklch(78.71, 0.1187, 304.8)],
+    ['a near-white tint', oklch(97.5, 0.02, 250)],
+    ['a near-black', oklch(27, 0.05, 250)],
+  ] as const)('%s', (_, seed) => {
+    const family = withScale('blue', { kind: 'seeded', seed });
+    expect([
+      ...pairFailures(family, 'light', 'blue'),
+      ...pairFailures(family, 'dark', 'blue'),
+    ]).toEqual([]);
   });
 });
 
