@@ -14,13 +14,17 @@ const roleSuffixes = [
   '-text',
   '-foreground',
 ];
-const buttonColors = [
-  ...intents.flatMap((intent) => roleSuffixes.map((s) => `${intent}${s}`)),
-  'background',
-  'border',
-  'foreground',
-  'secondary',
-];
+const intentColors = intents.flatMap((intent) =>
+  roleSuffixes.map((s) => `${intent}${s}`),
+);
+
+// Lists each color because the plugin's `*` also matches `,#f00`, which would
+// let a hardcoded fallback through.
+function colorVariables(prefix: string, neutralColors: string[] = []) {
+  return [...intentColors, ...neutralColors].map(
+    (color) => `[--${prefix}-*:var(--color-${color})]`,
+  );
+}
 
 const selectionColors = [
   'ButtonText',
@@ -29,10 +33,8 @@ const selectionColors = [
   'HighlightText',
 ];
 
-// Button sets its --btn-* variables to named theme colors. Each color is
-// listed because the plugin's `*` also matches `,#f00`, so a `var(--color-*)`
-// entry would let a hardcoded fallback through. The label's gap-[inherit]
-// lets size and className gaps reach the icon spacing.
+// The label's gap-[inherit] lets size and className gaps reach the icon
+// spacing.
 const componentVariables = defineConfig({
   overrides: [
     {
@@ -42,7 +44,12 @@ const componentVariables = defineConfig({
           'error',
           {
             allow: [
-              ...buttonColors.map((color) => `[--btn-*:var(--color-${color})]`),
+              ...colorVariables('btn', [
+                'background',
+                'border',
+                'foreground',
+                'secondary',
+              ]),
               'gap-[inherit]',
               // Neutral has no hover role: its fill fades instead.
               '[--btn-hover:color-mix(in_oklab,var(--color-foreground)_90%,transparent)]',
@@ -137,13 +144,7 @@ const componentVariables = defineConfig({
       rules: {
         'shadcn/no-arbitrary-values': [
           'error',
-          // A destructive item sets its --menu-* colors.
-          {
-            allow: [
-              '[--menu-subtle:var(--color-destructive-subtle)]',
-              '[--menu-text:var(--color-destructive-text)]',
-            ],
-          },
+          { allow: colorVariables('menu') },
         ],
       },
     },
