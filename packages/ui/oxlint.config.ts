@@ -123,6 +123,23 @@ const componentVariables = defineConfig({
       },
     },
     {
+      files: ['src/components/ui/overlays/menu.tsx'],
+      rules: {
+        'shadcn/no-arbitrary-values': [
+          'error',
+          // The menu scrolls within the height React Aria gives the popover,
+          // and a destructive item sets its --menu-* colors.
+          {
+            allow: [
+              'max-h-[inherit]',
+              '[--menu-subtle:var(--color-destructive-subtle)]',
+              '[--menu-text:var(--color-destructive-text)]',
+            ],
+          },
+        ],
+      },
+    },
+    {
       files: ['src/components/ui/inputs/list-box.tsx'],
       rules: {
         'shadcn/no-arbitrary-values': [

@@ -169,7 +169,7 @@ export function ComboboxTrigger({ className }: { className?: string }) {
     <AriaButton
       className={cn(
         fieldButton,
-        'pressed:scale-100 pressed:from-transparent pressed:to-transparent',
+        'pressed:from-transparent pressed:to-transparent pressed:not-[[aria-expanded=true][aria-haspopup]:not([aria-haspopup=false])]:scale-100',
         className,
       )}
       data-slot="combobox-trigger"

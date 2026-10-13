@@ -3245,6 +3245,102 @@
           "target": "@lib/cn-config.ts"
         }
       ]
+    },
+    {
+      "name": "dropdown-menu",
+      "type": "registry:ui",
+      "title": "Dropdown Menu",
+      "description": "Menu of actions opened from a button, built on React Aria Components, with shortcuts, descriptions, checkbox and radio groups, destructive items, links and submenus.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/dropdown-menu.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme", "oakoss/ui/popover"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/overlays/dropdown-menu.tsx",
+          "type": "registry:ui",
+          "target": "@ui/overlays/dropdown-menu.tsx"
+        },
+        {
+          "path": "src/components/ui/overlays/menu.tsx",
+          "type": "registry:ui",
+          "target": "@ui/overlays/menu.tsx"
+        },
+        {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "context-menu",
+      "type": "registry:ui",
+      "title": "Context Menu",
+      "description": "Menu of actions opened at the pointer by right-click, long press or the keyboard, built on React Aria Components, sharing Dropdown Menu's items.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/context-menu.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme", "oakoss/ui/popover"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/overlays/context-menu.tsx",
+          "type": "registry:ui",
+          "target": "@ui/overlays/context-menu.tsx"
+        },
+        {
+          "path": "src/components/ui/overlays/menu.tsx",
+          "type": "registry:ui",
+          "target": "@ui/overlays/menu.tsx"
+        },
+        {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
     }
   ]
 }

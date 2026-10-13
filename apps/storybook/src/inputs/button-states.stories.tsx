@@ -16,6 +16,30 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
+// A press shrinks the button, except a trigger whose popup is open, which
+// React Aria keeps pressed for as long as a menu stays open.
+export const Pressed: Story = {
+  play: async ({ canvas }) => {
+    const button = canvas.getByRole('button', { name: 'Save' });
+    const scale = async () => {
+      await Promise.all(button.getAnimations().map((a) => a.finished));
+      return getComputedStyle(button).scale;
+    };
+    button.toggleAttribute('data-pressed', true);
+    await expect(await scale()).toBe('0.97');
+    // An expanded disclosure still shrinks; an open menu or listbox trigger
+    // doesn't.
+    button.setAttribute('aria-expanded', 'true');
+    await expect(await scale()).toBe('0.97');
+    button.setAttribute('aria-haspopup', 'true');
+    await expect(await scale()).toBe('none');
+    button.setAttribute('aria-haspopup', 'listbox');
+    await expect(await scale()).toBe('none');
+    button.setAttribute('aria-haspopup', 'false');
+    await expect(await scale()).toBe('0.97');
+  },
+};
+
 export const Pending: Story = {
   args: { isPending: true },
   play: async ({ args, canvas }) => {
