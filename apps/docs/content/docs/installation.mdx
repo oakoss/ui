@@ -45,6 +45,19 @@ Give your app's root element `isolation: isolate` (the `isolate` class). Dialogs
 and popovers render at the end of `<body>` on the `--z-*` scale, and the root's
 own stacking context keeps z-indexes inside the app from competing with them.
 
+## Pick a theme family
+
+The theme starts on Zinc. To use another family, add its item after `base`:
+
+```npm
+npx shadcn@latest add oakoss/ui/theme-mauve
+```
+
+The families are `zinc`, `neutral`, `stone`, `mauve`, `olive`, `mist` and
+`taupe`. Each item sets the family's colors in light and dark. Adding
+components keeps the family; adding `base` or `theme` again resets the colors
+to Zinc.
+
 ## Add components
 
 ```npm
