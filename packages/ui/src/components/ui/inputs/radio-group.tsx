@@ -13,9 +13,9 @@ import {
   FieldDescription,
   fieldLayout,
   type FieldMessages,
-  isEmptyNode,
 } from '#/components/ui/inputs/field';
 import { cn, cx } from '#/lib/cx';
+import { isEmptyNode } from '#/lib/empty-node';
 import { targetSize as targetSizeStyles } from '#/lib/recipes';
 
 export type RadioGroupItemProps = {

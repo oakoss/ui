@@ -24,10 +24,10 @@ import {
   FieldDescription,
   FieldLabel,
   type FieldMessages,
-  isEmptyNode,
   type Shortcut,
 } from '#/components/ui/inputs/field';
 import { cn, cx } from '#/lib/cx';
+import { isEmptyNode } from '#/lib/empty-node';
 import { focusRing } from '#/lib/recipes';
 
 export type SliderProps<T extends SliderValue = number> = Omit<

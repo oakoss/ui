@@ -1,7 +1,7 @@
 import { createElement, Fragment } from 'react';
 import { expect, test } from 'vitest';
 
-import { isEmptyNode } from '#/components/ui/inputs/field';
+import { isEmptyNode } from '#/lib/empty-node';
 
 // Values that render nothing, so the part that would hold them never mounts.
 test.each([

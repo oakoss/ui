@@ -24,9 +24,9 @@ import {
   errorList,
   fieldLayout,
   type FieldMessages,
-  isEmptyNode,
 } from '#/components/ui/inputs/field';
 import { cn } from '#/lib/cx';
+import { isEmptyNode } from '#/lib/empty-node';
 import { fieldControl } from '#/lib/recipes';
 
 const selectStyles = tv({

@@ -2051,6 +2051,11 @@
           "target": "@ui/inputs/field.tsx"
         },
         {
+          "path": "src/lib/empty-node.ts",
+          "type": "registry:lib",
+          "target": "@lib/empty-node.ts"
+        },
+        {
           "path": "src/lib/cx.ts",
           "type": "registry:lib",
           "target": "@lib/cx.ts"
