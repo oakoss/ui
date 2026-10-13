@@ -53,7 +53,7 @@ export const Default: Story = {
     await expect(Math.round(box.left)).toBe(Math.round(anchor.left));
     await expect(getComputedStyle(panel).zIndex).toBe('1400');
     // The trigger stays full size while React Aria holds it pressed.
-    await expect(getComputedStyle(trigger).scale).toBe('none');
+    await expect(getComputedStyle(trigger).scale).toBe('1');
     const item = within(menu).getByRole('menuitem', { name: 'Duplicate' });
     await expect(item).toHaveAttribute('data-slot', 'dropdown-menu-item');
     await userEvent.click(item);

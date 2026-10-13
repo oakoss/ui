@@ -122,31 +122,15 @@ test('field keeps installing Input', () => {
   expect(field?.registryDependencies).toContain('oakoss/ui/input');
 });
 
-// Components use the plugin's pressed:/pending: variants and the
-// popup-open variant, which Tailwind drops without them; shadcn merges the
-// theme's css and devDependencies into every install that depends on it.
-test('the theme installs the React Aria Tailwind plugin and popup-open', () => {
+// Components use the plugin's pressed:/pending: variants, which Tailwind
+// drops without it; shadcn merges the theme's css and devDependencies into
+// every install that depends on it.
+test('the theme installs the React Aria Tailwind plugin', () => {
   const theme = ui.items.find(({ name }) => name === 'theme');
   expect(theme).toMatchObject({
-    css: {
-      '@custom-variant popup-open (&[aria-expanded=true][aria-haspopup]:not([aria-haspopup=false]))':
-        {},
-      '@plugin tailwindcss-react-aria-components': {},
-    },
+    css: { '@plugin tailwindcss-react-aria-components': {} },
     devDependencies: ['tailwindcss-react-aria-components'],
   });
-});
-
-// Installs get the variant from the theme, the repo from globals.css.
-test("the theme's popup-open variant matches globals.css", () => {
-  const globals = readFileSync(
-    new URL('../src/styles/globals.css', import.meta.url),
-    'utf-8',
-  );
-  const variant = /^@custom-variant popup-open .+(?=;$)/mu.exec(globals)?.[0];
-  const theme = ui.items.find(({ name }) => name === 'theme');
-  expect(variant).toBeDefined();
-  expect(theme?.css).toHaveProperty([String(variant)]);
 });
 
 // Only init writes `config` (apply takes no GitHub registry address), and

@@ -2,7 +2,6 @@
 @import './theme.css';
 @import './base.css';
 @plugin 'tailwindcss-react-aria-components';
-@custom-variant popup-open (&[aria-expanded=true][aria-haspopup]:not([aria-haspopup=false]));
 @source '..';
 
 @custom-variant dark (&:where(.dark, .dark *));

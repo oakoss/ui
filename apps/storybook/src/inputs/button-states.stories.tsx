@@ -32,10 +32,13 @@ export const Pressed: Story = {
     button.setAttribute('aria-expanded', 'true');
     await expect(await scale()).toBe('0.97');
     button.setAttribute('aria-haspopup', 'true');
-    await expect(await scale()).toBe('none');
+    await expect(await scale()).toBe('1');
     button.setAttribute('aria-haspopup', 'listbox');
-    await expect(await scale()).toBe('none');
+    await expect(await scale()).toBe('1');
     button.setAttribute('aria-haspopup', 'false');
+    await expect(await scale()).toBe('0.97');
+    button.setAttribute('aria-haspopup', 'true');
+    button.setAttribute('aria-expanded', 'false');
     await expect(await scale()).toBe('0.97');
   },
 };
