@@ -5,10 +5,12 @@ import {
   Scripts,
 } from '@tanstack/react-router';
 import { RootProvider } from 'fumadocs-ui/provider/tanstack';
+import { themeOptions } from 'virtual:theme-options';
 
 import { IconProvider } from '#/components/icon-resolver';
 import { StaticSearchDialog } from '#/components/search';
 import { appName } from '#/lib/site';
+import { themeScript } from '#/lib/theme-state';
 import appCss from '#/styles/app.css?url';
 
 export const Route = createRootRoute({
@@ -25,6 +27,9 @@ export const Route = createRootRoute({
       { content: 'width=device-width, initial-scale=1', name: 'viewport' },
       { title: appName },
     ],
+    // Applies the chosen theme before paint, so the previews don't flash
+    // the default.
+    scripts: [{ children: themeScript(themeOptions) }],
   }),
 });
 

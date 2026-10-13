@@ -20,7 +20,7 @@ import {
 import { BookOpen, Code } from 'lucide-react';
 import { Suspense, use, useEffect } from 'react';
 
-import { baseOptions } from '#/components/layout';
+import { baseOptions, docsOptions } from '#/components/layout';
 import { useMDXComponents } from '#/components/mdx';
 import { itemSourceUrl } from '#/lib/registry';
 import { githubSourceUrl, markdownUrl } from '#/lib/site';
@@ -115,7 +115,7 @@ function Page() {
     useFumadocsLoader(Route.useLoaderData());
 
   return (
-    <DocsLayout {...baseOptions()} tree={pageTree}>
+    <DocsLayout {...docsOptions()} tree={pageTree}>
       {/* Lets the prerender crawler find each page's Markdown version. */}
       <Link hidden to={markdownUrl} />
       <Suspense>

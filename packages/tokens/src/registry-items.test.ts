@@ -3,7 +3,14 @@ import { describe, expect, it } from 'vitest';
 import { type Family } from '#/family';
 import { families, styles, typographies } from '#/index';
 import { familyCssVars, registryCssVars } from '#/registry';
-import { type RegistryInputs, registryItems } from '#/registry-items';
+import {
+  radii,
+  type RegistryInputs,
+  registryItems,
+  themeChoices,
+  themeItem,
+  themeSlug,
+} from '#/registry-items';
 
 // The theme item's family is deliberately neither first nor last.
 const inputs: RegistryInputs = {
@@ -161,6 +168,72 @@ describe('registryItems theme checks', () => {
     ['a repeated hand-written name', [theme, button, button], 'repeat: button'],
   ])('rejects %s', (_, items, message) => {
     expect(() => registryItems(items, inputs)).toThrow(message);
+  });
+});
+
+describe('themeItem', () => {
+  const [none, , medium] = radii;
+
+  it('sets the chosen primary and radius over the family item', () => {
+    const item = themeItem(
+      { family: families.mauve, primary: 'red', radius: none },
+      styles.vega,
+    );
+    const red = familyCssVars(families.mauve, styles.vega, 'red');
+    expect(item).toEqual({
+      cssVars: { dark: red.dark, light: { radius: '0rem', ...red.light } },
+      description: 'The Mauve theme family with a red primary and none radius.',
+      name: 'theme-mauve-red-none',
+      registryDependencies: ['oakoss/ui/theme'],
+      title: 'Mauve theme, red primary',
+      type: 'registry:theme',
+    });
+    const gray = familyCssVars(families.mauve, styles.vega);
+    expect(red.light.primary).not.toEqual(gray.light.primary);
+    expect(red.dark.primary).not.toEqual(gray.dark.primary);
+  });
+
+  it("matches the family item for the family's defaults", () => {
+    const { cssVars } = themeItem(
+      { family: families.zinc, primary: 'zinc', radius: medium },
+      styles.vega,
+    );
+    expect(cssVars).toEqual({
+      ...familyCssVars(families.zinc, styles.vega),
+      light: {
+        radius: styles.vega.tokens.radius.value,
+        ...familyCssVars(families.zinc, styles.vega).light,
+      },
+    });
+  });
+
+  it("rejects a primary the family doesn't offer", () => {
+    expect(() =>
+      themeItem(
+        { family: families.mauve, primary: 'plaid', radius: none },
+        styles.vega,
+      ),
+    ).toThrow(`primary "plaid" isn't one of its choices`);
+  });
+});
+
+describe('themeChoices', () => {
+  it('writes item JSON in the registry key order', () => {
+    const choice = { family: families.zinc, primary: 'zinc', radius: radii[0] };
+    expect(JSON.stringify(themeItem(choice, styles.vega))).toMatch(
+      /^\{"name":.*,"type":.*,"title":.*,"description":.*,"registryDependencies":.*,"cssVars":/u,
+    );
+  });
+
+  it('builds every choice under a unique name', () => {
+    const choices = themeChoices(Object.values(families));
+    const perFamily = Object.values(families).map(
+      (family) => family.intents.primary.choices.length * radii.length,
+    );
+    expect(choices).toHaveLength(perFamily.reduce((a, b) => a + b));
+    expect(new Set(choices.map((choice) => themeSlug(choice))).size).toBe(
+      choices.length,
+    );
   });
 });
 

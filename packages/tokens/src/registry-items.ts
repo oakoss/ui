@@ -4,6 +4,8 @@ import type { Typography } from '#/typography';
 
 import { type CssVars, familyCssVars, registryCssVars } from '#/registry';
 
+export type Radius = (typeof radii)[number];
+
 export type RegistryInputs = {
   families: readonly Family[];
   // The `theme` item's family; it gets a `theme-<id>` item only if listed.
@@ -12,7 +14,9 @@ export type RegistryInputs = {
   typography: Typography;
 };
 
-type FamilyItem = {
+export type ThemeChoice = { family: Family; primary: string; radius: Radius };
+
+export type ThemeItem = {
   cssVars: Pick<CssVars, 'dark' | 'light'>;
   description: string;
   name: string;
@@ -24,6 +28,14 @@ type FamilyItem = {
 type Item = { name: string } & Record<string, unknown>;
 
 const kebabCase = /^[a-z\d]+(?:-[a-z\d]+)*$/u;
+
+// shadcn's /create presets.
+export const radii = [
+  { name: 'none', value: '0rem' },
+  { name: 'small', value: '0.45rem' },
+  { name: 'medium', value: '0.625rem' },
+  { name: 'large', value: '0.875rem' },
+] as const;
 
 /**
 `registry.json`'s items with the generated ones replaced: the `theme`
@@ -69,40 +81,51 @@ export function registryItems(
   return [...kept.slice(0, index), ...familyItems, ...kept.slice(index)];
 }
 
-// The JSON's key order, like the hand-written items; lint sorts literals.
-const familyItemKeys = everyKey([
-  'name',
-  'type',
-  'title',
-  'description',
-  'registryDependencies',
-  'cssVars',
-]);
-
-// The argument fails to compile when it leaves out a FamilyItem field.
-function everyKey<Key extends keyof FamilyItem>(
-  keys: ([Exclude<keyof FamilyItem, Key>] extends [never] ? unknown : never) &
-    readonly Key[],
-): readonly Key[] {
-  return keys;
+/**
+Every family, primary and radius combination, for theme items built outside
+the registry.
+*/
+export function themeChoices(families: readonly Family[]): ThemeChoice[] {
+  return families.flatMap((family) =>
+    family.intents.primary.choices.flatMap((primary) =>
+      radii.map((radius) => ({ family, primary, radius })),
+    ),
+  );
 }
 
-function familyItem(entry: Family, style: Style): Item {
+/**
+A `theme-<family>` item with a primary and radius chosen. It sets `radius`
+in `light`, the slot shadcn writes to `:root`.
+*/
+export function themeItem(choice: ThemeChoice, style: Style): ThemeItem {
+  const { family, primary, radius } = choice;
+  const { dark, light } = familyCssVars(family, style, primary);
+  const name = `theme-${themeSlug(choice)}`;
+  if (!kebabCase.test(name)) {
+    throw new Error(`theme item name "${name}" isn't kebab-case`);
+  }
+  return themeRegistryItem({
+    cssVars: { dark, light: { radius: radius.value, ...light } },
+    description: `The ${family.name} theme family with a ${primary} primary and ${radius.name} radius.`,
+    name,
+    title: `${family.name} theme, ${primary} primary`,
+  });
+}
+
+export function themeSlug({ family, primary, radius }: ThemeChoice): string {
+  return `${family.id}-${primary}-${radius.name}`;
+}
+
+function familyItem(entry: Family, style: Style): ThemeItem {
   if (!kebabCase.test(entry.id)) {
     throw new Error(`family id "${entry.id}" isn't a registry item name`);
   }
-  const item: FamilyItem = {
+  return themeRegistryItem({
     cssVars: familyCssVars(entry, style),
     description: `The ${entry.name} theme family's colors, light and dark.`,
     name: `theme-${entry.id}`,
-    registryDependencies: ['oakoss/ui/theme'],
     title: `${entry.name} theme`,
-    type: 'registry:theme',
-  };
-  return {
-    name: item.name,
-    ...Object.fromEntries(familyItemKeys.map((key) => [key, item[key]])),
-  };
+  });
 }
 
 function namedItems(items: unknown): Item[] {
@@ -119,4 +142,24 @@ function namedItems(items: unknown): Item[] {
     }
     return { ...item, name: item.name };
   });
+}
+
+/**
+A theme item that depends on the `theme` item, keyed in the JSON order of
+the hand-written items. Lint sorts object literals, so each key is assigned
+on its own, nested because `Object.assign` with more than three sources
+returns `any` and the return type would check nothing.
+*/
+function themeRegistryItem({
+  cssVars,
+  description,
+  name,
+  title,
+}: Pick<ThemeItem, 'cssVars' | 'description' | 'name' | 'title'>): ThemeItem {
+  return Object.assign(
+    Object.assign({ name }, { type: 'registry:theme' as const }, { title }),
+    { description },
+    { registryDependencies: ['oakoss/ui/theme'] },
+    { cssVars },
+  );
 }
