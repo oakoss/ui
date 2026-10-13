@@ -27,7 +27,7 @@ import {
   MenuLabel,
   type MenuLabelProps,
   MenuSeparator,
-} from '#/components/ui/overlays/menu';
+} from '#/components/ui/overlays/menu-item';
 import { cn, cx } from '#/lib/cx';
 import { itemTextValue } from '#/lib/text-value';
 

@@ -3278,6 +3278,11 @@
           "target": "@ui/overlays/menu.tsx"
         },
         {
+          "path": "src/components/ui/overlays/menu-item.tsx",
+          "type": "registry:ui",
+          "target": "@ui/overlays/menu-item.tsx"
+        },
+        {
           "path": "src/components/icons.tsx",
           "type": "registry:component",
           "target": "@components/icons.tsx"
@@ -3331,6 +3336,11 @@
           "target": "@ui/overlays/menu.tsx"
         },
         {
+          "path": "src/components/ui/overlays/menu-item.tsx",
+          "type": "registry:ui",
+          "target": "@ui/overlays/menu-item.tsx"
+        },
+        {
           "path": "src/components/icons.tsx",
           "type": "registry:component",
           "target": "@components/icons.tsx"
@@ -3373,8 +3383,7 @@
       "registryDependencies": [
         "oakoss/ui/theme",
         "oakoss/ui/dialog",
-        "oakoss/ui/input-group",
-        "oakoss/ui/popover"
+        "oakoss/ui/input-group"
       ],
       "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
       "files": [
@@ -3384,9 +3393,9 @@
           "target": "@ui/overlays/command.tsx"
         },
         {
-          "path": "src/components/ui/overlays/menu.tsx",
+          "path": "src/components/ui/overlays/menu-item.tsx",
           "type": "registry:ui",
-          "target": "@ui/overlays/menu.tsx"
+          "target": "@ui/overlays/menu-item.tsx"
         },
         {
           "path": "src/components/icons.tsx",
