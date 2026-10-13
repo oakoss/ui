@@ -27,9 +27,10 @@ win, while style and type tokens stay single-sourced in `theme`.
 export function familyCssVars(
   family: Family,
   style: Style,
+  primary?: string,
 ): Pick<CssVars, 'dark' | 'light'> {
-  const light = resolved(family, 'light');
-  const dark = resolved(family, 'dark');
+  const light = resolved(family, 'light', primary);
+  const dark = resolved(family, 'dark', primary);
   return {
     dark: { field: fieldColor(style, 'dark', dark), ...colors(dark) },
     light: { field: fieldColor(style, 'light', light), ...colors(light) },

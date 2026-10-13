@@ -27,6 +27,15 @@ export {
   intentRoleMeta,
   neutralRoleMeta,
 } from '#/meta';
+export {
+  radii,
+  type Radius,
+  type ThemeChoice,
+  themeChoices,
+  type ThemeItem,
+  themeItem,
+  themeItemJson,
+} from '#/registry-items';
 export { type ResolvedFlavor, resolveFlavor } from '#/resolve';
 export type {
   ContrastKind,
