@@ -25,6 +25,20 @@ describe('validateFamily: overrides across flavors', () => {
     });
   });
 
+  it('treats an explicit undefined role as inherited', () => {
+    const family = withFlavors({
+      dim: {
+        extends: 'dark',
+        name: 'Dim',
+        polarity: 'dark',
+        roles: { background: undefined },
+      },
+    });
+    expect(resolveFlavor(family, 'dim')).toMatchObject({
+      roles: { background: dark.roles.background },
+    });
+  });
+
   it('reports a replaced scale under each flavor that inherits it', () => {
     const bad = { ...red, foreground: oklch(120, 0, null) };
     const family = withFlavors({

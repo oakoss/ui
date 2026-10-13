@@ -251,6 +251,16 @@ Agreed on 2026-10-03. A bordered input with no distinct fill is identified by it
 - **Dark field fill.** Vega's `input/30` assumed shadcn's translucent input; it is now `foreground` at 4.5%, within 0.1 ΔE of the old fill. `input` keeps 3:1 against the filled control (3.11:1 at worst, on dark cards).
 - The contrast test checks `input` and `destructive-text` against `background`, `card` and `popover`.
 
+## Seeded scales (`ui-2mi.9`)
+
+Agreed on 2026-10-13. Generator b from [Building scales](#building-scales), filled in (`packages/tokens/src/seeded.ts`):
+
+- **Curves.** Lightness per step is the mean of Tailwind's 17 chromatic scales; the grays are left out because their chroma is near zero and their dark end is darker. Chroma per step is each chromatic scale's chroma divided by its own peak, averaged. Both are computed from the in-repo Tailwind data, so they follow it when it changes.
+- **Seed.** The seed sits unchanged at the core step whose mean lightness is nearest, and the role-step rule starts there in both modes (`anchor`). Every other step takes the mean lightness and `seed chroma × curve[step] / curve[seed step]`, at the seed's hue, clamped to the P3 gamut like Tailwind's own values; contrast is still measured after mapping to sRGB. Overrides win.
+- **Steps 25 and 1000.** Not generated: Tailwind has no such steps to average. They exist only where an override sets them, and validation rejects a reference to one otherwise.
+- **Measured.** Seeding each Tailwind accent from its 500 lands a mean OKLab distance of 0.033 from the real scale (worst scale 0.062, worst single step 0.115, yellow). Every role pair passes for each accent seeded from 400, 500 or 600, in both modes, and for the pastel and extreme seeds in the test.
+- **A near-white seed extrapolates to a vivid scale.** A seed with chroma 0.02 at step 50 peaks at 0.218 by step 600, since relative chroma is kept. A family that wants a muted scale overrides the steps it cares about.
+
 ## Rejected
 
 - **A density multiplier instead of purpose tokens.** Radix's `scaling` multiplies space, type and radius together. 0002 measured that shadcn's styles don't scale together: button height drops 22% from Vega to Mira while dialog padding drops 33%.

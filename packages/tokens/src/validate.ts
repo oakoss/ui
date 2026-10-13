@@ -10,7 +10,7 @@ import {
   intents,
   neutralRoles,
 } from '#/roles';
-import { hasStep, isStep, type Scale } from '#/scale';
+import { hasScaleStep, isStep, type Scale } from '#/scale';
 import { scaleErrors } from '#/validate-scale';
 
 type AnyScale = Scale<string, string>;
@@ -94,12 +94,9 @@ function flavorErrors(family: Family, flavorId: string): string[] {
   const base = new Set(
     referenceErrors(family, family.palette).map(([, error]) => error),
   );
+  const replaced = replacedScales(family, flavorId);
   const references = referenceErrors(family, resolved.palette)
-    .filter(
-      ([scale, error]) =>
-        resolved.palette.scales[scale] !== family.palette.scales[scale] ||
-        !base.has(error),
-    )
+    .filter(([scale, error]) => replaced.has(scale) || !base.has(error))
     .map(([, error]) => error);
   const errors = [...paletteErrors(delta), ...references].map(
     (error) => `flavor "${flavorId}": ${error}`,
@@ -202,9 +199,9 @@ function rampErrors(
     const scale = Object.hasOwn(palette.scales, hue)
       ? palette.scales[hue]
       : undefined;
-    if (scale?.kind !== 'authored') return [];
+    if (scale === undefined) return [];
     return charts.steps
-      .filter((step) => !hasStep(scale.steps, step))
+      .filter((step) => !hasScaleStep(scale, step))
       .map((step): ScaleError => [
         hue,
         `chart step ${step} is missing from scale "${hue}"`,
@@ -252,8 +249,24 @@ function refError(
   if (scale === undefined) return `unknown scale "${name}"`;
   const value = Number(step);
   if (String(value) !== step || !isStep(value)) return `unknown step "${step}"`;
-  if (scale.kind === 'authored' && !hasStep(scale.steps, value)) {
+  if (!hasScaleStep(scale, value)) {
     return `scale "${name}" has no step ${step}`;
   }
   return undefined;
+}
+
+// The scales a flavor or one it extends supplies; `resolveFlavor` has already
+// rejected a cycle.
+function replacedScales(family: Family, flavorId: string): Set<string> {
+  const names = new Set<string>();
+  let id: string | undefined = flavorId;
+  while (id !== undefined) {
+    const flavor: Family['flavors'][string] | undefined = family.flavors[id];
+    const scales = Object.entries(flavor?.palette?.scales ?? {});
+    for (const [name, scale] of scales) {
+      if (scale !== undefined) names.add(name);
+    }
+    id = flavor?.extends;
+  }
+  return names;
 }
