@@ -24,6 +24,7 @@ import {
 } from '#/components/ui/overlays/popover';
 import { cn, cx } from '#/lib/cx';
 import { listItem } from '#/lib/recipes';
+import { itemTextValue } from '#/lib/text-value';
 
 export type MenuContentProps<T extends object = object> = {
   className?: string;
@@ -59,7 +60,7 @@ export type MenuItemProps<T extends object = object> = MenuItemBaseProps<T> &
   MenuItemLabel;
 
 // Each part takes the component it belongs to, which names its data-slot.
-export type MenuKind = 'context-menu' | 'dropdown-menu';
+export type MenuKind = 'command' | 'context-menu' | 'dropdown-menu';
 
 export type MenuLabelProps = { inset?: boolean } & AriaHeaderProps;
 
@@ -147,7 +148,7 @@ export function MenuItem<T extends object>({
       className={cx(itemStyles({ inset, intent }), className)}
       data-intent={intent}
       data-slot={`${kind}-item`}
-      textValue={textValue ?? plainText(children)}
+      textValue={itemTextValue(textValue, children)}
       {...props}
     >
       {({ isSelected, selectionMode }) => (
@@ -279,16 +280,6 @@ function MenuShortcut({
       <KeyboardContext value={{}}>{children}</KeyboardContext>
     </AriaKeyboard>
   );
-}
-
-// JSX like `Delete {count} files` passes its text as an array.
-function plainText(children: ReactNode): string | undefined {
-  if (typeof children === 'string' || typeof children === 'number') {
-    return String(children);
-  }
-  if (!Array.isArray(children)) return undefined;
-  const parts = children.map((child: ReactNode) => plainText(child));
-  return parts.every((part) => part !== undefined) ? parts.join('') : undefined;
 }
 
 function SelectionMark({ mode }: { mode: 'multiple' | 'single' }) {
