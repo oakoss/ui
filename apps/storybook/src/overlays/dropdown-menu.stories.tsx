@@ -20,9 +20,8 @@ import { expect, fn, screen, userEvent, waitFor, within } from 'storybook/test';
 import {
   DropdownMenuDemo,
   type DropdownMenuDemoProps,
-  menuClosed,
-  openMenu,
 } from './dropdown-menu-demo';
+import { menuClosed, openMenu } from './menu-test';
 
 const onAction = fn<(key: unknown) => void>();
 
@@ -158,6 +157,22 @@ export const Empty: Story = {
     const { menu } = await openMenu();
     await expect(within(menu).getByText('No actions available')).toBeVisible();
   },
+};
+
+// A passed placement wins, and an undefined offset keeps the 4px default.
+export const Placement: Story = {
+  play: async () => {
+    const { panel } = await openMenu();
+    const box = panel.getBoundingClientRect();
+    const anchor = screen
+      .getByRole('button', { name: 'Options' })
+      .getBoundingClientRect();
+    await expect(Math.round(box.right)).toBe(Math.round(anchor.right));
+    await expect(Math.round(box.top - anchor.bottom)).toBe(4);
+  },
+  render: (args) => (
+    <DropdownMenuDemo {...args} offset={undefined} placement="bottom end" />
+  ),
 };
 
 // The menu sizes to its items, at least 8rem, rather than the trigger.

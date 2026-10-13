@@ -32,7 +32,10 @@
       "title": "Theme",
       "description": "Design tokens (color system) shared by all oakoss/ui components.",
       "devDependencies": ["tailwindcss-react-aria-components"],
-      "css": { "@plugin tailwindcss-react-aria-components": {} },
+      "css": {
+        "@plugin tailwindcss-react-aria-components": {},
+        "@custom-variant popup-open (&[aria-expanded=true][aria-haspopup]:not([aria-haspopup=false]))": {}
+      },
       "cssVars": {
         "dark": {
           "field": "oklch(0.985 0 0 / 4.5%)",

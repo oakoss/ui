@@ -4,12 +4,15 @@ import {
   ContextMenu,
   ContextMenuItem,
   ContextMenuSeparator,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from '@oakoss/ui/components/ui/overlays/context-menu';
 import { Pressable } from 'react-aria-components';
 import { expect, fn, screen, userEvent, waitFor, within } from 'storybook/test';
 
-import { menuClosed } from './dropdown-menu-demo';
+import { menuClosed } from './menu-test';
 import { settled } from './overlay-test';
 
 const onAction = fn<(key: unknown) => void>();
@@ -117,4 +120,58 @@ export const Keyboard: Story = {
       await expect(target).toHaveFocus();
     });
   },
+};
+
+// A submenu opens beside its item, with its first item level with it.
+export const Submenu: Story = {
+  play: async ({ canvas }) => {
+    const target = canvas.getByRole('button', { name: 'report.pdf' });
+    await userEvent.pointer({ keys: '[MouseRight]', target });
+    const { menu } = await settledMenu();
+    await userEvent.keyboard('{ArrowDown}{ArrowDown}{ArrowRight}');
+    const sub = await screen.findByRole('menu', { name: 'Share' });
+    const panel = sub.closest<HTMLElement>(
+      '[data-slot=context-menu-sub-content]',
+    );
+    if (!panel) throw new Error('No submenu panel');
+    await settled(panel);
+    const trigger = within(menu).getByRole('menuitem', { name: 'Share' });
+    const email = within(sub).getByRole('menuitem', { name: 'Email' });
+    await expect(
+      Math.abs(
+        panel.getBoundingClientRect().left -
+          trigger.getBoundingClientRect().right,
+      ),
+    ).toBeLessThanOrEqual(1);
+    await expect(
+      Math.abs(
+        email.getBoundingClientRect().top - trigger.getBoundingClientRect().top,
+      ),
+    ).toBeLessThanOrEqual(1);
+  },
+  render: () => (
+    <div className="grid min-h-96 place-items-center">
+      <ContextMenuTrigger>
+        <Pressable>
+          <div
+            aria-label="report.pdf"
+            className="grid h-40 w-96 place-items-center rounded-panel border border-dashed border-input text-sm"
+            role="button"
+            tabIndex={0}
+          >
+            Right-click the file
+          </div>
+        </Pressable>
+        <ContextMenu>
+          <ContextMenuItem id="open">Open</ContextMenuItem>
+          <ContextMenuSub>
+            <ContextMenuSubTrigger>Share</ContextMenuSubTrigger>
+            <ContextMenuSubContent>
+              <ContextMenuItem id="email">Email</ContextMenuItem>
+            </ContextMenuSubContent>
+          </ContextMenuSub>
+        </ContextMenu>
+      </ContextMenuTrigger>
+    </div>
+  ),
 };

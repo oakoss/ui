@@ -1,5 +1,4 @@
 import {
-  type HeaderProps as AriaHeaderProps,
   type MenuSectionProps as AriaMenuSectionProps,
   MenuTrigger as AriaMenuTrigger,
   type MenuTriggerProps as AriaMenuTriggerProps,
@@ -15,7 +14,9 @@ import {
   MenuItem,
   type MenuItemProps,
   MenuLabel,
+  type MenuLabelProps,
   MenuSeparator,
+  MenuSubContent,
   MenuSubTrigger,
   type MenuSubTriggerProps,
 } from '#/components/ui/overlays/menu';
@@ -24,10 +25,21 @@ export type ContextMenuItemProps<T extends object = object> = MenuItemProps<T>;
 
 export type ContextMenuProps<T extends object = object> = MenuContentProps<T>;
 
-// The menu opens at the pointer; put it in a ContextMenuTrigger after the
-// target.
-export function ContextMenu<T extends object>(props: ContextMenuProps<T>) {
-  return <MenuContent<T> {...props} isSubmenu={false} kind="context-menu" />;
+// The menu opens with its corner on the pointer; put it in a
+// ContextMenuTrigger after the target.
+export function ContextMenu<T extends object>({
+  offset = 0,
+  placement = 'bottom start',
+  ...props
+}: ContextMenuProps<T>) {
+  return (
+    <MenuContent<T>
+      {...props}
+      kind="context-menu"
+      offset={offset}
+      placement={placement}
+    />
+  );
 }
 
 export function ContextMenuGroup<T extends object>(
@@ -42,7 +54,7 @@ export function ContextMenuItem<T extends object>(
   return <MenuItem<T> {...props} kind="context-menu" />;
 }
 
-export function ContextMenuLabel(props: { inset?: boolean } & AriaHeaderProps) {
+export function ContextMenuLabel(props: MenuLabelProps) {
   return <MenuLabel {...props} kind="context-menu" />;
 }
 
@@ -58,7 +70,7 @@ export function ContextMenuSub(props: AriaSubmenuTriggerProps) {
 export function ContextMenuSubContent<T extends object>(
   props: ContextMenuProps<T>,
 ) {
-  return <MenuContent<T> {...props} isSubmenu kind="context-menu" />;
+  return <MenuSubContent<T> {...props} kind="context-menu" />;
 }
 
 export function ContextMenuSubTrigger<T extends object>(

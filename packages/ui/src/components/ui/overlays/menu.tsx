@@ -61,6 +61,8 @@ export type MenuItemProps<T extends object = object> = MenuItemBaseProps<T> &
 // Each part takes the component it belongs to, which names its data-slot.
 export type MenuKind = 'context-menu' | 'dropdown-menu';
 
+export type MenuLabelProps = { inset?: boolean } & AriaHeaderProps;
+
 export type MenuSubTriggerProps<T extends object = object> = MenuItemLabel &
   Omit<MenuItemBaseProps<T>, 'shortcut'>;
 
@@ -81,25 +83,24 @@ const itemStyles = tv({
   },
 });
 
-// A submenu opens beside its item, with its first item level with the trigger.
 export function MenuContent<T extends object>({
   className,
   crossOffset,
   emptyLabel,
-  isSubmenu = false,
   kind,
   offset,
+  part = 'content',
   placement,
   shouldFlip,
   ...props
-}: { isSubmenu?: boolean; kind: MenuKind } & MenuContentProps<T>) {
+}: { kind: MenuKind; part?: 'content' | 'sub-content' } & MenuContentProps<T>) {
   return (
     <PopoverContent
       className={cn('w-auto min-w-32 p-1', className)}
-      crossOffset={crossOffset ?? (isSubmenu ? -5 : undefined)}
-      data-slot={`${kind}-${isSubmenu ? 'sub-content' : 'content'}`}
-      offset={offset ?? popoverOffset(kind, isSubmenu)}
-      placement={placement ?? (isSubmenu ? 'end top' : 'bottom start')}
+      crossOffset={crossOffset}
+      data-slot={`${kind}-${part}`}
+      offset={offset}
+      placement={placement}
       shouldFlip={shouldFlip}
     >
       <AriaMenu<T>
@@ -176,7 +177,7 @@ export function MenuLabel({
   inset = false,
   kind,
   ...props
-}: { inset?: boolean; kind: MenuKind } & AriaHeaderProps) {
+}: { kind: MenuKind } & MenuLabelProps) {
   return (
     <AriaHeader
       className={cn(
@@ -205,7 +206,25 @@ export function MenuSeparator({
   );
 }
 
-// Opens a submenu: wrap it with the submenu's content in a SubmenuTrigger.
+// A submenu opens beside its item; the cross offset takes off the panel's
+// padding and border, so its first item sits level with the trigger.
+export function MenuSubContent<T extends object>({
+  crossOffset = -5,
+  offset = 0,
+  placement = 'end top',
+  ...props
+}: { kind: MenuKind } & MenuContentProps<T>) {
+  return (
+    <MenuContent<T>
+      {...props}
+      crossOffset={crossOffset}
+      offset={offset}
+      part="sub-content"
+      placement={placement}
+    />
+  );
+}
+
 export function MenuSubTrigger<T extends object>({
   kind,
   ...props
@@ -214,16 +233,15 @@ export function MenuSubTrigger<T extends object>({
     <MenuItem<T>
       {...props}
       data-slot={`${kind}-sub-trigger`}
-      end={
-        <Icon.ChevronRight
-          aria-hidden
-          className="ms-auto size-4 rtl:rotate-180"
-        />
-      }
+      end={chevron}
       kind={kind}
     />
   );
 }
+
+const chevron = (
+  <Icon.ChevronRight aria-hidden className="ms-auto size-4 rtl:rotate-180" />
+);
 
 function ItemContent({
   children,
@@ -271,12 +289,6 @@ function plainText(children: ReactNode): string | undefined {
   if (!Array.isArray(children)) return undefined;
   const parts = children.map((child: ReactNode) => plainText(child));
   return parts.every((part) => part !== undefined) ? parts.join('') : undefined;
-}
-
-// A context menu opens at the pointer, so it sits right on it.
-function popoverOffset(kind: MenuKind, isSubmenu: boolean) {
-  if (isSubmenu) return 0;
-  return kind === 'context-menu' ? 0 : 4;
 }
 
 function SelectionMark({ mode }: { mode: 'multiple' | 'single' }) {

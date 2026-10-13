@@ -11,14 +11,14 @@ import {
 } from '@oakoss/ui/components/ui/overlays/dropdown-menu';
 import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
 
+import { tokenColor } from '#/color';
 import { part } from '#/parts';
 
 import {
   DropdownMenuDemo,
   type DropdownMenuDemoProps,
-  openMenu,
-  resolvedColor,
 } from './dropdown-menu-demo';
+import { openMenu } from './menu-test';
 import { settled } from './overlay-test';
 
 const meta = {
@@ -125,7 +125,7 @@ export const Destructive: Story = {
     const { menu } = await openMenu();
     const remove = within(menu).getByRole('menuitem', { name: 'Delete' });
     await expect(getComputedStyle(remove).color).toBe(
-      resolvedColor('--color-destructive-text'),
+      tokenColor('--color-destructive-text'),
     );
     await userEvent.keyboard('{ArrowDown}{ArrowDown}');
     await waitFor(async () => {
@@ -133,10 +133,10 @@ export const Destructive: Story = {
     });
     await Promise.all(remove.getAnimations().map((a) => a.finished));
     await expect(getComputedStyle(remove).backgroundColor).toBe(
-      resolvedColor('--color-destructive-subtle', 'background-color'),
+      tokenColor('--color-destructive-subtle'),
     );
     await expect(getComputedStyle(remove).color).toBe(
-      resolvedColor('--color-destructive-text'),
+      tokenColor('--color-destructive-text'),
     );
   },
 };
@@ -189,7 +189,7 @@ export const Submenu: Story = {
     ).toBeLessThanOrEqual(1);
     await expect(trigger).toHaveAttribute('data-open', 'true');
     await expect(getComputedStyle(trigger).backgroundColor).toBe(
-      resolvedColor('--color-accent', 'background-color'),
+      tokenColor('--color-accent'),
     );
     await userEvent.keyboard('{ArrowLeft}');
     await waitFor(async () => {
