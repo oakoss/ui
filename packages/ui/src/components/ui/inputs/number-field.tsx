@@ -25,9 +25,6 @@ export type NumberFieldStepperProps = {
   slot: 'decrement' | 'increment';
 };
 
-// Where the steppers sit: split puts − before the value and + after it,
-// start and end put the pair together on that side, and none leaves typing
-// alone, for wide ranges a stepper can't cover.
 export type NumberFieldSteppers = 'end' | 'none' | 'split' | 'start';
 
 type LayoutProps = {
@@ -81,16 +78,7 @@ export function NumberField({
   );
 }
 
-// A stepper for a layout of your own, in an InputGroup with overflow-hidden
-// so its hover tint keeps the group's corners. side is where it sits beside
-// the input, which puts the divider between them; it defaults to before the
-// value for decrement and after it for increment.
-//
-// React Aria names each button ("Increase Quantity"), translated, and keeps
-// it out of the tab order; the arrow keys step instead. A stepper at a bound
-// fades, unless the whole field is disabled and already faded; the wrapper
-// keeps it from counting as the group's disabled control, which fades the
-// whole field. Below sm it widens to a 44px touch target.
+// The span keeps a stepper at a bound from fading the whole InputGroup.
 export function NumberFieldStepper({
   side,
   slot,

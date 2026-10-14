@@ -91,8 +91,7 @@ export function Checkbox({
   );
 }
 
-// The box Checkbox and Checkbox Group's items draw, from the button's render
-// state. A card draws the focus ring around itself instead.
+// A card draws the focus ring around itself, so its box draws none.
 export function CheckboxIndicator({
   isCard = false,
   state,

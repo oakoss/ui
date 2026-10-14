@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+import { Button } from '@oakoss/ui/components/ui/inputs/button';
 import {
   Combobox,
   ComboboxItem,
@@ -33,10 +34,16 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-// Typing filters the options; choosing one fills the input.
+// Typing filters the options; choosing one fills the input. With no start
+// decoration, nothing renders before the input.
 export const Default: Story = {
   play: async ({ canvas }) => {
     const input = canvas.getByRole('combobox', { name: 'Fruit' });
+    await expect(
+      input
+        .closest('[data-slot=input-group]')
+        ?.querySelector('[data-align=inline-start]'),
+    ).toBeNull();
     await userEvent.type(input, 'ap');
     const list = await screen.findByRole('listbox');
     await expect(within(list).getAllByRole('option')).toHaveLength(2);
@@ -176,6 +183,46 @@ export const Decorations: Story = {
     await expect(
       canvas.getByRole('combobox', { name: 'Fruit' }),
     ).toHaveAccessibleDescription('Pick one. Fruit:');
+  },
+};
+
+const onFilters = fn<() => void>();
+const onScope = fn<() => void>();
+
+// A button in a decoration keeps its own name, tab stop and action rather
+// than the trigger's: pressing it doesn't open the list.
+export const ButtonDecorations: Story = {
+  args: {
+    end: (
+      <Button onPress={onFilters} variant="ghost">
+        Filters
+      </Button>
+    ),
+    start: (
+      <Button onPress={onScope} variant="ghost">
+        Scope
+      </Button>
+    ),
+  },
+  beforeEach: () => {
+    onFilters.mockClear();
+    onScope.mockClear();
+  },
+  play: async ({ canvas }) => {
+    for (const [name, onPress] of [
+      ['Filters', onFilters],
+      ['Scope', onScope],
+    ] as const) {
+      const button = canvas.getByRole('button', { name });
+      await expect(button).not.toHaveAttribute('tabindex', '-1');
+      await expect(button).not.toHaveAttribute('aria-haspopup');
+      await userEvent.click(button);
+      await expect(onPress).toHaveBeenCalledOnce();
+      await expect(screen.queryByRole('listbox')).toBeNull();
+    }
+    await expect(
+      canvas.getByRole('button', { name: /Show suggestions/u }),
+    ).toBeInTheDocument();
   },
 };
 
