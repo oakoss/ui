@@ -159,7 +159,7 @@ export function SelectTrigger({
     warnedRef.current = true;
     // oxlint-disable-next-line no-console -- tells the consumer how to fix their markup
     console.warn(
-      "Select's trigger is a button, so a link, button or other focusable element inside it can't be reached or announced. Put only text or aria-hidden icons in it.",
+      "Select's trigger is a button, so a link, button or other focusable element inside it is invalid HTML that assistive tech may flatten into the trigger. Put only text or aria-hidden icons in it.",
     );
   });
 
