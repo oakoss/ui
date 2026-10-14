@@ -1,0 +1,169 @@
+---
+title: Tag Group
+description: A set of tags the user can remove or select.
+item: tag-group
+reactAria: https://react-aria.adobe.com/TagGroup
+---
+
+import { TagGroupDemo } from '#/components/demos/tag-group-demo';
+import { TagGroupIntents } from '#/components/demos/tag-group-intents';
+import { TagGroupSelection } from '#/components/demos/tag-group-selection';
+
+<ComponentPreview name="tag-group-demo">
+  <TagGroupDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="tag-group" />
+
+## Usage
+
+```tsx
+import { Tag, TagGroup } from '#/components/ui/data/tag-group';
+
+<TagGroup label="Skills" onRemove={(keys) => remove(keys)}>
+  <Tag id="design">Design</Tag>
+  <Tag id="research">Research</Tag>
+</TagGroup>;
+```
+
+The children are the tags. For a list from data, pass `items` and a
+function that returns a `Tag` for each, as the example above does.
+
+A tag group is for labels the user acts on. Other components cover the
+neighbors:
+
+- A label that only describes something is a [Badge](/docs/components/badge).
+- Picking one option from a few, shown as a row of buttons, is a
+  [Toggle Group](/docs/components/toggle-group).
+- Settings that each turn on or off, in a form, are
+  [Checkboxes](/docs/components/checkbox).
+
+## Examples
+
+### Selection
+
+`selectionMode` turns tags into filters: `single` or `multiple`. A selected
+tag turns solid, so selection shows as a fill and not as color alone.
+`description` explains what the selection does.
+
+<ComponentPreview name="tag-group-selection">
+  <TagGroupSelection />
+</ComponentPreview>
+
+### Intents
+
+`intent` on a tag colors it: neutral (the default), primary, success,
+warning, destructive or info. Each is soft at rest and solid when selected.
+
+<ComponentPreview name="tag-group-intents">
+  <TagGroupIntents />
+</ComponentPreview>
+
+### Removing, empty and errors
+
+`onRemove` adds a remove button to each tag and gets the keys to remove.
+`emptyLabel` (default `No tags`) shows when the last tag is gone, as in the
+first example; a blank one shows nothing. `errorMessage` shows below the
+tags. Keep tags to a word or two: a tag stays on one line, and a `className`
+such as `max-w-40` truncates a long one while its name stays whole for
+screen readers. A tag with `href` is a link, underlined so it doesn't rely on
+color.
+
+## Accessibility
+
+React Aria renders a `grid` named by `label`, with a row for each tag, and
+handles:
+
+- **Keys:** arrow keys move between tags, in the reading direction, and wrap
+  at the ends. Tab moves through each tag's remove button, then out of the
+  group.
+- **Removal:** Delete or Backspace removes the focused tag, or every
+  selected tag when the focused one is selected, and focus moves to the next
+  tag. Screen reader users hear "Press Delete to remove tag."
+- **Names:** each tag is named by its text; content that isn't plain text,
+  such as an icon and a word, needs `textValue`, which the types require.
+  The remove button is named "Remove" with the tag's text, translated by
+  React Aria.
+- **Changes:** added tags are announced while focus is in the group; after a
+  removal, focus moving to the next tag tells screen reader users where they
+  are.
+
+The remove button fills the tag's height at its end, a 24px target that
+meets WCAG 2.2 AA without overlapping the next tag. Tags, remove buttons
+and the empty list, where focus lands after the last removal, show the focus
+outline on keyboard focus. A disabled tag fades and the keyboard skips it. In
+Windows High Contrast a selected tag takes the system's selection colors and
+a disabled one its disabled color.
+
+| Key                  | Action                                    |
+| -------------------- | ----------------------------------------- |
+| `ArrowLeft`/`Right`  | Moves to the previous or next tag         |
+| `Home`/`End`         | Moves to the first or last tag            |
+| `Delete`/`Backspace` | Removes the focused or selected tags      |
+| `Space`/`Enter`      | Selects the focused tag, when tags select |
+| `Escape`             | Clears the selection                      |
+
+Follows React Aria's [TagGroup](https://react-aria.adobe.com/TagGroup)
+pattern; WAI-ARIA has no tag pattern of its own.
+
+## API
+
+### TagGroup
+
+Extends React Aria's
+[`TagGroup`](https://react-aria.adobe.com/TagGroup#api).
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/tag-group.tsx"
+  name="TagGroupProps"
+/>
+
+Also accepts all
+[React Aria `TagGroup` props](https://react-aria.adobe.com/TagGroup#api),
+such as `selectionMode`, `selectedKeys`, `disabledKeys` and `onRemove`.
+
+#### Data attributes
+
+| Attribute    | Present when                                                                             |
+| ------------ | ---------------------------------------------------------------------------------------- |
+| `data-slot`  | Always: `tag-group`, and on the parts `tag-list`, `tag`, `tag-remove`, `tag-group-error` |
+| `data-empty` | On `tag-list`, when there are no tags                                                    |
+
+### Tag
+
+Extends React Aria's [`Tag`](https://react-aria.adobe.com/TagGroup#api).
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/tag-group.tsx"
+  name="TagProps"
+/>
+
+Also accepts all [React Aria `Tag` props](https://react-aria.adobe.com/TagGroup#api),
+such as `id`, `isDisabled` and `href`.
+
+#### Data attributes
+
+| Attribute              | Present when                     |
+| ---------------------- | -------------------------------- |
+| `data-intent`          | Always; the color                |
+| `data-selected`        | The tag is selected              |
+| `data-disabled`        | The tag is disabled              |
+| `data-allows-removing` | The group has `onRemove`         |
+| `data-hovered`         | A pointer hovers a tag that acts |
+| `data-focus-visible`   | It has keyboard focus            |
+
+#### CSS variables
+
+| Variable       | Sets                             |
+| -------------- | -------------------------------- |
+| `--tag-subtle` | The resting fill                 |
+| `--tag-text`   | The resting text                 |
+| `--tag-bg`     | The selected fill                |
+| `--tag-hover`  | The selected fill on hover/press |
+| `--tag-fg`     | The selected text                |

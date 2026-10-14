@@ -243,6 +243,29 @@ const componentVariables = defineConfig({
         'shadcn/no-arbitrary-values': ['error', { allow: selectionStates }],
       },
     },
+    {
+      files: ['src/components/ui/data/tag-group.tsx'],
+      rules: {
+        'shadcn/no-arbitrary-values': [
+          'error',
+          {
+            allow: [
+              ...colorVariables('tag', [
+                'background',
+                'foreground',
+                'secondary',
+              ]),
+              // Neutral has no hover role: its fill fades instead.
+              '[--tag-hover:color-mix(in_oklab,var(--color-foreground)_90%,transparent)]',
+              // A selected tag's remove button sets its own focus outline.
+              'forced-colors:focus-visible:outline-[Highlight]',
+              'forced-colors:disabled:selected:text-[GrayText]',
+              ...selectionStates,
+            ],
+          },
+        ],
+      },
+    },
   ],
 });
 
