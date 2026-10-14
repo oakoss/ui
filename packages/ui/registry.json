@@ -3703,6 +3703,56 @@
           "target": "@lib/cn-config.ts"
         }
       ]
+    },
+    {
+      "name": "search-field",
+      "type": "registry:ui",
+      "title": "Search Field",
+      "description": "Search input with a leading search icon and a clear button that appears once there's text, with a label, description and error, named Search when it has no label; pass children to compose the field parts.",
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/field",
+        "oakoss/ui/input",
+        "oakoss/ui/input-group"
+      ],
+      "dependencies": ["cn", "react-aria-components"],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/search-field.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/search-field.tsx"
+        },
+        {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/empty-node.ts",
+          "type": "registry:lib",
+          "target": "@lib/empty-node.ts"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
     }
   ]
 }
