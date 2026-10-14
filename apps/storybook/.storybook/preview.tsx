@@ -1,4 +1,4 @@
-import '../src/styles.css';
+import '../src/styles/app.css';
 
 import type { Decorator, Preview } from '@storybook/react-vite';
 
