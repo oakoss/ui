@@ -3,8 +3,8 @@ import { createElement, type ReactElement } from 'react';
 import { cn } from '#/lib/cx';
 
 // A collection's renderEmptyState for its emptyLabel. A blank label renders
-// nothing, since React Aria would still mount its empty row, unnamed, which
-// axe flags.
+// nothing: menus and list boxes wrap the empty state in an item, which axe
+// flags when unnamed.
 export function emptyState(
   label: string | undefined,
   className?: string,
