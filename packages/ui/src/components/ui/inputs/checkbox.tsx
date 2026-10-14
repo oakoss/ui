@@ -71,7 +71,7 @@ export function Checkbox({
       >
         {(state) => (
           <>
-            <Box state={state} targetSize={targetSize} />
+            <CheckboxIndicator state={state} targetSize={targetSize} />
             {children}
             {state.isRequired ? (
               <span aria-hidden className="text-destructive-text">
@@ -91,10 +91,14 @@ export function Checkbox({
   );
 }
 
-function Box({
+// The box Checkbox and Checkbox Group's items draw, from the button's render
+// state. A card draws the focus ring around itself instead.
+export function CheckboxIndicator({
+  isCard = false,
   state,
   targetSize,
 }: {
+  isCard?: boolean;
   state: CheckboxButtonRenderProps;
   targetSize: boolean;
 }) {
@@ -104,7 +108,7 @@ function Box({
       className={cn(
         boxStyles({
           isDisabled: state.isDisabled,
-          isFocusVisible: state.isFocusVisible,
+          isFocusVisible: state.isFocusVisible && !isCard,
           isInvalid: state.isInvalid,
           isSelected: isSelected || isIndeterminate,
         }),

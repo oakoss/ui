@@ -1,0 +1,119 @@
+---
+title: Search Field
+description: A search input with a clear button.
+item: search-field
+reactAria: https://react-aria.adobe.com/SearchField
+---
+
+import { SearchFieldDemo } from '#/components/demos/search-field-demo';
+import { SearchFieldFilter } from '#/components/demos/search-field-filter';
+import { SearchFieldSubmit } from '#/components/demos/search-field-submit';
+
+<ComponentPreview name="search-field-demo">
+  <SearchFieldDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="search-field" />
+
+## Usage
+
+```tsx
+import { SearchField } from '#/components/ui/inputs/search-field';
+
+<SearchField label="Recipes" onSubmit={search} />;
+```
+
+A search icon leads the field, and a clear button ends it once there's text.
+Without a `label`, `aria-label` or `aria-labelledby`, the field is named
+"Search"; give it a name of its own when the page has more than one search.
+
+A placeholder can say what's searchable, but it isn't a label: it disappears
+as soon as someone types. Give the field room for a real query, about 27
+characters, rather than a narrow box that hides what's typed.
+
+## Examples
+
+### Submitting
+
+`onSubmit` runs on <kbd>Enter</kbd> and stops an enclosing form from
+submitting; without it, <kbd>Enter</kbd> submits the form. Where a search
+submits, put a visible Search button beside the field, which many people
+look for, and wrap the form in `role="search"` (or a `<search>` element) so
+the page has a search landmark.
+
+<ComponentPreview name="search-field-submit">
+  <SearchFieldSubmit />
+</ComponentPreview>
+
+### Filtering as you type
+
+A field that filters a list needs no button. Announce how many results are
+left from a `role="status"` region outside the field, which screen readers
+read when it changes; the field announces nothing itself, clearing included.
+
+<ComponentPreview name="search-field-filter">
+  <SearchFieldFilter />
+</ComponentPreview>
+
+### Decorations
+
+`start` and `end` add text or an element inside the border, after the
+search icon and before the clear button, as on [Text Field](/docs/components/text-field).
+
+## Accessibility
+
+React Aria handles:
+
+- **Input:** a `searchbox` named by its label, with the description and error
+  in its description.
+- **Clear button:** named "Clear search", translated, and kept out of the tab
+  order. Pressing it clears the field and keeps focus in the input.
+- **Keyboard:** <kbd>Escape</kbd> clears what's typed, and when the field is
+  already empty lets the key through, so a dialog around it can close.
+  <kbd>Enter</kbd> calls `onSubmit`.
+
+The component adds the leading icon, hidden from screen readers, and hides
+the clear button while the field is empty or read-only, where it would do
+nothing; hidden, it's out of the accessibility tree too. The browser's own
+clear button is hidden, and the on-screen keyboard's Enter key reads Search
+(`enterKeyHint`), which iOS otherwise shows only inside a form with an
+`action`. The clear button is square at the control height, and 44px wide
+below the `sm` breakpoint.
+
+## API
+
+### SearchField
+
+Extends React Aria's [`SearchField`](https://react-aria.adobe.com/SearchField#api).
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/search-field.tsx"
+  name="SearchFieldProps"
+/>
+
+Also accepts all [React Aria `SearchField` props](https://react-aria.adobe.com/SearchField#api).
+Takes the layout props or children, not both: children replace the layout,
+built from the [Field](/docs/components/field) parts, an `InputGroup` with
+`overflow-hidden`, an `Input` and `SearchFieldClear`. React Aria gives every
+button in the field the clear button's behavior, so wrap any other button in
+your layout in `<ButtonContext value={null}>`, as the built-in `start` and
+`end` do.
+
+#### Data attributes
+
+| Attribute       | Present when                                                         |
+| --------------- | -------------------------------------------------------------------- |
+| `data-slot`     | Always: `search-field`, and on the clear button `search-field-clear` |
+| `data-empty`    | The field is empty                                                   |
+| `data-disabled` | The field is disabled                                                |
+| `data-invalid`  | The field is invalid                                                 |
+| `data-readonly` | The field is read-only                                               |
+
+### SearchFieldClear
+
+The clear button for a layout of your own: a React Aria `Button` with the
+built-in look, hidden while the field is empty or read-only. Takes no props.

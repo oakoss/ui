@@ -137,7 +137,9 @@ test('a page that fails to load keeps the sidebar', async ({ page }) => {
   await expect(
     page.getByRole('heading', { level: 1, name: 'This page couldn’t load' }),
   ).toBeVisible();
-  await expect(sidebar.getByRole('link', { name: 'Checkbox' })).toBeVisible();
+  await expect(
+    sidebar.getByRole('link', { exact: true, name: 'Checkbox' }),
+  ).toBeVisible();
   await expect(
     page.getByText('The site may have been updated since you opened it.'),
   ).toBeVisible();

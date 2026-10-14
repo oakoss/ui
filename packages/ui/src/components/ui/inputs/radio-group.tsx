@@ -80,6 +80,7 @@ export function RadioGroup({
           {children}
         </Options>,
         { description, errorMessage, errors, label },
+        { isGroup: true },
       )}
     </AriaRadioGroup>
   );

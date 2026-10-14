@@ -148,11 +148,7 @@ export function CommandInput({
         <InputGroupAddon>
           <Icon.Search aria-hidden />
         </InputGroupAddon>
-        <Input
-          className="[&::-webkit-search-cancel-button]:hidden"
-          data-slot="command-input"
-          placeholder={placeholder}
-        />
+        <Input data-slot="command-input" placeholder={placeholder} />
       </InputGroup>
     </AriaSearchField>
   );

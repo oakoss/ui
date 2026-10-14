@@ -87,12 +87,27 @@ export const Borders: Story = {
   ),
 };
 
+// A single field's description and error sit below the input, unlike a
+// group's.
 export const Invalid: Story = {
-  args: { errorMessage: 'Enter a valid email.', isInvalid: true },
+  args: {
+    description: 'We never share your address.',
+    errorMessage: 'Enter a valid email.',
+    isInvalid: true,
+  },
   play: async ({ canvas }) => {
     const input = canvas.getByRole('textbox', { name: 'Email' });
     await expect(input).toHaveAttribute('aria-invalid', 'true');
-    await expect(input).toHaveAccessibleDescription('Enter a valid email.');
+    await expect(input).toHaveAccessibleDescription(
+      'We never share your address. Enter a valid email.',
+    );
+    const field = input.closest('[data-slot=text-field]');
+    if (!field) throw new Error('No text field');
+    await expect(
+      [...field.children].map((child) =>
+        child instanceof HTMLElement ? child.dataset.slot : undefined,
+      ),
+    ).toEqual(['field-label', 'input', 'field-description', 'field-error']);
   },
 };
 
