@@ -10,6 +10,12 @@ import { defineConfig } from 'vitest/config';
 const movePointerOffscreen: BrowserCommand = ({ page }) =>
   page.mouse.move(-10, -10);
 
+const emulateReducedMotion: BrowserCommand<[isReduced: boolean]> = (
+  { page },
+  isReduced,
+) =>
+  page.emulateMedia({ reducedMotion: isReduced ? 'reduce' : 'no-preference' });
+
 // The CLI and CI run, and axe-check, every story in both themes, plus stories
 // tagged forced-colors under Windows High Contrast emulation. Storybook's test
 // panel gets light only: it names every project after the config directory,
@@ -44,7 +50,7 @@ export default defineConfig({
       ],
       test: {
         browser: {
-          commands: { movePointerOffscreen },
+          commands: { emulateReducedMotion, movePointerOffscreen },
           enabled: true,
           headless: true,
           instances: [{ browser: 'chromium' }],

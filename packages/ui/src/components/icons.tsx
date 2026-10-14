@@ -78,6 +78,32 @@ export function Circle(props: IconProps) {
   );
 }
 
+export function CircleAlert(props: IconProps) {
+  return (
+    <IconPlaceholder
+      hugeicons="AlertCircleIcon"
+      lucide="CircleAlertIcon"
+      phosphor="WarningCircleIcon"
+      remixicon="RiErrorWarningLine"
+      tabler="IconAlertCircle"
+      {...props}
+    />
+  );
+}
+
+export function CircleCheck(props: IconProps) {
+  return (
+    <IconPlaceholder
+      hugeicons="CheckmarkCircle02Icon"
+      lucide="CircleCheckIcon"
+      phosphor="CheckCircleIcon"
+      remixicon="RiCheckboxCircleLine"
+      tabler="IconCircleCheck"
+      {...props}
+    />
+  );
+}
+
 export function Ellipsis(props: IconProps) {
   return (
     <IconPlaceholder
@@ -164,6 +190,19 @@ export function Search(props: IconProps) {
       phosphor="MagnifyingGlassIcon"
       remixicon="RiSearchLine"
       tabler="IconSearch"
+      {...props}
+    />
+  );
+}
+
+export function TriangleAlert(props: IconProps) {
+  return (
+    <IconPlaceholder
+      hugeicons="Alert02Icon"
+      lucide="TriangleAlertIcon"
+      phosphor="WarningIcon"
+      remixicon="RiAlertLine"
+      tabler="IconAlertTriangle"
       {...props}
     />
   );

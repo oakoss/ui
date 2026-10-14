@@ -1,0 +1,133 @@
+---
+title: Badge
+description: A short label or count beside other content.
+item: badge
+---
+
+import { BadgeCount } from '#/components/demos/badge-count';
+import { BadgeDemo } from '#/components/demos/badge-demo';
+import { BadgeLink } from '#/components/demos/badge-link';
+import { BadgeLooks } from '#/components/demos/badge-looks';
+
+<ComponentPreview name="badge-demo">
+  <BadgeDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="badge" />
+
+## Usage
+
+```tsx
+import { Badge } from '#/components/ui/data/badge';
+
+<Badge intent="success" variant="soft">
+  Paid
+</Badge>;
+```
+
+A badge labels something; it isn't a control. A set of labels the user can
+select or remove is React Aria's
+[TagGroup](https://react-aria.adobe.com/TagGroup), with keyboard removal and
+selection built in.
+
+Upstream's `variant` values map to `intent` and `variant`:
+
+| Upstream      | Here                                             |
+| ------------- | ------------------------------------------------ |
+| `default`     | `intent="primary"` (the default)                 |
+| `secondary`   | `intent="neutral" variant="soft"`                |
+| `destructive` | `intent="destructive" variant="soft"`            |
+| `outline`     | `intent="neutral" variant="outline"`             |
+| `ghost`       | Plain text, or `intent="neutral" variant="soft"` |
+| `link`        | A `Link` styled with `badgeStyles`               |
+
+## Examples
+
+### Looks
+
+`intent` sets the color and `variant` the look: `solid`, `soft` or
+`outline`. Keep labels to a word or two; a badge stays on one line rather
+than truncating, which would hide its text.
+
+<ComponentPreview name="badge-looks">
+  <BadgeLooks />
+</ComponentPreview>
+
+### Link
+
+A badge that goes somewhere is React Aria's `Link` with `badgeStyles`, which
+add hover, press and focus styles and a 44×44 pointer target around the
+20px badge. Pass `targetSize: false` where badges sit closer than 44px apart,
+or their targets overlap.
+
+<ComponentPreview name="badge-link">
+  <BadgeLink />
+</ComponentPreview>
+
+### Count
+
+A number alone doesn't say what it counts. Put the words in text screen
+readers read (`sr-only`), and cap a long count for the eye while reading the
+whole number. If the count changes while the user is on the page, put it in
+an element with `role="status"` that's rendered before the change, so the new
+count is announced.
+
+<ComponentPreview name="badge-count">
+  <BadgeCount />
+</ComponentPreview>
+
+## Accessibility
+
+A badge is a `span` with no role, read as part of the text around it. Its
+color only adds to its text: a status badge's word ("Paid", "Overdue") says
+what the color does, and an icon beside it, hidden from screen readers, helps
+people who can't tell the colors apart. Digits are tabular, so a changing
+count doesn't shift its neighbors.
+
+Hover, press and focus styles come only through `badgeStyles`, so a plain
+badge never looks clickable. A badge link or button gets a 44×44 pointer
+target, and a disabled one takes the system's disabled color in Windows High
+Contrast, where every badge keeps its border. React Aria adds no keys; a
+badge link or button follows `Link` or `Button`.
+
+## API
+
+### Badge
+
+A `span`.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/badge.tsx"
+  name="BadgeProps"
+/>
+
+Also accepts `span` props.
+
+#### Data attributes
+
+| Attribute      | Present when      |
+| -------------- | ----------------- |
+| `data-slot`    | Always: `badge`   |
+| `data-intent`  | Always; the color |
+| `data-variant` | Always; the look  |
+
+#### CSS variables
+
+| Variable         | Sets                                                     |
+| ---------------- | -------------------------------------------------------- |
+| `--badge-bg`     | The solid fill                                           |
+| `--badge-hover`  | The solid fill on hover and press, through `badgeStyles` |
+| `--badge-fg`     | Text on the solid fill                                   |
+| `--badge-subtle` | The soft fill                                            |
+| `--badge-border` | The outline border                                       |
+| `--badge-text`   | Text, and the hover and press tint, for other looks      |
+
+### badgeStyles
+
+Returns the classes for a React Aria `Link` or `Button` that looks like a
+badge. Takes `intent`, `variant`, `targetSize` (default `true`) and
+`className`, which wins over conflicting classes.

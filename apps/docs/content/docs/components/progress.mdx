@@ -1,0 +1,171 @@
+---
+title: Progress
+description: How far along a task is, or that it's running.
+item: progress
+reactAria: https://react-aria.adobe.com/ProgressBar
+---
+
+import { ProgressDemo } from '#/components/demos/progress-demo';
+import { ProgressIndeterminate } from '#/components/demos/progress-indeterminate';
+import { ProgressIntents } from '#/components/demos/progress-intents';
+import { ProgressLayout } from '#/components/demos/progress-layout';
+import { ProgressValueDemo } from '#/components/demos/progress-value';
+
+<ComponentPreview name="progress-demo">
+  <ProgressDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="progress" />
+
+The item adds the indeterminate animation to your stylesheet's `@theme`.
+
+## Usage
+
+```tsx
+import { Progress } from '#/components/ui/feedback/progress';
+
+<Progress label="Uploading photos" value={62} />;
+```
+
+`label` renders the default layout: the label and value in a row, then the
+track. For a different layout, pass children instead (see
+[Layout](#layout)).
+
+Upstream renders its children above a track it always adds, so a
+`ProgressTrack` placed by hand draws a second one. Here children replace the
+whole layout, as Slider's do, and the track draws its own fill, so
+`ProgressIndicator` is gone.
+
+Progress shows a task moving toward done. Other states have their own
+component:
+
+- Work too short to measure, inside a button or a line of text, is a
+  [Spinner](/docs/components/spinner).
+- Content that's loading into a known shape is a
+  [Skeleton](/docs/components/skeleton).
+- A value that isn't progress, such as storage used or a password's
+  strength, is a meter: React Aria's
+  [Meter](https://react-aria.adobe.com/Meter).
+
+For quick tasks, wait about 400ms before showing a bar, so it doesn't flash
+on and off.
+
+## Examples
+
+### Intents
+
+`intent` colors the fill: primary (the default), success, warning,
+destructive or info. Each keeps 3:1 against the track in light and dark.
+
+<ComponentPreview name="progress-intents">
+  <ProgressIntents />
+</ComponentPreview>
+
+### Indeterminate
+
+`isIndeterminate` is for work whose length isn't known. A short fill slides
+across the track, from the start of the line in the reading direction. With
+reduced motion it rests in the middle of the track, which doesn't read as a
+value.
+
+<ComponentPreview name="progress-indeterminate">
+  <ProgressIndeterminate />
+</ComponentPreview>
+
+### Value
+
+`formatOptions` formats the value for the locale, a percentage by default,
+and `valueLabel` replaces it with your own text. `minValue` and `maxValue`
+set the range.
+
+<ComponentPreview name="progress-value">
+  <ProgressValueDemo />
+</ComponentPreview>
+
+### Layout
+
+Children replace the default layout, built from `ProgressTrack`,
+`ProgressLabel` and `ProgressValue` in any order. `ProgressValue` takes a
+function of the formatted value to add words around it, and a function child
+of `Progress` gets React Aria's render props, such as `percentage`.
+
+<ComponentPreview name="progress-layout">
+  <ProgressLayout />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria renders a `progressbar` named by its label and handles:
+
+- **Value:** `aria-valuenow`, `aria-valuemin` and `aria-valuemax`, and
+  `aria-valuetext` with the formatted value or your `valueLabel`.
+- **Indeterminate:** `aria-valuenow` and `aria-valuetext` are left off, so
+  screen readers announce a busy bar rather than a number; this component
+  shows no value then either.
+
+A bar needs a name: `label`, a `ProgressLabel` in your layout, or
+`aria-label` when there's no visible label. Screen readers mostly don't announce a value as it changes, so for
+long tasks announce the result when it's done, with a status message or an
+[Alert](/docs/components/alert) in a `role="status"` container. The fill
+grows by width, logical in right-to-left locales, and takes the system
+highlight color in Windows High Contrast, where the track keeps a border.
+React Aria adds no keys.
+
+## API
+
+### Progress
+
+Extends React Aria's
+[`ProgressBar`](https://react-aria.adobe.com/ProgressBar#api).
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/feedback/progress.tsx"
+  name="ProgressProps"
+/>
+
+Also accepts all
+[React Aria `ProgressBar` props](https://react-aria.adobe.com/ProgressBar#api).
+Takes `label` or children, not both: children replace the layout, and a
+function child gets React Aria's render props, such as `percentage` and
+`valueText`.
+
+#### Data attributes
+
+| Attribute     | Present when                                                                                                    |
+| ------------- | --------------------------------------------------------------------------------------------------------------- |
+| `data-slot`   | Always: `progress`, and on the parts `progress-label`, `progress-value`, `progress-track`, `progress-indicator` |
+| `data-intent` | Always on `Progress`: the fill color                                                                            |
+
+#### CSS variables
+
+| Variable          | Sets           |
+| ----------------- | -------------- |
+| `--progress-fill` | The fill color |
+
+### ProgressLabel
+
+React Aria's [`Label`](https://react-aria.adobe.com/ProgressBar#api), which
+names the bar.
+
+### ProgressValue
+
+A `span` with the formatted value, which mounts nothing while the bar is
+indeterminate.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/feedback/progress.tsx"
+  name="ProgressValueProps"
+/>
+
+Also accepts `span` props.
+
+### ProgressTrack
+
+The track, a `span` that draws the fill inside it. Accepts `span` props
+other than `children`.

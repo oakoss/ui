@@ -1,0 +1,130 @@
+---
+title: Alert
+description: A callout for information the reader should notice on the page.
+item: alert
+---
+
+import { AlertDemo } from '#/components/demos/alert-demo';
+import { AlertIntents } from '#/components/demos/alert-intents';
+import { AlertLive } from '#/components/demos/alert-live';
+import { AlertWithAction } from '#/components/demos/alert-with-action';
+
+<ComponentPreview name="alert-demo">
+  <AlertDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="alert" />
+
+## Usage
+
+```tsx
+import {
+  Alert,
+  AlertAction,
+  AlertDescription,
+  AlertTitle,
+} from '#/components/ui/feedback/alert';
+
+<Alert intent="warning">
+  <AlertTitle>Storage almost full</AlertTitle>
+  <AlertDescription>You've used 9.2 GB of 10 GB.</AlertDescription>
+  <AlertAction>…</AlertAction>
+</Alert>;
+```
+
+An alert is part of the page. Other messages have their own place:
+
+- A problem with one input goes beside it, in the [field's error](/docs/components/field).
+- A brief confirmation of something the user just did is a toast, which
+  comes and goes without taking space on the page.
+- A message that needs a decision before the user continues is an
+  [Alert Dialog](/docs/components/alert-dialog).
+
+## Examples
+
+### Intents
+
+`intent` sets the color and the icon: neutral (the default, with no icon),
+info, success, warning or destructive. Keep the colored intents for
+messages that need them; an alert on every page stops being read.
+
+<ComponentPreview name="alert-intents">
+  <AlertIntents />
+</ComponentPreview>
+
+### Action
+
+`AlertAction` holds a button or link. It sits after the text on a wide
+alert and drops below it on a narrow one, so it never covers the text.
+
+<ComponentPreview name="alert-with-action">
+  <AlertWithAction />
+</ComponentPreview>
+
+### Announcing a message
+
+`role="status"` on a container rendered before the message announces it
+when it appears, after whatever the screen reader is saying.
+
+<ComponentPreview name="alert-live">
+  <AlertLive />
+</ComponentPreview>
+
+## Accessibility
+
+An alert is static by default: it has no role, so screen readers read it
+in place with the rest of the page. Screen readers don't announce an alert
+role that's there when the page loads
+([WAI-ARIA alert pattern](https://www.w3.org/WAI/ARIA/apg/patterns/alert/)),
+and one shown on every visit would interrupt them each time. Give it a role
+only for a message that appears while the user is on the page:
+
+- `role="alert"` interrupts the screen reader, for something urgent. Most
+  screen readers announce it even when it mounts with its text.
+- `role="status"` waits its turn. Screen readers announce changes to a
+  status region that's already on the page, so put the role on a container
+  rendered before the message, as the example above does.
+
+Each colored intent shows an icon, so the meaning doesn't rest on color
+alone. The icon is hidden from screen readers; put anything it adds in the
+title. Links in an alert are underlined. The border keeps the alert's edge in
+Windows High Contrast. If a button in `AlertAction` dismisses the alert, move
+focus to the next sensible element, or it returns to the start of the page.
+React Aria adds no keys.
+
+## API
+
+### Alert
+
+A `div`.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/feedback/alert.tsx"
+  name="AlertProps"
+/>
+
+Also accepts `div` props.
+
+#### Data attributes
+
+| Attribute     | Present when                                                                                       |
+| ------------- | -------------------------------------------------------------------------------------------------- |
+| `data-slot`   | Always: `alert`, and on the parts `alert-icon`, `alert-title`, `alert-description`, `alert-action` |
+| `data-intent` | Always on `Alert`: the color                                                                       |
+
+#### CSS variables
+
+| Variable         | Sets                     |
+| ---------------- | ------------------------ |
+| `--alert-bg`     | The fill                 |
+| `--alert-border` | The border               |
+| `--alert-fg`     | The title and icon color |
+| `--alert-muted`  | The description color    |
+
+### AlertTitle, AlertDescription, AlertAction
+
+`div`s with no props of their own; each accepts `div` props.

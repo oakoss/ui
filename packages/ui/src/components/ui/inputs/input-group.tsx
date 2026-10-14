@@ -17,12 +17,9 @@ import {
   type ButtonProps,
   ButtonStyleContext,
 } from '#/components/ui/inputs/button';
-import {
-  fieldLayout,
-  type FieldMessages,
-  isEmptyNode,
-} from '#/components/ui/inputs/field';
+import { fieldLayout, type FieldMessages } from '#/components/ui/inputs/field';
 import { cn, cx } from '#/lib/cx';
+import { isEmptyNode } from '#/lib/empty-node';
 
 // The group draws the control's border and focus outline, so the Input or
 // Textarea inside drops its own and fills the space between the addons.

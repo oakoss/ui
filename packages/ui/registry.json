@@ -2051,6 +2051,11 @@
           "target": "@ui/inputs/field.tsx"
         },
         {
+          "path": "src/lib/empty-node.ts",
+          "type": "registry:lib",
+          "target": "@lib/empty-node.ts"
+        },
+        {
           "path": "src/lib/cx.ts",
           "type": "registry:lib",
           "target": "@lib/cx.ts"
@@ -2437,6 +2442,50 @@
       ]
     },
     {
+      "name": "progress",
+      "type": "registry:ui",
+      "title": "Progress",
+      "description": "Progress bar with a label and formatted value, or parts to lay out your own, in primary, success, warning, destructive and info intents, and an indeterminate fill that slides across the track and rests in the middle under reduced motion.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/progress.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "cssVars": {
+        "theme": {
+          "animate-progress-indeterminate": "progress-indeterminate 1.5s ease-in-out infinite"
+        }
+      },
+      "css": {
+        "@keyframes progress-indeterminate": {
+          "from": { "inset-inline-start": "-40%" },
+          "to": { "inset-inline-start": "100%" }
+        }
+      },
+      "files": [
+        {
+          "path": "src/components/ui/feedback/progress.tsx",
+          "type": "registry:ui",
+          "target": "@ui/feedback/progress.tsx"
+        },
+        {
+          "path": "src/lib/empty-node.ts",
+          "type": "registry:lib",
+          "target": "@lib/empty-node.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
       "name": "skeleton",
       "type": "registry:ui",
       "title": "Skeleton",
@@ -2592,6 +2641,49 @@
       ]
     },
     {
+      "name": "alert",
+      "type": "registry:ui",
+      "title": "Alert",
+      "description": "Callout with a title, description and action, in neutral, info, success, warning and destructive intents with an icon each, static by default and live only when given a role.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/alert.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/feedback/alert.tsx",
+          "type": "registry:ui",
+          "target": "@ui/feedback/alert.tsx"
+        },
+        {
+          "path": "src/lib/empty-node.ts",
+          "type": "registry:lib",
+          "target": "@lib/empty-node.ts"
+        },
+        {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
       "name": "item",
       "type": "registry:ui",
       "title": "Item",
@@ -2634,6 +2726,39 @@
           "path": "src/components/ui/data/kbd.tsx",
           "type": "registry:ui",
           "target": "@ui/data/kbd.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "badge",
+      "type": "registry:ui",
+      "title": "Badge",
+      "description": "Short label or count in neutral, primary, success, warning, destructive and info intents, each solid, soft or outline, with badgeStyles for a link or button that adds hover, focus and a 44×44 pointer target.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/badge.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/data/badge.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/badge.tsx"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
         },
         {
           "path": "src/lib/cx.ts",

@@ -10,6 +10,8 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronUpIcon,
+  CircleAlertIcon,
+  CircleCheckIcon,
   CircleIcon,
   CircleQuestionMarkIcon,
   EllipsisIcon,
@@ -18,6 +20,7 @@ import {
   MinusIcon,
   PlusIcon,
   SearchIcon,
+  TriangleAlertIcon,
   XIcon,
 } from 'lucide-react';
 
@@ -28,6 +31,8 @@ export const lucideIcons = {
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronUpIcon,
+  CircleAlertIcon,
+  CircleCheckIcon,
   CircleIcon,
   CircleQuestionMarkIcon,
   EllipsisIcon,
@@ -36,6 +41,7 @@ export const lucideIcons = {
   MinusIcon,
   PlusIcon,
   SearchIcon,
+  TriangleAlertIcon,
   XIcon,
 };
 

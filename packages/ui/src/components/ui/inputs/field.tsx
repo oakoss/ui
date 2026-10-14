@@ -1,9 +1,5 @@
-import {
-  type ComponentProps,
-  Fragment,
-  isValidElement,
-  type ReactNode,
-} from 'react';
+import type { ComponentProps, ReactNode } from 'react';
+
 import {
   FieldError as AriaFieldError,
   type FieldErrorProps as AriaFieldErrorProps,
@@ -18,6 +14,7 @@ import { tv, type VariantProps } from 'tailwind-variants/lite';
 
 import { Separator } from '#/components/ui/layout/separator';
 import { cn, cx } from '#/lib/cx';
+import { isEmptyNode } from '#/lib/empty-node';
 
 export function FieldSet({ className, ...props }: ComponentProps<'fieldset'>) {
   return (
@@ -107,27 +104,6 @@ export function FieldSeparator({
         </>
       ) : null}
     </div>
-  );
-}
-
-// Whether a node renders nothing, fragments and arrays included, so a part
-// for it can skip mounting. Other iterables count as content: reading one
-// could use it up before it renders.
-export function isEmptyNode(node: ReactNode): boolean {
-  let current = node;
-  while (
-    isValidElement<{ children?: ReactNode }>(current) &&
-    current.type === Fragment
-  ) {
-    current = current.props.children;
-  }
-  if (Array.isArray(current))
-    return current.every((child) => isEmptyNode(child));
-  return (
-    current === undefined ||
-    current === null ||
-    typeof current === 'boolean' ||
-    current === ''
   );
 }
 

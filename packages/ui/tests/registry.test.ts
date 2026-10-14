@@ -22,15 +22,21 @@ test('registryDependencies point at items in this repo', () => {
 // Items ported from shadcn's React Aria base; add each new port here.
 const forked = [
   'accordion',
+  'alert',
   'alert-dialog',
   'avatar',
+  'badge',
   'breadcrumb',
   'button',
   'button-group',
   'card',
   'checkbox',
   'collapsible',
+  'combobox',
+  'command',
+  'context-menu',
   'dialog',
+  'dropdown-menu',
   'empty',
   'field',
   'hover-card',
@@ -38,8 +44,10 @@ const forked = [
   'input-group',
   'item',
   'kbd',
+  'native-select',
   'pagination',
   'popover',
+  'progress',
   'radio-group',
   'scroll-area',
   'select',
@@ -58,6 +66,15 @@ const forked = [
 const upstreams = new Map(
   ui.items.map((item) => [item.name, item.meta?.upstream]),
 );
+
+const ported = ui.items
+  .filter((item) => item.meta?.upstream !== undefined)
+  .map((item) => item.name);
+
+// An item that names an upstream is a port, so the check below covers it.
+test('every item naming an upstream is listed as forked', () => {
+  expect(ported.filter((name) => !forked.includes(name))).toEqual([]);
+});
 
 // Diffing upstream between this commit and a newer one finds fixes to port.
 test.each(forked)(
@@ -196,6 +213,43 @@ test('the base item ships base.css', () => {
     'utf-8',
   );
   expect(minified(stylesheet({ '@layer base': layer }))).toBe(minified(source));
+});
+
+const styled = ui.items.filter(
+  (item) => item.type === 'registry:ui' && ('css' in item || 'cssVars' in item),
+);
+
+// An item's theme variables and CSS as the @theme block shadcn writes them
+// into.
+function themeBlock(item: (typeof ui.items)[number]): string {
+  const theme = ('cssVars' in item ? item.cssVars?.theme : undefined) ?? {};
+  const variables = Object.entries(theme)
+    .map(([key, value]) => `--${key}:${String(value)};`)
+    .join('');
+  return `@theme{${variables}${stylesheet('css' in item ? item.css : {})}}`;
+}
+
+// Storybook and the docs load the same CSS from src/styles/<item>.css.
+test.each(styled.map((item) => [item.name, item] as const))(
+  '%s ships its stylesheet',
+  (name, item) => {
+    const source = readFileSync(
+      new URL(`../src/styles/${name}.css`, import.meta.url),
+      'utf-8',
+    );
+    expect(minified(themeBlock(item))).toBe(minified(source));
+  },
+);
+
+test('a component stylesheet reaches Storybook and the docs', () => {
+  const globals = readFileSync(
+    new URL('../src/styles/globals.css', import.meta.url),
+    'utf-8',
+  );
+  expect(styled.length).toBeGreaterThan(0);
+  for (const { name } of styled) {
+    expect(globals).toContain(`@import './${name}.css';`);
+  }
 });
 
 function isThemeless(item: (typeof ui.items)[number]): boolean {
