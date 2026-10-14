@@ -182,9 +182,8 @@ export function ComboboxTrigger({ className }: { className?: string }) {
 // Empties the input and the value, which a controlled pair keeps otherwise,
 // leaving focus in the input: taking focus would drop it to the page when the
 // button unmounts. It isn't a Tab stop, since deleting the text does the same.
-// It hides when React Aria disables the trigger, as it does for a disabled or
-// read-only field from props or context, then opts out of the trigger's
-// button context.
+// It hides when React Aria disables the trigger (a disabled or read-only
+// field, from props or context) and opts out of the trigger's button context.
 function ClearButton({
   inputRef,
   label,
@@ -239,7 +238,7 @@ function Field({
       axis="inline"
       end={
         <>
-          {decorations.end}
+          <ButtonContext value={null}>{decorations.end}</ButtonContext>
           {useDelayed(isLoading) ? (
             <Spinner data-slot="combobox-spinner" label={loadingLabel} />
           ) : null}
@@ -248,7 +247,11 @@ function Field({
         </>
       }
       size={size}
-      start={decorations.start}
+      start={
+        decorations.start === null ? null : (
+          <ButtonContext value={null}>{decorations.start}</ButtonContext>
+        )
+      }
     >
       <Input placeholder={placeholder} ref={inputRef} size={size} />
     </DecoratedInputGroup>
