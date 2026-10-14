@@ -22,15 +22,21 @@ test('registryDependencies point at items in this repo', () => {
 // Items ported from shadcn's React Aria base; add each new port here.
 const forked = [
   'accordion',
+  'alert',
   'alert-dialog',
   'avatar',
+  'badge',
   'breadcrumb',
   'button',
   'button-group',
   'card',
   'checkbox',
   'collapsible',
+  'combobox',
+  'command',
+  'context-menu',
   'dialog',
+  'dropdown-menu',
   'empty',
   'field',
   'hover-card',
@@ -38,6 +44,7 @@ const forked = [
   'input-group',
   'item',
   'kbd',
+  'native-select',
   'pagination',
   'popover',
   'radio-group',
@@ -58,6 +65,15 @@ const forked = [
 const upstreams = new Map(
   ui.items.map((item) => [item.name, item.meta?.upstream]),
 );
+
+const ported = ui.items
+  .filter((item) => item.meta?.upstream !== undefined)
+  .map((item) => item.name);
+
+// An item that names an upstream is a port, so the check below covers it.
+test('every item naming an upstream is listed as forked', () => {
+  expect(ported.filter((name) => !forked.includes(name))).toEqual([]);
+});
 
 // Diffing upstream between this commit and a newer one finds fixes to port.
 test.each(forked)(
