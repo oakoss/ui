@@ -108,7 +108,10 @@ export const Empty: Story = {
   play: async ({ canvas }) => {
     const input = canvas.getByRole('searchbox');
     await userEvent.type(input, 'zzz');
-    await expect(await canvas.findByText('No results')).toBeVisible();
+    const empty = await canvas.findByText('No results');
+    await expect(empty).toBeVisible();
+    await expect(getComputedStyle(empty).textAlign).toBe('center');
+    await expect(getComputedStyle(empty).paddingBlock).toBe('24px');
     await expect(canvas.queryByText('New file')).toBeNull();
     await userEvent.keyboard('{Escape}');
     await expect(input).toHaveValue('');

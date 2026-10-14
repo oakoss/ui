@@ -46,6 +46,26 @@ function ContextMenuDemo() {
   );
 }
 
+function EmptyMenuDemo({ emptyLabel }: { emptyLabel: string }) {
+  return (
+    <div className="grid min-h-96 place-items-center">
+      <ContextMenuTrigger>
+        <Pressable>
+          <div
+            aria-label="report.pdf"
+            className="grid h-40 w-96 place-items-center rounded-panel border border-dashed border-input text-sm"
+            role="button"
+            tabIndex={0}
+          >
+            Right-click the file
+          </div>
+        </Pressable>
+        <ContextMenu emptyLabel={emptyLabel}>{[]}</ContextMenu>
+      </ContextMenuTrigger>
+    </div>
+  );
+}
+
 const meta = {
   beforeEach: () => {
     onAction.mockClear();
@@ -120,6 +140,30 @@ export const Keyboard: Story = {
       await expect(target).toHaveFocus();
     });
   },
+};
+
+// emptyLabel shows when the menu has no items; a blank one mounts nothing.
+export const Empty: Story = {
+  play: async ({ canvas }) => {
+    const target = canvas.getByRole('button', { name: 'report.pdf' });
+    await userEvent.pointer({ keys: '[MouseRight]', target });
+    const { menu } = await settledMenu();
+    const empty = within(menu).getByText('No actions available');
+    await expect(empty).toBeVisible();
+    await expect(getComputedStyle(empty).paddingInline).toBe('8px');
+    await expect(getComputedStyle(empty).paddingBlock).toBe('6px');
+  },
+  render: () => <EmptyMenuDemo emptyLabel="No actions available" />,
+};
+
+export const BlankEmptyLabel: Story = {
+  play: async ({ canvas }) => {
+    const target = canvas.getByRole('button', { name: 'report.pdf' });
+    await userEvent.pointer({ keys: '[MouseRight]', target });
+    const { menu } = await settledMenu();
+    await expect(menu).toBeEmptyDOMElement();
+  },
+  render: () => <EmptyMenuDemo emptyLabel=" " />,
 };
 
 // A submenu opens beside its item, with its first item level with it.

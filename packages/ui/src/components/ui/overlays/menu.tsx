@@ -10,6 +10,7 @@ import {
   type PopoverContentProps,
 } from '#/components/ui/overlays/popover';
 import { cn } from '#/lib/cx';
+import { emptyState } from '#/lib/empty-state';
 
 export type MenuContentProps<T extends object = object> = {
   className?: string;
@@ -44,15 +45,7 @@ export function MenuContent<T extends object>({
       <AriaMenu<T>
         className="max-h-[inherit] overflow-y-auto outline-hidden"
         data-slot={`${kind}-list`}
-        renderEmptyState={
-          (emptyLabel ?? '').trim() === ''
-            ? undefined
-            : () => (
-                <div className="px-2 py-1.5 text-sm text-muted-foreground">
-                  {emptyLabel}
-                </div>
-              )
-        }
+        renderEmptyState={emptyState(emptyLabel, 'px-2 py-1.5')}
         {...props}
       />
     </PopoverContent>

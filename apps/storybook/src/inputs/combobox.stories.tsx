@@ -135,6 +135,9 @@ export const Empty: Story = {
     await expect(within(list).getByRole('option')).toHaveTextContent(
       'No fruit found',
     );
+    const style = getComputedStyle(within(list).getByText('No fruit found'));
+    await expect(style.paddingInline).toBe('8px');
+    await expect(style.paddingBlock).toBe('6px');
   },
 };
 

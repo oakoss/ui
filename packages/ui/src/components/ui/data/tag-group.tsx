@@ -15,6 +15,7 @@ import * as Icon from '#/components/icons';
 import { FieldDescription, FieldLabel } from '#/components/ui/inputs/field';
 import { cn, cx } from '#/lib/cx';
 import { isEmptyNode } from '#/lib/empty-node';
+import { emptyState } from '#/lib/empty-state';
 import { focusRing, stateLayer } from '#/lib/recipes';
 import { itemTextValue } from '#/lib/text-value';
 
@@ -158,12 +159,6 @@ export function TagGroup<T extends object>({
       )}
     </AriaTagGroup>
   );
-}
-
-function emptyState(label: string) {
-  return label.trim() === ''
-    ? undefined
-    : () => <span className="text-sm text-muted-foreground">{label}</span>;
 }
 
 // React Aria names the button "Remove" with the tag's text, translated. A
