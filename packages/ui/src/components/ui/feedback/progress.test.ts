@@ -19,7 +19,9 @@ test('Progress takes a label or children that replace the layout', () => {
   const both: ProgressProps = { children: createElement('span'), label: 'Up' };
   // @ts-expect-error intent is one of the five
   const intent: ProgressProps = { intent: 'danger' };
-  expect([...valid, both, intent]).toHaveLength(5);
+  // @ts-expect-error an empty child would render the layout with no label
+  const empty: ProgressProps = { children: null };
+  expect([...valid, both, intent, empty]).toHaveLength(6);
 });
 
 test('ProgressValue renders only the value it formats', () => {
