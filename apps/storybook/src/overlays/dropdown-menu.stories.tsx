@@ -184,7 +184,10 @@ export const Empty: Story = {
   args: { children: [], emptyLabel: 'No actions available' },
   play: async () => {
     const { menu } = await openMenu();
-    await expect(within(menu).getByText('No actions available')).toBeVisible();
+    const empty = within(menu).getByText('No actions available');
+    await expect(empty).toBeVisible();
+    await expect(getComputedStyle(empty).paddingInline).toBe('8px');
+    await expect(getComputedStyle(empty).paddingBlock).toBe('6px');
   },
 };
 

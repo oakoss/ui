@@ -22,6 +22,7 @@ import {
   type PopoverContentProps,
 } from '#/components/ui/overlays/popover';
 import { cn, cx } from '#/lib/cx';
+import { emptyState } from '#/lib/empty-state';
 import { listItem } from '#/lib/recipes';
 import { itemTextValue } from '#/lib/text-value';
 
@@ -70,15 +71,7 @@ export function ListBox<T extends object>({
     <AriaListBox<T>
       className="max-h-[inherit] overflow-y-auto outline-hidden"
       data-slot={`${kind}-list`}
-      renderEmptyState={
-        (emptyLabel ?? '').trim() === ''
-          ? undefined
-          : () => (
-              <div className="px-2 py-1.5 text-sm text-muted-foreground">
-                {emptyLabel}
-              </div>
-            )
-      }
+      renderEmptyState={emptyState(emptyLabel, 'px-2 py-1.5')}
     >
       <Collection dependencies={dependencies} items={items ?? context?.items}>
         {children}

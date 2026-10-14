@@ -29,6 +29,7 @@ import {
   MenuSeparator,
 } from '#/components/ui/overlays/menu-item';
 import { cn, cx } from '#/lib/cx';
+import { emptyState } from '#/lib/empty-state';
 import { itemTextValue } from '#/lib/text-value';
 
 // title names the dialog, which shows no heading.
@@ -183,15 +184,7 @@ export function CommandList<T extends object>({
         className,
       )}
       data-slot="command-list"
-      renderEmptyState={
-        emptyLabel.trim() === ''
-          ? undefined
-          : () => (
-              <div className="py-6 text-center text-sm text-muted-foreground">
-                {emptyLabel}
-              </div>
-            )
-      }
+      renderEmptyState={emptyState(emptyLabel, 'py-6 text-center')}
       {...props}
     />
   );

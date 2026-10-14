@@ -2826,6 +2826,11 @@
           "target": "@components/icon-placeholder.tsx"
         },
         {
+          "path": "src/lib/empty-state.ts",
+          "type": "registry:lib",
+          "target": "@lib/empty-state.ts"
+        },
+        {
           "path": "src/lib/recipes.ts",
           "type": "registry:lib",
           "target": "@lib/recipes.ts"
@@ -3047,6 +3052,11 @@
           "target": "@components/icon-placeholder.tsx"
         },
         {
+          "path": "src/lib/empty-state.ts",
+          "type": "registry:lib",
+          "target": "@lib/empty-state.ts"
+        },
+        {
           "path": "src/lib/recipes.ts",
           "type": "registry:lib",
           "target": "@lib/recipes.ts"
@@ -3151,6 +3161,11 @@
           "path": "src/components/icon-placeholder.tsx",
           "type": "registry:component",
           "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/empty-state.ts",
+          "type": "registry:lib",
+          "target": "@lib/empty-state.ts"
         },
         {
           "path": "src/lib/recipes.ts",
@@ -3493,6 +3508,11 @@
           "target": "@components/icon-placeholder.tsx"
         },
         {
+          "path": "src/lib/empty-state.ts",
+          "type": "registry:lib",
+          "target": "@lib/empty-state.ts"
+        },
+        {
           "path": "src/lib/recipes.ts",
           "type": "registry:lib",
           "target": "@lib/recipes.ts"
@@ -3551,6 +3571,11 @@
           "target": "@components/icon-placeholder.tsx"
         },
         {
+          "path": "src/lib/empty-state.ts",
+          "type": "registry:lib",
+          "target": "@lib/empty-state.ts"
+        },
+        {
           "path": "src/lib/recipes.ts",
           "type": "registry:lib",
           "target": "@lib/recipes.ts"
@@ -3606,6 +3631,11 @@
           "path": "src/components/icon-placeholder.tsx",
           "type": "registry:component",
           "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/empty-state.ts",
+          "type": "registry:lib",
+          "target": "@lib/empty-state.ts"
         },
         {
           "path": "src/lib/recipes.ts",
