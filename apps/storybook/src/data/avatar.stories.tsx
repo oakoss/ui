@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Link } from 'react-aria-components';
 import { expect, waitFor } from 'storybook/test';
 
-import { part } from '#/parts';
+import { part } from '#/helpers/parts';
 
 import { AvatarDemo, type AvatarDemoProps, photo } from './avatar-demo';
 

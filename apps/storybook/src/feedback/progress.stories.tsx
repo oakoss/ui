@@ -8,8 +8,8 @@ import {
 } from '@oakoss/ui/components/ui/feedback/progress';
 import { expect } from 'storybook/test';
 
-import { contrast, tokenColor } from '#/color';
-import { fillRatio, part } from '#/parts';
+import { contrast, tokenColor } from '#/helpers/color';
+import { fillRatio, part } from '#/helpers/parts';
 
 const meta = {
   args: { className: 'w-80', label: 'Uploading', value: 40 },

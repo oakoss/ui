@@ -5,8 +5,8 @@ import { Button } from '@oakoss/ui/components/ui/inputs/button';
 import { useState } from 'react';
 import { expect, userEvent, waitFor } from 'storybook/test';
 
-import { withReducedMotion } from '#/motion';
-import { part } from '#/parts';
+import { withReducedMotion } from '#/helpers/motion';
+import { part } from '#/helpers/parts';
 
 const meta = {
   args: { className: 'w-80', isIndeterminate: true, label: 'Uploading' },

@@ -5,7 +5,7 @@ import { Button, Link } from 'react-aria-components';
 import { expect, userEvent } from 'storybook/test';
 
 import { colorOf, hoverOf, intents, rolesOf } from '#/data/badge-roles';
-import { setState } from '#/state';
+import { setState } from '#/helpers/state';
 
 const meta = { component: Link, title: 'Data/Badge/Links' } satisfies Meta<
   typeof Link

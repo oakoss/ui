@@ -11,7 +11,7 @@ import {
 import { Button } from '@oakoss/ui/components/ui/inputs/button';
 import { expect } from 'storybook/test';
 
-import { part } from '#/parts';
+import { part } from '#/helpers/parts';
 
 function AlertDemo(props: AlertProps) {
   return (

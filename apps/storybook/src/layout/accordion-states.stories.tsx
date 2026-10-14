@@ -14,7 +14,7 @@ import {
 import { Link } from 'react-aria-components';
 import { expect, userEvent } from 'storybook/test';
 
-import { part } from '#/parts';
+import { part } from '#/helpers/parts';
 
 const meta = {
   args: { className: 'w-96' },

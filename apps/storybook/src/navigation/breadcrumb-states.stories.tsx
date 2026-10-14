@@ -9,7 +9,7 @@ import {
 } from '@oakoss/ui/components/ui/navigation/breadcrumb';
 import { expect, userEvent } from 'storybook/test';
 
-import { atViewportWidth } from '#/viewport';
+import { atViewportWidth } from '#/helpers/viewport';
 
 const meta = {
   component: Breadcrumb,

@@ -3,8 +3,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ScrollArea } from '@oakoss/ui/components/ui/layout/scroll-area';
 import { expect, userEvent } from 'storybook/test';
 
-import { contrast, tokenColor } from '#/color';
-import { part } from '#/parts';
+import { contrast, tokenColor } from '#/helpers/color';
+import { part } from '#/helpers/parts';
 
 const tags = Array.from({ length: 30 }, (_, index) => `v1.${index}.0`);
 

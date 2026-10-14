@@ -13,8 +13,8 @@ import {
 import { DialogTrigger } from '@oakoss/ui/components/ui/overlays/dialog';
 import { expect, fn, screen, userEvent, waitFor, within } from 'storybook/test';
 
-import { tokenColor } from '#/color';
-import { isPseudoHidden } from '#/pseudo';
+import { tokenColor } from '#/helpers/color';
+import { isPseudoHidden } from '#/helpers/pseudo';
 
 import { settled } from './overlay-test';
 

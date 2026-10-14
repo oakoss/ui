@@ -7,8 +7,8 @@ import {
 } from '@oakoss/ui/components/ui/data/tag-group';
 import { expect, userEvent } from 'storybook/test';
 
-import { computedColor, tokenColor } from '#/color';
-import { setState, transitioned } from '#/state';
+import { computedColor, tokenColor } from '#/helpers/color';
+import { setState, transitioned } from '#/helpers/state';
 
 const meta = {
   args: { label: 'Filters', selectionMode: 'multiple' },

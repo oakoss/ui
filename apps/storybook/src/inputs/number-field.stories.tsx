@@ -3,9 +3,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { NumberField } from '@oakoss/ui/components/ui/inputs/number-field';
 import { expect, fn, userEvent } from 'storybook/test';
 
-import { whilePressed } from '#/press';
-import { setState } from '#/state';
-import { atViewportWidth } from '#/viewport';
+import { whilePressed } from '#/helpers/press';
+import { setState } from '#/helpers/state';
+import { atViewportWidth } from '#/helpers/viewport';
 
 const onChange = fn<(value: number) => void>();
 

@@ -4,7 +4,7 @@ import { Tag, TagGroup } from '@oakoss/ui/components/ui/data/tag-group';
 import { useState } from 'react';
 import { expect, userEvent } from 'storybook/test';
 
-import { part } from '#/parts';
+import { part } from '#/helpers/parts';
 
 type Item = { id: string; name: string };
 

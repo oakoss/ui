@@ -8,8 +8,8 @@ import {
 } from '@oakoss/ui/components/ui/data/tag-group';
 import { expect } from 'storybook/test';
 
-import { tokenColor } from '#/color';
-import { part } from '#/parts';
+import { tokenColor } from '#/helpers/color';
+import { part } from '#/helpers/parts';
 
 type Item = { id: string; name: string };
 

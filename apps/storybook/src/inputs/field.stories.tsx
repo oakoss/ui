@@ -13,7 +13,7 @@ import { TextField } from '@oakoss/ui/components/ui/inputs/text-field';
 import { Button, Form, Link, SearchField } from 'react-aria-components';
 import { expect, userEvent } from 'storybook/test';
 
-import { part } from '#/parts';
+import { part } from '#/helpers/parts';
 
 const meta = { component: FieldError, title: 'Inputs/Field' } satisfies Meta<
   typeof FieldError

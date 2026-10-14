@@ -4,9 +4,9 @@ import { Button } from '@oakoss/ui/components/ui/inputs/button';
 import { SearchField } from '@oakoss/ui/components/ui/inputs/search-field';
 import { expect, fn, userEvent } from 'storybook/test';
 
-import { isPseudoHidden } from '#/pseudo';
-import { setState } from '#/state';
-import { atViewportWidth } from '#/viewport';
+import { isPseudoHidden } from '#/helpers/pseudo';
+import { setState } from '#/helpers/state';
+import { atViewportWidth } from '#/helpers/viewport';
 
 const onClear = fn<() => void>();
 const onFilters = fn<() => void>();

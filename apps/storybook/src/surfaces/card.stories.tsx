@@ -12,7 +12,7 @@ import {
 import { Link } from 'react-aria-components';
 import { expect, fn, userEvent } from 'storybook/test';
 
-import { part } from '#/parts';
+import { part } from '#/helpers/parts';
 
 import { CardDemo, type CardDemoProps } from './card-demo';
 

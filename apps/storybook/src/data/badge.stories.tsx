@@ -6,8 +6,8 @@ import { Link } from 'react-aria-components';
 import { expect } from 'storybook/test';
 
 import { colorOf, intents, rolesOf, variants } from '#/data/badge-roles';
-import { part } from '#/parts';
-import { hoverReal } from '#/pointer';
+import { part } from '#/helpers/parts';
+import { hoverReal } from '#/helpers/pointer';
 
 const meta = {
   args: { children: 'New' },

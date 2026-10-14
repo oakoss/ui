@@ -12,7 +12,7 @@ import { Input } from '@oakoss/ui/components/ui/inputs/input';
 import { TextField } from '@oakoss/ui/components/ui/inputs/text-field';
 import { expect } from 'storybook/test';
 
-import { part } from '#/parts';
+import { part } from '#/helpers/parts';
 
 const meta = { component: Field, title: 'Inputs/Field/Layout' } satisfies Meta<
   typeof Field

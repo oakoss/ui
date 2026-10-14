@@ -11,8 +11,8 @@ import {
 } from '@oakoss/ui/components/ui/overlays/dropdown-menu';
 import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
 
-import { tokenColor } from '#/color';
-import { part } from '#/parts';
+import { tokenColor } from '#/helpers/color';
+import { part } from '#/helpers/parts';
 
 import {
   DropdownMenuDemo,
