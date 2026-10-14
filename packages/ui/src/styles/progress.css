@@ -1,0 +1,13 @@
+@theme {
+  --animate-progress-indeterminate: progress-indeterminate 1.5s ease-in-out
+    infinite;
+
+  @keyframes progress-indeterminate {
+    from {
+      inset-inline-start: -40%;
+    }
+    to {
+      inset-inline-start: 100%;
+    }
+  }
+}

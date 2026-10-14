@@ -103,6 +103,26 @@ const componentVariables = defineConfig({
       },
     },
     {
+      files: ['src/components/ui/feedback/progress.tsx'],
+      rules: {
+        'shadcn/no-arbitrary-values': [
+          'error',
+          {
+            allow: [
+              ...colorVariables('progress'),
+              // The fill grows to the value; no utility transitions width
+              // alone.
+              'transition-[width]',
+              // Forced colors repaint the fill as the page color.
+              'forced-colors:bg-[Highlight]',
+            ],
+          },
+        ],
+        // The fill's width is the value, which only a style can set.
+        'shadcn/no-inline-styles': 'off',
+      },
+    },
+    {
       files: ['src/components/ui/surfaces/card.tsx'],
       rules: {
         'shadcn/no-arbitrary-values': [
