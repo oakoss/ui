@@ -5,11 +5,13 @@
     "@oakoss/tsconfig/react.json",
     "@oakoss/tsconfig/node.json"
   ],
+  "compilerOptions": { "allowImportingTsExtensions": true },
   "include": [
     "src",
     "tests",
     "vitest.config.ts",
     "eslint.config.js",
+    "oxlint.allow.ts",
     "oxlint.config.ts"
   ]
 }
