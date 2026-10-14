@@ -1,4 +1,4 @@
-import { type ReactNode, use } from 'react';
+import { type ReactNode, use, useEffect, useRef } from 'react';
 import {
   Button as AriaButton,
   type ButtonProps as AriaButtonProps,
@@ -66,6 +66,9 @@ export type SelectTriggerProps = {
 } & Omit<AriaButtonProps, 'children'>;
 
 type Mode = 'multiple' | 'single';
+
+const focusable =
+  'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"]), [contenteditable]:not([contenteditable="false"])';
 
 export function Select<T extends object, M extends Mode = 'single'>({
   children,
@@ -148,12 +151,25 @@ export function SelectTrigger({
   ...props
 }: SelectTriggerProps) {
   const validation = use(FieldErrorContext);
+  const ref = useRef<HTMLButtonElement>(null);
+  const warnedRef = useRef(false);
+
+  useEffect(() => {
+    if (warnedRef.current || !ref.current?.querySelector(focusable)) return;
+    warnedRef.current = true;
+    // oxlint-disable-next-line no-console -- tells the consumer how to fix their markup
+    console.warn(
+      "Select's trigger is a button, so a link, button or other focusable element inside it is invalid HTML that assistive tech may flatten into the trigger. Put only text or aria-hidden icons in it.",
+    );
+  });
+
   return (
     <AriaButton
       className={cx(triggerStyles({ size }), className)}
       data-invalid={validation?.isInvalid === true ? true : undefined}
       data-size={size}
       data-slot="select-trigger"
+      ref={ref}
       {...props}
     >
       {children}
