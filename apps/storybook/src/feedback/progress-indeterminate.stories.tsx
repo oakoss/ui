@@ -63,6 +63,9 @@ export const ReducedMotion: Story = {
         true,
       );
       const indicator = part('progress-indicator');
+      // The fill drops its animation itself, so it doesn't rely on the base
+      // item's reduced-motion rule, which cuts every animation short.
+      await expect(getComputedStyle(indicator).animationName).toBe('none');
       await Promise.all(indicator.getAnimations().map((a) => a.finished));
       const fill = indicator.getBoundingClientRect();
       const track = part('progress-track').getBoundingClientRect();

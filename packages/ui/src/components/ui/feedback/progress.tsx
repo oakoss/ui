@@ -151,7 +151,7 @@ function Fill() {
       className={cn(
         'h-full rounded-full bg-(--progress-fill) forced-colors:bg-[Highlight]',
         isIndeterminate
-          ? 'absolute inset-y-0 start-3/10 w-2/5 animate-progress-indeterminate'
+          ? 'absolute inset-y-0 start-3/10 w-2/5 animate-progress-indeterminate motion-reduce:animate-none'
           : 'transition-[width] duration-300 ease-out',
       )}
       data-slot="progress-indicator"
