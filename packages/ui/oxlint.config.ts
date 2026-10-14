@@ -53,9 +53,10 @@ const selectionStates = selectionColors.flatMap((color) => [
 const neutralHover = (prefix: string) =>
   `[--${prefix}-hover:color-mix(in_oklab,var(--color-foreground)_90%,transparent)]`;
 
-// Forced colors gray a disabled link styled as a button or badge, like a
-// native disabled button.
-const disabledLink = ['forced-colors:disabled:text-[GrayText]'];
+// Forced colors gray a disabled control that isn't a native button (a link
+// styled as a button or badge, a number field's stepper), like a native
+// disabled button.
+const disabledGray = ['forced-colors:disabled:text-[GrayText]'];
 
 // The fill grows to the value, and no utility transitions width alone;
 // forced colors repaint the fill as the page color.
@@ -87,7 +88,7 @@ const arbitraryValues: Record<string, string[]> = {
       'secondary',
     ]),
     neutralHover('badge'),
-    ...disabledLink,
+    ...disabledGray,
   ],
   // Forced colors repaint a transparent border, so the default look takes
   // the page color to stay borderless.
@@ -129,10 +130,11 @@ const arbitraryValues: Record<string, string[]> = {
     // spacing.
     'gap-[inherit]',
     neutralHover('btn'),
-    ...disabledLink,
+    ...disabledGray,
   ],
   'src/components/ui/inputs/checkbox.tsx': selectionStates,
   'src/components/ui/inputs/list-box.tsx': scrollsInPopover,
+  'src/components/ui/inputs/number-field.tsx': disabledGray,
   'src/components/ui/inputs/radio-group.tsx': selectionStates,
   'src/components/ui/inputs/slider.tsx': selectionStates,
   'src/components/ui/inputs/switch.tsx': selectionStates,

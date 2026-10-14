@@ -1,0 +1,143 @@
+---
+title: Number Field
+description: A number input with steppers, formatted for the locale.
+item: number-field
+reactAria: https://react-aria.adobe.com/NumberField
+---
+
+import { NumberFieldDemo } from '#/components/demos/number-field-demo';
+import { NumberFieldFormat } from '#/components/demos/number-field-format';
+import { NumberFieldSteppers } from '#/components/demos/number-field-steppers';
+import { NumberFieldValidation } from '#/components/demos/number-field-validation';
+
+<ComponentPreview name="number-field-demo">
+  <NumberFieldDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="number-field" />
+
+## Usage
+
+```tsx
+import { NumberField } from '#/components/ui/inputs/number-field';
+
+<NumberField defaultValue={2} label="Quantity" minValue={1} step={1} />;
+```
+
+`onChange` fires when the value commits, on blur or Enter, not on every
+keystroke, and an emptied field commits `NaN`.
+
+A number field is for an amount: a quantity, a price, a percentage. A
+value made of digits that isn't an amount, such as an ID, a postcode, a
+card or phone number or a year, is a [Text Field](/docs/components/text-field)
+with `inputMode="numeric"`, which keeps its leading zeros and no stepper or
+scroll wheel can change it.
+
+Size the field to the number it holds, with `className`, rather than to its
+container: about one `ch` per digit plus the steppers. A field much wider
+than its value leaves people unsure they read the label right.
+
+## Examples
+
+### Steppers
+
+`steppers` places the buttons: `split` (the default) puts − before the value
+and + after it, `end` and `start` put the pair together on that side, and
+`none` leaves typing alone. Steppers suit small changes from a common value;
+for a wide range, such as an amount of money, use `none`.
+
+<ComponentPreview name="number-field-steppers">
+  <NumberFieldSteppers />
+</ComponentPreview>
+
+### Formatting
+
+`formatOptions` formats the value for the locale, as currency, a percentage
+or a unit, and screen readers read the formatted value. A percentage steps by
+0.01 unless you set `step`. A unit `Intl` can't format, such as seats, goes
+in the label.
+
+<ComponentPreview name="number-field-format">
+  <NumberFieldFormat />
+</ComponentPreview>
+
+Set `minValue={0}` when negative numbers make no sense: an iPhone then shows
+the number pad, which has no minus key, instead of the full keyboard.
+
+### Validation
+
+By default a value outside `minValue` and `maxValue` snaps to the nearest
+bound when the field commits, and, when you set `step`, to the nearest step:
+without `step`, a typed 2.7 stays 2.7. That suits a quantity, where the
+nearest valid value is what the person meant. Where the exact number
+matters, such as money, set `commitBehavior="validate"`: the value stays as
+typed, and `errorMessage` says what's allowed, including when the field is
+emptied.
+
+<ComponentPreview name="number-field-validation">
+  <NumberFieldValidation />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria handles:
+
+- **Input:** a text input with `aria-roledescription="Number field"`, the
+  keyboard each platform needs for the allowed values, and the raw number in
+  a hidden input for forms when you pass `name`.
+- **Steppers:** each named for the field ("Increase Quantity"), translated,
+  and kept out of the tab order. Holding one keeps stepping, and the one at a
+  bound is disabled.
+- **Keyboard:** <kbd>↑</kbd> and <kbd>↓</kbd> step, <kbd>Page Up</kbd> and
+  <kbd>Page Down</kbd> step too, <kbd>Home</kbd> and <kbd>End</kbd> go to the
+  bounds, and <kbd>Enter</kbd> commits.
+- **Scroll wheel:** steps only while the field has focus; `isWheelDisabled`
+  turns it off.
+
+The steppers are square at the control height, and 44px wide below the `sm`
+breakpoint. A stepper at a bound fades, and in Windows High Contrast takes
+the system's disabled color.
+
+## API
+
+### NumberField
+
+Extends React Aria's [`NumberField`](https://react-aria.adobe.com/NumberField#api).
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/number-field.tsx"
+  name="NumberFieldProps"
+/>
+
+Also accepts all [React Aria `NumberField` props](https://react-aria.adobe.com/NumberField#api).
+Takes the layout props or children, not both: children replace the layout,
+built from the [Field](/docs/components/field) parts, an `InputGroup` with
+`overflow-hidden`, an `Input` and `NumberFieldStepper`s.
+
+#### Data attributes
+
+| Attribute       | Present when                                                                                   |
+| --------------- | ---------------------------------------------------------------------------------------------- |
+| `data-slot`     | Always: `number-field`, and on the steppers `number-field-decrement`, `number-field-increment` |
+| `data-disabled` | The field is disabled                                                                          |
+| `data-invalid`  | The field is invalid                                                                           |
+
+### NumberFieldStepper
+
+A stepper for a layout of your own: a React Aria `Button` with the
+built-in steppers' look, which fades alone at a bound.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/number-field.tsx"
+  name="NumberFieldStepperProps"
+/>
+
+`side` is where it sits beside the input, which puts the divider between
+them; it defaults to before the value for `decrement` and after it for
+`increment`.
