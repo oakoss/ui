@@ -4,6 +4,8 @@ import { TextField } from '@oakoss/ui/components/ui/inputs/text-field';
 import { TextFieldContext } from 'react-aria-components';
 import { expect, userEvent } from 'storybook/test';
 
+import { tokenColor } from '#/helpers/color';
+
 const meta = {
   args: { label: 'Email', placeholder: 'you@example.com' },
   component: TextField,
@@ -57,14 +59,14 @@ export const Sizes: Story = {
 
 // The utilities behind these values appear only in packages/ui, so this fails
 // if Tailwind stops scanning the package. Keep their class names out of
-// stories. py-1 is used only by the input.
+// stories, comments included.
 export const CssCheck: Story = {
   play: async ({ canvas }) => {
     const style = getComputedStyle(
       canvas.getByRole('textbox', { name: 'Email' }),
     );
-    await expect(style.paddingTop).toBe('4px');
-    await expect(style.paddingInlineStart).toBe('10px');
+    await expect(style.backgroundColor).toBe(tokenColor('--color-field'));
+    await expect(style.fontSize).toBe('14px');
   },
 };
 

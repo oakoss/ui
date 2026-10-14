@@ -8,6 +8,8 @@ import {
 } from '@oakoss/ui/components/ui/overlays/dialog';
 import { expect, screen } from 'storybook/test';
 
+import { tokenColor } from '#/helpers/color';
+
 import {
   closePosition,
   Demo,
@@ -112,11 +114,14 @@ export const ClassName: Story = {
 };
 
 // The utilities behind these values appear only in packages/ui, so this fails
-// if Tailwind stops scanning the package. p-panel is used only by the content.
+// if Tailwind stops scanning the package. Keep their class names out of
+// stories, comments included.
 export const CssCheck: Story = {
   play: async () => {
     const { content } = dialogParts(await screen.findByRole('dialog'));
-    await expect(getComputedStyle(content).paddingTop).toBe('24px');
+    const style = getComputedStyle(content);
+    await expect(style.backgroundColor).toBe(tokenColor('--color-popover'));
+    await expect(style.overflowY).toBe('auto');
   },
 };
 
