@@ -1,3 +1,13 @@
+// A CSS color value as the browser computes it, such as an rgb() string.
+export function computedColor(value: string, root: Element = document.body) {
+  const probe = document.createElement('span');
+  probe.style.color = value;
+  root.append(probe);
+  const color = getComputedStyle(probe).color;
+  probe.remove();
+  return color;
+}
+
 // WCAG contrast of the first color drawn over the second, drawn over the
 // page, in any syntax the browser parses. Translucent colors are blended as
 // painted, so a transparent fill measures as the color beneath it.
@@ -11,14 +21,9 @@ export function contrast(top: string, bottom: string) {
   return (light + 0.05) / (dark + 0.05);
 }
 
-// A CSS variable's color as the browser computes it, such as an rgb() string.
+// A CSS variable's color as the browser computes it.
 export function tokenColor(variable: string, root: Element = document.body) {
-  const probe = document.createElement('span');
-  probe.style.color = `var(${variable})`;
-  root.append(probe);
-  const color = getComputedStyle(probe).color;
-  probe.remove();
-  return color;
+  return computedColor(`var(${variable})`, root);
 }
 
 function canvas() {

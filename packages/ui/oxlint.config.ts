@@ -61,6 +61,28 @@ const componentVariables = defineConfig({
       },
     },
     {
+      files: ['src/components/ui/data/badge.tsx'],
+      rules: {
+        'shadcn/no-arbitrary-values': [
+          'error',
+          {
+            allow: [
+              ...colorVariables('badge', [
+                'background',
+                'border',
+                'foreground',
+                'secondary',
+              ]),
+              // Neutral has no hover role: its fill fades instead.
+              '[--badge-hover:color-mix(in_oklab,var(--color-foreground)_90%,transparent)]',
+              // Forced colors gray a disabled badge link like a native one.
+              'forced-colors:disabled:text-[GrayText]',
+            ],
+          },
+        ],
+      },
+    },
+    {
       files: ['src/components/ui/feedback/alert.tsx'],
       rules: {
         'shadcn/no-arbitrary-values': [
