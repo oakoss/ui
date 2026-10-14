@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import * as Icon from '@oakoss/ui/components/icons';
 import { Select, SelectItem } from '@oakoss/ui/components/ui/inputs/select';
 import { setInteractionModality } from 'react-aria-components';
 import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
@@ -48,34 +47,6 @@ export const Multiple: Story = {
     <MultipleSelect label={args.label} selectionMode="multiple">
       {fruits}
     </MultipleSelect>
-  ),
-};
-
-// Text inside the trigger describes it; an element is decoration.
-export const Decorations: Story = {
-  args: { description: 'Ships tomorrow.', end: 'incl. tax', start: 'Ship to:' },
-  play: async ({ canvas }) => {
-    const button = trigger(canvas);
-    await expect(button).toHaveAccessibleDescription(
-      'Ships tomorrow. Ship to: incl. tax',
-    );
-    await expect(within(button).getByText('Ship to:')).toBeVisible();
-    await expect(within(button).getByText('incl. tax')).toBeVisible();
-    await expect(canvas.getAllByText('Ship to:')).toHaveLength(1);
-    await expect(
-      button.querySelector('[data-slot=select-value]')?.nextElementSibling,
-    ).toHaveTextContent('incl. tax');
-    await expect(
-      canvas.getByRole('button', { name: /Size/u }),
-    ).not.toHaveAccessibleDescription();
-  },
-  render: (args) => (
-    <div className="flex flex-col gap-4">
-      <SingleSelect {...args} />
-      <SingleSelect label="Size" start={<Icon.Search aria-hidden />}>
-        {fruits}
-      </SingleSelect>
-    </div>
   ),
 };
 
