@@ -1,0 +1,7 @@
+---
+'@oakoss/ui': minor
+---
+
+Tag Group: a labeled set of tags on React Aria's `TagGroup`, which the user can remove or select. `label`, `description`, `errorMessage` and `emptyLabel` (default "No tags") sit around the tags, which are its children or built from `items`. `onRemove` adds a 24px remove button to each tag, named "Remove" with the tag's text in the user's language, and Delete or Backspace removes the focused tag. Tags come in neutral (the default), primary, success, warning, destructive and info intents, soft at rest and solid when selected, so selection isn't color alone. A tag whose content isn't plain text needs `textValue`, checked by the types; a link tag is underlined; a long tag truncates under a width you set while its name stays whole; and the empty list shows the focus outline after the last removal. In Windows High Contrast a selected tag takes the system's selection colors and a disabled one its disabled color. Install with `npx shadcn@latest add oakoss/ui/tag-group`.
+
+Meter: a value within a known range, such as storage used, on React Aria's `Meter`. It takes Progress's layout: `label` renders the label and the value, formatted for the locale, above the track, and children replace that layout, built from `MeterLabel`, `MeterValue` and `MeterTrack`. Each intent's fill keeps 3:1 against the track in light and dark, the fill slides to a new value, and it takes the system's highlight color in Windows High Contrast. The docs show units and computing an intent from thresholds. Install with `npx shadcn@latest add oakoss/ui/meter`.

@@ -1,0 +1,147 @@
+---
+title: Meter
+description: A value within a known range, such as storage used.
+item: meter
+reactAria: https://react-aria.adobe.com/Meter
+---
+
+import { MeterDemo } from '#/components/demos/meter-demo';
+import { MeterIntents } from '#/components/demos/meter-intents';
+import { MeterLayout } from '#/components/demos/meter-layout';
+import { MeterThresholds } from '#/components/demos/meter-thresholds';
+import { MeterValueDemo } from '#/components/demos/meter-value';
+
+<ComponentPreview name="meter-demo">
+  <MeterDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="meter" />
+
+## Usage
+
+```tsx
+import { Meter } from '#/components/ui/feedback/meter';
+
+<Meter label="Storage" value={64} />;
+```
+
+`label` renders the default layout: the label and value in a row, then the
+track. For a different layout, pass children instead (see
+[Layout](#layout)).
+
+A meter shows a measurement that stays where it is, such as storage used,
+battery left or a password's strength. Other values have their own
+component:
+
+- A task moving toward done is a [Progress](/docs/components/progress) bar.
+- A value the user sets is a [Slider](/docs/components/slider).
+
+## Examples
+
+### Intents
+
+`intent` colors the fill: primary (the default), success, warning,
+destructive or info. Each keeps 3:1 against the track in light and dark.
+
+<ComponentPreview name="meter-intents">
+  <MeterIntents />
+</ComponentPreview>
+
+### Value
+
+`formatOptions` formats the value for the locale, a percentage by default
+or a unit such as gigabytes. `valueLabel` replaces it with your own text, and
+`minValue` and `maxValue` set the range.
+
+<ComponentPreview name="meter-value">
+  <MeterValueDemo />
+</ComponentPreview>
+
+### Thresholds
+
+Meter has no thresholds of its own; compute `intent` from the value. Put the
+level in `valueLabel` too, so it doesn't rely on color, and screen readers
+read it as the value.
+
+<ComponentPreview name="meter-thresholds">
+  <MeterThresholds />
+</ComponentPreview>
+
+### Layout
+
+Children replace the default layout, built from `MeterTrack`, `MeterLabel`
+and `MeterValue` in any order. `MeterValue` takes a function of the formatted
+value to add words around it, and a function child of `Meter` gets React
+Aria's render props, such as `percentage`.
+
+<ComponentPreview name="meter-layout">
+  <MeterLayout />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria renders a `meter` named by its label and handles:
+
+- **Value:** `aria-valuenow`, `aria-valuemin` and `aria-valuemax`, and
+  `aria-valuetext` with the formatted value or your `valueLabel`.
+
+A meter needs a name: `label`, a `MeterLabel` in your layout, or
+`aria-label` when there's no visible label. The fill grows by width, logical
+in right-to-left locales, and takes the system highlight color in Windows
+High Contrast, where the track keeps a border. React Aria adds no keys.
+
+## API
+
+### Meter
+
+Extends React Aria's [`Meter`](https://react-aria.adobe.com/Meter#api).
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/feedback/meter.tsx"
+  name="MeterProps"
+/>
+
+Also accepts all [React Aria `Meter` props](https://react-aria.adobe.com/Meter#api).
+Takes `label` or children, not both: children replace the layout, and a
+function child gets React Aria's render props, such as `percentage` and
+`valueText`.
+
+#### Data attributes
+
+| Attribute     | Present when                                                                                     |
+| ------------- | ------------------------------------------------------------------------------------------------ |
+| `data-slot`   | Always: `meter`, and on the parts `meter-label`, `meter-value`, `meter-track`, `meter-indicator` |
+| `data-intent` | Always on `Meter`: the fill color                                                                |
+
+#### CSS variables
+
+| Variable       | Sets           |
+| -------------- | -------------- |
+| `--meter-fill` | The fill color |
+
+### MeterLabel
+
+React Aria's [`Label`](https://react-aria.adobe.com/Meter#api), which names
+the meter.
+
+### MeterValue
+
+A `span` with the formatted value.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/feedback/meter.tsx"
+  name="MeterValueProps"
+/>
+
+Also accepts `span` props.
+
+### MeterTrack
+
+The track, a `span` that draws the fill inside it. Accepts `span` props
+other than `children`.

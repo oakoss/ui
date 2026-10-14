@@ -58,6 +58,7 @@ How to write a component in `packages/ui`. Each entry is a rule and its reason; 
 - **Logical utilities only** (`ps`/`pe`, `ms`/`me`, `start`/`end`, `text-start`); the lint rule bans physical ones in component files.
 - **Hover and press on non-solid looks are a state layer.** The `stateLayer` recipe tints the surface with its own text color at the tokens' strengths (8% hover, 12% press), which the tokens keep text AA under. It's a gradient so it paints over the fill. Solid fills swap to their `-hover` color instead.
 - **Arbitrary-value exceptions name each value.** A per-file oxlint allow list may wildcard the variable name but lists each color (`[--btn-*:var(--color-primary)]`); a `*` in the value would also admit a hardcoded fallback like `var(--color-primary,#f00)`.
+- **A file's arbitrary-value exceptions are one entry in `arbitraryValues`** in `packages/ui/oxlint.config.ts`, keyed by the file's path. oxlint replaces a rule's options when a later override matches the same file, so a file in two allow lists keeps only the last; a repeated key fails the typecheck and lint instead. Exceptions several files share are named pieces (`valueFill`, `selectionStates`) that each entry spreads, so each reason is written once.
 
 ## Accessibility
 

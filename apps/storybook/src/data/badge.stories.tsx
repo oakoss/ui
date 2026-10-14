@@ -5,14 +5,9 @@ import { Badge, badgeStyles } from '@oakoss/ui/components/ui/data/badge';
 import { Link } from 'react-aria-components';
 import { expect } from 'storybook/test';
 
-import {
-  colorOf,
-  intents,
-  rolesOf,
-  setState,
-  variants,
-} from '#/data/badge-roles';
+import { colorOf, intents, rolesOf, variants } from '#/data/badge-roles';
 import { part } from '#/parts';
+import { hoverReal } from '#/pointer';
 
 const meta = {
   args: { children: 'New' },
@@ -79,14 +74,15 @@ export const Looks: Story = {
   ),
 };
 
-// A static badge has no hover style, so it doesn't look clickable. The
-// hover: variant matches data-hovered as well as :hover on a plain element.
+// A static badge has no hover style, so it doesn't look clickable. On a plain
+// element hover: matches only :hover, so the story moves the real mouse.
 export const StaticHover: Story = {
   play: async () => {
     const badge = part('badge');
-    await setState(badge, 'resting');
+    await expect(badge.matches(':hover')).toBe(false);
     const resting = getComputedStyle(badge).backgroundColor;
-    await setState(badge, 'hovered');
+    await hoverReal(badge);
+    await expect(badge.matches(':hover')).toBe(true);
     await expect(getComputedStyle(badge).backgroundColor).toBe(resting);
     await expect(getComputedStyle(badge).cursor).toBe('auto');
   },

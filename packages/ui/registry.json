@@ -2486,6 +2486,36 @@
       ]
     },
     {
+      "name": "meter",
+      "type": "registry:ui",
+      "title": "Meter",
+      "description": "Meter for a value within a known range, such as storage used, with a label and formatted value, or parts to lay out your own, in primary, success, warning, destructive and info intents.",
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/feedback/meter.tsx",
+          "type": "registry:ui",
+          "target": "@ui/feedback/meter.tsx"
+        },
+        {
+          "path": "src/lib/empty-node.ts",
+          "type": "registry:lib",
+          "target": "@lib/empty-node.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
       "name": "skeleton",
       "type": "registry:ui",
       "title": "Skeleton",
@@ -2759,6 +2789,51 @@
           "path": "src/lib/recipes.ts",
           "type": "registry:lib",
           "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "tag-group",
+      "type": "registry:ui",
+      "title": "Tag Group",
+      "description": "Removable and selectable tags in a labeled group, with keyboard removal, a 24px remove button named in the user's language, intents that turn solid when selected, an empty state and an error message.",
+      "registryDependencies": ["oakoss/ui/theme", "oakoss/ui/field"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/data/tag-group.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/tag-group.tsx"
+        },
+        {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/text-value.ts",
+          "type": "registry:lib",
+          "target": "@lib/text-value.ts"
         },
         {
           "path": "src/lib/cx.ts",

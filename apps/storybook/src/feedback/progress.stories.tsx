@@ -9,7 +9,7 @@ import {
 import { expect } from 'storybook/test';
 
 import { contrast, tokenColor } from '#/color';
-import { part } from '#/parts';
+import { fillRatio, part } from '#/parts';
 
 const meta = {
   args: { className: 'w-80', label: 'Uploading', value: 40 },
@@ -37,7 +37,7 @@ export const Default: Story = {
     await expect(bar).toHaveAttribute('aria-valuenow', '40');
     await expect(bar.getBoundingClientRect().width).toBe(320);
     await expect(part('progress-value')).toHaveTextContent('40%');
-    await expect(ratio()).toBe(0.4);
+    await expect(fillRatio('progress')).toBe(0.4);
     const fill = getComputedStyle(part('progress-indicator'));
     await expect(fill.backgroundColor).toBe(tokenColor('--color-primary-text'));
     const track = getComputedStyle(part('progress-track'));
@@ -70,7 +70,7 @@ export const Layout: Story = {
 export const Range: Story = {
   args: { maxValue: 200, minValue: 0, value: 50 },
   play: async () => {
-    await expect(ratio()).toBe(0.25);
+    await expect(fillRatio('progress')).toBe(0.25);
     await expect(part('progress-value')).toHaveTextContent('25%');
   },
 };
@@ -120,7 +120,7 @@ export const CustomLayout: Story = {
 export const RenderProps: Story = {
   play: async ({ canvas }) => {
     await expect(canvas.getByText('40 of 100 sent')).toBeVisible();
-    await expect(ratio()).toBe(0.4);
+    await expect(fillRatio('progress')).toBe(0.4);
   },
   render: ({ label: _label, ...args }) => (
     <Progress {...args} aria-label="Uploading">
@@ -190,13 +190,3 @@ export const ForcedColors: Story = {
   },
   tags: ['forced-colors'],
 };
-
-// The fill's width over the track's, once its transition has finished.
-function ratio() {
-  const fill = part('progress-indicator');
-  for (const animation of fill.getAnimations()) animation.finish();
-  return (
-    fill.getBoundingClientRect().width /
-    part('progress-track').getBoundingClientRect().width
-  );
-}
