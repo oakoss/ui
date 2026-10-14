@@ -9,7 +9,7 @@ import {
 } from '@oakoss/ui/components/ui/layout/collapsible';
 import { expect, userEvent } from 'storybook/test';
 
-import { part } from '#/parts';
+import { part } from '#/helpers/parts';
 
 const meta = {
   component: Collapsible,

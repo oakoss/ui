@@ -6,7 +6,7 @@ import {
 } from '@oakoss/ui/components/ui/inputs/combobox';
 import { expect, fn, screen, userEvent, waitFor, within } from 'storybook/test';
 
-import { whilePressed } from '#/press';
+import { whilePressed } from '#/helpers/press';
 
 const FruitCombobox = Combobox<object>;
 

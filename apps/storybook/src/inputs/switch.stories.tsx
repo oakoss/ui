@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Switch } from '@oakoss/ui/components/ui/inputs/switch';
 import { expect, fn, userEvent } from 'storybook/test';
 
-import { part } from '#/parts';
+import { part } from '#/helpers/parts';
 
 const onChange = fn<(isSelected: boolean) => void>();
 

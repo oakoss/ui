@@ -9,8 +9,8 @@ import {
 import { useState } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { part } from '#/parts';
-import { atViewportWidth } from '#/viewport';
+import { part } from '#/helpers/parts';
+import { atViewportWidth } from '#/helpers/viewport';
 
 const onChange = fn<(value: string[]) => void>();
 

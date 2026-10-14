@@ -11,7 +11,7 @@ import {
 } from '@oakoss/ui/components/ui/inputs/slider';
 import { expect, fn, userEvent } from 'storybook/test';
 
-import { part } from '#/parts';
+import { part } from '#/helpers/parts';
 
 const onChange = fn<(value: number) => void>();
 

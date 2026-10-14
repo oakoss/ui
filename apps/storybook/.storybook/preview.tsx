@@ -1,4 +1,4 @@
-import '../src/styles.css';
+import '../src/styles/app.css';
 
 import type { Decorator, Preview } from '@storybook/react-vite';
 
@@ -12,7 +12,7 @@ import * as lucide from 'lucide-react';
 import { type ComponentType, type ReactNode, useEffect } from 'react';
 import { I18nProvider, isRTL } from 'react-aria-components';
 
-import { parkPointer } from '#/pointer';
+import { parkPointer } from '#/helpers/pointer';
 
 // Installs swap icons at `shadcn add` time; Storybook resolves them live.
 const lucideIcons = new Map<string, unknown>(Object.entries(lucide));

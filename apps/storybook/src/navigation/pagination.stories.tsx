@@ -11,8 +11,8 @@ import {
 } from '@oakoss/ui/components/ui/navigation/pagination';
 import { expect, userEvent } from 'storybook/test';
 
-import { part } from '#/parts';
-import { atViewportWidth } from '#/viewport';
+import { part } from '#/helpers/parts';
+import { atViewportWidth } from '#/helpers/viewport';
 
 const meta = {
   component: Pagination,

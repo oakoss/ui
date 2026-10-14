@@ -1,6 +1,6 @@
 import type { BadgeStyleProps } from '@oakoss/ui/components/ui/data/badge';
 
-import { computedColor, tokenColor } from '#/color';
+import { computedColor, tokenColor } from '#/helpers/color';
 
 export const intents = [
   'neutral',

@@ -7,7 +7,7 @@ import {
 } from '@oakoss/ui/components/ui/inputs/checkbox-group';
 import { expect, fn, userEvent } from 'storybook/test';
 
-import { part } from '#/parts';
+import { part } from '#/helpers/parts';
 
 const meta = {
   args: {

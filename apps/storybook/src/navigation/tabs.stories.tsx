@@ -8,7 +8,7 @@ import {
 } from '@oakoss/ui/components/ui/navigation/tabs';
 import { expect, userEvent } from 'storybook/test';
 
-import { part } from '#/parts';
+import { part } from '#/helpers/parts';
 
 const meta = {
   component: Tabs,

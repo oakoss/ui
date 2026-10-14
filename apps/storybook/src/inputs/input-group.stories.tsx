@@ -13,7 +13,7 @@ import { Textarea } from '@oakoss/ui/components/ui/inputs/textarea';
 import { TextField } from 'react-aria-components';
 import { expect, userEvent } from 'storybook/test';
 
-import { part } from '#/parts';
+import { part } from '#/helpers/parts';
 
 const meta = {
   component: InputGroup,

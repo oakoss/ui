@@ -6,7 +6,7 @@ import {
 } from '@oakoss/ui/components/ui/inputs/radio-group';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { part } from '#/parts';
+import { part } from '#/helpers/parts';
 
 const onChange = fn<(value: string) => void>();
 
