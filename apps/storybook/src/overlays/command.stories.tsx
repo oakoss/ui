@@ -14,6 +14,7 @@ import { DialogTrigger } from '@oakoss/ui/components/ui/overlays/dialog';
 import { expect, fn, screen, userEvent, waitFor, within } from 'storybook/test';
 
 import { tokenColor } from '#/color';
+import { isPseudoHidden } from '#/pseudo';
 
 import { settled } from './overlay-test';
 
@@ -69,6 +70,13 @@ export const Default: Story = {
     await expect(input).toHaveAttribute('placeholder', 'Type a command');
     await expect(canvas.queryByText('No results')).toBeNull();
     await userEvent.type(input, 'FILE');
+    // WebKit's own clear button and decoration are hidden.
+    await expect(isPseudoHidden(input, '::-webkit-search-cancel-button')).toBe(
+      true,
+    );
+    await expect(isPseudoHidden(input, '::-webkit-search-decoration')).toBe(
+      true,
+    );
     const menu = canvas.getByRole('menu', { name: 'Commands' });
     await waitFor(async () => {
       await expect(within(menu).getAllByRole('menuitem')).toHaveLength(2);
