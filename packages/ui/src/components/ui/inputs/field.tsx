@@ -227,29 +227,40 @@ export function FieldLabel({ className, ...props }: AriaLabelProps) {
 }
 
 // React Aria render-prop children for a field; reads only isRequired.
+// A group's description and error go above its options, so they're read
+// before the list rather than after scanning it.
 export function fieldLayout(
   control: ReactNode,
   { description, errorMessage, errors, label }: FieldMessages,
+  { isGroup = false }: { isGroup?: boolean } = {},
 ) {
-  return ({ isRequired }: { isRequired: boolean }) => (
-    <>
-      {isEmptyNode(label) ? null : (
-        <FieldLabel>
-          {label}
-          {isRequired ? (
-            <span aria-hidden className="text-destructive-text">
-              *
-            </span>
-          ) : null}
-        </FieldLabel>
-      )}
-      {control}
-      {isEmptyNode(description) ? null : (
-        <FieldDescription>{description}</FieldDescription>
-      )}
-      <FieldError errors={errors}>{errorMessage}</FieldError>
-    </>
-  );
+  return ({ isRequired }: { isRequired: boolean }) => {
+    const messages = (
+      <>
+        {isEmptyNode(description) ? null : (
+          <FieldDescription>{description}</FieldDescription>
+        )}
+        <FieldError errors={errors}>{errorMessage}</FieldError>
+      </>
+    );
+    return (
+      <>
+        {isEmptyNode(label) ? null : (
+          <FieldLabel>
+            {label}
+            {isRequired ? (
+              <span aria-hidden className="text-destructive-text">
+                *
+              </span>
+            ) : null}
+          </FieldLabel>
+        )}
+        {isGroup ? messages : null}
+        {control}
+        {isGroup ? null : messages}
+      </>
+    );
+  };
 }
 
 export function FieldLegend({

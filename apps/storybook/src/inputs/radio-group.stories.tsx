@@ -86,13 +86,13 @@ export const Validation: Story = {
     await expect(group).toHaveAttribute('aria-invalid', 'true');
     const label = part('field-label', group);
     await expect(within(label).getByText('*')).toBeVisible();
-    // The layout TextField and RadioGroup share: label, control, description,
-    // then error.
+    // A group's description and error sit above the options, so they're
+    // read before the list.
     await expect(
       [...group.children].map((child) =>
         child instanceof HTMLElement ? child.dataset.slot : undefined,
       ),
-    ).toEqual(['field-label', undefined, 'field-description', 'field-error']);
+    ).toEqual(['field-label', 'field-description', 'field-error', undefined]);
   },
 };
 
