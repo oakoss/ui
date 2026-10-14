@@ -227,8 +227,6 @@ export function FieldLabel({ className, ...props }: AriaLabelProps) {
 }
 
 // React Aria render-prop children for a field; reads only isRequired.
-// A group's description and error go above its options, so they're read
-// before the list rather than after scanning it.
 export function fieldLayout(
   control: ReactNode,
   { description, errorMessage, errors, label }: FieldMessages,

@@ -28,8 +28,6 @@ const defaultSearchLabel = 'Search';
 export type SearchFieldProps = Omit<AriaSearchFieldProps, 'children'> &
   Shortcut<LayoutProps>;
 
-// enterKeyHint labels the on-screen keyboard's Enter key; iOS shows Search
-// for a search input only inside a form with an action.
 type LayoutProps = {
   enterKeyHint?: InputHTMLAttributes<HTMLInputElement>['enterKeyHint'];
   placeholder?: string;
@@ -37,8 +35,6 @@ type LayoutProps = {
 } & FieldMessages &
   InputGroupSlots;
 
-// A search icon leads, and a clear button ends the field once there's text.
-// It's named Search unless it has a label or a name of its own.
 export function SearchField({
   'aria-label': ariaLabel = '',
   children,
@@ -54,7 +50,6 @@ export function SearchField({
   start,
   ...props
 }: SearchFieldProps) {
-  // A blank label is no label, so the field still gets its fallback name.
   const shownLabel =
     typeof label === 'string' && label.trim() === '' ? undefined : label;
   const isNamed =
@@ -89,12 +84,8 @@ export function SearchField({
   );
 }
 
-// React Aria names it "Clear search", translated, and keeps it out of the tab
-// order: Escape clears from the keyboard. Hidden while the field is empty or
-// read-only, where it would do nothing, which also takes it out of the
-// accessibility tree. The wrapper keeps it, disabled in a read-only field,
-// from counting as the group's disabled control, which fades the whole
-// field.
+// The span keeps the button, disabled in a read-only field, from fading the
+// whole InputGroup.
 export function SearchFieldClear() {
   return (
     <span className="contents">
@@ -140,8 +131,6 @@ function Control({
   );
 }
 
-// React Aria hands its clear button's name, handler and tab order to any
-// button in the field, so a button in a decoration gets none of them.
 function Decoration({
   align,
   children,

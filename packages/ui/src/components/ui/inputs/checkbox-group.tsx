@@ -22,9 +22,6 @@ export type CheckboxGroupItemProps = {
   description?: ReactNode;
 } & Omit<CheckboxFieldProps, 'children'>;
 
-// React Aria's CheckboxGroup has no orientation, so the group sets its own.
-// requiredLabel is the error when isRequired and nothing is checked, where
-// the browser's own message speaks of a single box.
 export type CheckboxGroupProps = {
   children?: ReactNode;
   orientation?: 'horizontal' | 'vertical';
@@ -92,7 +89,6 @@ export function CheckboxGroup({
 const cardStyles =
   'relative rounded-lg border border-input p-4 transition-colors has-data-focus-visible:outline-(length:--ring-width) has-data-focus-visible:outline-offset-2 has-data-focus-visible:outline-ring has-data-focus-visible:outline-solid selected:border-primary disabled:opacity-50 forced-colors:selected:border-[Highlight]';
 
-// The group shows errors, so an item takes none of its own.
 export function CheckboxGroupItem({
   children,
   className,
@@ -143,7 +139,6 @@ export function CheckboxGroupItem({
   );
 }
 
-// Horizontal options wrap onto more rows on a narrow screen.
 function Options({
   children,
   targetSize,

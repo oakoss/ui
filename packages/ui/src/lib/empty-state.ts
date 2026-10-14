@@ -2,9 +2,6 @@ import { createElement, type ReactElement } from 'react';
 
 import { cn } from '#/lib/cx';
 
-// A collection's renderEmptyState for its emptyLabel. A blank label renders
-// nothing: menus and list boxes wrap the empty state in an item, which axe
-// flags when unnamed.
 export function emptyState(
   label: string | undefined,
   className?: string,
