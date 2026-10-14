@@ -5,14 +5,9 @@ import { Badge, badgeStyles } from '@oakoss/ui/components/ui/data/badge';
 import { Link } from 'react-aria-components';
 import { expect } from 'storybook/test';
 
-import {
-  colorOf,
-  intents,
-  rolesOf,
-  setState,
-  variants,
-} from '#/data/badge-roles';
+import { colorOf, intents, rolesOf, variants } from '#/data/badge-roles';
 import { part } from '#/parts';
+import { setState } from '#/state';
 
 const meta = {
   args: { children: 'New' },

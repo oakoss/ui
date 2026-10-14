@@ -9,7 +9,7 @@ import {
 import { expect } from 'storybook/test';
 
 import { contrast, tokenColor } from '#/color';
-import { part } from '#/parts';
+import { fillRatio, part } from '#/parts';
 
 const meta = {
   args: { className: 'w-80', label: 'Storage', value: 40 },
@@ -37,7 +37,7 @@ export const Default: Story = {
     await expect(meter).toHaveAttribute('aria-valuenow', '40');
     await expect(meter.getBoundingClientRect().width).toBe(320);
     await expect(part('meter-value')).toHaveTextContent('40%');
-    await expect(ratio()).toBe(0.4);
+    await expect(fillRatio('meter')).toBe(0.4);
     const fill = getComputedStyle(part('meter-indicator'));
     await expect(fill.backgroundColor).toBe(tokenColor('--color-primary-text'));
     const track = getComputedStyle(part('meter-track'));
@@ -73,7 +73,7 @@ export const Value: Story = {
     value: 64,
   },
   play: async ({ canvas }) => {
-    await expect(ratio()).toBe(0.25);
+    await expect(fillRatio('meter')).toBe(0.25);
     await expect(part('meter-value')).toHaveTextContent('64 GB');
     const custom = canvas.getByRole('meter', { name: 'Battery' });
     await expect(custom).toHaveAttribute('aria-valuetext', 'About 2 hours');
@@ -159,7 +159,7 @@ export const Parts: Story = {
 export const RenderProps: Story = {
   play: async ({ canvas }) => {
     await expect(canvas.getByText('40 of 100 seats')).toBeVisible();
-    await expect(ratio()).toBe(0.4);
+    await expect(fillRatio('meter')).toBe(0.4);
   },
   render: ({ label: _label, ...args }) => (
     <Meter {...args} aria-label="Seats">
@@ -206,7 +206,7 @@ export const Intents: Story = {
 export const RightToLeft: Story = {
   globals: { locale: 'ar-EG' },
   play: async () => {
-    ratio();
+    fillRatio('meter');
     const track = part('meter-track').getBoundingClientRect();
     const fill = part('meter-indicator').getBoundingClientRect();
     await expect(fill.right).toBe(track.right);
@@ -245,13 +245,3 @@ export const ForcedColors: Story = {
   },
   tags: ['forced-colors'],
 };
-
-// The fill's width over the track's, once its transition has finished.
-function ratio() {
-  const fill = part('meter-indicator');
-  for (const animation of fill.getAnimations()) animation.finish();
-  return (
-    fill.getBoundingClientRect().width /
-    part('meter-track').getBoundingClientRect().width
-  );
-}

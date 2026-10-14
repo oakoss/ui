@@ -8,7 +8,7 @@ import {
 import { expect, userEvent } from 'storybook/test';
 
 import { computedColor, tokenColor } from '#/color';
-import { setState } from '#/data/badge-roles';
+import { setState, transitioned } from '#/state';
 
 const meta = {
   args: { label: 'Filters', selectionMode: 'multiple' },
@@ -143,7 +143,7 @@ export const ForcedColors: Story = {
   play: async ({ canvas }) => {
     await expect(matchMedia('(forced-colors: active)').matches).toBe(true);
     const open = canvas.getByRole('row', { name: 'Open' });
-    await settled(open);
+    await transitioned(open);
     const selected = getComputedStyle(open);
     const rest = getComputedStyle(canvas.getByRole('row', { name: 'Draft' }));
     const native = getComputedStyle(canvas.getByText('Native'));
@@ -195,8 +195,4 @@ function groupArgs({
   ...args
 }: Partial<TagGroupProps<object>>) {
   return args;
-}
-
-async function settled(element: Element) {
-  await Promise.all(element.getAnimations().map((a) => a.finished));
 }
