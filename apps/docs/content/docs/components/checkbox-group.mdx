@@ -1,0 +1,159 @@
+---
+title: Checkbox Group
+description: A set of options where any number can be chosen.
+item: checkbox-group
+reactAria: https://react-aria.adobe.com/CheckboxGroup
+---
+
+import { CheckboxGroupCard } from '#/components/demos/checkbox-group-card';
+import { CheckboxGroupDemo } from '#/components/demos/checkbox-group-demo';
+import { CheckboxGroupHorizontal } from '#/components/demos/checkbox-group-horizontal';
+import { CheckboxGroupSelectAll } from '#/components/demos/checkbox-group-select-all';
+import { CheckboxGroupValidation } from '#/components/demos/checkbox-group-validation';
+
+<ComponentPreview name="checkbox-group-demo">
+  <CheckboxGroupDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="checkbox-group" />
+
+## Usage
+
+```tsx
+import {
+  CheckboxGroup,
+  CheckboxGroupItem,
+} from '#/components/ui/inputs/checkbox-group';
+
+<CheckboxGroup description="Select all that apply." label="Notify me by">
+  <CheckboxGroupItem value="email">Email</CheckboxGroupItem>
+  <CheckboxGroupItem value="sms">Text message</CheckboxGroupItem>
+</CheckboxGroup>;
+```
+
+The group's `description` and error sit between its label and the options,
+so "Select all that apply" and what went wrong are read before the list.
+Keep the description short: screen readers repeat it on every option.
+
+Don't also wrap the group in a [Field](/docs/components/field) `FieldSet`
+with a legend: the group is already named by its `label`, and a legend would
+name it twice. Past about 15 options, a list is easier to scan as a
+[Select](/docs/components/select) with `selectionMode="multiple"`. An option that excludes the rest, such as
+"None", goes last.
+
+## Examples
+
+### Horizontal
+
+`orientation="horizontal"` lays the options out in a row, which wraps on a
+narrow screen. Keep it for two or three short options; a vertical list is
+easier to scan.
+
+<ComponentPreview name="checkbox-group-horizontal">
+  <CheckboxGroupHorizontal />
+</ComponentPreview>
+
+### Cards
+
+`variant="card"` makes each option a card, with its `description` under the
+title; anywhere on a card toggles it.
+
+<ComponentPreview name="checkbox-group-card">
+  <CheckboxGroupCard />
+</ComponentPreview>
+
+### Select all
+
+A select-all checkbox is a [Checkbox](/docs/components/checkbox) outside the
+group that follows its value: `isIndeterminate` while only some options are
+checked, checking all or none when pressed.
+
+<ComponentPreview name="checkbox-group-select-all">
+  <CheckboxGroupSelectAll />
+</ComponentPreview>
+
+### Validation
+
+`isRequired` goes on the group, not each option: React Aria then requires an
+option only while none is checked. Its error defaults to "Select at least one
+option." (`requiredLabel`), where the browser's own message speaks of a
+single box. `validate` checks other rules, such as a minimum count.
+
+<ComponentPreview name="checkbox-group-validation">
+  <CheckboxGroupValidation />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria renders a `group` named by `label`, with a native checkbox for
+each option inside a `<label>`, so an option's label is its name and its
+click target.
+
+- **Keys:** Tab moves through the options and Space toggles the focused one.
+- **Description and errors:** the group's `description` and error describe
+  the group and each of its options; an option's own `description` describes
+  that option alone. The error shows only while the group is invalid, and a
+  form's submit focuses the first option when it is.
+- **Required:** the asterisk after a required group's label is hidden from
+  screen readers, which hear each option's required state until one is
+  checked.
+- **Cards:** the option's label stretches over its card, so the name stays
+  the title, and the card shows focus. A link or button in a card's
+  description sits above the label, so it stays clickable.
+- **Target size:** each box's hit area grows to 44px, and options sit far
+  enough apart that a box's area never covers a neighbor. Set
+  `targetSize={false}` for tighter options.
+
+## API
+
+### CheckboxGroup
+
+Renders React Aria's [`CheckboxGroup`](https://react-aria.adobe.com/CheckboxGroup#api).
+Children are its options.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/checkbox-group.tsx"
+  name="CheckboxGroupProps"
+/>
+
+Also accepts React Aria `CheckboxGroup` props.
+
+#### Data attributes
+
+| Attribute          | Present when                       |
+| ------------------ | ---------------------------------- |
+| `data-slot`        | Always `checkbox-group`            |
+| `data-variant`     | Always; `default` or `card`        |
+| `data-orientation` | Always; `vertical` or `horizontal` |
+| `data-invalid`     | It's invalid                       |
+| `data-disabled`    | It's disabled                      |
+| `data-readonly`    | It's read-only                     |
+| `data-required`    | It's required                      |
+
+### CheckboxGroupItem
+
+Renders React Aria's `CheckboxField`, with its label in a `CheckboxButton`.
+Children are the label.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/checkbox-group.tsx"
+  name="CheckboxGroupItemProps"
+/>
+
+Also accepts React Aria `CheckboxField` props, including `value` and
+`isIndeterminate`.
+
+#### Data attributes
+
+| Attribute       | Present when                                                                                                         |
+| --------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `data-slot`     | Always: `checkbox-group-item-field` on the root, `checkbox-group-item` on the label, `checkbox-indicator` on the box |
+| `data-selected` | It's checked                                                                                                         |
+| `data-disabled` | It's disabled                                                                                                        |
+| `data-invalid`  | Its group is invalid                                                                                                 |

@@ -132,6 +132,7 @@ const arbitraryValues: Record<string, string[]> = {
     neutralHover('btn'),
     ...disabledGray,
   ],
+  'src/components/ui/inputs/checkbox-group.tsx': selectionStates,
   'src/components/ui/inputs/checkbox.tsx': selectionStates,
   'src/components/ui/inputs/list-box.tsx': scrollsInPopover,
   'src/components/ui/inputs/number-field.tsx': disabledGray,
