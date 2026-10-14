@@ -81,6 +81,11 @@ export default defineConfig({
       },
     },
     {
+      // A config grows by one entry per thing it configures.
+      files: ['**/*.config.{js,mjs,ts}'],
+      rules: { 'max-lines': 'off' },
+    },
+    {
       files: [
         '**/*.stories.*',
         '**/*.test.*',
