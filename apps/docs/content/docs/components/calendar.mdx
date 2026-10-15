@@ -138,8 +138,10 @@ Pick a weekend day to see it.
 
 ### Custom days
 
-`renderCell` draws a day's contents. Screen readers hear only the date, so
-anything it adds, such as a price or a dot, needs another way to reach them.
+`renderCell` draws a day's contents. It replaces the today dot, so mark today
+from `isToday` (this demo bolds it) or with `data-today` on the cell. Screen
+readers hear only the date, so anything it adds, such as a price or a dot,
+needs another way to reach them.
 
 <ComponentPreview name="calendar-custom-days">
   <ClientOnly fallback={<div className="h-72 any-pointer-coarse:h-84" />}>

@@ -95,7 +95,8 @@ export function CalendarCell({
               {typeof children === 'function'
                 ? children({ ...values, defaultChildren: values.formattedDate })
                 : (children ?? values.formattedDate)}
-              {values.isToday ? <TodayMark /> : null}
+              {/* Custom contents own the whole day, so they mark today themselves. */}
+              {children === undefined && values.isToday ? <TodayMark /> : null}
             </span>
           </>
         );

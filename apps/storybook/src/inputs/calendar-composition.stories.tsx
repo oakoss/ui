@@ -160,20 +160,27 @@ export const RangeDialogClose: Story = {
   ),
 };
 
-// renderCell draws a day's contents; React Aria still names the day by its
-// date, and today keeps its mark.
+// renderCell draws a day's contents in place of the today dot, and marks
+// today itself from isToday; React Aria still names the day by its date.
 export const RenderCell: Story = {
   args: {
-    renderCell: ({ formattedDate }) => (
-      <span data-testid="price">{formattedDate}*</span>
+    renderCell: ({ formattedDate, isToday }) => (
+      <span data-testid="price">
+        {formattedDate}
+        {isToday ? '!' : '*'}
+      </span>
     ),
   },
   play: async ({ canvasElement }) => {
     const day = within(canvasElement).getByRole('button', {
       name: /Today, Thursday, January 15, 2026/u,
     });
-    await expect(within(day).getByTestId('price')).toHaveTextContent('15*');
-    await expect(day.querySelector('[data-slot=calendar-today]')).toBeVisible();
+    await expect(within(day).getByTestId('price')).toHaveTextContent('15!');
+    await expect(day.querySelector('[data-slot=calendar-today]')).toBeNull();
+    const other = within(canvasElement).getByRole('button', {
+      name: /January 16, 2026/u,
+    });
+    await expect(within(other).getByTestId('price')).toHaveTextContent('16*');
   },
 };
 
