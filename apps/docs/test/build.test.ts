@@ -201,6 +201,15 @@ describe('props and search output', () => {
     expect(read(file)).not.toContain('`onBlur');
   });
 
+  // ClientOnly is the docs site's, so the Markdown shows the demo alone.
+  it.each(['docs/components/calendar.md', 'llms-full.txt'])(
+    'leaves the docs-only ClientOnly out of %s',
+    (file) => {
+      expect(read(file)).toContain('<CalendarDemo />');
+      expect(read(file)).not.toContain('ClientOnly');
+    },
+  );
+
   it('indexes the install steps for search', () => {
     expect(read('api/search')).toContain('Copy each file into your project');
     // Search records keep link text, not link syntax.

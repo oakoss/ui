@@ -5,7 +5,9 @@ item: calendar
 reactAria: https://react-aria.adobe.com/Calendar
 ---
 
+import { ClientOnly } from '#/components/client-only';
 import { CalendarCustomDays } from '#/components/demos/calendar-custom-days';
+import { CalendarCustomLayout } from '#/components/demos/calendar-custom-layout';
 import { CalendarDemo } from '#/components/demos/calendar-demo';
 import { CalendarMaxRange } from '#/components/demos/calendar-max-range';
 import { CalendarMonthYear } from '#/components/demos/calendar-month-year';
@@ -15,7 +17,9 @@ import { CalendarUnavailable } from '#/components/demos/calendar-unavailable';
 import { CalendarValidation } from '#/components/demos/calendar-validation';
 
 <ComponentPreview name="calendar-demo">
-  <CalendarDemo />
+  <ClientOnly fallback={<div className="h-72 any-pointer-coarse:h-84" />}>
+    <CalendarDemo />
+  </ClientOnly>
 </ComponentPreview>
 
 ## Installation
@@ -49,7 +53,16 @@ side by side, wrapping when there's no room; the steppers sit at the outer
 edges, and days a neighboring month repeats are hidden.
 
 <ComponentPreview name="calendar-range">
-  <CalendarRange />
+  <ClientOnly
+    fallback={
+      <div className="flex flex-wrap gap-6">
+        <div className="h-72 w-63 any-pointer-coarse:h-84 any-pointer-coarse:w-77" />
+        <div className="h-72 w-63 any-pointer-coarse:h-84 any-pointer-coarse:w-77" />
+      </div>
+    }
+  >
+    <CalendarRange />
+  </ClientOnly>
 </ComponentPreview>
 
 ### Month and year dropdowns
@@ -60,7 +73,9 @@ however many months show. `visibleYears` sets how many years the list holds,
 within `minValue` and `maxValue`.
 
 <ComponentPreview name="calendar-month-year">
-  <CalendarMonthYear />
+  <ClientOnly fallback={<div className="h-72 any-pointer-coarse:h-84" />}>
+    <CalendarMonthYear />
+  </ClientOnly>
 </ComponentPreview>
 
 ### Unavailable dates
@@ -70,7 +85,18 @@ an unavailable date only as dimmed, not why, so say the rule in text the
 calendar points to with `aria-describedby`.
 
 <ComponentPreview name="calendar-unavailable">
-  <CalendarUnavailable />
+  <ClientOnly
+    fallback={
+      <div className="not-prose flex flex-col gap-2">
+        <p className="text-sm text-muted-foreground">
+          Weekends and public holidays are unavailable.
+        </p>
+        <div className="h-72 any-pointer-coarse:h-84" />
+      </div>
+    }
+  >
+    <CalendarUnavailable />
+  </ClientOnly>
 </ComponentPreview>
 
 ### Presets
@@ -82,7 +108,9 @@ keep their own names and handlers, and one with `slot="close"` closes the
 popover or dialog around the calendar.
 
 <ComponentPreview name="calendar-presets">
-  <CalendarPresets />
+  <ClientOnly fallback={<div className="h-83 any-pointer-coarse:h-95" />}>
+    <CalendarPresets />
+  </ClientOnly>
 </ComponentPreview>
 
 ### Maximum range length
@@ -92,7 +120,9 @@ While the user picks the end of a range, React Aria passes the start to
 skipped.
 
 <ComponentPreview name="calendar-max-range">
-  <CalendarMaxRange />
+  <ClientOnly fallback={<div className="h-72 any-pointer-coarse:h-84" />}>
+    <CalendarMaxRange />
+  </ClientOnly>
 </ComponentPreview>
 
 ### Validation
@@ -101,7 +131,9 @@ skipped.
 Pick a weekend day to see it.
 
 <ComponentPreview name="calendar-validation">
-  <CalendarValidation />
+  <ClientOnly fallback={<div className="h-72 any-pointer-coarse:h-84" />}>
+    <CalendarValidation />
+  </ClientOnly>
 </ComponentPreview>
 
 ### Custom days
@@ -110,11 +142,25 @@ Pick a weekend day to see it.
 anything it adds, such as a price or a dot, needs another way to reach them.
 
 <ComponentPreview name="calendar-custom-days">
-  <CalendarCustomDays />
+  <ClientOnly fallback={<div className="h-72 any-pointer-coarse:h-84" />}>
+    <CalendarCustomDays />
+  </ClientOnly>
 </ComponentPreview>
 
 `isLoading` fades the months behind a spinner named by `loadingLabel`
 ("Loading"), for availability fetched as the user changes month.
+
+### Custom layout
+
+Children replace the layout, built from `CalendarHeader` (the steppers around
+a heading), `CalendarHeading` and `CalendarGrid`; pass `offset` to a heading
+and grid for each further month. This one adds a Today button below the grid.
+
+<ComponentPreview name="calendar-custom-layout">
+  <ClientOnly fallback={<div className="h-84 any-pointer-coarse:h-96" />}>
+    <CalendarCustomLayout />
+  </ClientOnly>
+</ComponentPreview>
 
 ## Accessibility
 
@@ -146,9 +192,10 @@ takes Mark, and the range keeps a border.
 
 The arrow keys follow the reading direction in right-to-left locales.
 
-Today comes from the browser's time zone. A page rendered on a server in
-another zone can mark a different day until it hydrates, so render calendars
-on the client, or pass `ZonedDateTime` values.
+Today and the month shown first come from the visitor's clock and time zone.
+A page rendered on the server, or prerendered on an earlier day, disagrees with
+the browser, and React reports a hydration error, so render calendars on the
+client only, as this page does.
 
 ## API
 

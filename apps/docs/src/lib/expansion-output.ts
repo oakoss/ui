@@ -7,6 +7,8 @@ import { toMarkdown } from 'mdast-util-to-markdown';
 
 import { manualSources } from './manual-sources';
 
+const clientOnly = 'ClientOnly';
+
 export type File = Parameters<typeof replaceSource>[0];
 
 // The mdast shapes the docs' remark plugins read and build.
@@ -68,13 +70,17 @@ function withLinkText(node: Node): Node {
   };
 }
 
-// The output links the manual-install files instead of inlining them.
+// The output links the manual-install files instead of inlining them, and
+// shows a demo without the docs site's ClientOnly around it.
 function withoutManualSources(node: Node): Node {
   if (!node.children) return node;
   return {
     ...node,
     children: node.children
       .filter((child) => child.name !== manualSources)
+      .flatMap((child) =>
+        child.name === clientOnly ? (child.children ?? []) : [child],
+      )
       .map((child) => withoutManualSources(child)),
   };
 }
