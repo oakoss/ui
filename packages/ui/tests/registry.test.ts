@@ -232,7 +232,7 @@ function isVariant([key]: [string, unknown]) {
   return key.startsWith('@custom-variant ');
 }
 
-// An item's CSS as shadcn 4.21.4 writes it: variants on top, the rest @theme.
+// An item's CSS as shadcn 4.21.4 writes it: variants on top, the rest @theme inline.
 function themeBlock(item: (typeof ui.items)[number]): string {
   const theme = ('cssVars' in item ? item.cssVars?.theme : undefined) ?? {};
   const variables = Object.entries(theme)
@@ -244,7 +244,7 @@ function themeBlock(item: (typeof ui.items)[number]): string {
   const block =
     variables === '' && themed.length === 0
       ? ''
-      : `@theme{${variables}${stylesheet(Object.fromEntries(themed))}}`;
+      : `@theme inline{${variables}${stylesheet(Object.fromEntries(themed))}}`;
   return `${variants.map(([key]) => `${key};`).join('')}${block}`;
 }
 

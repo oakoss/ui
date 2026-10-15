@@ -4,7 +4,7 @@ type CssItem = {
 };
 
 // An item's CSS as shadcn writes it into a stylesheet: custom variants at the
-// top level, theme variables and other rules such as keyframes in @theme.
+// top level, theme variables and rules such as keyframes in @theme inline.
 export function itemCss(item: CssItem): string {
   const rules = Object.entries(item.css ?? {});
   const variants = rules
@@ -19,7 +19,9 @@ export function itemCss(item: CssItem): string {
       .map(([key, value]) => cssRule(key, value)),
   ];
   const block =
-    themed.length === 0 ? [] : [`@theme {\n${indent(themed.join('\n'))}\n}`];
+    themed.length === 0
+      ? []
+      : [`@theme inline {\n${indent(themed.join('\n'))}\n}`];
   return [...variants, ...block].join('\n\n');
 }
 
