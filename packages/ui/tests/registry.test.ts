@@ -19,7 +19,7 @@ test('registryDependencies point at items in this repo', () => {
   expect(deps.filter((dep) => !addresses.has(dep))).toEqual([]);
 });
 
-// Items ported from shadcn's React Aria base; add each new port here.
+// Items ported from shadcn; add each new port here.
 const forked = [
   'accordion',
   'alert',
@@ -58,12 +58,20 @@ const forked = [
   'slider',
   'spinner',
   'switch',
+  'table',
   'tabs',
   'textarea',
   'toggle',
   'toggle-group',
   'tooltip',
 ];
+
+// The base each port came from: React Aria's, except Table, a plain HTML
+// table from the Radix base (docs/research/0002).
+const bases: Record<string, string> = {
+  ...Object.fromEntries(forked.map((name) => [name, 'aria'])),
+  table: 'radix',
+};
 const upstreams = new Map(
   ui.items.map((item) => [item.name, item.meta?.upstream]),
 );
@@ -78,12 +86,12 @@ test('every item naming an upstream is listed as forked', () => {
 });
 
 // Diffing upstream between this commit and a newer one finds fixes to port.
-test.each(forked)(
+test.each(forked.map((name) => [name, bases[name]]))(
   '%s names the upstream commit and file it came from',
-  (name) => {
+  (name, base) => {
     expect(upstreams.get(name)).toMatch(
       new RegExp(
-        String.raw`^shadcn-ui/ui@[\da-f]{7,40}:apps/v4/registry/bases/aria/ui/${name}\.tsx$`,
+        String.raw`^shadcn-ui/ui@[\da-f]{7,40}:apps/v4/registry/bases/${base}/ui/${name}\.tsx$`,
         'u',
       ),
     );

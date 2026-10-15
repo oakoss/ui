@@ -199,6 +199,14 @@ Settled in `ui-lwb.4` (2026-10-03), after surveying 16 libraries' text fields fr
 ## Verified since
 
 - **Fumadocs' dark mode switches our components' colors.** Both use a `.dark` class on `<html>`; `apps/docs/e2e/overlays.spec.ts` checks a dialog's background against `--color-popover` in each scheme, and that the two differ (2026-10-06).
+- **Table forks shadcn's Radix base, a plain HTML table, not the React Aria one.** A spike on React Aria's Table with TanStack Table (2026-10-14, react-aria-components 1.22.1) found:
+  - its column headers cycle ascending and descending but never clear, and drop Shift, since `onSortChange` gets no event, so multi-sort needed a button of our own;
+  - Space didn't activate a button inside a column header, though one in a plain `<th>` worked;
+  - under Virtualizer it renders `div`s, and a sticky first column scrolled away;
+  - a nested `Column` throws, so there are no header groups.
+
+  TanStack Table drives the data features on plain table parts instead (the data-table item); `registry.test.ts` lists Table as Radix-based (2026-10-15).
+
 - **Overlays take the theme from `<html>`.** React Aria portals them to `<body>`; the same e2e test shows a dialog following the class on `<html>`. Previews have no theme of their own today, so a theme set on a preview wrapper is untested; it shouldn't reach a portaled overlay (inferred), so a theme switcher (`ui-dqp.11`) should set its attributes on `<html>`, as Storybook does.
 
 ## Sources
