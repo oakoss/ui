@@ -220,6 +220,42 @@ export const RightToLeft: Story = {
   },
 };
 
+async function listRight(canvas: { getByRole: typeof screen.getByRole }) {
+  await userEvent.click(trigger(canvas));
+  const list = await screen.findByRole('listbox');
+  const popover = list.closest<HTMLElement>('[data-slot=select-content]');
+  if (!popover) throw new Error('No popover');
+  for (const animation of popover.getAnimations()) animation.finish();
+  return popover.getBoundingClientRect().right;
+}
+
+// A full-width trigger's list stays inside React Aria's 12px viewport padding
+// rather than widening the page.
+export const FullWidthList: Story = {
+  play: async ({ canvas }) => {
+    const viewport = document.documentElement.clientWidth;
+    await expect(trigger(canvas).getBoundingClientRect().width).toBe(viewport);
+    await expect(await listRight(canvas)).toBeLessThanOrEqual(viewport - 12);
+  },
+};
+
+// A long option widens the list up to the same padding, then wraps.
+export const LongOptionList: Story = {
+  args: {
+    children: (
+      <SelectItem id="long">
+        {'A long option that keeps going well past the trigger. '.repeat(8)}
+      </SelectItem>
+    ),
+    className: 'w-48',
+  },
+  play: async ({ canvas }) => {
+    await expect(await listRight(canvas)).toBeLessThanOrEqual(
+      document.documentElement.clientWidth - 12,
+    );
+  },
+};
+
 // The focused option takes the system's selection colors in forced colors.
 export const ForcedColors: Story = {
   play: async ({ canvas }) => {
