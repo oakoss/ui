@@ -58,6 +58,31 @@ export const BlankLabel: Story = {
   },
 };
 
+// A blank aria-labelledby isn't a name either.
+export const BlankLabelledby: Story = {
+  args: { 'aria-labelledby': ' ' },
+  play: BlankLabel.play,
+};
+
+// An untyped caller's non-string label names nothing instead of throwing.
+export const NonStringLabel: Story = {
+  play: BlankLabel.play,
+  render: (args) => (
+    <InvoiceTable {...args} {...Object.fromEntries([['aria-label', 5]])} />
+  ),
+};
+
+// The same holds for aria-labelledby.
+export const NonStringLabelledby: Story = {
+  play: BlankLabel.play,
+  render: (args) => (
+    <InvoiceTable
+      {...args}
+      {...Object.fromEntries([['aria-labelledby', ['caption']]])}
+    />
+  ),
+};
+
 // A blank caption names nothing, so the table scrolls without a region.
 export const BlankCaption: Story = {
   args: { caption: ' ' },

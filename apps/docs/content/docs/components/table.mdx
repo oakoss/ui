@@ -6,6 +6,7 @@ item: table
 
 import { TableDemo } from '#/components/demos/table-demo';
 import { TableEmpty } from '#/components/demos/table-empty';
+import { TableLinked } from '#/components/demos/table-linked';
 import { TableSelected } from '#/components/demos/table-selected';
 import { TableSticky } from '#/components/demos/table-sticky';
 import { TableStriped } from '#/components/demos/table-striped';
@@ -64,8 +65,8 @@ rows, the next rows' first cells sit in the second column, so set
 `isSticky={false}` on them. Give the container a height
 with `containerClassName` for the header to stick to. A shadow marks each
 edge once content has scrolled beneath it. Sticky cells paint `--table-bg`,
-so on a surface other than the page, set it to match:
-`containerClassName="[--table-bg:var(--color-card)]"`.
+the page color by default, so on another surface set it once on that surface,
+such as a Card with `className="[--table-bg:var(--color-card)]"`.
 
 <ComponentPreview name="table-sticky">
   <TableSticky />
@@ -84,10 +85,27 @@ row to help the eye follow a long row.
 
 `aria-selected` on a row tints it. Pair it with a control that says what's
 selected, such as a checkbox, since screen readers don't announce selection
-on a plain table's rows.
+on a plain table's rows. `interactive` adds a hover tint, for rows that act
+when clicked; a read-only table leaves it off so its rows don't look
+clickable.
 
 <ComponentPreview name="table-selected">
   <TableSelected />
+</ComponentPreview>
+
+### Linked rows
+
+`aria-current="true"` on a row or a cell marks the one a link points to, such
+as `?invoice=INV014` in the URL, with a warm tint over any other. Mark one at a
+time, and only for a link: selection stays `aria-selected`. Once the row has
+rendered, scroll it in with `scrollIntoView({ block: 'center' })`, which keeps
+the table's header in view too. The container pads scrolling by the sticky
+header and first column, so the row lands clear of them. Then move focus to
+its row header (`tabIndex={-1}` and `focus({ preventScroll: true })`), so a
+screen reader reads the linked row rather than starting at the top of the page.
+
+<ComponentPreview name="table-linked">
+  <TableLinked />
 </ComponentPreview>
 
 ### Empty state
@@ -127,9 +145,10 @@ also becomes a region named like the table, so screen readers announce what
 the focused area holds; a table that fits is neither a tab stop nor a
 landmark. Its focus ring sits inside its edge. React Aria adds no keys.
 
-`align="end"` aligns numbers to the end of the reading direction with digits
-of equal width. In Windows High Contrast the row tints give way to the system
-colors: a selected row takes the selection colors, and lines between rows
+Digits have equal width throughout, so numbers line up, and `align="end"`
+aligns a column to the end of the reading direction. In Windows High Contrast
+the row tints give way to the system colors: a selected row takes the
+selection colors, a linked row or cell the mark colors, and lines between rows
 stay.
 
 ## API
@@ -150,17 +169,15 @@ Also accepts `table` props. `className` styles the table and
 
 #### Data attributes
 
-| Attribute         | Present when                                            |
-| ----------------- | ------------------------------------------------------- |
-| `data-slot`       | Always: `table`, and `table-container` on the container |
-| `data-scrolled-x` | On the container, once scrolled from the start          |
-| `data-scrolled-y` | On the container, once scrolled down                    |
+| Attribute   | Present when                                            |
+| ----------- | ------------------------------------------------------- |
+| `data-slot` | Always: `table`, and `table-container` on the container |
 
 #### CSS variables
 
-| Variable     | Sets                                                                    |
-| ------------ | ----------------------------------------------------------------------- |
-| `--table-bg` | The surface sticky cells paint, on the container; the page's by default |
+| Variable     | Sets                                                                                     |
+| ------------ | ---------------------------------------------------------------------------------------- |
+| `--table-bg` | The surface sticky cells paint, set on any ancestor; the page color when nothing sets it |
 
 ### TableHead and TableCell
 
@@ -186,7 +203,8 @@ the header and `row` elsewhere.
 ### TableHeader, TableBody, TableFooter, TableRow and TableCaption
 
 A `thead`, `tbody`, `tfoot`, `tr` and `caption`, accepting their elements'
-props. Set `aria-selected` on a `TableRow` to mark it selected.
+props. Set `aria-selected` on a `TableRow` to mark it selected, and
+`aria-current` on a `TableRow`, `TableHead` or `TableCell` to mark it linked.
 
 #### Data attributes
 

@@ -5,7 +5,6 @@ import {
   use,
   useId,
   useMemo,
-  useRef,
 } from 'react';
 import { tv } from 'tailwind-variants/lite';
 
@@ -24,40 +23,45 @@ export type TableHeadProps = {
   scope?: 'col' | 'colgroup' | 'row' | 'rowgroup';
 } & Omit<ComponentProps<'th'>, 'align' | 'scope'>;
 
-export type TableProps = {
-  containerClassName?: string;
+export type TableOptions = {
+  interactive?: boolean;
   size?: 'md' | 'sm';
   stickyColumn?: boolean;
   stickyHeader?: boolean;
   striped?: boolean;
-} & ComponentProps<'table'>;
+};
+
+export type TableProps = {
+  containerClassName?: string;
+} & ComponentProps<'table'> &
+  TableOptions;
 
 type Align = 'center' | 'end' | 'start';
 
-const TableContext = createContext<
-  Required<
-    Pick<TableProps, 'size' | 'stickyColumn' | 'stickyHeader' | 'striped'>
-  >
->({ size: 'md', stickyColumn: false, stickyHeader: false, striped: false });
+const TableContext = createContext<Required<TableOptions>>({
+  interactive: false,
+  size: 'md',
+  stickyColumn: false,
+  stickyHeader: false,
+  striped: false,
+});
 const SectionContext = createContext<'body' | 'footer' | 'header'>('body');
 // Per Table, so a nested table's shadows follow its own scrolling.
 const ScrollContext = createContext({ isPastStart: false, isPastTop: false });
 
+// A linked cell (aria-current) wins over every row tint, selection included.
+// Its focus ring has no resting outline, which forced colors would paint.
 const cellStyles = tv({
-  base: 'border-b border-border align-middle whitespace-nowrap',
+  base: 'border-b border-border align-middle whitespace-nowrap focus-visible:outline-(length:--ring-width) focus-visible:-outline-offset-2 focus-visible:outline-ring focus-visible:outline-solid linked:from-warning-subtle! linked:to-warning-subtle! forced-colors:linked:bg-[Mark]! forced-colors:linked:bg-none forced-colors:linked:text-[MarkText]! forced-colors:linked:forced-color-adjust-none',
   variants: {
-    align: {
-      center: 'text-center',
-      end: 'text-end tabular-nums',
-      start: 'text-start',
-    },
+    align: { center: 'text-center', end: 'text-end', start: 'text-start' },
     isPastStart: { false: 'first:before:opacity-0', true: '' },
     size: { md: 'p-2', sm: 'px-2 py-1' },
     // A sticky cell paints the table's surface under its row's tint, so
     // content scrolls out of sight beneath it.
     stickyColumn: {
       false: '',
-      true: 'first:sticky first:start-0 first:z-1 first:bg-(--table-bg) first:before:pointer-events-none first:before:absolute first:before:inset-y-0 first:before:-end-2 first:before:w-2 first:before:bg-linear-to-r first:before:from-black/10 first:before:transition-opacity rtl:first:before:bg-linear-to-l dark:first:before:from-black/40 forced-colors:first:border-e',
+      true: 'first:sticky first:start-0 first:z-1 first:bg-[var(--table-bg,var(--color-background))] first:before:pointer-events-none first:before:absolute first:before:inset-y-0 first:before:-end-2 first:before:w-2 first:before:bg-linear-to-r first:before:from-black/10 first:before:transition-opacity rtl:first:before:bg-linear-to-l dark:first:before:from-black/40 forced-colors:first:border-e',
     },
   },
 });
@@ -65,16 +69,22 @@ const cellStyles = tv({
 // Tints paint on the cells, over a sticky cell's surface too; each state
 // excludes the others so none depends on CSS order.
 const rowStyles = tv({
-  base: '*:bg-linear-to-b *:from-transparent *:to-transparent forced-colors:aria-selected:*:bg-[Highlight] forced-colors:aria-selected:*:bg-none forced-colors:aria-selected:*:text-[HighlightText] forced-colors:aria-selected:*:forced-color-adjust-none',
+  base: '*:bg-linear-to-b *:from-transparent *:to-transparent forced-colors:aria-selected:*:bg-[Highlight] forced-colors:aria-selected:*:bg-none forced-colors:aria-selected:*:text-[HighlightText] forced-colors:aria-selected:*:forced-color-adjust-none linked:*:from-warning-subtle! linked:*:to-warning-subtle! forced-colors:linked:*:bg-[Mark]! forced-colors:linked:*:bg-none forced-colors:linked:*:text-[MarkText]! forced-colors:linked:*:forced-color-adjust-none',
   variants: {
-    section: {
-      body: 'hover:not-aria-selected:*:from-muted hover:not-aria-selected:*:to-muted aria-selected:not-hover:*:from-primary/10 aria-selected:not-hover:*:to-primary/10 aria-selected:hover:*:from-primary/15 aria-selected:hover:*:to-primary/15',
-      footer: '*:from-muted/50 *:to-muted/50',
-      header: '',
+    body: {
+      false: '',
+      interactive:
+        'hover:not-aria-selected:*:from-muted hover:not-aria-selected:*:to-muted aria-selected:not-hover:*:from-primary/10 aria-selected:not-hover:*:to-primary/10 aria-selected:hover:*:from-primary/15 aria-selected:hover:*:to-primary/15 dark:aria-selected:not-hover:*:from-primary/20 dark:aria-selected:not-hover:*:to-primary/20 dark:aria-selected:hover:*:from-primary/25 dark:aria-selected:hover:*:to-primary/25',
+      still:
+        'aria-selected:*:from-primary/10 aria-selected:*:to-primary/10 dark:aria-selected:*:from-primary/20 dark:aria-selected:*:to-primary/20',
     },
+    section: { body: '', footer: '*:from-muted/50 *:to-muted/50', header: '' },
     striped: {
       false: '',
-      true: 'even:not-hover:not-aria-selected:*:from-muted/50 even:not-hover:not-aria-selected:*:to-muted/50',
+      interactive:
+        'even:not-hover:not-aria-selected:*:from-muted/50 even:not-hover:not-aria-selected:*:to-muted/50',
+      still:
+        'even:not-aria-selected:*:from-muted/50 even:not-aria-selected:*:to-muted/50',
     },
   },
 });
@@ -85,7 +95,7 @@ const headerStyles = tv({
     isPastTop: { false: '*:*:after:opacity-0', true: '' },
     stickyHeader: {
       false: '',
-      true: 'sticky top-0 z-2 *:*:relative *:*:bg-(--table-bg) *:*:after:pointer-events-none *:*:after:absolute *:*:after:inset-x-0 *:*:after:-bottom-2 *:*:after:h-2 *:*:after:bg-linear-to-b *:*:after:from-black/10 *:*:after:transition-opacity dark:*:*:after:from-black/40',
+      true: 'sticky top-0 z-2 *:*:relative *:*:bg-[var(--table-bg,var(--color-background))] *:*:after:pointer-events-none *:*:after:absolute *:*:after:inset-x-0 *:*:after:-bottom-2 *:*:after:h-2 *:*:after:bg-linear-to-b *:*:after:from-black/10 *:*:after:transition-opacity dark:*:*:after:from-black/40',
     },
   },
 });
@@ -94,6 +104,7 @@ export function Table({
   children,
   className,
   containerClassName,
+  interactive = false,
   size = 'md',
   stickyColumn = false,
   stickyHeader = false,
@@ -101,31 +112,24 @@ export function Table({
   ...props
 }: TableProps) {
   const context = useMemo(
-    () => ({ size, stickyColumn, stickyHeader, striped }),
-    [size, stickyColumn, stickyHeader, striped],
+    () => ({ interactive, size, stickyColumn, stickyHeader, striped }),
+    [interactive, size, stickyColumn, stickyHeader, striped],
   );
   return (
-    <TableContainer
-      containerClassName={containerClassName}
-      name={{
-        'aria-label': props['aria-label'],
-        'aria-labelledby': props['aria-labelledby'],
-        findLabel: findCaption,
-      }}
-    >
-      <table
-        className={cn(
-          'w-full caption-bottom border-separate border-spacing-0 text-sm',
-          className,
-        )}
-        data-slot="table"
-        {...props}
-      >
-        <TableContext value={context}>
+    <TableContext value={context}>
+      <TableContainer containerClassName={containerClassName} label={props}>
+        <table
+          className={cn(
+            'w-full caption-bottom border-separate border-spacing-0 text-sm tabular-nums',
+            className,
+          )}
+          data-slot="table"
+          {...props}
+        >
           <SectionContext value="body">{children}</SectionContext>
-        </TableContext>
-      </table>
-    </TableContainer>
+        </table>
+      </TableContainer>
+    </TableContext>
   );
 }
 
@@ -226,12 +230,13 @@ export function TableHeader({ className, ...props }: ComponentProps<'thead'>) {
 }
 
 export function TableRow({ className, ...props }: ComponentProps<'tr'>) {
-  const { striped } = use(TableContext);
+  const { interactive, striped } = use(TableContext);
   const section = use(SectionContext);
+  const body = section === 'body' && (interactive ? 'interactive' : 'still');
   return (
     <tr
       className={cn(
-        rowStyles({ section, striped: section === 'body' && striped }),
+        rowStyles({ body, section, striped: striped && body }),
         className,
       )}
       data-slot="table-row"
@@ -240,35 +245,34 @@ export function TableRow({ className, ...props }: ComponentProps<'tr'>) {
   );
 }
 
-// A caption names the scroll region only while it renders text.
-function findCaption(container: HTMLElement) {
-  return container.querySelector(':scope > table > caption');
-}
-
 function TableContainer({
   children,
   containerClassName,
-  name,
+  label,
 }: {
   children: ReactNode;
   containerClassName: string | undefined;
-  name: Parameters<typeof useScrollRegion>[1];
+  label: Pick<ComponentProps<'table'>, 'aria-label' | 'aria-labelledby'>;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const { onScroll, regionProps, scrolled } = useScrollRegion(ref, name);
+  const { stickyColumn, stickyHeader } = use(TableContext);
+  const { props, scrolled } = useScrollRegion<HTMLDivElement>({
+    'aria-label': label['aria-label'],
+    'aria-labelledby': label['aria-labelledby'],
+    labelSelector: ':scope > table > caption',
+    stickyStart: stickyColumn
+      ? ':scope > table > tbody > tr > :first-child'
+      : undefined,
+    stickyTop: stickyHeader ? ':scope > table > thead' : undefined,
+  });
   return (
     <div
       className={cn(
         focusRing,
-        'relative w-full overflow-auto [--table-bg:var(--color-background)] focus-visible:-outline-offset-3',
+        'relative w-full overflow-auto focus-visible:-outline-offset-3',
         containerClassName,
       )}
-      data-scrolled-x={scrolled.isPastStart || undefined}
-      data-scrolled-y={scrolled.isPastTop || undefined}
       data-slot="table-container"
-      onScroll={onScroll}
-      ref={ref}
-      {...regionProps}
+      {...props}
     >
       <ScrollContext value={scrolled}>{children}</ScrollContext>
     </div>

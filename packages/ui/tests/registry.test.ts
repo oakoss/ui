@@ -228,14 +228,24 @@ const styled = ui.items.filter(
   (item) => item.type === 'registry:ui' && ('css' in item || 'cssVars' in item),
 );
 
-// An item's theme variables and CSS as the @theme block shadcn writes them
-// into.
+function isVariant([key]: [string, unknown]) {
+  return key.startsWith('@custom-variant ');
+}
+
+// An item's CSS as shadcn 4.21.4 writes it: variants on top, the rest @theme.
 function themeBlock(item: (typeof ui.items)[number]): string {
   const theme = ('cssVars' in item ? item.cssVars?.theme : undefined) ?? {};
   const variables = Object.entries(theme)
     .map(([key, value]) => `--${key}:${String(value)};`)
     .join('');
-  return `@theme{${variables}${stylesheet('css' in item ? item.css : {})}}`;
+  const rules = Object.entries('css' in item ? (item.css ?? {}) : {});
+  const variants = rules.filter((rule) => isVariant(rule));
+  const themed = rules.filter((rule) => !isVariant(rule));
+  const block =
+    variables === '' && themed.length === 0
+      ? ''
+      : `@theme{${variables}${stylesheet(Object.fromEntries(themed))}}`;
+  return `${variants.map(([key]) => `${key};`).join('')}${block}`;
 }
 
 // Storybook and the docs load the same CSS from src/styles/<item>.css.

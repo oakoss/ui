@@ -93,13 +93,18 @@ const arbitraryValues: Record<string, string[]> = {
   // Forced colors repaint a transparent border, so the default look takes
   // the page color to stay borderless.
   'src/components/ui/data/item.tsx': ['forced-colors:border-[Canvas]'],
-  // Sticky cells paint the table's surface, which a table on a card sets to
-  // the card's; forced colors repaint the tint, so a selected row takes
-  // Highlight.
+  // Sticky cells paint --table-bg, which any ancestor can set, or the page
+  // color. Forced colors repaint the tints, so a selected row takes
+  // Highlight and a linked row or cell takes Mark.
   'src/components/ui/data/table.tsx': [
-    '[--table-bg:var(--color-background)]',
+    'first:bg-[var(--table-bg,var(--color-background))]',
+    '*:*:bg-[var(--table-bg,var(--color-background))]',
     'forced-colors:aria-selected:*:bg-[Highlight]',
     'forced-colors:aria-selected:*:text-[HighlightText]',
+    'forced-colors:linked:bg-[Mark]!',
+    'forced-colors:linked:text-[MarkText]!',
+    'forced-colors:linked:*:bg-[Mark]!',
+    'forced-colors:linked:*:text-[MarkText]!',
   ],
   'src/components/ui/data/tag-group.tsx': [
     ...colorVariables('tag', ['background', 'foreground', 'secondary']),

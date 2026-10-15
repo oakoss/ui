@@ -15,10 +15,10 @@ import { contrast } from '#/helpers/color';
 import { paintedColor } from '#/helpers/paint';
 import { hoverReal } from '#/helpers/pointer';
 
-import { cellOf, InvoiceTable } from './table-demo';
+import { cellOf, gradientColor, InvoiceTable } from './table-demo';
 
 const meta = {
-  args: { selected: 'INV002' },
+  args: { interactive: true, selected: 'INV002' },
   component: InvoiceTable,
   title: 'Data/Table/States',
 } satisfies Meta<typeof InvoiceTable>;
@@ -27,22 +27,24 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-// The first color of a computed linear-gradient, the tint a row paints.
-function gradientColor(image: string) {
-  const start = image.indexOf('(') + 1;
-  let depth = 0;
-  for (let index = start; index < image.length; index += 1) {
-    if (image[index] === '(') depth += 1;
-    if (image[index] === ')') depth -= 1;
-    if (depth === 0 && /[ ,]/u.test(image[index] ?? '')) {
-      return image.slice(start, index);
-    }
+// A translucent tint as painted over the page, as an opaque rgb() color.
+function onPage(color: string) {
+  const context = document.createElement('canvas').getContext('2d');
+  if (!context) throw new Error('No canvas');
+  for (const fill of [getComputedStyle(document.body).backgroundColor, color]) {
+    context.fillStyle = fill;
+    context.fillRect(0, 0, 1, 1);
   }
-  return '';
+  const [red, green, blue] = context.getImageData(0, 0, 1, 1).data;
+  return `rgb(${red} ${green} ${blue})`;
 }
 
 function tint(id: string) {
   return getComputedStyle(cellOf(id, 1)).backgroundImage;
+}
+
+function tintColor(id: string) {
+  return gradientColor(tint(id));
 }
 
 // Hovering a row tints it; rows are plain elements, so the real mouse hovers.
@@ -76,6 +78,58 @@ export const Selected: Story = {
     await waitFor(() => expect(tint('INV002')).not.toBe(selected));
     for (const other of [selected, hovered, tint('INV003')]) {
       await expect(tint('INV002')).not.toBe(other);
+    }
+  },
+};
+
+// Rows that aren't interactive don't tint on hover, and a hovered stripe or
+// selected row keeps its tint.
+export const NotInteractive: Story = {
+  args: { interactive: false, striped: true },
+  play: async () => {
+    const resting = [tint('INV001'), tint('INV002'), tint('INV004')];
+    for (const id of ['INV001', 'INV002', 'INV004']) {
+      await hoverReal(cellOf(id, 1));
+      await waitFor(() => expect(cellOf(id, 1).matches(':hover')).toBe(true));
+    }
+    await expect([tint('INV001'), tint('INV002'), tint('INV004')]).toEqual(
+      resting,
+    );
+  },
+};
+
+// A table that isn't interactive still tints a selected row, apart from a
+// stripe.
+export const SelectedNotInteractive: Story = {
+  args: { interactive: false, selected: 'INV004', striped: true },
+  play: async () => {
+    const selected = onPage(tintColor('INV004'));
+    const stripe = onPage(tintColor('INV002'));
+    await expect(tintColor('INV004')).not.toBe(tintColor('INV001'));
+    await expect(contrast(selected, stripe)).toBeGreaterThan(1.04);
+  },
+};
+
+// Stripe, hover, selected and hovered-selected tints stay apart in both
+// themes; dark mode's primary/10 and /15 selection tints fell to 1.026.
+export const TintsDistinct: Story = {
+  args: { selected: 'INV004', striped: true },
+  play: async () => {
+    const color = tintColor;
+    const stripe = color('INV002');
+    const selected = color('INV004');
+    await hoverReal(cellOf('INV003', 1));
+    await waitFor(() => expect(color('INV003')).not.toBe(color('INV001')));
+    const hovered = color('INV003');
+    await hoverReal(cellOf('INV004', 1));
+    await waitFor(() => expect(color('INV004')).not.toBe(selected));
+    const hoveredSelected = color('INV004');
+    const tints = [stripe, hovered, selected, hoveredSelected];
+    const pairs = tints.flatMap((top, index) =>
+      tints.slice(index + 1).map((bottom) => [top, bottom] as const),
+    );
+    for (const [top, bottom] of pairs) {
+      await expect(contrast(onPage(top), onPage(bottom))).toBeGreaterThan(1.04);
     }
   },
 };
