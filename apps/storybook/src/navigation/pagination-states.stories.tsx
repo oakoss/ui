@@ -8,7 +8,7 @@ import {
 } from '@oakoss/ui/components/ui/navigation/pagination';
 import { expect, userEvent } from 'storybook/test';
 
-import { contrast } from '#/helpers/color';
+import { contrast, flatBackground } from '#/helpers/color';
 import { paintedColor } from '#/helpers/paint';
 
 const meta = {
@@ -129,7 +129,7 @@ export const ForcedColors: Story = {
       contrast(current?.color ?? '', current?.backgroundColor ?? ''),
     ).toBeGreaterThan(4.5);
     await expect(await paintedColor(canvas.getByTestId('current'))).not.toBe(
-      await paintedColor(canvas.getByRole('navigation')),
+      flatBackground(canvas.getByRole('navigation')),
     );
   },
   tags: ['forced-colors'],

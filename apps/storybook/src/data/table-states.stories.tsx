@@ -11,7 +11,7 @@ import {
 } from '@oakoss/ui/components/ui/data/table';
 import { expect, waitFor } from 'storybook/test';
 
-import { contrast } from '#/helpers/color';
+import { contrast, flatBackground } from '#/helpers/color';
 import { paintedColor } from '#/helpers/paint';
 import { hoverReal } from '#/helpers/pointer';
 
@@ -225,11 +225,13 @@ export const ForcedColors: Story = {
     const selected = getComputedStyle(cellOf('INV002', 1));
     await expect(selected.backgroundImage).toBe('none');
     await expect(await paintedColor(cellOf('INV002', 1))).not.toBe(
-      await paintedColor(cellOf('INV001', 1)),
+      flatBackground(cellOf('INV001', 1)),
     );
     await expect(
       contrast(selected.color, selected.backgroundColor),
     ).toBeGreaterThan(4.5);
+    // The text backplate would hide HighlightText, and no color shows it.
+    await expect(selected.forcedColorAdjust).toBe('none');
     await expect(getComputedStyle(cellOf('INV001', 1)).borderBottomWidth).toBe(
       '1px',
     );

@@ -8,7 +8,7 @@ import {
 } from '@oakoss/ui/components/ui/navigation/tabs';
 import { expect, userEvent } from 'storybook/test';
 
-import { contrast } from '#/helpers/color';
+import { contrast, flatBackground } from '#/helpers/color';
 import { paintedColor } from '#/helpers/paint';
 import { part } from '#/helpers/parts';
 
@@ -194,7 +194,7 @@ export const ForcedColorsLabel: Story = {
     // A tab is tight around its label, so compare against the page, which
     // the backplate would match.
     await expect(await paintedColor(canvas.getByTestId('label'))).not.toBe(
-      await paintedColor(canvas.getByRole('tabpanel')),
+      flatBackground(canvas.getByRole('tabpanel')),
     );
   },
   render: (args) => (

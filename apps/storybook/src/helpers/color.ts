@@ -21,6 +21,16 @@ export function contrast(top: string, bottom: string) {
   return (light + 0.05) / (dark + 0.05);
 }
 
+// An element's computed background painted over the page, translucent ones
+// included, in paintedColor's "r,g,b", so it compares with a screenshot.
+export function flatBackground(element: Element) {
+  const context = canvas();
+  const color = getComputedStyle(element).backgroundColor;
+  for (const layer of ['white', page(), color]) paint(context, layer);
+  const [r = 0, g = 0, b = 0] = pixel(context);
+  return `${r},${g},${b}`;
+}
+
 // A CSS variable's color as the browser computes it.
 export function tokenColor(variable: string, root: Element = document.body) {
   return computedColor(`var(${variable})`, root);

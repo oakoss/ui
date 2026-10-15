@@ -4,7 +4,12 @@ import * as Icon from '@oakoss/ui/components/icons';
 import { Toggle } from '@oakoss/ui/components/ui/inputs/toggle';
 import { expect, fn, userEvent } from 'storybook/test';
 
-import { contrast, tokenColor } from '#/helpers/color';
+import {
+  computedColor,
+  contrast,
+  flatBackground,
+  tokenColor,
+} from '#/helpers/color';
 import { paintedColor } from '#/helpers/paint';
 
 const onChange = fn<(isSelected: boolean) => void>();
@@ -207,6 +212,7 @@ export const ForcedColors: Story = {
     await expect(contrast(style.color, style.backgroundColor)).toBeGreaterThan(
       4.5,
     );
+    await expect(style.color).toBe(computedColor('HighlightText'));
   },
   tags: ['forced-colors'],
 };
@@ -279,7 +285,7 @@ export const ForcedColorsLabel: Story = {
   play: async ({ canvas }) => {
     await settle();
     await expect(await paintedColor(canvas.getByTestId('label'))).toBe(
-      await paintedColor(canvas.getByRole('button')),
+      flatBackground(canvas.getByRole('button')),
     );
   },
   tags: ['forced-colors'],
