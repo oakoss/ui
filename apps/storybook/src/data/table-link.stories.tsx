@@ -10,7 +10,6 @@ import {
 import { expect, waitFor } from 'storybook/test';
 
 import { computedColor, contrast, tokenColor } from '#/helpers/color';
-import { paintedColor } from '#/helpers/paint';
 import { part } from '#/helpers/parts';
 
 import { cellOf, gradientColor, InvoiceTable } from './table-demo';
@@ -172,23 +171,25 @@ export const ForcedColorsLinked: Story = {
   },
   play: async () => {
     await expect(matchMedia('(forced-colors: active)').matches).toBe(true);
-    const selected = await paintedColor(cellOf('INV002', 1));
+    const markColor = computedColor('Mark');
+    await expect(
+      getComputedStyle(cellOf('INV002', 1)).backgroundColor,
+    ).not.toBe(markColor);
     mark('INV005');
     const linked = cellOf('INV005', 1);
     await waitFor(() =>
-      expect(getComputedStyle(linked).backgroundImage).toBe('none'),
+      expect(getComputedStyle(linked).backgroundColor).toBe(markColor),
     );
-    const linkedPaint = await paintedColor(linked);
-    await expect(linkedPaint).not.toBe(selected);
-    await expect(linkedPaint).not.toBe(await paintedColor(cellOf('INV001', 1)));
     await expect(getComputedStyle(linked).color).toBe(
       computedColor('MarkText'),
     );
+    await expect(getComputedStyle(linked).forcedColorAdjust).toBe('none');
+    await expect(getComputedStyle(linked).backgroundImage).toBe('none');
     mark('INV002');
-    await expect(await paintedColor(cellOf('INV002', 1))).toBe(linkedPaint);
-    await expect(getComputedStyle(cellOf('INV002', 1)).color).toBe(
-      computedColor('MarkText'),
-    );
+    const selected = getComputedStyle(cellOf('INV002', 1));
+    await expect(selected.backgroundColor).toBe(markColor);
+    await expect(selected.backgroundImage).toBe('none');
+    await expect(selected.color).toBe(computedColor('MarkText'));
   },
   tags: ['forced-colors'],
 };
@@ -197,19 +198,21 @@ export const ForcedColorsLinked: Story = {
 export const ForcedColorsLinkedCell: Story = {
   parameters: ForcedColorsLinked.parameters,
   play: async () => {
-    const plain = await paintedColor(cellOf('INV006', 2));
+    const markColor = computedColor('Mark');
     mark('INV006', 2);
     mark('INV002', 2);
     const linked = cellOf('INV006', 2);
     await waitFor(() =>
-      expect(getComputedStyle(linked).backgroundImage).toBe('none'),
+      expect(getComputedStyle(linked).backgroundColor).toBe(markColor),
     );
-    const linkedPaint = await paintedColor(linked);
-    await expect(linkedPaint).not.toBe(plain);
     await expect(getComputedStyle(linked).color).toBe(
       computedColor('MarkText'),
     );
-    await expect(await paintedColor(cellOf('INV002', 2))).toBe(linkedPaint);
+    const selected = getComputedStyle(cellOf('INV002', 2));
+    await expect(selected.backgroundColor).toBe(markColor);
+    await expect(selected.backgroundImage).toBe('none');
+    await expect(getComputedStyle(linked).forcedColorAdjust).toBe('none');
+    await expect(getComputedStyle(linked).backgroundImage).toBe('none');
   },
   tags: ['forced-colors'],
 };
