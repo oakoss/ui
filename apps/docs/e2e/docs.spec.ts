@@ -32,6 +32,26 @@ test('a component demo responds after hydration', async ({ page }) => {
   await expect(demo).toHaveText('Pressed 2 times');
 });
 
+// Calendar demos read the visitor's clock, so they render after hydration: a
+// visit months after the build hydrates without a mismatch.
+test('calendar demos render only on the client', async ({ page }) => {
+  const response = await page.request.get('/docs/components/calendar');
+  expect(await response.text()).not.toContain('role="grid"');
+  const errors: string[] = [];
+  const messages: { text: string; type: string }[] = [];
+  page.on('pageerror', (error) => {
+    errors.push(error.message);
+  });
+  page.on('console', (message) => {
+    messages.push({ text: message.text(), type: message.type() });
+  });
+  await page.clock.install({ time: new Date(2027, 5, 20, 12) });
+  await gotoHydrated(page, '/docs/components/calendar');
+  await expect(page.getByRole('grid').first()).toBeVisible();
+  expect(errors).toEqual([]);
+  expect(messages.filter(({ type }) => type === 'error')).toEqual([]);
+});
+
 test('sidebar links navigate without a full page load', async ({ page }) => {
   await gotoHydrated(page, '/docs/components/button');
   // Survives client-side navigation and is lost on a full reload.

@@ -9,6 +9,27 @@ export function isPseudoHidden(element: Element, pseudo: string) {
   );
 }
 
+// Each branch of a nested rule's list, under each branch of its parent's.
+export function resolve(branches: string[], parents: string[]) {
+  if (parents.length === 0) return branches;
+  return parents.flatMap((parent) =>
+    branches.map((branch) =>
+      branch.includes('&')
+        ? branch.replaceAll('&', () => parent)
+        : `${parent} ${branch}`,
+    ),
+  );
+}
+
+export function rulesOf(sheet: CSSStyleSheet) {
+  try {
+    return sheet.cssRules;
+  } catch {
+    // A cross-origin sheet can't be read, and holds none of our rules.
+    return null;
+  }
+}
+
 function isHiddenIn(
   rules: CSSRuleList | null,
   element: Element,
@@ -44,27 +65,6 @@ function isHiddenIn(
   });
 }
 
-// Each branch of a nested rule's list, under each branch of its parent's.
-function resolve(branches: string[], parents: string[]) {
-  if (parents.length === 0) return branches;
-  return parents.flatMap((parent) =>
-    branches.map((branch) =>
-      branch.includes('&')
-        ? branch.replaceAll('&', () => parent)
-        : `${parent} ${branch}`,
-    ),
-  );
-}
-
-function rulesOf(sheet: CSSStyleSheet) {
-  try {
-    return sheet.cssRules;
-  } catch {
-    // A cross-origin sheet can't be read, and holds none of our rules.
-    return null;
-  }
-}
-
 const nesting: Partial<Record<string, number>> = {
   '(': 1,
   ')': -1,
@@ -74,7 +74,7 @@ const nesting: Partial<Record<string, number>> = {
 
 // Splits a selector list at its top-level commas, leaving those inside
 // :is(), :not(), attribute values and escapes alone.
-function splitList(list: string) {
+export function splitList(list: string) {
   const branches: string[] = [];
   let depth = 0;
   let isEscaped = false;

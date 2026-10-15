@@ -1,0 +1,265 @@
+---
+title: Calendar
+description: Pick a date, several dates or a range from one or more months, with unavailable dates, an error message and a loading state.
+item: calendar
+reactAria: https://react-aria.adobe.com/Calendar
+---
+
+import { ClientOnly } from '#/components/client-only';
+import { CalendarCustomDays } from '#/components/demos/calendar-custom-days';
+import { CalendarCustomLayout } from '#/components/demos/calendar-custom-layout';
+import { CalendarDemo } from '#/components/demos/calendar-demo';
+import { CalendarMaxRange } from '#/components/demos/calendar-max-range';
+import { CalendarMonthYear } from '#/components/demos/calendar-month-year';
+import { CalendarPresets } from '#/components/demos/calendar-presets';
+import { CalendarRange } from '#/components/demos/calendar-range';
+import { CalendarUnavailable } from '#/components/demos/calendar-unavailable';
+import { CalendarValidation } from '#/components/demos/calendar-validation';
+
+<ComponentPreview name="calendar-demo">
+  <ClientOnly fallback={<div className="h-72 any-pointer-coarse:h-84" />}>
+    <CalendarDemo />
+  </ClientOnly>
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="calendar" />
+
+## Usage
+
+```tsx
+import { getLocalTimeZone, today } from '@internationalized/date';
+import { Calendar } from '#/components/ui/inputs/calendar';
+
+<Calendar aria-label="Delivery date" minValue={today(getLocalTimeZone())} />;
+```
+
+Values are `@internationalized/date` objects (`CalendarDate`, `CalendarDateTime`
+or `ZonedDateTime`), which the item installs; React Aria doesn't re-export
+`today`, `parseDate` or the other helpers. `selectionMode="multiple"` picks
+several dates. A calendar always shows six weeks, so it keeps its height from
+month to month; `weeksInMonth` changes that.
+
+A calendar suits dates close to now. For a date of birth or another distant
+date, typing is faster, so use a date field instead.
+
+## Examples
+
+### Range and months
+
+`RangeCalendar` picks a start and an end. `visibleMonths` shows several months
+side by side, wrapping when there's no room; the steppers sit at the outer
+edges, and days a neighboring month repeats are hidden.
+
+<ComponentPreview name="calendar-range">
+  <ClientOnly
+    fallback={
+      <div className="flex flex-wrap gap-6">
+        <div className="h-72 w-63 any-pointer-coarse:h-84 any-pointer-coarse:w-77" />
+        <div className="h-72 w-63 any-pointer-coarse:h-84 any-pointer-coarse:w-77" />
+      </div>
+    }
+  >
+    <CalendarRange />
+  </ClientOnly>
+</ComponentPreview>
+
+### Month and year dropdowns
+
+`heading` replaces the month heading. `CalendarMonthYearSelect`, installed with
+`calendar-month-year-select`, fills it with month and year dropdowns, once
+however many months show. `visibleYears` sets how many years the list holds,
+within `minValue` and `maxValue`.
+
+<ComponentPreview name="calendar-month-year">
+  <ClientOnly fallback={<div className="h-72 any-pointer-coarse:h-84" />}>
+    <CalendarMonthYear />
+  </ClientOnly>
+</ComponentPreview>
+
+### Unavailable dates
+
+`isDateUnavailable` strikes dates through and skips them. Screen readers hear
+an unavailable date only as dimmed, not why, so say the rule in text the
+calendar points to with `aria-describedby`.
+
+<ComponentPreview name="calendar-unavailable">
+  <ClientOnly
+    fallback={
+      <div className="not-prose flex flex-col gap-2">
+        <p className="text-sm text-muted-foreground">
+          Weekends and public holidays are unavailable.
+        </p>
+        <div className="h-72 any-pointer-coarse:h-84" />
+      </div>
+    }
+  >
+    <CalendarUnavailable />
+  </ClientOnly>
+</ComponentPreview>
+
+### Presets
+
+`footer` renders below the months, inside the calendar. These presets set a
+range and show its month; save a preset's `id` rather than its dates so that
+"Last 7 days" stays relative. Buttons in the footer, heading or a custom layout
+keep their own names and handlers, and one with `slot="close"` closes the
+popover or dialog around the calendar.
+
+<ComponentPreview name="calendar-presets">
+  <ClientOnly fallback={<div className="h-83 any-pointer-coarse:h-95" />}>
+    <CalendarPresets />
+  </ClientOnly>
+</ComponentPreview>
+
+### Maximum range length
+
+While the user picks the end of a range, React Aria passes the start to
+`isDateUnavailable` as a second argument, so days too far from it can be
+skipped.
+
+<ComponentPreview name="calendar-max-range">
+  <ClientOnly fallback={<div className="h-72 any-pointer-coarse:h-84" />}>
+    <CalendarMaxRange />
+  </ClientOnly>
+</ComponentPreview>
+
+### Validation
+
+`errorMessage` shows while `isInvalid` is set, and describes the selected day.
+Pick a weekend day to see it.
+
+<ComponentPreview name="calendar-validation">
+  <ClientOnly fallback={<div className="h-72 any-pointer-coarse:h-84" />}>
+    <CalendarValidation />
+  </ClientOnly>
+</ComponentPreview>
+
+### Custom days
+
+`renderCell` draws a day's contents. It replaces the today dot, so mark today
+from `isToday` (this demo bolds it) or with `data-today` on the cell. Screen
+readers hear only the date, so anything it adds, such as a price or a dot,
+needs another way to reach them.
+
+<ComponentPreview name="calendar-custom-days">
+  <ClientOnly fallback={<div className="h-72 any-pointer-coarse:h-84" />}>
+    <CalendarCustomDays />
+  </ClientOnly>
+</ComponentPreview>
+
+`isLoading` fades the months behind a spinner named by `loadingLabel`
+("Loading"), for availability fetched as the user changes month.
+
+### Custom layout
+
+Children replace the layout, built from `CalendarHeader` (the steppers around
+a heading), `CalendarHeading` and `CalendarGrid`; pass `offset` to a heading
+and grid for each further month. This one adds a Today button below the grid.
+
+<ComponentPreview name="calendar-custom-layout">
+  <ClientOnly fallback={<div className="h-84 any-pointer-coarse:h-96" />}>
+    <CalendarCustomLayout />
+  </ClientOnly>
+</ComponentPreview>
+
+## Accessibility
+
+React Aria renders a [grid](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/)
+of days inside an `application`, and links it up:
+
+- **Name:** the calendar is named by `aria-label` and the visible months, and
+  each day by its full date, with "Today" and "selected" in the user's
+  language.
+- **Navigation:** the steppers are named "Previous" and "Next" in the user's
+  language, and the month heading is announced when it changes.
+- **Validation:** a day's error comes from `errorMessage`; an unavailable or
+  disabled day is `aria-disabled`.
+
+Days are 36px and grow to 44px wherever a touch pointer is present. Today has a
+dot, never a fill, so it stays visible inside a range. In Windows High
+Contrast the selected day takes the system's selection colors, an invalid one
+takes Mark, and the range keeps a border.
+
+| Key                           | Action                                             |
+| ----------------------------- | -------------------------------------------------- |
+| ←, →                          | Moves to the previous or next day                  |
+| ↑, ↓                          | Moves to the same day in the previous or next week |
+| `Home`, `End`                 | Moves to the first or last day of the month        |
+| `PageUp`, `PageDown`          | Moves to the previous or next month                |
+| `Shift` + `PageUp`/`PageDown` | Moves to the previous or next year                 |
+| `Enter`, `Space`              | Selects the day, or a range's start then its end   |
+| `Escape`                      | Cancels a range picked halfway                     |
+
+The arrow keys follow the reading direction in right-to-left locales.
+
+Today and the month shown first come from the visitor's clock and time zone.
+A page rendered on the server, or prerendered on an earlier day, disagrees with
+the browser, and React reports a hydration error, so render calendars on the
+client only, as this page does.
+
+## API
+
+### Calendar
+
+Extends React Aria's [`Calendar`](https://react-aria.adobe.com/Calendar#api).
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/calendar.tsx"
+  name="CalendarProps"
+/>
+
+Also accepts all [React Aria `Calendar` props](https://react-aria.adobe.com/Calendar#api)
+except `visibleDuration`, which `visibleMonths` sets. Children replace the
+layout.
+
+### RangeCalendar
+
+Extends React Aria's [`RangeCalendar`](https://react-aria.adobe.com/RangeCalendar#api),
+with the same props as Calendar.
+
+#### Data attributes
+
+| Attribute       | Present when            |
+| --------------- | ----------------------- |
+| `data-slot`     | Always `calendar`       |
+| `data-invalid`  | The calendar is invalid |
+| `data-disabled` | `isDisabled` is set     |
+
+### CalendarCell
+
+Extends React Aria's [`CalendarCell`](https://react-aria.adobe.com/Calendar#calendarcell).
+
+#### Data attributes
+
+| Attribute              | Present when                         |
+| ---------------------- | ------------------------------------ |
+| `data-slot`            | Always `calendar-cell`               |
+| `data-selected`        | The day is selected                  |
+| `data-selection-start` | The day starts the range             |
+| `data-selection-end`   | The day ends the range               |
+| `data-today`           | The day is today                     |
+| `data-unavailable`     | `isDateUnavailable` returns true     |
+| `data-disabled`        | The day is out of bounds or disabled |
+| `data-outside-month`   | The day belongs to another month     |
+| `data-invalid`         | The selected day is invalid          |
+
+### CalendarMonthYearSelect
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/calendar-month-year-select.tsx"
+  name="CalendarMonthYearSelectProps"
+/>
+
+### Other parts
+
+| Part              | Extends                                 | `data-slot`        |
+| ----------------- | --------------------------------------- | ------------------ |
+| `CalendarHeader`  | A `div` holding the steppers            | `calendar-header`  |
+| `CalendarHeading` | React Aria's `CalendarHeading`          | `calendar-heading` |
+| `CalendarGrid`    | React Aria's `CalendarGrid`, with cells | `calendar-grid`    |
