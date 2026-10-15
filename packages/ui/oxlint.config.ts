@@ -132,6 +132,13 @@ const arbitraryValues: Record<string, string[]> = {
     neutralHover('btn'),
     ...disabledGray,
   ],
+  // A selected day opts out of forced colors and sets its own outline, and an
+  // invalid one takes Mark, as an invalid selection does elsewhere.
+  'src/components/ui/inputs/calendar-cell.tsx': [
+    ...selectionStates,
+    'forced-colors:bg-[Mark]',
+    'forced-colors:outline-[Highlight]',
+  ],
   'src/components/ui/inputs/checkbox-group.tsx': selectionStates,
   'src/components/ui/inputs/checkbox.tsx': selectionStates,
   'src/components/ui/inputs/list-box.tsx': scrollsInPopover,

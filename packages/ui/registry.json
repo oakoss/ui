@@ -3782,6 +3782,82 @@
           "target": "@lib/cn-config.ts"
         }
       ]
+    },
+    {
+      "name": "calendar",
+      "type": "registry:ui",
+      "title": "Calendar",
+      "description": "Single, multiple or range date selection in one or more months, with a today mark, unavailable dates, an error message, a loading state, and slots for the heading and a footer.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/calendar.tsx"
+      },
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/button",
+        "oakoss/ui/spinner"
+      ],
+      "dependencies": [
+        "@internationalized/date",
+        "cn",
+        "react-aria-components",
+        "tailwind-variants"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/calendar.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/calendar.tsx"
+        },
+        {
+          "path": "src/components/ui/inputs/calendar-cell.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/calendar-cell.tsx"
+        },
+        {
+          "path": "src/lib/empty-node.ts",
+          "type": "registry:lib",
+          "target": "@lib/empty-node.ts"
+        },
+        {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "calendar-month-year-select",
+      "type": "registry:ui",
+      "title": "Calendar Month and Year Select",
+      "description": "Month and year dropdowns for a Calendar's heading slot, rendered once however many months show, with the number of years to list.",
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/calendar",
+        "oakoss/ui/select"
+      ],
+      "dependencies": ["react-aria-components"],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/calendar-month-year-select.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/calendar-month-year-select.tsx"
+        }
+      ]
     }
   ]
 }

@@ -6,6 +6,8 @@ packages:
 catalog:
   '@hugeicons/core-free-icons': ^4.3.5
   '@hugeicons/react': ^1.1.10
+  # React Aria's own range, so the apps share its copy.
+  '@internationalized/date': ^3.12.4
   '@phosphor-icons/react': ^2.1.10
   '@remixicon/react': ^4.9.0
   # Exact: 0.x and weeks old; its rules may change between minors.
