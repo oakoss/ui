@@ -45,6 +45,7 @@ export const Default: Story = {
     const trigger = screen.getByRole('button', { name: 'Options' });
     await expect(trigger).toHaveAttribute('aria-haspopup', 'true');
     const { menu, panel } = await openMenu();
+    await expect(trigger).toHaveAttribute('aria-controls', menu.id);
     await expect(panel).toHaveAttribute('data-slot', 'dropdown-menu-content');
     await expect(panel).toHaveAttribute('data-placement', 'bottom');
     const box = panel.getBoundingClientRect();
