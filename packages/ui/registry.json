@@ -3869,6 +3869,9 @@
       },
       "registryDependencies": ["oakoss/ui/theme"],
       "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "css": {
+        "@custom-variant linked (&[aria-current]:not([aria-current=false]))": {}
+      },
       "files": [
         {
           "path": "src/components/ui/data/table.tsx",

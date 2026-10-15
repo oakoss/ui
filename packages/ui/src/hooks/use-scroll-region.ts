@@ -3,33 +3,37 @@ import {
   type UIEvent,
   useCallback,
   useLayoutEffect,
+  useRef,
   useState,
 } from 'react';
 
-type RegionName = {
+// Selectors run against the container. labelSelector finds an element whose
+// text names the region when neither label is set, such as a caption;
+// stickyTop and stickyStart find elements that may stick to those edges.
+type RegionOptions = {
   'aria-label'?: string;
   'aria-labelledby'?: string;
-  // Finds an element whose text names the region when neither label is set,
-  // such as a table's caption; it must be stable across renders.
-  findLabel?: (container: HTMLElement) => Element | null;
+  labelSelector?: string;
+  stickyStart?: string;
+  stickyTop?: string;
 };
 
 type Scrolled = { isPastStart: boolean; isPastTop: boolean };
 
 // A scroll container that's a tab stop only while its content overflows, and
-// a region only while it has a name. Watches the container and its first
-// child, and reports whether each axis has scrolled from the start
-// (scrollLeft is negative in RTL).
-export function useScrollRegion(
-  container: RefObject<HTMLElement | null>,
-  name: RegionName,
-) {
+// a region only while it has a name. Spread `props` on the container. Watches
+// it and its first child, reports whether each axis has scrolled from the
+// start (scrollLeft is negative in RTL), and pads scrolling by whatever sticks
+// to its edges, so an element scrolled into view lands clear of it.
+export function useScrollRegion<T extends HTMLElement>(options: RegionOptions) {
+  const ref = useRef<T>(null);
   const [isScrollable, setIsScrollable] = useState(false);
   const { scrolled, update } = useScrolled();
-  const labelId = useLabelId(container, name.findLabel);
+  const labelId = useLabelId(ref, options.labelSelector);
+  const { stickyStart, stickyTop } = options;
 
   useLayoutEffect(() => {
-    const element = container.current;
+    const element = ref.current;
     const measure = () => {
       if (!element) return;
       setIsScrollable(
@@ -37,52 +41,87 @@ export function useScrollRegion(
           element.scrollHeight > element.clientHeight,
       );
       update(element);
+      padInsets(element, stickyTop, stickyStart);
     };
     const observer = new ResizeObserver(measure);
     measure();
     if (element) observer.observe(element);
     if (element?.firstElementChild) observer.observe(element.firstElementChild);
     return () => observer.disconnect();
-  }, [container, update]);
+  }, [stickyStart, stickyTop, update]);
+
+  // An inset can stick or unstick without resizing anything.
+  useLayoutEffect(() => {
+    if (ref.current) padInsets(ref.current, stickyTop, stickyStart);
+  });
 
   const onScroll = useCallback(
-    (event: UIEvent<HTMLElement>) => update(event.currentTarget),
+    (event: UIEvent<T>) => update(event.currentTarget),
     [update],
   );
 
-  const label = regionLabel(name, labelId);
-  const regionProps = isScrollable
-    ? {
-        ...label,
-        role: label === undefined ? undefined : 'region',
-        tabIndex: 0,
-      }
-    : {};
-
-  return { onScroll, regionProps, scrolled };
+  const label = regionLabel(options, labelId);
+  const props = {
+    onScroll,
+    ref,
+    ...(isScrollable && {
+      ...label,
+      role: label === undefined ? undefined : 'region',
+      tabIndex: 0,
+    }),
+  };
+  return { props, scrolled };
 }
 
-function regionLabel(name: RegionName, labelId: string | undefined) {
-  if ((name['aria-labelledby'] ?? '').trim() !== '') {
-    return { 'aria-labelledby': name['aria-labelledby'] };
+// Skips an element that doesn't stick, such as a cell spanning columns.
+function insetSize(
+  container: HTMLElement,
+  selector: string | undefined,
+  axis: 'height' | 'width',
+) {
+  const found =
+    selector === undefined ? [] : [...container.querySelectorAll(selector)];
+  const inset = found.find(
+    (element) => getComputedStyle(element).position === 'sticky',
+  );
+  return inset ? `${inset.getBoundingClientRect()[axis]}px` : '';
+}
+
+function isText(value: unknown): value is string {
+  return typeof value === 'string' && value.trim() !== '';
+}
+
+function padInsets(element: HTMLElement, top?: string, start?: string) {
+  element.style.scrollPaddingTop = insetSize(element, top, 'height');
+  element.style.scrollPaddingInlineStart = insetSize(element, start, 'width');
+}
+
+// A label from an untyped caller may not be a string, and a blank one names
+// nothing.
+function regionLabel(options: RegionOptions, labelId: string | undefined) {
+  if (isText(options['aria-labelledby'])) {
+    return { 'aria-labelledby': options['aria-labelledby'] };
   }
-  if ((name['aria-label'] ?? '').trim() !== '') {
-    return { 'aria-label': name['aria-label'] };
+  if (isText(options['aria-label'])) {
+    return { 'aria-label': options['aria-label'] };
   }
   return labelId === undefined ? undefined : { 'aria-labelledby': labelId };
 }
 
-// The id of the element findLabel returns while it has text, read from the
+// The id of the element labelSelector finds while it has text, read from the
 // page as its text and the container's content change.
 function useLabelId(
   container: RefObject<HTMLElement | null>,
-  findLabel: RegionName['findLabel'],
+  labelSelector: string | undefined,
 ) {
   const [labelId, setLabelId] = useState<string>();
   useLayoutEffect(() => {
     const element = container.current;
     const read = () => {
-      const label = element && findLabel ? findLabel(element) : null;
+      const label =
+        element && labelSelector !== undefined
+          ? element.querySelector(labelSelector)
+          : null;
       const hasText = (label?.textContent ?? '').trim() !== '';
       const id = label?.id ?? '';
       setLabelId(hasText && id !== '' ? id : undefined);
@@ -98,7 +137,7 @@ function useLabelId(
       });
     }
     return () => observer.disconnect();
-  }, [container, findLabel]);
+  }, [container, labelSelector]);
   return labelId;
 }
 

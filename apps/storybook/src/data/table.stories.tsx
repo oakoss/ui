@@ -63,6 +63,9 @@ export const AlignEnd: Story = {
     const style = getComputedStyle(amount);
     await expect(style.textAlign).toBe('end');
     await expect(style.fontVariantNumeric).toBe('tabular-nums');
+    await expect(getComputedStyle(cellOf('INV001', 0)).fontVariantNumeric).toBe(
+      'tabular-nums',
+    );
     const text = document.createRange();
     text.selectNodeContents(amount);
     const box = amount.getBoundingClientRect();

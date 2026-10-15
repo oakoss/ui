@@ -86,7 +86,7 @@ export const ScrolledBack: Story = {
 
 // A sticky cell keeps its row's tint: selected, striped and hovered.
 export const StickyCellTint: Story = {
-  args: { selected: 'INV002', striped: true },
+  args: { interactive: true, selected: 'INV002', striped: true },
   play: async () => {
     scrollTo({ left: 120 });
     await waitFor(() => expect(cue(cellOf('INV001', 0), '::before')).toBe(1));
@@ -221,6 +221,49 @@ export const Nested: Story = {
             A wide trailing cell that overflows the outer table
           </TableCell>
         </TableRow>
+      </TableBody>
+    </Table>
+  ),
+};
+
+// The same holds for the header shadow when the outer table scrolls down.
+export const NestedHeader: Story = {
+  play: async ({ canvas }) => {
+    const outer = part('table-container');
+    const innerHeader = canvas.getByRole('columnheader', { name: 'Inner' });
+    outer.scrollTo({ top: 120 });
+    await waitFor(() => expect(outer.scrollTop).toBeGreaterThan(0));
+    await expect(cue(innerHeader, '::after')).toBe(0);
+  },
+  render: () => (
+    <Table aria-label="Outer" containerClassName="h-40" stickyHeader>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Outer</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell>
+            <Table aria-label="Inner" stickyHeader>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Inner</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell>Nested row</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableCell>
+        </TableRow>
+        {Array.from({ length: 12 }, (_, index) => (
+          <TableRow key={index}>
+            <TableCell>{`Outer row ${String(index + 1)}`}</TableCell>
+          </TableRow>
+        ))}
       </TableBody>
     </Table>
   ),

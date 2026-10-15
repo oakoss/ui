@@ -1,4 +1,4 @@
-@theme {
+@theme inline {
   --animate-progress-indeterminate: progress-indeterminate 1.5s ease-in-out
     infinite;
 

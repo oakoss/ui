@@ -16,7 +16,7 @@ const members = [
 export function TableSelected() {
   return (
     <div className="not-prose w-full">
-      <Table aria-label="Team members">
+      <Table aria-label="Team members" interactive>
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>

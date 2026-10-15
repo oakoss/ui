@@ -39,6 +39,20 @@ export function cellOf(id: string, column: number) {
   return cell;
 }
 
+// The first color of a computed linear-gradient, the tint a row paints.
+export function gradientColor(image: string) {
+  const start = image.indexOf('(') + 1;
+  let depth = 0;
+  for (let index = start; index < image.length; index += 1) {
+    if (image[index] === '(') depth += 1;
+    if (image[index] === ')') depth -= 1;
+    if (depth === 0 && /[ ,]/u.test(image[index] ?? '')) {
+      return image.slice(start, index);
+    }
+  }
+  return '';
+}
+
 // Invoices, repeated to rows, with each row headed by its invoice number.
 export function InvoiceTable({
   caption = 'Recent invoices',

@@ -27,8 +27,7 @@ async function scrollTo(options: ScrollToOptions) {
   await waitFor(() =>
     expect(container).toSatisfy(
       (element: HTMLElement) =>
-        element.dataset.scrolledX !== undefined ||
-        element.dataset.scrolledY !== undefined,
+        Math.abs(element.scrollLeft) > 0 || element.scrollTop > 0,
     ),
   );
 }
@@ -125,11 +124,11 @@ export const StickyColumnRTL: Story = {
 
 // Sticky cells paint --table-bg, so content can't show through them.
 export const OnASurface: Story = {
-  args: {
-    containerClassName: 'w-72 [--table-bg:var(--color-muted)]',
-    stickyColumn: true,
-  },
+  args: { stickyColumn: true },
+  // Set once on the surface, so every table inside it matches.
   play: async () => {
+    const surface = part('table-container').parentElement;
+    surface?.style.setProperty('--table-bg', 'var(--color-muted)');
     const first = getComputedStyle(cellOf('INV001', 0)).backgroundColor;
     await expect(first).toBe(tokenColor('--color-muted'));
     await expect(first).not.toBe(tokenColor('--color-background'));
@@ -139,4 +138,14 @@ export const OnASurface: Story = {
       <InvoiceTable {...args} />
     </div>
   ),
+};
+
+// Without a surface set, sticky cells paint the page color.
+export const DefaultSurface: Story = {
+  args: { stickyColumn: true },
+  play: async () => {
+    await expect(getComputedStyle(cellOf('INV001', 0)).backgroundColor).toBe(
+      tokenColor('--color-background'),
+    );
+  },
 };
