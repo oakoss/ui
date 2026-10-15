@@ -3858,6 +3858,44 @@
           "target": "@ui/inputs/calendar-month-year-select.tsx"
         }
       ]
+    },
+    {
+      "name": "table",
+      "type": "registry:ui",
+      "title": "Table",
+      "description": "HTML table with optional sticky header and first column, compact and striped rows, end-aligned numbers, and a scroll area that becomes a named, focusable region only when it overflows.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/radix/ui/table.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/data/table.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/table.tsx"
+        },
+        {
+          "path": "src/hooks/use-scroll-region.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-scroll-region.ts"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
     }
   ]
 }

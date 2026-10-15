@@ -1,0 +1,195 @@
+---
+title: Table
+description: An HTML table for reading data in rows and columns.
+item: table
+---
+
+import { TableDemo } from '#/components/demos/table-demo';
+import { TableEmpty } from '#/components/demos/table-empty';
+import { TableSelected } from '#/components/demos/table-selected';
+import { TableSticky } from '#/components/demos/table-sticky';
+import { TableStriped } from '#/components/demos/table-striped';
+import { TableTruncate } from '#/components/demos/table-truncate';
+
+<ComponentPreview name="table-demo">
+  <TableDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="table" />
+
+## Usage
+
+```tsx
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '#/components/ui/data/table';
+
+<Table>
+  <TableCaption>Recent invoices</TableCaption>
+  <TableHeader>
+    <TableRow>
+      <TableHead>Invoice</TableHead>
+      <TableHead align="end">Amount</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    <TableRow>
+      <TableHead>INV001</TableHead>
+      <TableCell align="end">$250.00</TableCell>
+    </TableRow>
+  </TableBody>
+</Table>;
+```
+
+Table is a plain HTML table for reading data. Sorting, selection, filtering
+and pagination belong to a data table built on it.
+
+## Examples
+
+### Sticky header and column
+
+`stickyHeader` keeps the header rows in view while the body scrolls, and
+`stickyColumn` keeps the first column in view while the rest scrolls sideways;
+a first cell that spans several columns, such as a footer's total label,
+scrolls with the rest rather than cover them. Below a first cell that spans
+rows, the next rows' first cells sit in the second column, so set
+`isSticky={false}` on them. Give the container a height
+with `containerClassName` for the header to stick to. A shadow marks each
+edge once content has scrolled beneath it. Sticky cells paint `--table-bg`,
+so on a surface other than the page, set it to match:
+`containerClassName="[--table-bg:var(--color-card)]"`.
+
+<ComponentPreview name="table-sticky">
+  <TableSticky />
+</ComponentPreview>
+
+### Compact and striped
+
+`size="sm"` tightens rows for dense data, and `striped` tints every other body
+row to help the eye follow a long row.
+
+<ComponentPreview name="table-striped">
+  <TableStriped />
+</ComponentPreview>
+
+### Selected rows
+
+`aria-selected` on a row tints it. Pair it with a control that says what's
+selected, such as a checkbox, since screen readers don't announce selection
+on a plain table's rows.
+
+<ComponentPreview name="table-selected">
+  <TableSelected />
+</ComponentPreview>
+
+### Empty state
+
+With no rows, one cell spans every column (`colSpan`) and says why.
+
+<ComponentPreview name="table-empty">
+  <TableEmpty />
+</ComponentPreview>
+
+### Truncated text
+
+Table cells grow to fit their text and ignore `max-width`, so truncate a
+`span` inside the cell and give it the full text as a `title`. Screen readers
+read the whole text either way, but keyboard and touch users can't open a
+title, so truncate only text that's repeated elsewhere, such as on a detail
+page the row links to.
+
+<ComponentPreview name="table-truncate">
+  <TableTruncate />
+</ComponentPreview>
+
+## Accessibility
+
+Table renders native table elements, following the
+[WAI-ARIA table pattern](https://www.w3.org/WAI/ARIA/apg/patterns/table/), so
+screen readers navigate it by row and column and announce the headers of each
+cell. `TableCaption` names the table;
+without one, give `Table` an `aria-label` or `aria-labelledby`. A `TableHead`
+in the header heads its column (`scope="col"`), and one in the body or footer
+heads its row (`scope="row"`), so make each row's first cell a `TableHead`
+when it identifies the row. A `scope` you set wins.
+
+A table wider or taller than its space scrolls, and only then is its container
+focusable, so keyboard users can tab to it and scroll with the arrow keys. It
+also becomes a region named like the table, so screen readers announce what
+the focused area holds; a table that fits is neither a tab stop nor a
+landmark. Its focus ring sits inside its edge. React Aria adds no keys.
+
+`align="end"` aligns numbers to the end of the reading direction with digits
+of equal width. In Windows High Contrast the row tints give way to the system
+colors: a selected row takes the selection colors, and lines between rows
+stay.
+
+## API
+
+### Table
+
+A `table` in a scrolling `div`.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/table.tsx"
+  name="TableProps"
+/>
+
+Also accepts `table` props. `className` styles the table and
+`containerClassName` the scrolling container.
+
+#### Data attributes
+
+| Attribute         | Present when                                            |
+| ----------------- | ------------------------------------------------------- |
+| `data-slot`       | Always: `table`, and `table-container` on the container |
+| `data-scrolled-x` | On the container, once scrolled from the start          |
+| `data-scrolled-y` | On the container, once scrolled down                    |
+
+#### CSS variables
+
+| Variable     | Sets                                                                    |
+| ------------ | ----------------------------------------------------------------------- |
+| `--table-bg` | The surface sticky cells paint, on the container; the page's by default |
+
+### TableHead and TableCell
+
+A `th` and a `td`.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/table.tsx"
+  name="TableCellProps"
+/>
+
+Also accept `th` or `td` props, except HTML's `align`. `TableHead` also takes
+`scope` (`col`, `colgroup`, `row` or `rowgroup`), which defaults to `col` in
+the header and `row` elsewhere.
+
+#### Data attributes
+
+| Attribute   | Present when                         |
+| ----------- | ------------------------------------ |
+| `data-slot` | Always: `table-head` or `table-cell` |
+
+### TableHeader, TableBody, TableFooter, TableRow and TableCaption
+
+A `thead`, `tbody`, `tfoot`, `tr` and `caption`, accepting their elements'
+props. Set `aria-selected` on a `TableRow` to mark it selected.
+
+#### Data attributes
+
+| Attribute   | Present when                                                                         |
+| ----------- | ------------------------------------------------------------------------------------ |
+| `data-slot` | Always: `table-header`, `table-body`, `table-footer`, `table-row` or `table-caption` |
