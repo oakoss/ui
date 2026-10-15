@@ -32,7 +32,6 @@ export default defineConfig(
       'src/helpers/paint.ts',
       'src/helpers/pointer.ts',
       'src/helpers/press.ts',
-      'src/helpers/touch.ts',
       'src/helpers/viewport.ts',
     ],
     rules: { 'no-restricted-syntax': 'off' },

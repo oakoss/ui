@@ -11,7 +11,7 @@ import { expect, userEvent, within } from 'storybook/test';
 
 import { contrast, tokenColor } from '#/helpers/color';
 import { freezeDate } from '#/helpers/date';
-import { withTouch } from '#/helpers/touch';
+import { valueUnderMedia } from '#/helpers/media';
 
 const SingleCalendar = Calendar<CalendarDate>;
 
@@ -56,11 +56,16 @@ export const Default: Story = {
 // included.
 export const TouchSize: Story = {
   play: async ({ canvasElement }) => {
-    await withTouch(async () => {
-      await expect(matchMedia('(any-pointer: coarse)').matches).toBe(true);
-      const today = day(canvasElement, /January 15, 2026/u);
-      await expect(today.getBoundingClientRect().width).toBe(44);
-    });
+    const today = day(canvasElement, /January 15, 2026/u);
+    const probe = document.createElement('div');
+    for (const property of ['width', 'height']) {
+      const value = valueUnderMedia(today, '(any-pointer: coarse)', property);
+      probe.style.setProperty(property, value ?? '');
+    }
+    canvasElement.append(probe);
+    const box = probe.getBoundingClientRect();
+    probe.remove();
+    await expect([box.width, box.height]).toEqual([44, 44]);
   },
 };
 
