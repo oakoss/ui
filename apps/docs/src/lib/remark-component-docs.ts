@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { type File, type Node, recordExpansion } from './expansion-output';
+import { itemCss } from './item-css';
 import { manualSources } from './manual-sources';
 import {
   type PackageManager,
@@ -79,6 +80,21 @@ function commandTabs(command: (manager: PackageManager) => string): Node {
       ),
     ],
   );
+}
+
+// The CSS each component item ships, which shadcn writes into the stylesheet.
+function cssSteps(items: Item[]): Node[] {
+  const blocks = items
+    .filter((item) => item.type === 'registry:ui')
+    .map((item) => itemCss(item))
+    .filter((css) => css !== '');
+  if (blocks.length === 0) return [];
+  return [
+    element('Step', {}, [
+      paragraph('Add this CSS to your stylesheet.'),
+      code('css', blocks.join('\n\n')),
+    ]),
+  ];
 }
 
 // A null attribute value renders as a bare boolean attribute.
@@ -194,6 +210,7 @@ function manualSteps(items: Item[]): Node {
       fileList(files),
       element(manualSources, {}, sources),
     ]),
+    ...cssSteps(items),
     ...(files.some((file) => file.path.endsWith('icon-placeholder.tsx'))
       ? [iconStep()]
       : []),
