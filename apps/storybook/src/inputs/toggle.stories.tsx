@@ -213,6 +213,9 @@ export const ForcedColors: Story = {
       4.5,
     );
     await expect(style.color).toBe(computedColor('HighlightText'));
+    // Highlight is translucent here, so the border over the fill draws a
+    // darker edge.
+    await expect(style.borderTopColor).toBe(computedColor('Highlight'));
   },
   tags: ['forced-colors'],
 };

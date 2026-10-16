@@ -38,7 +38,7 @@ const faceStyles = tv({
       band: 'text-primary-text',
       bandInvalid: 'text-destructive-text',
       invalid:
-        'bg-destructive text-destructive-foreground forced-colors:bg-[Mark] forced-colors:bg-none forced-colors:text-[HighlightText] forced-colors:outline-[Highlight] forced-colors:forced-color-adjust-none',
+        'bg-destructive text-destructive-foreground forced-colors:bg-[Mark] forced-colors:bg-none forced-colors:text-[MarkText] forced-colors:outline-[Highlight] forced-colors:forced-color-adjust-none',
       none: '',
       selected:
         'bg-primary text-primary-foreground forced-colors:bg-[Highlight] forced-colors:bg-none forced-colors:text-[HighlightText] forced-colors:outline-[Highlight] forced-colors:forced-color-adjust-none',
