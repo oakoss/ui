@@ -152,7 +152,10 @@ export const ForcedColors: Story = {
     );
     await expect(selected.backgroundColor).not.toBe(rest.backgroundColor);
     await expect(selected.borderTopColor).toBe(selected.backgroundColor);
-    await expect(selected.color).not.toBe(rest.color);
+    // The selected tag opts out of forced colors, which would otherwise draw
+    // a backplate behind its text, so its text takes HighlightText itself.
+    await expect(selected.forcedColorAdjust).toBe('none');
+    await expect(selected.color).toBe(computedColor('HighlightText'));
     const archived = getComputedStyle(
       canvas.getByRole('row', { name: 'Archived' }),
     );
@@ -162,8 +165,12 @@ export const ForcedColors: Story = {
       await expect(style.color).toBe(native.color);
       await expect(style.opacity).toBe('1');
     }
-    // The remove button on the selected tag draws its outline in Highlight.
+    // Opted out, the focused selected tag and its remove button draw their
+    // own outlines in Highlight.
     await userEvent.tab();
+    await expect(open).toHaveFocus();
+    await transitioned(open);
+    await expect(selected.outlineColor).toBe(selected.backgroundColor);
     await userEvent.tab();
     const remove = canvas.getByRole('button', { name: 'Remove Open' });
     await expect(remove).toHaveFocus();

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Switch } from '@oakoss/ui/components/ui/inputs/switch';
 import { expect, userEvent } from 'storybook/test';
 
-import { contrast } from '#/helpers/color';
+import { computedColor, contrast } from '#/helpers/color';
 import { part } from '#/helpers/parts';
 
 const meta = {
@@ -128,6 +128,43 @@ export const ForcedColors: Story = {
     const onThumb = style('switch-thumb').backgroundColor;
     const onTrack = style('switch-track').backgroundColor;
     await expect(contrast(onThumb, onTrack)).toBeGreaterThan(3);
+    await expect(style('switch-track').borderTopColor).toBe(
+      computedColor('Highlight'),
+    );
+  },
+  tags: ['forced-colors'],
+};
+
+// A disabled switch turns its outline and thumb GrayText, as a native
+// disabled control does; forced colors alone would draw them in the page's
+// text color.
+export const ForcedColorsDisabled: Story = {
+  args: { isDisabled: true },
+  parameters: {
+    a11y: { config: { rules: [{ enabled: false, id: 'color-contrast' }] } },
+  },
+  play: async () => {
+    const gray = computedColor('GrayText');
+    await expect(style('switch-track').borderTopColor).toBe(gray);
+    await expect(style('switch-thumb').backgroundColor).toBe(gray);
+  },
+  tags: ['forced-colors'],
+};
+
+// On and disabled, the track fills GrayText under a thumb that stands out on
+// it, so it doesn't read as an enabled switch.
+export const ForcedColorsOnDisabled: Story = {
+  args: { defaultSelected: true, isDisabled: true },
+  parameters: {
+    a11y: { config: { rules: [{ enabled: false, id: 'color-contrast' }] } },
+  },
+  play: async () => {
+    const gray = computedColor('GrayText');
+    await expect(style('switch-track').borderTopColor).toBe(gray);
+    await expect(style('switch-track').backgroundColor).toBe(gray);
+    await expect(
+      contrast(style('switch-thumb').backgroundColor, gray),
+    ).toBeGreaterThan(3);
   },
   tags: ['forced-colors'],
 };

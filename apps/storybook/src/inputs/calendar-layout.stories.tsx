@@ -176,6 +176,18 @@ export const ForcedColors: Story = {
     await expect(style.backgroundColor).toBe(computedColor('Highlight'));
     await expect(style.color).toBe(computedColor('HighlightText'));
     await expect(style.backgroundImage).toBe('none');
+    // Opted out of forced colors, the selected day sets its own focus color.
+    await expect(style.forcedColorAdjust).toBe('none');
+    await expect(style.outlineColor).toBe(computedColor('Highlight'));
+    // Disabled days, such as those outside the month, take GrayText, as
+    // native disabled text does.
+    const outside = canvasElement.querySelector(
+      ':scope [data-outside-month] [data-slot=calendar-day]',
+    );
+    if (!outside) throw new Error('No day outside the month');
+    await expect(getComputedStyle(outside).color).toBe(
+      computedColor('GrayText'),
+    );
   },
   tags: ['forced-colors'],
 };

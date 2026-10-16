@@ -6,7 +6,7 @@ import {
 } from '@oakoss/ui/components/ui/inputs/radio-group';
 import { expect, fn, userEvent } from 'storybook/test';
 
-import { contrast, tokenColor } from '#/helpers/color';
+import { computedColor, contrast, tokenColor } from '#/helpers/color';
 import { part } from '#/helpers/parts';
 
 const meta = {
@@ -258,6 +258,23 @@ export const ForcedColors: Story = {
     await expect(contrast(team?.borderTopColor ?? '', page())).toBeGreaterThan(
       3,
     );
+    await expect(team?.borderTopWidth).toBe('4px');
+    await expect(team?.borderTopColor).toBe(computedColor('Highlight'));
+  },
+  tags: ['forced-colors'],
+};
+
+// Disabled dots turn GrayText, selected or not, as a native disabled
+// control's do; the selected one stays apart by its thick ring.
+export const ForcedColorsDisabled: Story = {
+  args: { defaultValue: 'team', isDisabled: true },
+  parameters: {
+    a11y: { config: { rules: [{ enabled: false, id: 'color-contrast' }] } },
+  },
+  play: async () => {
+    const [free, team] = dots();
+    await expect(free?.borderTopColor).toBe(computedColor('GrayText'));
+    await expect(team?.borderTopColor).toBe(computedColor('GrayText'));
     await expect(team?.borderTopWidth).toBe('4px');
   },
   tags: ['forced-colors'],

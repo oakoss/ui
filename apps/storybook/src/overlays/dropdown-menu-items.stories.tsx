@@ -11,7 +11,7 @@ import {
 } from '@oakoss/ui/components/ui/overlays/dropdown-menu';
 import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
 
-import { tokenColor } from '#/helpers/color';
+import { computedColor, tokenColor } from '#/helpers/color';
 import { part } from '#/helpers/parts';
 
 import {
@@ -239,13 +239,18 @@ export const Links: Story = {
 };
 
 // The focused item takes the system's selection colors in forced colors,
-// destructive or not.
+// destructive or not, and a disabled one stays at full opacity in GrayText.
 export const ForcedColors: Story = {
   args: {
     children: (
-      <DropdownMenuItem id="delete" intent="destructive">
-        Delete
-      </DropdownMenuItem>
+      <>
+        <DropdownMenuItem id="delete" intent="destructive">
+          Delete
+        </DropdownMenuItem>
+        <DropdownMenuItem id="archive" isDisabled>
+          Archive
+        </DropdownMenuItem>
+      </>
     ),
   },
   play: async () => {
@@ -267,6 +272,13 @@ export const ForcedColors: Story = {
       getComputedStyle(probe).color,
     );
     probe.remove();
+    // Opted out, so no backplate covers the Highlight fill.
+    await expect(getComputedStyle(remove).forcedColorAdjust).toBe('none');
+    const archive = within(menu).getByRole('menuitem', { name: 'Archive' });
+    await expect(getComputedStyle(archive).opacity).toBe('1');
+    await expect(getComputedStyle(archive).color).toBe(
+      computedColor('GrayText'),
+    );
   },
   tags: ['forced-colors'],
 };

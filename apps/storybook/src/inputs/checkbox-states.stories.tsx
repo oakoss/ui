@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Checkbox } from '@oakoss/ui/components/ui/inputs/checkbox';
 import { expect, userEvent } from 'storybook/test';
 
-import { contrast, tokenColor } from '#/helpers/color';
+import { computedColor, contrast, tokenColor } from '#/helpers/color';
 import { part } from '#/helpers/parts';
 
 const meta = {
@@ -95,9 +95,43 @@ export const ForcedColors: Story = {
     );
     const fill = box().backgroundColor;
     await expect(contrast(fill, page)).toBeGreaterThan(3);
+    await expect(box().borderTopColor).toBe(computedColor('Highlight'));
     const check = part('checkbox-indicator').querySelector('svg');
     if (!check) throw new Error('No check');
     await expect(contrast(getComputedStyle(check).color, fill)).toBeGreaterThan(
+      3,
+    );
+  },
+  tags: ['forced-colors'],
+};
+
+// A disabled box's outline turns GrayText, as a native disabled control's
+// does; forced colors alone would draw it in the page's text color.
+export const ForcedColorsDisabled: Story = {
+  args: { isDisabled: true },
+  parameters: {
+    a11y: { config: { rules: [{ enabled: false, id: 'color-contrast' }] } },
+  },
+  play: async () => {
+    await expect(box().borderTopColor).toBe(computedColor('GrayText'));
+  },
+  tags: ['forced-colors'],
+};
+
+// Checked and disabled, the box fills GrayText with a check that stands out
+// on it, so it doesn't read as an enabled checked box.
+export const ForcedColorsCheckedDisabled: Story = {
+  args: { defaultSelected: true, isDisabled: true },
+  parameters: {
+    a11y: { config: { rules: [{ enabled: false, id: 'color-contrast' }] } },
+  },
+  play: async () => {
+    const gray = computedColor('GrayText');
+    await expect(box().borderTopColor).toBe(gray);
+    await expect(box().backgroundColor).toBe(gray);
+    const check = part('checkbox-indicator').querySelector('svg');
+    if (!check) throw new Error('No check');
+    await expect(contrast(getComputedStyle(check).color, gray)).toBeGreaterThan(
       3,
     );
   },

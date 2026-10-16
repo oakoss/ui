@@ -42,8 +42,14 @@ const GroupContext = createContext<{
 // filled center would vanish into the page color.
 const dotStyles = tv({
   base: 'size-4 shrink-0 rounded-full border border-input bg-field transition-colors forced-colors:border-[ButtonText]',
+  // A disabled dot grays out selected too, or it would read as enabled.
   compoundVariants: [
     { className: 'border-destructive-text', isInvalid: true, isSelected: true },
+    {
+      className: 'forced-colors:border-[GrayText]',
+      isDisabled: true,
+      isSelected: true,
+    },
   ],
   variants: {
     isDisabled: { true: 'forced-colors:border-[GrayText]' },

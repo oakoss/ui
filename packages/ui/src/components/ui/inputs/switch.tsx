@@ -35,6 +35,14 @@ export type SwitchProps = {
 // system colors there, and the thumb keeps an outline either way.
 const trackStyles = tv({
   base: 'flex shrink-0 items-center rounded-full border border-transparent bg-input px-0.5 transition-colors forced-colors:border-[ButtonText]',
+  // On and disabled grays out too, or it would read as enabled.
+  compoundVariants: [
+    {
+      className: 'forced-colors:border-[GrayText] forced-colors:bg-[GrayText]',
+      isDisabled: true,
+      isSelected: true,
+    },
+  ],
   variants: {
     isDisabled: { true: 'forced-colors:border-[GrayText]' },
     isFocusVisible: {
