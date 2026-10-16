@@ -52,6 +52,18 @@ export default defineConfig({
         browser: {
           commands: { emulateReducedMotion, movePointerOffscreen },
           enabled: true,
+          // Visual runs (VITE_VISUAL) write one image per story and project.
+          expect: {
+            toMatchScreenshot: {
+              resolveScreenshotPath: ({ arg, ext, project, root }) =>
+                path.join(
+                  root,
+                  '.visual',
+                  project.name.split(' ', 1)[0] ?? project.name,
+                  `${arg}${ext}`,
+                ),
+            },
+          },
           headless: true,
           instances: [{ browser: 'chromium' }],
           provider: playwright(

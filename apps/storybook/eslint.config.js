@@ -33,6 +33,7 @@ export default defineConfig(
       'src/helpers/pointer.ts',
       'src/helpers/press.ts',
       'src/helpers/viewport.ts',
+      'src/helpers/visual.ts',
     ],
     rules: { 'no-restricted-syntax': 'off' },
   },
