@@ -30,10 +30,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: pnpm/setup@fbda4c85fc2e1e08721cd8763afea8f48d60f024 # v3.0.0
-        with:
-          cache: true
-          require-lockfile: true
+      - uses: ./.github/actions/setup
 
       # Builds first; the tests catch pages that prerender with missing content.
       - run: pnpm turbo run test --filter=@oakoss/docs
