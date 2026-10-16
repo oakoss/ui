@@ -31,9 +31,16 @@ jobs:
           persist-credentials: false
 
       - uses: ./.github/actions/setup
+        with:
+          playwright: ${{ github.event_name == 'push' && '@oakoss/docs' || '' }}
+          turbo-cache: docs-deploy
 
-      # Builds first; the tests catch pages that prerender with missing content.
-      - run: pnpm turbo run test --filter=@oakoss/docs
+      # CI's docs job tests a PR. A deploy builds first, and its tests catch
+      # pages that prerender with missing content.
+      - if: github.event_name == 'push'
+        run: pnpm turbo run test --filter=@oakoss/docs
+      - if: github.event_name == 'pull_request'
+        run: pnpm turbo run build --filter=@oakoss/docs
 
       - name: Deploy to ui.oakoss.dev
         if: github.event_name == 'push'
