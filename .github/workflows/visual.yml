@@ -58,7 +58,11 @@ jobs:
       - uses: pnpm/setup@fbda4c85fc2e1e08721cd8763afea8f48d60f024 # v3.0.0
         with:
           cache: true
-          require-lockfile: true
+          install: false
+
+      # The image has no xz, which oakum's postinstall needs to unpack its
+      # binary; capture needs no install script.
+      - run: pnpm install --frozen-lockfile --ignore-scripts --no-runtime
 
       - name: Capture every story
         working-directory: apps/storybook
