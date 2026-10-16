@@ -17,21 +17,27 @@ const emulateReducedMotion: BrowserCommand<[isReduced: boolean]> = (
   page.emulateMedia({ reducedMotion: isReduced ? 'reduce' : 'no-preference' });
 
 // The CLI and CI run, and axe-check, every story in both themes, plus stories
-// tagged forced-colors under Windows High Contrast emulation. Storybook's test
-// panel gets light only: it names every project after the config directory,
-// so two projects collide.
+// tagged forced-colors under Windows High Contrast emulation, in its light and
+// dark palettes. Storybook's test panel gets light only: it names every project
+// after the config directory, so two projects collide.
 const isPanel = process.env.VITEST_STORYBOOK === 'true';
 const isCI = process.env.CI === 'true';
 
-const projects = [
-  { name: 'light', theme: 'light' },
-  ...(isPanel
-    ? []
-    : [
-        { name: 'dark', theme: 'dark' },
-        { forcedColors: true, name: 'forced-colors', theme: 'light' },
-      ]),
-];
+type Project = {
+  forcedColors?: boolean;
+  name: string;
+  theme: 'dark' | 'light';
+};
+
+const panelProjects: Project[] = [{ name: 'light', theme: 'light' }];
+const projects: Project[] = isPanel
+  ? panelProjects
+  : [
+      ...panelProjects,
+      { name: 'dark', theme: 'dark' },
+      { forcedColors: true, name: 'forced-colors', theme: 'light' },
+      { forcedColors: true, name: 'forced-colors-dark', theme: 'dark' },
+    ];
 
 export default defineConfig({
   test: {
@@ -66,8 +72,16 @@ export default defineConfig({
           },
           headless: true,
           instances: [{ browser: 'chromium' }],
+          // Chromium picks the forced palette from the color scheme.
           provider: playwright(
-            forcedColors ? { contextOptions: { forcedColors: 'active' } } : {},
+            forcedColors
+              ? {
+                  contextOptions: {
+                    colorScheme: theme,
+                    forcedColors: 'active',
+                  },
+                }
+              : {},
           ),
         },
         name,
