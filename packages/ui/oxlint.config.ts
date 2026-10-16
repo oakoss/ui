@@ -154,7 +154,12 @@ const arbitraryValues: Record<string, string[]> = {
   ],
   'src/components/ui/inputs/checkbox-group.tsx': selectionStates,
   'src/components/ui/inputs/checkbox.tsx': selectionStates,
-  'src/components/ui/inputs/list-box.tsx': scrollsInPopover,
+  // The list stays inside React Aria's 12px viewport padding on each side.
+  'src/components/ui/inputs/list-box.tsx': [
+    ...scrollsInPopover,
+    'max-w-[calc(100%-24px)]',
+    'min-w-[min(var(--trigger-width),calc(100%-24px))]',
+  ],
   'src/components/ui/inputs/number-field.tsx': disabledGray,
   'src/components/ui/inputs/radio-group.tsx': selectionStates,
   'src/components/ui/inputs/slider.tsx': selectionStates,

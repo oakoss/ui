@@ -146,7 +146,7 @@ export function ListBoxItem<T extends object>({
   );
 }
 
-// The list is at least the field's width, so long options aren't cut off.
+// At least the field's width, capped inside React Aria's 12px viewport padding.
 export function ListBoxPopover({
   className,
   kind,
@@ -156,7 +156,10 @@ export function ListBoxPopover({
 }: { kind: ListKind } & PopoverContentProps) {
   return (
     <PopoverContent
-      className={cn('w-auto min-w-(--trigger-width) p-1', className)}
+      className={cn(
+        'w-auto max-w-[calc(100%-24px)] min-w-[min(var(--trigger-width),calc(100%-24px))] p-1',
+        className,
+      )}
       data-slot={`${kind}-content`}
       offset={offset}
       placement={placement}

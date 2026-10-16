@@ -226,6 +226,26 @@ export const ButtonDecorations: Story = {
   },
 };
 
+// A full-width field's list stays inside React Aria's 12px viewport padding,
+// or scrolling an option into view scrolls the page and closes the list.
+export const FullWidthList: Story = {
+  play: async ({ canvas }) => {
+    const input = canvas.getByRole('combobox', { name: 'Fruit' });
+    const viewport = document.documentElement.clientWidth;
+    await expect(
+      input.closest('[data-slot=input-group]')?.getBoundingClientRect().width,
+    ).toBe(viewport);
+    await userEvent.type(input, 'ap');
+    const list = await screen.findByRole('listbox');
+    const popover = list.closest<HTMLElement>('[data-slot=combobox-content]');
+    if (!popover) throw new Error('No popover');
+    for (const animation of popover.getAnimations()) animation.finish();
+    await expect(popover.getBoundingClientRect().right).toBeLessThanOrEqual(
+      viewport - 12,
+    );
+  },
+};
+
 // className sizes the field, and the list is at least as wide as the input
 // and buttons together.
 export const ListWidth: Story = {
