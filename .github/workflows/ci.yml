@@ -209,33 +209,14 @@ jobs:
         with:
           persist-credentials: false
 
-      # A pinned release checked against its published checksum. Renovate reads
-      # `uses:`, not `env:`, so this pin moves only by hand, version and
-      # checksum together.
-      - name: Install jactionlint
-        env:
-          JACTIONLINT_VERSION: 2.2.0
-          JACTIONLINT_SHA256: 8137d5bfe266dd5e48d2af2306827785ce07c6988e04b1c3d6ad4776e97d27d2
-        run: |
-          set -euo pipefail
-          tarball="$RUNNER_TEMP/jactionlint.tar.gz"
-          curl -fsSL -o "$tarball" \
-            "https://github.com/jdx/jactionlint/releases/download/v${JACTIONLINT_VERSION}/jactionlint_${JACTIONLINT_VERSION}_linux_amd64.tar.gz"
-          echo "$JACTIONLINT_SHA256  $tarball" | sha256sum -c -
-          tar -xzf "$tarball" -C "$RUNNER_TEMP" jactionlint
-          sudo install "$RUNNER_TEMP/jactionlint" /usr/local/bin/jactionlint
-          # Another jactionlint earlier on PATH would lint in its place.
-          installed="$(jactionlint --version | head -1)"
-          if [ "$installed" != "$JACTIONLINT_VERSION" ]; then
-            echo "jactionlint on PATH is $installed, expected $JACTIONLINT_VERSION" >&2
-            exit 1
-          fi
-
       # jactionlint skips `run:` blocks without shellcheck and still exits 0.
       - run: shellcheck --version
 
-      # No `shell: python` steps, so pyflakes is off.
-      - run: jactionlint --pyflakes= --format github
+      # The action downloads the jactionlint release it was published with, so
+      # pinning it pins the binary. No `shell: python` steps, so pyflakes is off.
+      - uses: jdx/jactionlint@1027f0a131ab98bc7e191d995bfa15dbed5bbf8f # v2.2.0
+        with:
+          args: --pyflakes=
 
   ci-summary:
     name: CI Summary
