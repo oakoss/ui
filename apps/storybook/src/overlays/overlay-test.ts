@@ -100,8 +100,15 @@ export function wait(ms: number) {
   });
 }
 
+// Jumps every finite animation on the page to its end rather than waiting
+// them out, so a trigger's or backdrop's own transition ends too. An infinite
+// one never ends, and finish() throws on it.
 async function finished(element: HTMLElement) {
-  await Promise.all(element.getAnimations().map((a) => a.finished));
+  const animations = element.ownerDocument
+    .getAnimations()
+    .filter((a) => a.effect?.getComputedTiming().endTime !== Infinity);
+  for (const animation of animations) animation.finish();
+  await Promise.all(animations.map((a) => a.finished));
 }
 
 function slideStyle(element: HTMLElement) {
