@@ -63,9 +63,11 @@ export const Keyboard: Story = {
     trigger.focus();
     await userEvent.keyboard('{ArrowDown}');
     const list = await screen.findByRole('listbox');
+    await expect(trigger).toHaveAttribute('aria-controls', list.id);
     await userEvent.keyboard('{ArrowDown}{Enter}');
     await waitFor(() => expect(list).not.toBeInTheDocument());
     await expect(onChange).toHaveBeenCalledOnce();
+    await waitFor(() => expect(trigger).toHaveFocus());
   },
 };
 

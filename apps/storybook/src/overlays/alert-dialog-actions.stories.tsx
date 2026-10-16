@@ -95,12 +95,13 @@ export const SyncAction: Story = {
 export const AsyncAction: Story = {
   play: async () => {
     work.current = Promise.withResolvers<null>();
-    await openAlert();
+    const { content } = dialogParts(await openAlert(), 'alert-dialog');
     const action = await pressDelete();
     await expect(action).toHaveAttribute('data-pending');
     await expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
     await userEvent.keyboard('{Escape}');
-    await expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+    // A closing dialog stays mounted through its exit transition.
+    await expect(content).not.toHaveAttribute('data-exiting');
     work.current.resolve(null);
     await closed('alertdialog');
   },

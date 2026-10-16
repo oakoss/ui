@@ -46,6 +46,7 @@ export const Default: Story = {
     ).toBeNull();
     await userEvent.type(input, 'ap');
     const list = await screen.findByRole('listbox');
+    await expect(input).toHaveAttribute('aria-controls', list.id);
     await expect(within(list).getAllByRole('option')).toHaveLength(2);
     await userEvent.click(
       within(list).getByRole('option', { name: 'Apricot' }),
@@ -223,6 +224,25 @@ export const ButtonDecorations: Story = {
     await expect(
       canvas.getByRole('button', { name: /Show suggestions/u }),
     ).toBeInTheDocument();
+  },
+};
+
+// Tab reaches each decoration button, and Enter presses it without opening
+// the list.
+export const ButtonDecorationsKeyboard: Story = {
+  ...ButtonDecorations,
+  play: async ({ canvas }) => {
+    await userEvent.tab();
+    await expect(canvas.getByRole('button', { name: 'Scope' })).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(onScope).toHaveBeenCalledOnce();
+    await userEvent.tab();
+    await expect(canvas.getByRole('combobox', { name: 'Fruit' })).toHaveFocus();
+    await userEvent.tab();
+    await expect(canvas.getByRole('button', { name: 'Filters' })).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(onFilters).toHaveBeenCalledOnce();
+    await expect(screen.queryByRole('listbox')).toBeNull();
   },
 };
 

@@ -42,6 +42,7 @@ export const Multiple: Story = {
     await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(screen.queryByRole('listbox')).toBeNull());
     await expect(trigger(canvas)).toHaveTextContent('Apple and Pear');
+    await waitFor(() => expect(trigger(canvas)).toHaveFocus());
   },
   render: (args) => (
     <MultipleSelect label={args.label} selectionMode="multiple">

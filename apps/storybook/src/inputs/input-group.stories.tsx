@@ -111,6 +111,28 @@ export const AddonClick: Story = {
   render: () => <Website />,
 };
 
+// An onClick that prevents the default stops the addon focusing the input.
+export const AddonClickPrevented: Story = {
+  play: async ({ canvas }) => {
+    await userEvent.click(canvas.getByText('$'));
+    await expect(
+      canvas.getByRole('textbox', { name: 'Price' }),
+    ).not.toHaveFocus();
+  },
+  render: () => (
+    <InputGroup
+      onClick={(event) => {
+        event.preventDefault();
+      }}
+    >
+      <InputGroupAddon>
+        <InputGroupText>$</InputGroupText>
+      </InputGroupAddon>
+      <Input aria-label="Price" />
+    </InputGroup>
+  ),
+};
+
 // A native control in an addon keeps the focus a click gives it.
 export const AddonSelect: Story = {
   play: async ({ canvas }) => {
