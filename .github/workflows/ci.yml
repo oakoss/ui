@@ -19,6 +19,9 @@ jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Bounds the turbo cache restored below, which every run re-saves.
+    env:
+      TURBO_CACHE_MAX_AGE: 7d
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -28,6 +31,20 @@ jobs:
         with:
           cache: true
           require-lockfile: true
+
+      # Turbo replays a task whose inputs match an earlier run's, so packages
+      # a change doesn't touch skip typecheck and tests. Turbo doesn't hash
+      # the Node version or runner image, so the key does; the image variables
+      # are the runner's own, which the env context can't read.
+      - id: turbo-key
+        run: |
+          set -euo pipefail
+          echo "prefix=turbo-${RUNNER_OS}-${ImageOS}-${ImageVersion}-$(node --version)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          key: ${{ steps.turbo-key.outputs.prefix }}-${{ github.sha }}
+          path: .turbo/cache
+          restore-keys: ${{ steps.turbo-key.outputs.prefix }}-
 
       - run: pnpm typecheck
       - run: pnpm lint
@@ -73,6 +90,18 @@ jobs:
             echo "No test script in: $missing"
             exit 1
           fi
+
+      # Storybook's and the docs' pretest install Chromium for this Playwright.
+      - id: playwright
+        run: |
+          set -euo pipefail
+          version="$(pnpm --filter @oakoss/storybook exec node -p "require('playwright/package.json').version")"
+          [ -n "$version" ]
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+          path: ~/.cache/ms-playwright
 
       - run: pnpm test
 
@@ -169,12 +198,32 @@ jobs:
       - if: (success() || failure()) && steps.pr-status.outcome == 'failure'
         run: echo "::warning title=oakum ci pr-status::the step failed, so the release plan may not have reached the PR or the job summary; the check above still decides"
 
+  # jactionlint, a maintained actionlint fork that tracks new workflow syntax;
+  # the default profile, security rules included.
+  workflows:
+    name: Workflows
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # jactionlint skips `run:` blocks without shellcheck and still exits 0.
+      - run: shellcheck --version
+
+      # The action downloads the jactionlint release it was published with, so
+      # pinning it pins the binary. No `shell: python` steps, so pyflakes is off.
+      - uses: jdx/jactionlint@1027f0a131ab98bc7e191d995bfa15dbed5bbf8f # v2.2.0
+        with:
+          args: --pyflakes=
+
   ci-summary:
     name: CI Summary
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: always()
-    needs: [check, commitlint, oakum]
+    needs: [check, commitlint, oakum, workflows]
     steps:
       # Gates every job in `needs`; a job left out of `needs` is not gated.
       - name: Gate on all required jobs
