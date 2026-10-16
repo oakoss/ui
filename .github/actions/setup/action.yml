@@ -1,0 +1,54 @@
+name: Setup
+description: Installs dependencies and restores the turbo and Chromium caches.
+
+inputs:
+  turbo-cache:
+    description: A name for this job's turbo cache, or empty for none.
+    default: ''
+  playwright:
+    description: A package whose tests run Playwright, to restore Chromium for its version, or empty for none.
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - uses: pnpm/setup@fbda4c85fc2e1e08721cd8763afea8f48d60f024 # v3.0.0
+      with:
+        cache: true
+        require-lockfile: true
+
+    # Turbo replays a task whose inputs match an earlier run's, so packages
+    # a change doesn't touch skip their tasks. Turbo doesn't hash the Node
+    # version or runner image, so the key does; the image variables are the
+    # runner's own, which the env context can't read. Every run re-saves the
+    # cache, so the max age bounds it.
+    - id: turbo-key
+      if: inputs.turbo-cache != ''
+      shell: bash
+      run: |
+        set -euo pipefail
+        echo "prefix=turbo-${RUNNER_OS}-${ImageOS}-${ImageVersion}-$(node --version)" >> "$GITHUB_OUTPUT"
+        echo "TURBO_CACHE_MAX_AGE=7d" >> "$GITHUB_ENV"
+    - if: inputs.turbo-cache != ''
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        key: ${{ steps.turbo-key.outputs.prefix }}-${{ inputs.turbo-cache }}-${{ github.sha }}
+        path: .turbo/cache
+        restore-keys: ${{ steps.turbo-key.outputs.prefix }}-${{ inputs.turbo-cache }}-
+
+    # The package's pretest installs Chromium for its Playwright.
+    - id: playwright
+      if: inputs.playwright != ''
+      shell: bash
+      env:
+        PACKAGE: ${{ inputs.playwright }}
+      run: |
+        set -euo pipefail
+        version="$(pnpm --filter "$PACKAGE" exec playwright --version | sed -n 's/^Version //p')"
+        [ -n "$version" ]
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+    - if: inputs.playwright != ''
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+        path: ~/.cache/ms-playwright

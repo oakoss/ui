@@ -33,10 +33,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: pnpm/setup@fbda4c85fc2e1e08721cd8763afea8f48d60f024 # v3.0.0
-        with:
-          cache: true
-          require-lockfile: true
+      - uses: ./.github/actions/setup
 
       - run: pnpm exec oakum ci version-pr
         env:
@@ -62,10 +59,7 @@ jobs:
           persist-credentials: true
           token: ${{ steps.app-token.outputs.token }}
 
-      - uses: pnpm/setup@fbda4c85fc2e1e08721cd8763afea8f48d60f024 # v3.0.0
-        with:
-          cache: true
-          require-lockfile: true
+      - uses: ./.github/actions/setup
 
       # Tags carry the App bot as their tagger, matching the token that pushes them.
       - name: Use the App bot's git identity
