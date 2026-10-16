@@ -1,0 +1,103 @@
+name: Visual
+
+# Screenshots every story and comments on the PR with the ones that changed
+# since its merge base. Report only: outside CI Summary and never a required
+# check. Plan and measurements: docs/research/0005-visual-regression-spike.md.
+on:
+  # reg-actions compares a PR against the capture taken at its merge base, so
+  # main captures on every push.
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - .github/workflows/visual.yml
+      - apps/storybook/.storybook/**
+      - apps/storybook/src/styles/**
+      - apps/storybook/vitest.config.ts
+      - packages/tokens/src/**
+      - '!packages/tokens/src/**/*.test.ts'
+      - '!packages/tokens/src/__snapshots__/**'
+      - packages/ui/src/**
+      - '!packages/ui/src/**/*.test.ts'
+      - pnpm-lock.yaml
+
+permissions:
+  contents: read
+
+# Only PR runs cancel: a cancelled main capture leaves later PRs without a base.
+concurrency:
+  group: visual-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  TURBO_TELEMETRY_DISABLED: '1'
+
+jobs:
+  capture:
+    if: github.event_name == 'push' || !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    # reg-actions finds the base run's artifact and comments on the PR.
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: write
+    # Matches Storybook's pinned Playwright; bump the two together.
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.0-noble@sha256:06a9939e57531807f8d5fd76ce44b53165ffb7d7501d87ab10e285c20b1e971f
+    steps:
+      # The PR head, not checkout's default merge commit, since the base is the
+      # merge base's capture; reg-actions runs git merge-base, so full history.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - uses: pnpm/setup@fbda4c85fc2e1e08721cd8763afea8f48d60f024 # v3.0.0
+        with:
+          cache: true
+          require-lockfile: true
+
+      - name: Capture every story
+        working-directory: apps/storybook
+        env:
+          CI: 'true'
+          VITE_VISUAL: 'true'
+        run: pnpm exec vitest run --update=all --reporter=default --reporter=github-actions --reporter=json --outputFile.json="$RUNNER_TEMP/visual.json"
+
+      # A screenshot path without the project, or a capture that wrote nothing,
+      # would otherwise pass.
+      - name: Check each passed story wrote one image
+        working-directory: apps/storybook
+        shell: node {0}
+        run: |
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const report = path.join(process.env.RUNNER_TEMP, 'visual.json');
+          const passed = JSON.parse(fs.readFileSync(report, 'utf8')).numPassedTests;
+          const written = fs
+            .readdirSync('.visual', { recursive: true })
+            .filter((file) => file.endsWith('.png')).length;
+          console.log(`${passed} passed, ${written} images`);
+          if (!Number.isInteger(passed) || passed === 0 || written !== passed) {
+            console.log(`::error title=Visual capture::${written} images for ${passed} passed stories`);
+            process.exit(1);
+          }
+
+      # The container runs as root over a runner-owned checkout, and checkout's
+      # safe.directory entry doesn't outlast its step; reg-actions' git calls need it.
+      - name: Trust the checkout for git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      # Uploads the capture as the `reg` artifact. On a PR it compares against
+      # the merge base's artifact and comments only when images changed.
+      - uses: reg-viz/reg-actions@f0cccbcab7e7ecf9b0434b719f1e842c97bcd2a7 # v3
+        with:
+          comment-mode: changes
+          disable-branch: true
+          github-token: ${{ github.token }}
+          image-directory-path: apps/storybook/.visual
+          outdated-comment-action: update
+          threshold-pixel: 50

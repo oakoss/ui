@@ -21,6 +21,15 @@
     },
     { "automerge": false, "matchUpdateTypes": ["major"] },
     {
+      "description": "visual.yml's container must match Storybook's Playwright, or its browsers are missing; Storybook pins it exactly, since lockfile maintenance isn't grouped.",
+      "groupName": "Playwright",
+      "matchPackageNames": [
+        "@playwright/test",
+        "mcr.microsoft.com/playwright",
+        "playwright"
+      ]
+    },
+    {
       "description": "Our own packages; the release-age wait guards against third-party compromises.",
       "matchPackageNames": ["@oakoss/**"],
       "minimumReleaseAge": null
