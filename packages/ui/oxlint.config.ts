@@ -151,6 +151,7 @@ const arbitraryValues: Record<string, string[]> = {
     ...selectionStates,
     'forced-colors:bg-[Mark]',
     'forced-colors:outline-[Highlight]',
+    'forced-colors:text-[MarkText]',
   ],
   'src/components/ui/inputs/checkbox-group.tsx': selectionStates,
   'src/components/ui/inputs/checkbox.tsx': selectionStates,

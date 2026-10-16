@@ -6,6 +6,7 @@ import { expect, userEvent, within } from 'storybook/test';
 
 import { computedColor, contrast, tokenColor } from '#/helpers/color';
 import { freezeDate } from '#/helpers/date';
+import { setState } from '#/helpers/state';
 
 const DateRangeCalendar = RangeCalendar<CalendarDate>;
 
@@ -242,10 +243,19 @@ export const ForcedColors: Story = {
     if (!band) throw new Error('No band');
     const border = getComputedStyle(band);
     await expect(border.borderTopStyle).toBe('solid');
+    await expect(border.borderTopWidth).toBe('1px');
     await expect(border.borderTopColor).toBe(computedColor('Highlight'));
-    await expect(
-      styles(cell(canvasElement, /January 12, 2026/u)).day.backgroundColor,
-    ).toBe(computedColor('Mark'));
+    // The invalid end opts out of forced colors, so it sets its own text and
+    // focus colors, and keeps the state layer's gradient off its fill.
+    const start = cell(canvasElement, /January 12, 2026/u);
+    await setState(start, 'hovered');
+    const end = styles(start).day;
+    await expect(end.backgroundColor).toBe(computedColor('Mark'));
+    await expect(end.forcedColorAdjust).toBe('none');
+    await expect(end.color).toBe(computedColor('MarkText'));
+    await expect(contrast(end.color, end.backgroundColor)).toBeGreaterThan(4.5);
+    await expect(end.outlineColor).toBe(computedColor('Highlight'));
+    await expect(end.backgroundImage).toBe('none');
   },
   tags: ['forced-colors'],
 };

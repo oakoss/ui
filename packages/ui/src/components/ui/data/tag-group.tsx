@@ -31,7 +31,7 @@ const styles = tv({
     'disabled:opacity-50 forced-colors:disabled:text-[GrayText] forced-colors:disabled:opacity-100 forced-colors:disabled:selected:text-[GrayText]',
     // Forced colors repaint a selected fill as the page color, so a selected
     // tag takes the system's selection colors while it's enabled.
-    'forced-colors:selected:not-disabled:border-[Highlight] forced-colors:selected:not-disabled:bg-[Highlight] forced-colors:selected:not-disabled:bg-none forced-colors:selected:not-disabled:text-[HighlightText] forced-colors:selected:not-disabled:forced-color-adjust-none forced-colors:selected:not-disabled:focus-visible:outline-[Highlight]',
+    'forced-colors:selected:not-disabled:border-[Highlight] forced-colors:selected:not-disabled:bg-[Highlight] forced-colors:selected:not-disabled:text-[HighlightText] forced-colors:selected:not-disabled:forced-color-adjust-none forced-colors:selected:not-disabled:focus-visible:outline-[Highlight]',
   ],
   variants: {
     intent: {

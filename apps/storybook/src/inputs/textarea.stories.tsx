@@ -159,6 +159,9 @@ export const ForcedColors: Story = {
     const textarea = canvas.getByRole('textbox', { name: 'Bio' });
     const native = canvas.getByRole('textbox', { name: 'Native' });
     await expect(getComputedStyle(textarea).borderTopStyle).toBe('solid');
+    // Preflight's border style stays solid without a width, so a missing
+    // border still passes the style check.
+    await expect(getComputedStyle(textarea).borderTopWidth).toBe('1px');
     await expect(getComputedStyle(textarea).borderTopColor).toBe(
       getComputedStyle(native).borderTopColor,
     );

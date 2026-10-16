@@ -34,9 +34,15 @@ export type CheckboxProps = {
 // carries it.
 const boxStyles = tv({
   base: 'flex size-4 shrink-0 items-center justify-center rounded-sm border border-input bg-field text-primary-foreground transition-colors forced-colors:border-[ButtonText]',
-  // An invalid box keeps its error border when checked.
+  // An invalid box keeps its error border when checked, and a disabled one
+  // grays out checked too, or it would read as enabled.
   compoundVariants: [
     { className: 'border-destructive-text', isInvalid: true, isSelected: true },
+    {
+      className: 'forced-colors:border-[GrayText] forced-colors:bg-[GrayText]',
+      isDisabled: true,
+      isSelected: true,
+    },
   ],
   variants: {
     isDisabled: { true: 'forced-colors:border-[GrayText]' },
