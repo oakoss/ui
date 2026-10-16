@@ -46,20 +46,10 @@ jobs:
           path: .turbo/cache
           restore-keys: ${{ steps.turbo-key.outputs.prefix }}-
 
-      # Read-only checks run side by side; the theme check below writes files.
-      - id: typecheck
-        background: true
-        run: pnpm typecheck
-      - id: lint
-        background: true
-        run: pnpm lint
-      - id: format
-        background: true
-        run: pnpm format:check
-      - id: registry
-        background: true
-        run: pnpm exec shadcn registry validate
-      - wait-all:
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm format:check
+      - run: pnpm exec shadcn registry validate
 
       - name: Check generated theme files are up to date
         run: |
@@ -208,8 +198,8 @@ jobs:
       - if: (success() || failure()) && steps.pr-status.outcome == 'failure'
         run: echo "::warning title=oakum ci pr-status::the step failed, so the release plan may not have reached the PR or the job summary; the check above still decides"
 
-  # jactionlint, a maintained fork of actionlint that knows newer syntax such
-  # as parallel steps; the default profile, security rules included.
+  # jactionlint, a maintained actionlint fork that tracks new workflow syntax;
+  # the default profile, security rules included.
   workflows:
     name: Workflows
     runs-on: ubuntu-latest
