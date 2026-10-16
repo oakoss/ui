@@ -12,6 +12,8 @@ test-results/
 
 # Storybook
 storybook-static/
+.visual/
+.vitest/
 *storybook.log
 
 # Logs

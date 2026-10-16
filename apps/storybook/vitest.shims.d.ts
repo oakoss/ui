@@ -2,4 +2,5 @@
 
 interface ImportMetaEnv {
   readonly VITE_STORY_THEME?: 'dark' | 'light';
+  readonly VITE_VISUAL?: string;
 }

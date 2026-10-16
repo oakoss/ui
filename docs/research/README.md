@@ -11,6 +11,7 @@ Research notes that inform ideas, specs, and decisions. Each note captures what 
 
 <!-- Add newest first: - [NNNN — Title](./NNNN-kebab-title.md) — one-line hook -->
 
+- [0005 — Visual Regression from the Storybook Run](./0005-visual-regression-spike.md) — screenshotting every story in the Vitest run, a 2.2% noise floor across two identical runs, and the comparison options.
 - [0004 — Token Data Model](./0004-token-model-research.md) — component libraries, design systems, token formats and theme families checked against the proposed model: lightness scales with named roles, typed contrast pairs, axes as modifiers.
 - [0003 — Docs Site Inspiration](./0003-docs-site-inspiration.md) — what 22 docs sites do best, ranked by fit for our static Fumadocs site, and the beads filed from them.
 - [0002 — Forking shadcn's React Aria Base](./0002-shadcn-aria-fork.md) — fork shadcn's React Aria base into tv, styles as tokens, theme families, and swappable fonts and icons.
