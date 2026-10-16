@@ -46,7 +46,8 @@ Two full runs of one tree in `mcr.microsoft.com/playwright:v1.64.0-noble` (x86, 
 
 **reg-actions** (README and repository, checked 2026-10-16):
 
-- **Base images** come from the artifact the workflow uploaded on the target branch, so it runs on both `push` and `pull_request`, and `main` must upload a capture on every push. Merging a PR is the approval: its capture becomes `main`'s next base.
+- **Base images** come from the `reg` artifact of a run whose commit is the PR's merge base (`git merge-base` of the base and head SHAs, in `src/git.ts` and `src/run.ts` on `main` at `7bcfef2`, the source the pinned `v3` build `f0cccbc` was generated from; corrected 2026-10-16 while building the workflow). So it runs on both `push` and `pull_request`, `main` must upload a capture on every push, and checkout needs the full history. Merging a PR is the approval: its capture becomes the base for PRs branched after it.
+- **It uploads its own artifact,** the capture plus any base images and diffs, with no retention setting (`retention-days` applies only to the image branch), so artifacts keep the repository's default retention.
 - **Thresholds:** `matching-threshold` (per-pixel YIQ distance), then `threshold-pixel` or `threshold-rate`; `threshold-pixel` wins when both are set. All default to 0, which would flag all 37 noisy images.
 - **Image branch:** by default it pushes the comment's images to a branch (`branch`, default `reg_actions`) in this repository and needs a token with write access. `disable-branch: true` turns that off; the comment then shows no images, and the diffs live only in the uploaded artifact.
 - **It never fails the workflow** on changes; it reports through the comment.
@@ -60,12 +61,12 @@ Two full runs of one tree in `mcr.microsoft.com/playwright:v1.64.0-noble` (x86, 
 
 - **Time:** a capture would take about 12–13 minutes plus setup, inferred from the container times; a normal Storybook run took about the same in the container as in CI (420–450s). As its own workflow it adds nothing to the `check` job or CI Summary. Running capture inside `check` is not possible, since it needs `--update=all`.
 - **Minutes:** free. The repository is public, and Actions on standard GitHub-hosted runners is free for public repositories.
-- **Storage:** 20.5MB per capture. At CI's recent 9–25 runs a day, keeping every capture for the default 90 days could reach tens of gigabytes. Keeping PR captures for 7 days leaves mostly the `main` captures kept 90 days to protect the base: about 6 path-matching pushes a day comes to roughly 11GB (inferred). GitHub documents storage quotas for private repositories and none for public ones, so free storage here is inferred. reg-actions' image branch would grow the repository's history for good, which `disable-branch: true` avoids. Actions caches already hold 11.6GB, over the free 10GB, so GitHub evicts the least recently used; a capture uses artifacts, not the cache.
-- **Baseline gaps:** a PR compares against the last capture uploaded on `main`. A cancelled or failed `main` run leaves the previous capture as the base, so a PR can show changes that are already on `main`.
+- **Storage:** 20.5MB per capture. At CI's recent 9–25 runs a day, keeping every capture for the default 90 days could reach tens of gigabytes. reg-actions can't set a shorter retention for PR captures, and a PR's artifact also holds the base images, about twice the size (inferred). GitHub documents storage quotas for private repositories and none for public ones, so free storage here is inferred. reg-actions' image branch would grow the repository's history for good, which `disable-branch: true` avoids. Actions caches already hold 11.6GB, over the free 10GB, so GitHub evicts the least recently used; a capture uses artifacts, not the cache.
+- **Baseline gaps:** a PR compares against the capture at its merge base. When that `main` run was cancelled, failed or expired, the PR finds no base, and every push posts a new comment reporting every story as new: reg-actions' no-base path ignores `comment-mode` and `outdated-comment-action` (`src/service.ts`). PRs branched before the workflow's first `main` capture hit this too.
 - **Rendering upgrades:** a Playwright or Chromium bump, or a font change in the runner image, can change hundreds of images at once. Capturing inside the pinned Playwright container rules out the runner image; browser upgrades will still show many changes.
 - **Review load:** every intentional visual change produces a report to look at, and new or renamed stories show as added or removed.
 - **Fork PRs** get a read-only token, so reg-actions can't comment on them; the capture still runs.
-- **Maintenance:** a third-party action pinned by commit SHA, artifact retention, and the popover story's opt-out or fix.
+- **Maintenance:** a third-party action pinned by commit SHA, artifact retention, and keeping the container and Storybook's Playwright on one version.
 
 ### When to capture
 
@@ -74,20 +75,21 @@ Measured against the last 30 merged PRs, a filter on every UI path (`packages/ui
 ## Recommendation
 
 1. **Keep the capture hook** as built: whole page, per-project paths, soft assertion, flag-gated.
-2. **Add a `visual.yml` workflow** that runs `VITE_VISUAL=true vitest run --update=all` in the Playwright container and uploads `.visual` as an artifact. It checks each project wrote one image per story it ran: a path without the project (light and dark overwriting each other) or a capture that wrote nothing would otherwise pass. It runs automatically, with no label to remember:
-   - **Pull requests** that change `packages/ui/src` or `packages/tokens/src` (not their tests or snapshots), `apps/storybook/.storybook`, `apps/storybook/src/styles`, or the lockfile; not while a PR is a draft. A PR that only changes stories or story helpers gets no report; its new stories join the baseline when it merges.
-   - **Pushes to `main`** on the same paths plus all of `apps/storybook/src`, so the baseline picks up new stories as they merge.
+2. **Add a `visual.yml` workflow** that runs `VITE_VISUAL=true vitest run --update=all` in the Playwright container, and reg-actions uploads `.visual` as its artifact. It checks one image was written per story that passed: a path without the project (light and dark overwriting each other) or a capture that wrote nothing would otherwise pass. It runs automatically, with no label to remember:
+   - **Pull requests** that change `packages/ui/src` or `packages/tokens/src` (not their tests or snapshots), `apps/storybook/.storybook`, `apps/storybook/src/styles`, `apps/storybook/vitest.config.ts`, the lockfile, or the workflow itself; not while a PR is a draft. A PR that only changes stories or story helpers gets no report; its new stories join the baseline when it merges.
+   - **Every push to `main`,** since a PR whose merge base has no capture gets no comparison.
 3. **Compare with reg-actions, `disable-branch: true`** (chosen 2026-10-16) and `threshold-pixel: 50` alone, since it overrides `threshold-rate`: a PR comment listing changed stories, diffs in the artifact, nothing pushed to the repository. The image branch and reg-cli were the alternatives.
 4. **Report, don't block:** reg-actions never fails the workflow; a few weeks of reports would show whether the threshold holds.
 5. **Run settings:**
-   - **Only PR runs cancel:** a newer push to a PR cancels its older run, but `main` runs always finish, since a cancelled `main` capture leaves PRs comparing against a stale base.
-   - **Keep the base alive:** `main` artifacts for 90 days, PR artifacts for 7. Past retention, the next PR finds no base and reports every story as new.
-   - **Update a branch that's behind before reading its report:** reg-actions compares against `main`'s latest capture, not the PR's merge base, so a stale branch shows other merged changes as diffs.
-   - **Pin the container to the lockfile's Playwright version** and bump both together (Renovate can update a workflow's container image); a mismatch fails on missing browsers.
+   - **Only PR runs cancel:** a newer push to a PR cancels its older run, but `main` runs always finish, since a cancelled `main` capture leaves PRs branched from that commit without a base.
+   - **Keep the base alive:** artifacts keep the repository's default retention, since reg-actions sets none. A PR whose merge base is older than that finds no base and reports every story as new.
+   - **A stale branch's report holds:** reg-actions compares against the capture at the merge base, so changes merged to `main` since then don't show as diffs.
+   - **Pin the container to Storybook's Playwright version** and bump both together (Renovate can update a workflow's container image); a mismatch fails on missing browsers. Storybook pins Playwright exactly, since Renovate's lockfile maintenance isn't grouped and could move it alone.
+   - **Check out the PR head,** not checkout's default merge commit, so the capture and its merge-base base share history; and add the checkout to git's `safe.directory`, since the container runs as root over a runner-owned workspace.
    - **Permissions and triggers:** `pull_request`, never `pull_request_target`, which would run fork code with write access; `contents: read`, `actions: read`, `pull-requests: write`.
    - **Not a required check**, so a flaky capture never blocks a merge, outside CI Summary, with `timeout-minutes: 25`.
    - **Growth:** capture time grows with the story count; Vitest's `--shard` can split it across jobs if it gets slow.
-6. **Before turning it on:** fix or opt out the popover-inside-dialog story (an opt-out needs a per-story parameter in the hook), and add the image-count check. Lockfile-only Renovate PRs will run captures too; that is expected, since dependency bumps can change rendering.
+6. **Before turning it on:** fix or opt out the popover-inside-dialog story (fixed: its play function opened the popover while the dialog was still scaling in), and add the image-count check. Lockfile-only Renovate PRs will run captures too; that is expected, since dependency bumps can change rendering.
 
 ## Sources
 

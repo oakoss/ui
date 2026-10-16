@@ -3,7 +3,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Dialog, DialogTitle } from '@oakoss/ui/components/ui/overlays/dialog';
 import { expect, screen, userEvent, waitFor } from 'storybook/test';
 
-import { closed, visible } from './dialog-demo';
+import { closed, dialogParts, visible } from './dialog-demo';
+import { settled } from './overlay-test';
 import {
   PopoverDemo,
   type PopoverDemoProps,
@@ -86,14 +87,20 @@ export const Offset: Story = {
 };
 
 // Opened from an open Dialog, the popover stacks above it and stays reachable
-// while React Aria hides the dialog behind it.
+// while React Aria hides the dialog behind it. The click waits for the dialog
+// to settle, since the popover places itself against the trigger once.
 export const InsideDialog: Story = {
   play: async () => {
-    await screen.findByRole('dialog', { name: 'Layers' });
+    await settled(
+      dialogParts(await screen.findByRole('dialog', { name: 'Layers' }))
+        .content,
+    );
     await userEvent.click(
       screen.getByRole('button', { name: 'Open settings' }),
     );
-    const { dialog, panel } = await settledPopover();
+    const { box, dialog, panel, trigger } = await settledPopover();
+    // The panel's top snaps to a whole pixel; the trigger's bottom doesn't.
+    await expect(Math.abs(box.top - trigger.bottom - 8)).toBeLessThan(1);
     await expect(panel.closest('[inert], [aria-hidden=true]')).toBeNull();
     await expect(getComputedStyle(panel).zIndex).toBe('1400');
     await expect(
