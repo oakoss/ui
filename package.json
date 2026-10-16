@@ -16,6 +16,7 @@
   "scripts": {
     "build": "turbo run build",
     "build-storybook": "turbo run build-storybook",
+    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm exec shadcn registry validate && bash scripts/check-generated.sh && bash scripts/check-workspace.sh",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "lint": "pnpm run lint:oxlint && pnpm run lint:eslint && pnpm run lint:md",

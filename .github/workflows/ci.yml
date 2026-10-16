@@ -46,48 +46,17 @@ jobs:
           path: .turbo/cache
           restore-keys: ${{ steps.turbo-key.outputs.prefix }}-check-
 
-      - run: pnpm typecheck
-      - run: pnpm lint
-      - run: pnpm format:check
-      - run: pnpm exec shadcn registry validate
+      # The same checks as a local `pnpm check`, so the two can't drift.
+      - run: pnpm check
 
-      - name: Check generated theme files are up to date
+      # A clean checkout stays clean: a generator that writes a file its
+      # check doesn't know about fails here.
+      - name: Check nothing was left changed
         run: |
-          pnpm --filter @oakoss/tokens generate
-          if [ -n "$(git status --porcelain -- packages/ui)" ]; then
-            echo "Generated theme files are stale; run: pnpm --filter @oakoss/tokens generate"
-            git status --short -- packages/ui
-            git diff -- packages/ui
-            exit 1
-          fi
-
-      - name: Check every package has a test script and lint configs
-        run: |
-          set -euo pipefail
-          workspace="$(pnpm ls -r --depth -1 --json | jq -e '
-            (map(.path) | min_by(length)) as $root
-            | map(. + {dir: (.path | ltrimstr($root) | ltrimstr("/"))})
-            | map(select(.dir != ""))
-            | if length == 0 then error("pnpm found no workspace packages") else . end')"
-          jq -e '
-            [.[] | select(.name == null) | .dir]
-            | if length > 0 then error("workspace packages without a name: \(join(" "))") else true end' <<<"$workspace" >/dev/null
-          no_lint="$(jq -r '.[] | select(.dir | startswith("tooling/") | not) | .dir' <<<"$workspace" | while IFS= read -r dir; do
-            [ -f "$dir/oxlint.config.ts" ] && [ -f "$dir/eslint.config.js" ] || echo "$dir"
-          done)"
-          if [ -n "$no_lint" ]; then
-            echo "Missing oxlint.config.ts or eslint.config.js in: $no_lint"
-            exit 1
-          fi
-          # Config-only tooling packages are covered by typecheck and lint.
-          exempt="$(jq -c '[.[] | select(.dir | startswith("tooling/")) | .name]' <<<"$workspace")"
-          missing="$(pnpm turbo run test --dry=json | jq -er --argjson exempt "$exempt" '
-            (.packages | if length == 0 then error("turbo found no workspace packages") else . end)
-            - $exempt
-            - [.tasks[] | select(.task == "test" and (.command | type) == "string" and .command != "<NONEXISTENT>") | .package]
-            | join(" ")')"
-          if [ -n "$missing" ]; then
-            echo "No test script in: $missing"
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::error title=Tree changed::pnpm check left files changed or added"
+            git status --short
+            git diff
             exit 1
           fi
 

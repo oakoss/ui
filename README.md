@@ -43,6 +43,7 @@ pnpm install
 pnpm run setup      # task tracking (beads); see AGENTS.md
 pnpm storybook      # component stories
 pnpm --filter @oakoss/docs dev
+pnpm check          # typecheck, lint, format, registry, generated files and workspace layout
 pnpm test
 ```
 
