@@ -1,5 +1,57 @@
 # Changelog
 
+## 0.4.0 (2026-10-16)
+
+### Added
+
+Add an installable theme item per family (`theme-<family>`), so `shadcn add oakoss/ui/theme-mauve` switches a project's colors.
+
+Add Dropdown Menu and Context Menu, sharing menu parts with shortcuts, descriptions, checkbox and radio groups, destructive items, links and submenus. A Button that opens a menu or listbox stays full size while its popup is open, so the popup sits where it was placed.
+
+Add Command, a searchable list of commands built on Autocomplete and the menu parts, inline or in a dialog, with groups, keywords, shortcuts and descriptions.
+
+**Breaking:** `isEmptyNode` moves from Field to its own file. Import it from `@/lib/empty-node` instead of `@/components/ui/inputs/field`.
+
+Alert: a callout with `AlertTitle`, `AlertDescription` and `AlertAction`, in neutral (the default), info, success, warning and destructive intents. Each colored intent shows an icon, hidden from screen readers, so the meaning isn't color alone; `icon` replaces it, and a value that renders nothing hides it. It has no role by default, where upstream's always announced itself with `role="alert"`; `role` takes `alert` for something urgent or `status` for a message that waits its turn. `AlertAction` sits after the text on a wide alert and below it on a narrow one, where upstream pinned it in the corner with a fixed space beside the text, and the layout follows the reading direction. Links in an alert are underlined, and the border keeps its edge in Windows High Contrast. Install with `npx shadcn@latest add oakoss/ui/alert`.
+
+Badge: a short label or count in neutral, primary (the default), success, warning, destructive and info intents, each `solid`, `soft` or `outline`, the same `intent` and `variant` names as Button. A badge that's a link or button is React Aria's `Link` or `Button` with `badgeStyles`, which adds hover, press, focus, a disabled look and a 44×44 pointer target, and a plain badge has no hover style, where upstream's `ghost` and `link` variants gave one to any badge. Upstream's `render` prop is gone. Digits are tabular and text stays on one line, and a solid badge keeps its edge in Windows High Contrast. The docs map upstream's variants to these and show a count read whole by screen readers. Install with `npx shadcn@latest add oakoss/ui/badge`.
+
+Progress: a bar on React Aria's `ProgressBar`. `label` renders the label and the value, formatted for the locale, above the track; children replace that layout, built from `ProgressLabel`, `ProgressValue` and `ProgressTrack`, where upstream rendered its children above a track it always added, so a hand-placed track drew twice. Intents color the fill with a color that keeps 3:1 against the track in light and dark. An indeterminate bar slides a short fill across the track in the reading direction, where upstream's was a full, static bar that looked finished, and with reduced motion the fill rests mid-track. A value arriving after an indeterminate bar starts the fill at that value. The fill takes the system's highlight color in Windows High Contrast. The item adds its animation to your stylesheet's `@theme inline`. Install with `npx shadcn@latest add oakoss/ui/progress`.
+
+Tag Group: a labeled set of tags on React Aria's `TagGroup`, which the user can remove or select. `label`, `description`, `errorMessage` and `emptyLabel` (default "No tags") sit around the tags, which are its children or built from `items`. `onRemove` adds a 24px remove button to each tag, named "Remove" with the tag's text in the user's language, and Delete or Backspace removes the focused tag. Tags come in neutral (the default), primary, success, warning, destructive and info intents, soft at rest and solid when selected, so selection isn't color alone. A tag whose content isn't plain text needs `textValue`, checked by the types; a link tag is underlined; a long tag truncates under a width you set while its name stays whole; and the empty list shows the focus outline after the last removal. In Windows High Contrast a selected tag takes the system's selection colors and a disabled one its disabled color. Install with `npx shadcn@latest add oakoss/ui/tag-group`.
+
+Meter: a value within a known range, such as storage used, on React Aria's `Meter`. It takes Progress's layout: `label` renders the label and the value, formatted for the locale, above the track, and children replace that layout, built from `MeterLabel`, `MeterValue` and `MeterTrack`. Each intent's fill keeps 3:1 against the track in light and dark, the fill slides to a new value, and it takes the system's highlight color in Windows High Contrast. The docs show units and computing an intent from thresholds. Install with `npx shadcn@latest add oakoss/ui/meter`.
+
+Radio Group: the group's description and error now sit above the options, between the label and the list, so they're read before it. Text fields keep theirs below the input.
+
+Number Field: a number input on React Aria's `NumberField`, formatted for the locale through `formatOptions` (currency, percent, units). `label`, `description` and `errorMessage` lay it out like Text Field, or children replace the layout, with `NumberFieldStepper` for the steppers. `steppers` places the buttons: `split` (the default) puts − before the value and + after it, `start` and `end` put the pair on one side, and `none` leaves them out. React Aria names each stepper for the field, translated, and keeps it out of the tab order; a stepper at a bound fades, the steppers stay square at every size and widen to 44px on phones, and in Windows High Contrast a disabled one takes the system's disabled color. Install with `npx shadcn@latest add oakoss/ui/number-field`.
+
+Search Field: a search input on React Aria's `SearchField`, with a leading search icon and a clear button that appears once there's text. React Aria names the button "Clear search", translated, and keeps it out of the tab order, since Escape clears; it's hidden while the field is empty or read-only. Without a label or a name of its own, the field is named "Search". The on-screen keyboard's Enter key reads Search (`enterKeyHint`, overridable). `label`, `description`, `errorMessage`, `start` and `end` lay it out like Text Field, or children replace the layout, with `SearchFieldClear` for the button. Install with `npx shadcn@latest add oakoss/ui/search-field`.
+
+Checkbox Group: checkboxes on React Aria's `CheckboxGroup`, with `CheckboxGroupItem` for each option. The group's `label` names it, and its `description` and error sit between the label and the options. `orientation` lays the options out vertically (the default) or in a row that wraps; `variant="card"` makes each whole option the click target; `targetSize` gives each box a 44px hit area. A required group's error defaults to "Select at least one option." (`requiredLabel`). Checkbox exports `CheckboxIndicator`, the box both share. Install with `npx shadcn@latest add oakoss/ui/checkbox-group`.
+
+Calendar and RangeCalendar: date pickers on React Aria's `Calendar` and `RangeCalendar`, showing one or more months (`visibleMonths`) and always six weeks, so the height holds between months. Days are 36px and grow to 44px wherever a touch pointer is present; today has a dot, never a fill, so it shows inside a range. A range fills its ends and runs a band through the days between, outside-month days included. Unavailable days are struck through, `errorMessage` shows while invalid, `isLoading` fades the months behind a spinner, and `heading` and `footer` take content of your own, such as presets. In Windows High Contrast the selected day takes the system's selection colors. Install with `npx shadcn@latest add oakoss/ui/calendar`; `calendar-month-year-select` adds month and year dropdowns for the heading, which keep the month and day when the year list stops at `minValue` or `maxValue`, and are disabled with the calendar.
+
+Add Table: a plain HTML table with optional sticky header and first column, compact and striped rows, end-aligned numbers, a selected-row style, and a scroll area that becomes a named, focusable region only when it overflows.
+
+Table rows tint on hover only with the `interactive` prop. A row or cell marked `aria-current` takes a warm linked tint, a focused cell draws the focus ring, and scrolling pads by the sticky header and first column so a linked row lands clear of them. `--table-bg` can be set on any ancestor, digits have equal width across the table, and a selected row's tint is stronger in dark mode.
+
+### Fixed
+
+Select and Combobox options with an interpolated label, such as `Delete {count} files`, now filter and typeahead as one string, and a blank `textValue` falls back to the text label; choosing such an option fills Combobox's input with that text. A blank `emptyLabel` on Combobox shows an empty list instead of an unnamed option.
+
+Tag Group, Select, Combobox, Dropdown Menu, Context Menu and Command render their empty label through a shared `lib/empty-state.ts`, which installs with each of them. Tag Group's empty label is now a block like the others'.
+
+Input hides WebKit's built-in search clear button and decoration, so Command's input and the new Search Field show only their own. A Text Field with `type="search"` no longer shows the browser's clear button; `className="[&_input::-webkit-search-cancel-button]:block"` on the Text Field brings it back.
+
+Combobox: a button in `start` or `end` keeps its own name, tab stop and action. It had taken the trigger's, so it was named "Show suggestions" and opened the list.
+
+Select warns in the console when a start or end decoration holds a focusable element, which can't be reached inside its trigger button.
+
+Select's and Combobox's lists stay inside the viewport when the field spans nearly its full width. A list as wide as the field stuck out past the screen's edge, which let the page scroll sideways; in Combobox, pressing ArrowDown then closed the list and cleared what was typed.
+
+In forced colors, a checked and disabled Checkbox, Radio or Switch now grays out like a native disabled control instead of drawing the enabled selection colors, and Calendar's invalid selected day uses MarkText on its Mark fill, so its number stays readable in the light High Contrast palette. TagGroup drops a forced-colors class that changed nothing.
+
 ## 0.3.0 (2026-10-11)
 
 ### Added
