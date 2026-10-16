@@ -16,7 +16,7 @@ import {
   type DemoProps,
   dialogParts,
 } from './dialog-demo';
-import { settled } from './overlay-test';
+import { inState, settled } from './overlay-test';
 
 const meta = {
   args: { defaultOpen: true },
@@ -44,6 +44,21 @@ export const Open: Story = {
     await expect(getComputedStyle(overlay).zIndex).toBe('1300');
     const close = closePosition(dialog);
     await expect(close).toMatchObject({ left: false, right: true, top: true });
+  },
+};
+
+// The panel enters from, and exits toward, transparent at 95%, and the
+// overlay fades with it.
+export const Motion: Story = {
+  play: async () => {
+    const { content, overlay } = dialogParts(await screen.findByRole('dialog'));
+    await settled(content);
+    const hidden = { opacity: '0', scale: '0.95' };
+    for (const state of ['entering', 'exiting'] as const) {
+      await expect(await inState(content, state, motion)).toEqual(hidden);
+      const backdrop = await inState(overlay, state, motion);
+      await expect(backdrop.opacity).toBe('0');
+    }
   },
 };
 
@@ -140,3 +155,8 @@ export const ForcedColors: Story = {
   },
   tags: ['forced-colors'],
 };
+
+function motion(element: HTMLElement) {
+  const { opacity, scale } = getComputedStyle(element);
+  return { opacity, scale };
+}
