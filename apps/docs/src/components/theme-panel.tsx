@@ -1,3 +1,5 @@
+import type { Key } from 'react-aria-components';
+
 import { Button } from '@oakoss/ui/components/ui/inputs/button';
 import { Select, SelectItem } from '@oakoss/ui/components/ui/inputs/select';
 import {
@@ -17,7 +19,6 @@ import {
 } from '@oakoss/ui/components/ui/overlays/tooltip';
 import { Palette } from 'lucide-react';
 import { type ReactNode, useEffect, useId, useRef, useState } from 'react';
-import { type Key } from 'react-aria-components';
 import { themeOptions } from 'virtual:theme-options';
 
 import { packageManagerKey, packageManagers } from '#/lib/package-managers';
