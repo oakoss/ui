@@ -1,9 +1,9 @@
 import type { ComponentProps, ReactNode } from 'react';
-
-import {
-  type DialogProps as AriaDialogProps,
-  type ModalOverlayProps as AriaModalOverlayProps,
+import type {
+  DialogProps as AriaDialogProps,
+  ModalOverlayProps as AriaModalOverlayProps,
 } from 'react-aria-components';
+
 import { tv, type VariantProps } from 'tailwind-variants/lite';
 
 import {

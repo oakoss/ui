@@ -3,10 +3,8 @@ import {
   type TextFieldProps as AriaTextFieldProps,
 } from 'react-aria-components';
 
-import {
-  type FieldMessages,
-  type Shortcut,
-} from '#/components/ui/inputs/field';
+import type { FieldMessages, Shortcut } from '#/components/ui/inputs/field';
+
 import { Input, type InputSize } from '#/components/ui/inputs/input';
 import {
   DecoratedInputGroup,

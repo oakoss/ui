@@ -1,4 +1,5 @@
-import { type ClassNameValue } from 'cn';
+import type { ClassNameValue } from 'cn';
+
 import { createCn } from 'cn/config';
 import { composeRenderProps } from 'react-aria-components';
 

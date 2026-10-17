@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { type Family } from '#/family';
+import type { Family } from '#/family';
+
 import { families, styles, typographies } from '#/index';
 import { familyCssVars, registryCssVars } from '#/registry';
 import {

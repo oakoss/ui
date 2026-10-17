@@ -1,8 +1,8 @@
+import type { Gray } from '#/families/tailwind-grays';
 import type { NeutralRole } from '#/roles';
 import type { Step } from '#/scale';
 
 import { oklch } from '#/color';
-import { type Gray } from '#/families/tailwind-grays';
 import { tailwindScales } from '#/families/tailwind-scales';
 import { type ColorRef, defineFamily } from '#/family';
 

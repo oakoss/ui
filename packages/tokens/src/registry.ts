@@ -1,5 +1,6 @@
 import type { Family } from '#/family';
 import type { Style } from '#/style';
+import type { ThemeTokens } from '#/theme';
 import type { Typography } from '#/typography';
 
 import {
@@ -11,7 +12,6 @@ import {
   typographyDeclarations,
   zIndexDeclarations,
 } from '#/css';
-import { type ThemeTokens } from '#/theme';
 
 export type CssVars = {
   dark: Record<string, string>;

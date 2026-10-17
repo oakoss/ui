@@ -35,6 +35,7 @@ export default defineConfig({
         'typescript/no-dynamic-delete': 'error',
         'typescript/no-empty-object-type': 'error',
         'typescript/no-explicit-any': 'error',
+        'typescript/no-import-type-side-effects': 'error',
         'typescript/no-inferrable-types': 'error',
         'typescript/no-invalid-void-type': 'error',
         'typescript/no-misused-promises': [

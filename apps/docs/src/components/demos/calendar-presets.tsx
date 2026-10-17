@@ -1,3 +1,5 @@
+import type { DateRange } from 'react-aria-components';
+
 import {
   endOfMonth,
   getLocalTimeZone,
@@ -7,7 +9,6 @@ import {
 import { Button } from '@oakoss/ui/components/ui/inputs/button';
 import { RangeCalendar } from '@oakoss/ui/components/ui/inputs/calendar';
 import { useState } from 'react';
-import { type DateRange } from 'react-aria-components';
 
 // Saving a preset's id rather than its dates keeps "Last 7 days" relative.
 const presets = [
