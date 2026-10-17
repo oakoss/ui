@@ -4020,6 +4020,43 @@
           "target": "@lib/cn-config.ts"
         }
       ]
+    },
+    {
+      "name": "date-range-picker",
+      "type": "registry:ui",
+      "title": "Date Range Picker",
+      "description": "Start and end date inputs with a range calendar in a popover, and start and end time fields there when the value includes a time; with a label, description and error, and slots for the calendar's heading and footer.",
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/calendar",
+        "oakoss/ui/date-field",
+        "oakoss/ui/date-picker",
+        "oakoss/ui/field",
+        "oakoss/ui/input-group",
+        "oakoss/ui/time-field"
+      ],
+      "dependencies": [
+        "@internationalized/date",
+        "cn",
+        "react-aria-components"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/date-range-picker.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/date-range-picker.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
     }
   ]
 }

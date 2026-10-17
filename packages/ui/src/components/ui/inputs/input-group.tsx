@@ -30,11 +30,11 @@ import { isEmptyNode } from '#/lib/empty-node';
 const groupStyles = tv({
   base: [
     'group/input-group relative flex w-full min-w-0 items-center rounded-control border border-input bg-field text-ui transition-colors',
-    'has-[>input:focus,>textarea:focus,>[data-slot=date-input][data-focus-within]]:outline-(length:--ring-width) has-[>input:focus,>textarea:focus,>[data-slot=date-input][data-focus-within]]:outline-offset-2 has-[>input:focus,>textarea:focus,>[data-slot=date-input][data-focus-within]]:outline-ring has-[>input:focus,>textarea:focus,>[data-slot=date-input][data-focus-within]]:outline-solid',
-    'has-[>:disabled]:opacity-50 has-[>[aria-invalid=true]]:border-destructive-text data-invalid:border-destructive-text forced-colors:has-[>:disabled]:opacity-100 forced-colors:has-[>:disabled]:[&>[data-slot=input-group-addon]]:text-[GrayText]',
+    'has-[>input:focus,>textarea:focus,>[data-slot=date-input][data-focus-within],>[data-slot=date-range-input]:focus-within]:outline-(length:--ring-width) has-[>input:focus,>textarea:focus,>[data-slot=date-input][data-focus-within],>[data-slot=date-range-input]:focus-within]:outline-offset-2 has-[>input:focus,>textarea:focus,>[data-slot=date-input][data-focus-within],>[data-slot=date-range-input]:focus-within]:outline-ring has-[>input:focus,>textarea:focus,>[data-slot=date-input][data-focus-within],>[data-slot=date-range-input]:focus-within]:outline-solid',
+    'has-[>:disabled,>[data-slot=date-range-input]>:disabled]:opacity-50 has-[>[aria-invalid=true]]:border-destructive-text data-invalid:border-destructive-text forced-colors:has-[>:disabled,>[data-slot=date-range-input]>:disabled]:opacity-100 forced-colors:has-[>:disabled,>[data-slot=date-range-input]>:disabled]:[&>[data-slot=input-group-addon]]:text-[GrayText]',
     'has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col has-[>textarea]:h-auto',
     '[&>:is(input,textarea)]:flex-1 [&>:is(input,textarea)]:self-stretch [&>:is(input,textarea)]:rounded-none [&>:is(input,textarea)]:border-0 [&>:is(input,textarea)]:bg-transparent [&>:is(input,textarea):disabled]:opacity-100 [&>:is(input,textarea):focus]:outline-none [&>input]:h-auto',
-    'has-[>[data-align=inline-end]]:[&>:is(input,[data-slot=date-input])]:pe-2 has-[>[data-align=inline-start]]:[&>:is(input,[data-slot=date-input])]:ps-2',
+    'has-[>[data-align=inline-end]]:[&>:is(input,[data-slot=date-input],[data-slot=date-range-input])]:pe-2 has-[>[data-align=inline-start]]:[&>:is(input,[data-slot=date-input],[data-slot=date-range-input])]:ps-2',
   ],
   defaultVariants: { size: 'md' },
   variants: {
@@ -126,7 +126,7 @@ export function InputGroup({
     }
     currentTarget
       .querySelector<HTMLElement>(
-        ':scope > input, :scope > textarea, :scope > [data-slot=date-input] [data-slot=date-segment]:not([data-type=literal])',
+        ':scope > input, :scope > textarea, :scope > :is([data-slot=date-input], [data-slot=date-range-input]) [data-slot=date-segment]:not([data-type=literal])',
       )
       ?.focus();
   }

@@ -164,9 +164,11 @@ const arbitraryValues: Record<string, string[]> = {
     'forced-colors:focus:text-[HighlightText]',
     '[scrollbar-width:none]',
   ],
+  // A range's two inputs scroll together without a scrollbar.
+  'src/components/ui/inputs/date-range-picker.tsx': ['[scrollbar-width:none]'],
   // A disabled field's addons gray like its native disabled input.
   'src/components/ui/inputs/input-group.tsx': [
-    'forced-colors:has-[>:disabled]:[&>[data-slot=input-group-addon]]:text-[GrayText]',
+    'forced-colors:has-[>:disabled,>[data-slot=date-range-input]>:disabled]:[&>[data-slot=input-group-addon]]:text-[GrayText]',
   ],
   // The list stays inside React Aria's 12px viewport padding on each side.
   'src/components/ui/inputs/list-box.tsx': [
