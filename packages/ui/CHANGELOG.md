@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1 (2026-10-17)
+
+### Fixed
+
+Text Field, Search Field, Sheet and `cx` import their types with `import type`, so an installed copy no longer keeps a runtime import of a module it uses only for types.
+
 ## 0.4.0 (2026-10-16)
 
 ### Added
