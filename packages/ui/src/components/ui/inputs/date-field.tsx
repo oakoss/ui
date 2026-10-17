@@ -8,6 +8,7 @@ import {
   type DateSegmentProps as AriaDateSegmentProps,
   type DateValue,
   GroupContext,
+  useSlottedContext,
 } from 'react-aria-components';
 
 import type { FieldMessages, Shortcut } from '#/components/ui/inputs/field';
@@ -78,16 +79,19 @@ export function DateField<T extends DateValue = DateValue>({
   );
 }
 
-// The InputGroup would take the GroupContext meant for the DateInput, and the
-// field would be announced as two groups.
+// The InputGroup takes only the field's state from the GroupContext meant for
+// the DateInput; with its name too, the field would be announced as two groups.
 export function DateFieldGroup({
   children,
   size,
   ...decorations
 }: DateFieldGroupProps) {
   const group = use(GroupContext);
+  const state = useSlottedContext(GroupContext);
   return (
-    <GroupContext value={null}>
+    <GroupContext
+      value={{ isDisabled: state?.isDisabled, isInvalid: state?.isInvalid }}
+    >
       <DecoratedInputGroup axis="inline" size={size} {...decorations}>
         <GroupContext value={group}>{children}</GroupContext>
       </DecoratedInputGroup>
