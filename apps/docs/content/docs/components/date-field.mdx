@@ -1,0 +1,155 @@
+---
+title: Date Field
+description: A date input with one editable segment per unit, ordered for the locale.
+item: date-field
+reactAria: https://react-aria.adobe.com/DateField
+---
+
+import { DateFieldDemo } from '#/components/demos/date-field-demo';
+import { DateFieldGranularity } from '#/components/demos/date-field-granularity';
+import { DateFieldValidation } from '#/components/demos/date-field-validation';
+
+<ComponentPreview name="date-field-demo">
+  <DateFieldDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="date-field" />
+
+## Usage
+
+```tsx
+import { parseDate } from '@internationalized/date';
+
+import { DateField } from '#/components/ui/inputs/date-field';
+
+<DateField defaultValue={parseDate('2026-03-14')} label="Due date" />;
+```
+
+Values are [Internationalized Date](https://react-aria.adobe.com/internationalized/date/)
+objects, not `Date`: `CalendarDate` for a day, `CalendarDateTime` for a day
+and time, and `ZonedDateTime` for a moment in a time zone. `parseDate` reads
+an ISO string such as `2026-03-14`, and `value.toString()` writes one back.
+
+Each unit is its own segment, in the order and with the digits of the
+user's locale, so nobody has to guess whether 3/4 means March or April. Type
+digits into a segment or step it with the arrow keys; there's no free text
+to parse.
+
+## Examples
+
+### Granularity
+
+`granularity` sets the smallest segment: `day` (the default for dates),
+`hour`, `minute` or `second`, which needs a `CalendarDateTime` or
+`ZonedDateTime` value. A `ZonedDateTime` shows its time zone, which
+`hideTimeZone` hides.
+
+<ComponentPreview name="date-field-granularity">
+  <DateFieldGranularity />
+</ComponentPreview>
+
+### Validation
+
+`minValue`, `maxValue` and `isDateUnavailable` validate the value, with
+React Aria's translated message unless you pass `errorMessage`. With the
+default `validationBehavior="native"`, errors show when the form is
+submitted; `validationBehavior="aria"` shows them as soon as the value
+breaks a rule.
+
+<ComponentPreview name="date-field-validation">
+  <DateFieldValidation />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria handles:
+
+- **Segments:** a `group` named by the label, with a
+  [spinbutton](https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/) per unit
+  named for its unit and the field ("month, Due date"). On iOS they're text
+  boxes, since VoiceOver can't focus a spinbutton there. Separators are
+  hidden from screen readers.
+- **Keyboard:** <kbd>←</kbd> and <kbd>→</kbd> move between segments, in the
+  locale's direction; digits fill a segment and move on once it's full;
+  <kbd>↑</kbd> and <kbd>↓</kbd> step it, <kbd>Page Up</kbd> and
+  <kbd>Page Down</kbd> step further, and <kbd>Home</kbd> and <kbd>End</kbd>
+  go to its first and last value; <kbd>Backspace</kbd> clears digits and moves
+  back from an empty segment.
+- **Forms:** the value as an ISO string in a hidden input when you pass
+  `name`.
+
+The field draws a single border and focus outline around its segments, as
+an Input does. A focused segment fills with the accent color, or red while
+the field is invalid, and in Windows High Contrast with the system's
+highlight color. A disabled field fades, and its segments take the system's
+disabled color in High Contrast.
+
+Known React Aria issues: VoiceOver's own increment and decrement gestures
+don't change a segment
+([react-spectrum#8591](https://github.com/adobe/react-spectrum/issues/8591)),
+and segments don't support copy and paste
+([react-spectrum#5285](https://github.com/adobe/react-spectrum/issues/5285)).
+
+## API
+
+### DateField
+
+Extends React Aria's [`DateField`](https://react-aria.adobe.com/DateField#api).
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/date-field.tsx"
+  name="DateFieldLayoutProps"
+/>
+
+Also accepts all [React Aria `DateField` props](https://react-aria.adobe.com/DateField#api).
+Takes the layout props or children, not both: children replace the layout,
+built from the [Field](/docs/components/field) parts, `DateFieldGroup` and
+`DateInput`.
+
+#### Data attributes
+
+| Attribute       | Present when           |
+| --------------- | ---------------------- |
+| `data-slot`     | Always: `date-field`   |
+| `data-disabled` | The field is disabled  |
+| `data-invalid`  | The field is invalid   |
+| `data-readonly` | The field is read-only |
+| `data-required` | The field is required  |
+
+### DateFieldGroup
+
+The border around a `DateInput`, for a layout of your own. It takes `size`,
+`start` and `end` like the field.
+
+### DateInput
+
+React Aria's [`DateInput`](https://react-aria.adobe.com/DateField#api) with
+a `DateSegment` per unit, which scrolls sideways when a long locale
+outgrows the field.
+
+#### Data attributes
+
+| Attribute           | Present when          |
+| ------------------- | --------------------- |
+| `data-slot`         | Always: `date-input`  |
+| `data-focus-within` | A segment has focus   |
+| `data-invalid`      | The field is invalid  |
+| `data-disabled`     | The field is disabled |
+
+### DateSegment
+
+One unit of the value, or a separator.
+
+#### Data attributes
+
+| Attribute          | Present when                                                                       |
+| ------------------ | ---------------------------------------------------------------------------------- |
+| `data-slot`        | Always: `date-segment`                                                             |
+| `data-type`        | Always: the unit (`year`, `month`, `day`, `hour`, …), or `literal` for a separator |
+| `data-placeholder` | The segment has no value yet                                                       |
+| `data-invalid`     | The field is invalid                                                               |
+| `data-disabled`    | The field is disabled                                                              |

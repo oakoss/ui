@@ -155,6 +155,19 @@ const arbitraryValues: Record<string, string[]> = {
   ],
   'src/components/ui/inputs/checkbox-group.tsx': selectionStates,
   'src/components/ui/inputs/checkbox.tsx': selectionStates,
+  // A focused segment opts out of forced colors on a Highlight fill; a
+  // disabled one is a span, so it grays itself. The segments of a long
+  // locale scroll without a scrollbar.
+  'src/components/ui/inputs/date-field.tsx': [
+    'forced-colors:data-disabled:text-[GrayText]',
+    'forced-colors:focus:bg-[Highlight]',
+    'forced-colors:focus:text-[HighlightText]',
+    '[scrollbar-width:none]',
+  ],
+  // A disabled field's addons gray like its native disabled input.
+  'src/components/ui/inputs/input-group.tsx': [
+    'forced-colors:has-[>:disabled]:[&>[data-slot=input-group-addon]]:text-[GrayText]',
+  ],
   // The list stays inside React Aria's 12px viewport padding on each side.
   'src/components/ui/inputs/list-box.tsx': [
     ...scrollsInPopover,

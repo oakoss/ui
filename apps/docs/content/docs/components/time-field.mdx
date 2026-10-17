@@ -1,0 +1,81 @@
+---
+title: Time Field
+description: A time input with hour, minute and day-period segments that follow the locale.
+item: time-field
+reactAria: https://react-aria.adobe.com/TimeField
+---
+
+import { TimeFieldDemo } from '#/components/demos/time-field-demo';
+import { TimeFieldHourCycle } from '#/components/demos/time-field-hour-cycle';
+
+<ComponentPreview name="time-field-demo">
+  <TimeFieldDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="time-field" />
+
+## Usage
+
+```tsx
+import { parseTime } from '@internationalized/date';
+
+import { TimeField } from '#/components/ui/inputs/time-field';
+
+<TimeField defaultValue={parseTime('09:30')} label="Start time" />;
+```
+
+The value is a `Time` from
+[Internationalized Date](https://react-aria.adobe.com/internationalized/date/):
+`parseTime` reads `09:30`, and `value.toString()` writes `09:30:00`. A time
+with a date is a [Date Field](/docs/components/date-field) with
+`granularity="minute"`.
+
+## Examples
+
+### Hour cycle and seconds
+
+The locale decides between a 12-hour clock with a day-period segment and a
+24-hour one; `hourCycle` forces either. `granularity="second"` adds a
+seconds segment.
+
+<ComponentPreview name="time-field-hour-cycle">
+  <TimeFieldHourCycle />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria handles the same segments and keys as
+[Date Field](/docs/components/date-field#accessibility): a `group` named by
+the label, a spinbutton per unit, and arrow keys to move between and step
+them. In a 12-hour locale, typing the first letter of the day period sets
+it.
+
+Known React Aria issue: after clearing the field, the hidden form input
+keeps the old value
+([react-spectrum#9801](https://github.com/adobe/react-spectrum/issues/9801)).
+
+## API
+
+### TimeField
+
+Extends React Aria's [`TimeField`](https://react-aria.adobe.com/TimeField#api).
+
+#### Props
+
+Takes the same layout props as [Date Field](/docs/components/date-field#api)
+(`label`, `description`, `errorMessage`, `errors`, `size`, `start` and
+`end`), and all [React Aria `TimeField` props](https://react-aria.adobe.com/TimeField#api).
+Children replace the layout, built from the Field parts, `DateFieldGroup`
+and `DateInput` from Date Field.
+
+#### Data attributes
+
+| Attribute       | Present when           |
+| --------------- | ---------------------- |
+| `data-slot`     | Always: `time-field`   |
+| `data-disabled` | The field is disabled  |
+| `data-invalid`  | The field is invalid   |
+| `data-readonly` | The field is read-only |
+| `data-required` | The field is required  |

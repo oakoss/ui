@@ -3899,6 +3899,74 @@
           "target": "@lib/cn-config.ts"
         }
       ]
+    },
+    {
+      "name": "date-field",
+      "type": "registry:ui",
+      "title": "Date Field",
+      "description": "Date input made of one editable segment per unit, ordered and formatted for the locale, with a label, description and error; pass children to compose the field parts.",
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/field",
+        "oakoss/ui/input",
+        "oakoss/ui/input-group"
+      ],
+      "dependencies": [
+        "@internationalized/date",
+        "cn",
+        "react-aria-components"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/date-field.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/date-field.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "time-field",
+      "type": "registry:ui",
+      "title": "Time Field",
+      "description": "Time input made of hour, minute and day-period segments that follow the locale's hour cycle, with a label, description and error; pass children to compose the field parts.",
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/date-field",
+        "oakoss/ui/field",
+        "oakoss/ui/input-group"
+      ],
+      "dependencies": [
+        "@internationalized/date",
+        "cn",
+        "react-aria-components"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/time-field.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/time-field.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
     }
   ]
 }
