@@ -7,6 +7,8 @@ import {
 import {
   Group as AriaGroup,
   type GroupProps as AriaGroupProps,
+  GroupContext,
+  useSlottedContext,
 } from 'react-aria-components';
 import { tv } from 'tailwind-variants/lite';
 
@@ -97,17 +99,18 @@ export function DecoratedInputGroup({
 
 // A named group is announced as one; an unnamed one only lays out its
 // children. Inside a React Aria field it takes the field's invalid and
-// disabled state. Clicking an addon focuses the control, unless the click
-// lands on something interactive of its own.
+// disabled state, and a date picker names it. Clicking an addon focuses the
+// control, unless the click lands on something interactive of its own.
 export function InputGroup({
   className,
   onClick,
   size = 'md',
   ...props
 }: InputGroupProps) {
+  const named = { ...useSlottedContext(GroupContext), ...props };
   const isNamed =
-    (props['aria-label'] ?? '').trim() !== '' ||
-    (props['aria-labelledby'] ?? '').trim() !== '';
+    (named['aria-label'] ?? '').trim() !== '' ||
+    (named['aria-labelledby'] ?? '').trim() !== '';
   function focusControl(event: MouseEvent<HTMLDivElement>) {
     onClick?.(event);
     const { currentTarget, defaultPrevented, target } = event;

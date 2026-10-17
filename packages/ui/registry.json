@@ -3967,6 +3967,59 @@
           "target": "@lib/cn-config.ts"
         }
       ]
+    },
+    {
+      "name": "date-picker",
+      "type": "registry:ui",
+      "title": "Date Picker",
+      "description": "A segmented date input with a calendar in a popover, and a time field there when the value includes a time; with a label, description and error, and slots for the calendar's heading and footer.",
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/button",
+        "oakoss/ui/calendar",
+        "oakoss/ui/date-field",
+        "oakoss/ui/field",
+        "oakoss/ui/input-group",
+        "oakoss/ui/popover",
+        "oakoss/ui/time-field"
+      ],
+      "dependencies": [
+        "@internationalized/date",
+        "cn",
+        "react-aria-components"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/date-picker.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/date-picker.tsx"
+        },
+        {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/empty-node.ts",
+          "type": "registry:lib",
+          "target": "@lib/empty-node.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
     }
   ]
 }

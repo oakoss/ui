@@ -38,7 +38,7 @@ export type DateInputProps = Omit<AriaDateInputProps, 'children'>;
 
 // React Aria throws when the granularity is finer than the value holds: a
 // CalendarDate has no hour.
-type GranularityOf<T extends DateValue> = T extends { hour: number }
+export type GranularityOf<T extends DateValue> = T extends { hour: number }
   ? AriaDateFieldProps<T>['granularity']
   : 'day';
 

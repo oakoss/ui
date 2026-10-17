@@ -5,6 +5,7 @@ import {
   IconResolverContext,
 } from '@oakoss/ui/components/icon-placeholder';
 import {
+  CalendarIcon,
   CheckIcon,
   ChevronDownIcon,
   ChevronLeftIcon,
@@ -26,6 +27,7 @@ import {
 
 // Only the icons icons.tsx names, so the site doesn't ship all of Lucide.
 export const lucideIcons = {
+  CalendarIcon,
   CheckIcon,
   ChevronDownIcon,
   ChevronLeftIcon,
