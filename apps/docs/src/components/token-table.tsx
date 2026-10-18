@@ -168,11 +168,7 @@ function Row({ token }: { token: TokenValue }) {
       <td className="px-3 py-2 font-mono whitespace-nowrap">{source}</td>
       <td className="px-3 py-2 font-mono whitespace-nowrap">{color}</td>
       <td className="text-fd-muted-foreground px-3 py-2">
-        {withCode(
-          token.usage === undefined
-            ? token.description
-            : `${token.description} ${token.usage}`,
-        )}
+        {withCode(token.description)}
       </td>
     </tr>
   );

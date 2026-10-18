@@ -26,4 +26,4 @@ export type TokenReference = {
   themes: Record<string, Record<string, TokenEntry[]>>;
 };
 
-export type TokenRow = { description: string; name: string; usage?: string };
+export type TokenRow = { description: string; name: string };

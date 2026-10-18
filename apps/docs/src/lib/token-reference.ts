@@ -25,13 +25,15 @@ import type {
   TokenRow,
 } from './token-reference-types.ts';
 
+type Meta = { description: string; usage?: string };
+
 const style = styles[axes.style.default];
 
 export const tokenGroups: TokenGroup[] = [
   {
     id: 'neutral',
     rows: [
-      ...neutralRoles.map((name) => ({ name, ...neutralRoleMeta[name] })),
+      ...neutralRoles.map((name) => row(name, neutralRoleMeta[name])),
       {
         description: 'Background of form controls, set by the style.',
         name: 'field',
@@ -140,10 +142,9 @@ function familyChoices(): TokenReference['families'] {
 
 function intentRows(intent: Intent): TokenRow[] {
   return [
-    ...intentRoleKinds.map((kind) => ({
-      name: kind === 'fill' ? intent : `${intent}-${kind}`,
-      ...intentRoleMeta[kind],
-    })),
+    ...intentRoleKinds.map((kind) =>
+      row(kind === 'fill' ? intent : `${intent}-${kind}`, intentRoleMeta[kind]),
+    ),
     ...steps.map((step) => ({
       description: `Step ${step} of the ${intent} scale.`,
       name: `${intent}-${step}`,
@@ -163,10 +164,17 @@ function resolved(
   return result;
 }
 
-function rows(
-  meta: Record<string, { description: string; usage?: string }>,
-): TokenRow[] {
-  return Object.entries(meta).map(([name, entry]) => ({ name, ...entry }));
+// The reference shows a token's description and usage as one sentence pair.
+function row(name: string, meta: Meta): TokenRow {
+  const { description, usage } = meta;
+  return {
+    description: usage === undefined ? description : `${description} ${usage}`,
+    name,
+  };
+}
+
+function rows(meta: Record<string, Meta>): TokenRow[] {
+  return Object.entries(meta).map(([name, entry]) => row(name, entry));
 }
 
 /**

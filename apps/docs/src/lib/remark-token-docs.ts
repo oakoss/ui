@@ -11,8 +11,6 @@ import {
   intentStepRules,
 } from '@oakoss/tokens';
 
-import type { TokenRow } from './token-reference-types';
-
 import {
   type File,
   type Node,
@@ -96,7 +94,6 @@ function contrastRows(): Cell[][] {
   ];
 }
 
-// The default family's tokens in its light and dark flavors.
 function defaultFamilyTokens(groupId: string) {
   const values = (flavor: string) =>
     groupValues(tokenReference(), groupId, { family: family.id, flavor })
@@ -116,7 +113,15 @@ function derivedRows(): Cell[][] {
   ];
 }
 
-function described({ description, usage }: Omit<TokenRow, 'name'>): string {
+// The rule tables read the role metadata directly; the token reference's
+// rows arrive with the two already joined.
+function described({
+  description,
+  usage,
+}: {
+  description: string;
+  usage?: string;
+}): string {
   return usage === undefined ? description : `${description} ${usage}`;
 }
 
@@ -171,7 +176,7 @@ function neutralRows(): Cell[][] {
     ['Token', 'Description', `${family.name} light`, `${family.name} dark`],
     ...light.map((token, index) => [
       code(`--${token.name}`),
-      described(token),
+      token.description,
       code(token.source),
       code(dark[index]?.source ?? ''),
     ]),
@@ -220,7 +225,7 @@ function tokenValues(groupId: string): Cell[][] {
       code(`--${token.name}`),
       cell(token),
       cell(dark[index]),
-      described(token),
+      token.description,
     ]),
   ];
 }
