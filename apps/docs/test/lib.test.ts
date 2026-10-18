@@ -1,6 +1,8 @@
+import registry from '@oakoss/ui/registry.json';
 import { describe, expect, it } from 'vitest';
 
 import { INHERITED_PREFIX, NO_OWN_PROPS, ownEntries } from '#/lib/props';
+import { isShownAsSource } from '#/lib/registry-paths';
 import { decodeMarkdownUrl, githubSourceUrl, markdownUrl } from '#/lib/site';
 import { typeTableMarkdown } from '#/lib/type-tables';
 
@@ -19,6 +21,19 @@ describe('markdownUrl', () => {
       expect(decodeMarkdownUrl(segments)).toEqual(slugs);
     },
   );
+});
+
+describe('isShownAsSource', () => {
+  const files = registry.items.flatMap((item) => item.files ?? []);
+
+  // The Manual tab compiles each source as a module; a .css id would reach
+  // Tailwind and fail the build.
+  it('shows only script files and keeps the copied themes.css out', () => {
+    const shown = files.filter((file) => isShownAsSource(file));
+    expect(shown.length).toBeGreaterThan(0);
+    expect(shown.filter((file) => !/\.tsx?$/u.test(file.path))).toEqual([]);
+    expect(files.map((file) => file.path)).toContain('src/styles/themes.css');
+  });
 });
 
 describe('githubSourceUrl', () => {

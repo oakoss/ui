@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, test } from 'vitest';
 
 import ui from '../registry.json';
@@ -29,7 +30,9 @@ const familyIds = new Set(
     .keys()
     .flatMap(
       (selector) =>
-        /^\[data-family='([\w-]+)'\]$/u.exec(selector)?.slice(1) ?? [],
+        /^\[data-family='([\w-]+)'\]\[data-family\]$/u
+          .exec(selector)
+          ?.slice(1) ?? [],
     ),
 );
 
@@ -97,7 +100,7 @@ describe.each(generatedItems)('$name', (item) => {
 });
 
 describe.each(familyItems)('$name', (item) => {
-  const scope = `[data-family='${item.name.slice('theme-'.length)}']`;
+  const scope = `[data-family='${item.name.slice('theme-'.length)}'][data-family]`;
 
   // themes.css comes from the runtime bundle, a separate code path.
   test("matches the family's runtime bundle in themes.css", () => {
@@ -108,8 +111,54 @@ describe.each(familyItems)('$name', (item) => {
   });
 });
 
+const themes = ui.items.find(({ name }) => name === 'themes');
+const themeImports = Object.keys(
+  themes !== undefined && 'css' in themes ? (themes.css ?? {}) : {},
+);
+const themeKeys = new Set(Object.keys(themes ?? {}));
+const [, themeImportPath = ''] =
+  /^@import "(.+)"$/u.exec(themeImports[0] ?? '') ?? [];
+
+// A registry:file is copied as-is; shadcn's transformers would drop the
+// file's leading comments, which hold the palette credits.
+test('the themes item copies themes.css and depends on the theme', () => {
+  expect(themes).toMatchObject({
+    files: [
+      {
+        path: 'src/styles/themes.css',
+        target: 'src/styles/themes.css',
+        type: 'registry:file',
+      },
+    ],
+    registryDependencies: ['oakoss/ui/theme'],
+    type: 'registry:item',
+  });
+  // Nothing else: no cssVars to merge into :root, no packages to install.
+  expect(themeKeys).toEqual(
+    new Set([
+      'css',
+      'description',
+      'files',
+      'name',
+      'registryDependencies',
+      'title',
+      'type',
+    ]),
+  );
+});
+
+// shadcn adds the import as written, deduplicating on its exact text, so it
+// keeps a formatter's double quotes. From Vite's src/index.css it reaches the
+// installed file.
+test("the themes item imports the file from Vite's stylesheet", () => {
+  expect(themeImports).toEqual(['@import "./styles/themes.css"']);
+  expect(path.posix.join('src', themeImportPath)).toBe(
+    themes?.files?.[0]?.target,
+  );
+});
+
 describe.each(flavorItems)('$name', (item) => {
-  const scope = `[data-family='${familyOf(item.name) ?? ''}']`;
+  const scope = `[data-family='${familyOf(item.name) ?? ''}'][data-family]`;
 
   test("keeps the family's light colors and changes its dark ones", () => {
     expect(themesRules.get(scope), `no block for ${scope}`).toBeDefined();

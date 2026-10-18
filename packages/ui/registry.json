@@ -2721,6 +2721,21 @@
       }
     },
     {
+      "name": "themes",
+      "type": "registry:item",
+      "title": "Themes",
+      "description": "Every theme family and primary color as CSS scoped by data-family and data-primary, for apps that switch themes at runtime. Installs styles/themes.css (in src/ when the project has one) and imports it from your stylesheet.",
+      "registryDependencies": ["oakoss/ui/theme"],
+      "css": { "@import \"./styles/themes.css\"": {} },
+      "files": [
+        {
+          "path": "src/styles/themes.css",
+          "type": "registry:file",
+          "target": "src/styles/themes.css"
+        }
+      ]
+    },
+    {
       "name": "button",
       "type": "registry:ui",
       "title": "Button",

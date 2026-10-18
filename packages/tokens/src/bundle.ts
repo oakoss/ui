@@ -118,13 +118,17 @@ function primaryDeclarations(
   });
 }
 
-// `.dark` may sit on the element or on an ancestor such as `<html>`.
+// `.dark` may sit on the element or on an ancestor such as `<html>`. The
+// repeated attribute outranks the theme's `:root` and `.dark`, which shadcn
+// writes after the import; every block gains it, so their order still decides.
 function selector(
   attributes: readonly (readonly [name: string, value: string])[],
   polarity: Polarity,
 ) {
-  const scope = attributes
+  const [[first] = []] = attributes;
+  if (first === undefined) throw new Error('a scope needs an attribute');
+  const scope = `${attributes
     .map(([name, value]) => `[${name}="${value}"]`)
-    .join('');
+    .join('')}[${first}]`;
   return polarity === 'light' ? scope : `.dark ${scope}, ${scope}.dark`;
 }

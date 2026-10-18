@@ -115,9 +115,13 @@ describe('Catppuccin colors', () => {
     "scopes its %s blue primary to its own palette's values",
     (polarity, selector) => {
       const scoped = blockPrimary(
-        selector('[data-family="catppuccin"][data-primary="blue"]'),
+        selector(
+          '[data-family="catppuccin"][data-primary="blue"][data-family]',
+        ),
       );
-      const shared = blockPrimary(selector('[data-primary="blue"]'));
+      const shared = blockPrimary(
+        selector('[data-primary="blue"][data-primary]'),
+      );
       expect(scoped).toBe(resolvedPrimary('blue', polarity));
       expect(shared).toBeDefined();
       expect(scoped).not.toBe(shared);

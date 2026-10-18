@@ -1,5 +1,4 @@
 @import '@oakoss/ui/styles.css';
-/* After styles.css: a theme's [data-family] block ties :root on specificity. */
 @import '@oakoss/ui/themes.css';
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
