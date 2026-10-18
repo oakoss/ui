@@ -66,14 +66,22 @@ export function resolved(
   family: Family,
   polarity: Polarity,
   primary?: string,
+  flavorId?: string,
 ): ThemeTokens {
-  const flavor = family.defaults[polarity];
+  const flavor = flavorId ?? family.defaults[polarity];
   const theme =
     flavor === undefined
       ? [`no default ${polarity} flavor`]
       : resolveTheme(family, flavor, primary);
-  if ('tokens' in theme) return theme.tokens;
-  throw new Error(`family "${family.id}":\n${theme.join('\n')}`);
+  if (!('tokens' in theme)) {
+    throw new Error(`family "${family.id}":\n${theme.join('\n')}`);
+  }
+  if (family.flavors[flavor ?? '']?.polarity !== polarity) {
+    throw new Error(
+      `family "${family.id}": flavor "${flavor}" isn't ${polarity}`,
+    );
+  }
+  return theme.tokens;
 }
 
 export function rule(selector: string, declarations: Declarations): string {

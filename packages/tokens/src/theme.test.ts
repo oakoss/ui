@@ -6,7 +6,7 @@ import type { Family } from '#/family';
 import { type Color, oklch } from '#/color';
 import { tailwindScales } from '#/families/tailwind-scales';
 import { families } from '#/index';
-import { resolveFlavor } from '#/resolve';
+import { type ResolvedFlavor, resolveFlavor } from '#/resolve';
 import { isStep } from '#/scale';
 import { expandSeeded } from '#/seeded';
 import { withLightRole, withScale } from '#/testing';
@@ -19,6 +19,12 @@ function errorsOf(result: string[] | Theme): string[] {
   return Array.isArray(result) ? result : [];
 }
 
+function flavorOf(family: Family, flavor: string): ResolvedFlavor {
+  const resolved = resolveFlavor(family, flavor);
+  if (typeof resolved === 'string') throw new Error(resolved);
+  return resolved;
+}
+
 // Writes past the readonly types, as untyped code can.
 function overwrite(target: object | undefined, change: object) {
   if (target === undefined) throw new Error('nothing to overwrite');
@@ -26,24 +32,18 @@ function overwrite(target: object | undefined, change: object) {
 }
 
 function referenced(
-  family: Family,
-  flavor: string,
+  { palette }: ResolvedFlavor,
   path: string,
 ): Color | undefined {
-  const resolved = resolveFlavor(family, flavor);
-  if (typeof resolved === 'string') throw new Error(resolved);
   const [, name = '', step] = path.split('.', 3);
-  if (step === undefined) return resolved.palette.neutrals[name];
+  if (step === undefined) return palette.neutrals[name];
   const number = Number(step);
-  return isStep(number)
-    ? resolved.palette.scales[name]?.steps[number]
-    : undefined;
+  return isStep(number) ? palette.scales[name]?.steps[number] : undefined;
 }
 
 // The color a token's recorded source points at, following derived roles.
 function sourceColor(
-  family: Family,
-  flavor: string,
+  flavor: ResolvedFlavor,
   sources: Theme['sources'],
   name: string,
 ): Color | undefined {
@@ -51,7 +51,7 @@ function sourceColor(
   while (source !== undefined && 'role' in source)
     source = sources[source.role];
   if (source === undefined) return undefined;
-  const color = referenced(family, flavor, source.ref);
+  const color = referenced(flavor, source.ref);
   return color === undefined || source.alpha === undefined
     ? color
     : { ...color, alpha: source.alpha };
@@ -148,20 +148,21 @@ describe('resolveTheme sources', () => {
   // primitive the theme doesn't use.
   it('gives every token a source that resolves to its color', () => {
     const mismatches = Object.values(families).flatMap((family) =>
-      Object.keys(family.flavors).flatMap((flavor) =>
-        family.intents.primary.choices.flatMap((hue) => {
+      Object.keys(family.flavors).flatMap((flavor) => {
+        const resolvedFlavor = flavorOf(family, flavor);
+        return family.intents.primary.choices.flatMap((hue) => {
           const resolved = theme(resolveTheme(family, flavor, hue));
           return Object.keys(resolved.tokens)
             .filter(
               (name) =>
                 !isDeepStrictEqual(
-                  sourceColor(family, flavor, resolved.sources, name),
+                  sourceColor(resolvedFlavor, resolved.sources, name),
                   resolved.tokens[name],
                 ),
             )
             .map((name) => `${family.id} ${flavor} ${hue}: ${name}`);
-        }),
-      ),
+        });
+      }),
     );
     expect(mismatches).toEqual([]);
   });

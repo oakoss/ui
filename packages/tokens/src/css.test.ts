@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { bundleCss, primaryHues } from '#/bundle';
+import { bundleCss, primaryBlocks, primaryHues } from '#/bundle';
 import { oklch } from '#/color';
 import {
   formatColor,
@@ -84,59 +84,89 @@ describe('bundleCss', () => {
   });
 
   it('puts primary blocks after family blocks so they win a tie', () => {
-    expect(css.lastIndexOf('[data-family=')).toBeLessThan(
+    const familyBlocks = css
+      .matchAll(
+        /^(?:\.dark )?\[data-family="\w+"\](?:, \[data-family="\w+"\]\.dark)? \{$/gmu,
+      )
+      .toArray();
+    expect(familyBlocks).toHaveLength(2 * Object.keys(families).length);
+    expect(familyBlocks.at(-1)?.index).toBeLessThan(
       css.indexOf('[data-primary='),
     );
   });
+});
 
-  it('scopes exactly the primary hues, once each, every family offering them', () => {
-    const hues = primaryHues(Object.values(families));
-    const scoped = css
-      .matchAll(/^\[data-primary="(\w+)"\] \{$/gmu)
-      .map(([, hue]) => hue)
-      .toArray();
-    expect(scoped).toEqual(hues);
-    expect(new Set(hues).size).toBe(hues.length);
+describe('bundleCss primary coverage', () => {
+  const css = bundleCss(Object.values(families), vega);
+
+  it('gives every family a light block for each primary hue it offers', () => {
+    const shared = new Set(
+      css.matchAll(/^\[data-primary="(\w+)"\] \{$/gmu).map(([, hue]) => hue),
+    );
+    const scoped = new Set(
+      css
+        .matchAll(/^\[data-family="(\w+)"\]\[data-primary="(\w+)"\] \{$/gmu)
+        .map(([, family, hue]) => `${family}/${hue}`),
+    );
     for (const family of Object.values(families)) {
-      expect(hues).toEqual(
-        expect.arrayContaining([...family.intents.primary.choices]),
-      );
+      for (const hue of family.intents.primary.choices) {
+        const covered = [shared.has(hue), scoped.has(`${family.id}/${hue}`)];
+        expect(covered, `${family.id}/${hue}`).toContain(true);
+      }
     }
+    expect(primaryHues(Object.values(families))).toEqual(
+      expect.arrayContaining([...shared]),
+    );
+  });
+
+  it("scopes Catppuccin's hues, which differ from Tailwind's", () => {
+    expect(css).toContain('[data-family="catppuccin"][data-primary="blue"] {');
+    expect(css).toContain('\n[data-primary="blue"] {');
   });
 });
 
-describe('bundleCss axis independence', () => {
-  it('rejects a primary hue that differs only in dark mode', () => {
-    const blue = {
-      ...tailwindScales.blue,
-      anchor: { dark: 300, light: 700 },
-    } as const;
-    const darkOnly = {
-      ...families.zinc,
-      palette: {
-        ...families.zinc.palette,
-        scales: { ...families.zinc.palette.scales, blue },
-      },
-    };
-    expect(() =>
-      bundleCss([families.stone, families.mauve, darkOnly], vega),
-    ).toThrow('primary "blue" (dark) differs in family "zinc"');
+function withOwnBlue(anchor: { dark: 300 | 600; light: 700 | 900 }) {
+  const blue = { ...tailwindScales.blue, anchor };
+  return {
+    ...families.zinc,
+    palette: {
+      ...families.zinc.palette,
+      scales: { ...families.zinc.palette.scales, blue },
+    },
+  };
+}
+
+describe('bundleCss primary blocks', () => {
+  it('shares one block among the families that agree on a hue', () => {
+    const baseColors = [families.stone, families.zinc, families.mauve];
+    expect(primaryBlocks(baseColors, 'blue', 'light')).toEqual([
+      { declarations: expect.any(Array) },
+    ]);
   });
 
-  it('rejects a primary hue that differs between families', () => {
-    const blue = {
-      ...tailwindScales.blue,
-      anchor: { dark: 600, light: 900 },
-    } as const;
-    const zinc = {
-      ...families.zinc,
-      palette: {
-        ...families.zinc.palette,
-        scales: { ...families.zinc.palette.scales, blue },
-      },
-    };
-    expect(() => bundleCss([families.stone, zinc], vega)).toThrow(
-      'primary "blue" (light) differs in family "zinc"',
+  it('scopes a family whose hue differs only in dark mode', () => {
+    const darkOnly = withOwnBlue({ dark: 300, light: 700 });
+    const css = bundleCss([families.stone, families.mauve, darkOnly], vega);
+    expect(css).toContain('\n[data-primary="blue"] {');
+    expect(css).toContain(
+      '.dark [data-family="zinc"][data-primary="blue"], [data-family="zinc"][data-primary="blue"].dark {',
+    );
+    expect(css).not.toContain('\n[data-family="zinc"][data-primary="blue"] {');
+  });
+
+  it('scopes every family when no group of them is largest', () => {
+    const blocks = primaryBlocks(
+      [families.stone, withOwnBlue({ dark: 600, light: 900 })],
+      'blue',
+      'light',
+    );
+    expect(blocks.map(({ family }) => family)).toEqual(['stone', 'zinc']);
+  });
+
+  it('credits a family that names its palette', () => {
+    const credited = { ...families.zinc, credit: 'Copyright (c) Someone' };
+    expect(bundleCss([credited], vega)).toMatch(
+      /^\/\* Generated by [^\n]+\n\/\* Zinc: Copyright \(c\) Someone \*\/\n/u,
     );
   });
 });

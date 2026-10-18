@@ -4,6 +4,8 @@ packages:
   - tooling/*
 
 catalog:
+  # Exact: a new release changes the generated Catppuccin colors.
+  '@catppuccin/palette': 1.8.0
   '@hugeicons/core-free-icons': ^4.3.5
   '@hugeicons/react': ^1.1.10
   # React Aria's own range, so the apps share its copy.

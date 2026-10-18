@@ -2,7 +2,7 @@ import '../src/styles/app.css';
 
 import type { Decorator, Preview } from '@storybook/react-vite';
 
-import { families, primaryHues } from '@oakoss/tokens';
+import { axes, families, primaryHues } from '@oakoss/tokens';
 import {
   type IconProps,
   type IconResolver,
@@ -35,6 +35,24 @@ const withIcons: Decorator = (Story) => (
     <Story />
   </IconResolverContext>
 );
+
+// The toolbar lists every family's hues; a hue the family lacks would apply
+// another family's block or none, so the family's own default applies instead.
+function offeredPrimary(
+  family: string | undefined,
+  primary: string | undefined,
+): string | undefined {
+  const familyId = family ?? axes.family.default;
+  const entry = Object.values(families).find(({ id }) => id === familyId);
+  if (entry === undefined) {
+    console.warn(`No theme family "${familyId}"; using the default colors.`);
+    return undefined;
+  }
+  const choices: readonly string[] = entry.intents.primary.choices;
+  return primary !== undefined && choices.includes(primary)
+    ? primary
+    : undefined;
+}
 
 function PalettedStory({
   canvasElement,
@@ -85,7 +103,7 @@ const withPalette: Decorator = (Story, context) => (
   <PalettedStory
     canvasElement={context.canvasElement}
     family={context.globals.family}
-    primary={context.globals.primary}
+    primary={offeredPrimary(context.globals.family, context.globals.primary)}
   >
     <Story />
   </PalettedStory>

@@ -39,7 +39,8 @@ export const radii = [
 
 /**
 `registry.json`'s items with the generated ones replaced: the `theme`
-item's cssVars and a `theme-<family>` item per family, right after it.
+item's cssVars and, right after it, a `theme-<family>` item per family and
+a `theme-<family>-<flavor>` item per dark flavor besides the default.
 */
 export function registryItems(
   items: unknown,
@@ -57,7 +58,9 @@ export function registryItems(
   }
   theme.cssVars = registryCssVars(family, style, typography);
 
-  const familyItems = families.map((entry) => familyItem(entry, style));
+  const familyItems = families.flatMap((entry) =>
+    familyThemeItems(entry, style),
+  );
   const familyNames = new Set(familyItems.map((item) => item.name));
   // Every registry:theme item but `theme` is a generated family item.
   const generated = checked.filter(
@@ -106,7 +109,10 @@ export function themeItem(choice: ThemeChoice, style: Style): ThemeItem {
   }
   return themeRegistryItem({
     cssVars: { dark, light: { radius: radius.value, ...light } },
-    description: `The ${family.name} theme family with a ${primary} primary and ${radius.name} radius.`,
+    description: withCredit(
+      family,
+      `The ${family.name} theme family with a ${primary} primary and ${radius.name} radius.`,
+    ),
     name,
     title: `${family.name} theme, ${primary} primary`,
   });
@@ -116,16 +122,40 @@ export function themeSlug({ family, primary, radius }: ThemeChoice): string {
   return `${family.id}-${primary}-${radius.name}`;
 }
 
-function familyItem(entry: Family, style: Style): ThemeItem {
+// The family's default light flavor pairs with each dark flavor.
+function familyThemeItems(entry: Family, style: Style): ThemeItem[] {
   if (!kebabCase.test(entry.id)) {
     throw new Error(`family id "${entry.id}" isn't a registry item name`);
   }
-  return themeRegistryItem({
-    cssVars: familyCssVars(entry, style),
-    description: `The ${entry.name} theme family's colors, light and dark.`,
-    name: `theme-${entry.id}`,
-    title: `${entry.name} theme`,
-  });
+  const darkFlavors = Object.entries(entry.flavors).filter(
+    ([id, flavor]) => flavor.polarity === 'dark' && id !== entry.defaults.dark,
+  );
+  return [
+    themeRegistryItem({
+      cssVars: familyCssVars(entry, style),
+      description: withCredit(
+        entry,
+        `The ${entry.name} theme family's colors, light and dark.`,
+      ),
+      name: `theme-${entry.id}`,
+      title: `${entry.name} theme`,
+    }),
+    ...darkFlavors.map(([id, flavor]) => {
+      const name = `theme-${entry.id}-${id}`;
+      if (!kebabCase.test(name)) {
+        throw new Error(`theme item name "${name}" isn't kebab-case`);
+      }
+      return themeRegistryItem({
+        cssVars: familyCssVars(entry, style, undefined, id),
+        description: withCredit(
+          entry,
+          `The ${entry.name} theme family's colors, with ${flavor.name} in dark mode.`,
+        ),
+        name,
+        title: `${entry.name} theme, ${flavor.name}`,
+      });
+    }),
+  ];
 }
 
 function namedItems(items: unknown): Item[] {
@@ -162,4 +192,10 @@ function themeRegistryItem({
     { registryDependencies: ['oakoss/ui/theme'] },
     { cssVars },
   );
+}
+
+function withCredit(family: Family, description: string): string {
+  return family.credit === undefined
+    ? description
+    : `${description} ${family.name} colors: ${family.credit}`;
 }

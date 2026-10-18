@@ -20,12 +20,15 @@ for runtime switching. Blocks hold resolved values rather than aliases, so
 a scope never depends on variables declared further up.
 */
 export function bundleCss(families: readonly Family[], style: Style): string {
-  const blocks: string[] = [header];
+  const credits = families.flatMap(({ credit, name }) =>
+    credit === undefined ? [] : `/* ${name}: ${credit} */`,
+  );
+  const blocks: string[] = [[header, ...credits].join('\n')];
   for (const family of families) {
     for (const polarity of ['light', 'dark'] as const) {
       const tokens = resolved(family, polarity);
       blocks.push(
-        rule(selector('data-family', family.id, polarity), [
+        rule(selector([['data-family', family.id]], polarity), [
           ['color-scheme', polarity],
           ['--field', fieldColor(style, polarity, tokens)],
           ...tokenDeclarations(tokens),
@@ -33,19 +36,62 @@ export function bundleCss(families: readonly Family[], style: Style): string {
       );
     }
   }
-  // Primary blocks come after family blocks: on one element they tie on
-  // specificity, and the later block's primary wins.
+  // Primary blocks come after family blocks: on one element an unscoped
+  // block ties on specificity, and the later block's primary wins.
   for (const hue of primaryHues(families)) {
     for (const polarity of ['light', 'dark'] as const) {
-      blocks.push(
-        rule(
-          selector('data-primary', hue, polarity),
-          primaryDeclarations(families, hue, polarity),
-        ),
-      );
+      for (const block of primaryBlocks(families, hue, polarity)) {
+        const scope: [string, string][] =
+          block.family === undefined
+            ? [['data-primary', hue]]
+            : [
+                ['data-family', block.family],
+                ['data-primary', hue],
+              ];
+        blocks.push(rule(selector(scope, polarity), block.declarations));
+      }
     }
   }
   return blocks.join('\n\n');
+}
+
+/**
+One primary hue's blocks. Families that resolve the hue to the same values
+share one block (note 0004's axis independence); the largest such group
+gets the unscoped block, and any other family, such as one with its own
+palette's blue, gets a block scoped to it. A tie for largest scopes them
+all.
+*/
+export function primaryBlocks(
+  families: readonly Family[],
+  hue: string,
+  polarity: Polarity,
+): { declarations: Declarations; family?: string }[] {
+  const groups = new Map<
+    string,
+    { declarations: Declarations; ids: string[] }
+  >();
+  for (const family of families) {
+    if (!family.intents.primary.choices.includes(hue)) continue;
+    const declarations = primaryDeclarations(family, hue, polarity);
+    const key = JSON.stringify(declarations);
+    const group = groups.get(key) ?? { declarations, ids: [] };
+    group.ids.push(family.id);
+    groups.set(key, group);
+  }
+  const ranked = groups
+    .values()
+    .toArray()
+    .toSorted((a, b) => b.ids.length - a.ids.length);
+  const [largest, next] = ranked;
+  if (largest === undefined) throw new Error(`no family offers "${hue}"`);
+  const shared = next?.ids.length === largest.ids.length ? undefined : largest;
+  const blocks: { declarations: Declarations; family?: string }[] = [];
+  for (const { declarations, ids } of ranked) {
+    if (ids === shared?.ids) blocks.push({ declarations });
+    else for (const family of ids) blocks.push({ declarations, family });
+  }
+  return blocks;
 }
 
 /**
@@ -57,40 +103,28 @@ export function primaryHues(families: readonly Family[]): string[] {
   ];
 }
 
-// Axis independence (note 0004): a primary hue must resolve to the same
-// values in every family that offers it, or one block can't serve them all.
 function primaryDeclarations(
-  families: readonly Family[],
+  family: Family,
   hue: string,
   polarity: Polarity,
 ): Declarations {
-  const offering = families.filter((family) =>
-    family.intents.primary.choices.includes(hue),
-  );
-  const [first, ...rest] = offering.map((family) => {
-    const tokens = resolved(family, polarity, hue);
-    // Optional steps (25, 1000) appear only where a scale has them.
-    return primaryTokenNames(family).flatMap((name) => {
-      const color = tokens[name];
-      return color === undefined
-        ? []
-        : [[`--${name}`, formatColor(color)] as const];
-    });
+  const tokens = resolved(family, polarity, hue);
+  // Optional steps (25, 1000) appear only where a scale has them.
+  return primaryTokenNames(family).flatMap((name) => {
+    const color = tokens[name];
+    return color === undefined
+      ? []
+      : [[`--${name}`, formatColor(color)] as const];
   });
-  if (first === undefined) throw new Error(`no family offers "${hue}"`);
-  const expected = JSON.stringify(first);
-  for (const [index, declarations] of rest.entries()) {
-    if (JSON.stringify(declarations) !== expected) {
-      throw new Error(
-        `primary "${hue}" (${polarity}) differs in family "${offering[index + 1]?.id}"`,
-      );
-    }
-  }
-  return first;
 }
 
 // `.dark` may sit on the element or on an ancestor such as `<html>`.
-function selector(attribute: string, value: string, polarity: Polarity) {
-  const scope = `[${attribute}="${value}"]`;
+function selector(
+  attributes: readonly (readonly [name: string, value: string])[],
+  polarity: Polarity,
+) {
+  const scope = attributes
+    .map(([name, value]) => `[${name}="${value}"]`)
+    .join('');
   return polarity === 'light' ? scope : `.dark ${scope}, ${scope}.dark`;
 }

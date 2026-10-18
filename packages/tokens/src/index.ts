@@ -7,6 +7,7 @@ import {
   taupe,
   zinc,
 } from '#/families/base-colors';
+import { catppuccin } from '#/families/catppuccin';
 import { vega } from '#/styles/vega';
 import { defaultTypography } from '#/typographies/default';
 
@@ -79,6 +80,7 @@ export { validateStyle, validateTypography } from '#/validate-axes';
 export { zIndex } from '#/z-index';
 
 export const families = {
+  catppuccin,
   mauve,
   mist,
   neutral,

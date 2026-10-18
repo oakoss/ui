@@ -160,12 +160,16 @@ function nameErrors(family: Family): string[] {
     ...Object.keys(family.palette.scales),
     ...Object.keys(family.palette.neutrals),
   ];
-  return names.flatMap((name) => {
+  const errors = names.flatMap((name) => {
     if (name.includes('.')) return `name "${name}" contains a "."`;
     return reservedNames.has(name)
       ? `name "${name}" is reserved for a role or intent`
       : [];
   });
+  // The credit goes into a CSS comment.
+  return family.credit?.includes('*/') === true
+    ? [...errors, 'credit contains "*/"']
+    : errors;
 }
 
 function paletteErrors(palette: {

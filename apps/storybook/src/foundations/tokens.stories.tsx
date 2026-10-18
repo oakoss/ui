@@ -87,3 +87,4 @@ export const Mauve: Story = { args: { family: 'mauve' } };
 export const Olive: Story = { args: { family: 'olive' } };
 export const Mist: Story = { args: { family: 'mist' } };
 export const Taupe: Story = { args: { family: 'taupe' } };
+export const Catppuccin: Story = { args: { family: 'catppuccin' } };

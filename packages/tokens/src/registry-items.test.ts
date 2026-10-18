@@ -32,6 +32,39 @@ function names(items: unknown, overrides: Partial<RegistryInputs> = {}) {
   );
 }
 
+describe('registryItems flavor items', () => {
+  const dim = {
+    ...families.zinc.flavors.dark,
+    name: 'Dim',
+    roles: {
+      ...families.zinc.flavors.dark.roles,
+      background: { ref: 'color.zinc.900' },
+    },
+  } as const;
+  const zinc: Family = {
+    ...families.zinc,
+    credit: 'Copyright (c) Someone',
+    flavors: { ...families.zinc.flavors, dim },
+  };
+
+  it('adds an item per extra dark flavor, paired with the default light', () => {
+    const items = registryItems([theme], { ...inputs, families: [zinc] });
+    expect(items.map(({ name }) => name)).toEqual([
+      'theme',
+      'theme-zinc',
+      'theme-zinc-dim',
+    ]);
+    const dimVars = familyCssVars(zinc, styles.vega, undefined, 'dim');
+    const mainVars = familyCssVars(zinc, styles.vega);
+    expect(items.at(2)?.cssVars).toEqual(dimVars);
+    expect(dimVars.light).toEqual(mainVars.light);
+    expect(dimVars.dark.background).not.toBe(mainVars.dark.background);
+    expect(items.at(2)?.description).toBe(
+      "The Zinc theme family's colors, with Dim in dark mode. Zinc colors: Copyright (c) Someone",
+    );
+  });
+});
+
 describe('registryItems', () => {
   it('puts a theme item per family right after the theme item', () => {
     expect(names([base, theme, button])).toEqual([
