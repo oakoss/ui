@@ -18,9 +18,10 @@ import {
   TooltipTrigger,
 } from '@oakoss/ui/components/ui/overlays/tooltip';
 import { Palette } from 'lucide-react';
-import { type ReactNode, useEffect, useId, useRef, useState } from 'react';
+import { type ReactNode, useId, useState } from 'react';
 import { themeOptions } from 'virtual:theme-options';
 
+import { CopyButton } from '#/components/copy-button';
 import { packageManagerKey, packageManagers } from '#/lib/package-managers';
 import { siteUrl } from '#/lib/site';
 import {
@@ -30,8 +31,6 @@ import {
   type ThemeState,
   themeStorageKey,
 } from '#/lib/theme-state';
-
-type CopyResult = 'Copied' | 'Copy failed';
 
 type Update = (change: null | Partial<ThemeState>) => void;
 
@@ -158,49 +157,6 @@ function Controls({ theme, update }: { theme: ThemeState; update: Update }) {
         ))}
       </Choices>
     </>
-  );
-}
-
-// The clipboard is missing outside secure contexts, and a write can be
-// refused.
-async function copied(text: () => string): Promise<CopyResult> {
-  try {
-    await navigator.clipboard.writeText(text());
-    return 'Copied';
-  } catch {
-    return 'Copy failed';
-  }
-}
-
-function CopyButton({
-  children,
-  text,
-}: {
-  children: string;
-  text: () => string;
-}) {
-  const [result, setResult] = useState<CopyResult>();
-  const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
-  const stop = () => {
-    if (timerRef.current !== null) clearTimeout(timerRef.current);
-  };
-  useEffect(() => stop, []);
-  // A new press restarts the timer, so an earlier one can't clear its label.
-  const copy = async () => {
-    setResult(await copied(text));
-    stop();
-    timerRef.current = setTimeout(() => setResult(undefined), 2000);
-  };
-  return (
-    <Button
-      onPress={() => {
-        void copy();
-      }}
-      size="sm"
-      variant="outline"
-    >
-      {result ?? children}
-    </Button>
   );
 }
 

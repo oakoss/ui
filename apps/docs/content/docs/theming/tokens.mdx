@@ -1,0 +1,66 @@
+---
+title: Color Tokens
+description: Every color token, the palette color it resolves to in each family and flavor, and what it's for.
+---
+
+Components read colors from CSS variables such as `--primary` and
+`--muted-foreground`, never from the palette directly. Each table lists a
+group's tokens with the palette color they resolve to and the value in the
+CSS. Pick a family and flavor for each table, or the primary color for the
+Primary table. Press a token's name to copy its `var()`.
+
+In a component, use the Tailwind class for the token: `bg-primary`,
+`text-muted-foreground`, `border-input`. See [Token
+Names](/docs/theming/token-names) for how the names are built.
+
+## Neutral roles
+
+The page, surfaces, text and borders. Each family maps these by hand to its
+gray, so they don't change with the primary color.
+
+<TokenTable group="neutral" />
+
+## Primary
+
+The brand color: solid buttons, links, focus rings and selected states. Its
+roles move to whichever primary color you pick.
+
+<TokenTable group="primary" />
+
+## Destructive
+
+Delete actions, errors and invalid fields.
+
+<TokenTable group="destructive" />
+
+## Success
+
+Confirmations and completed states.
+
+<TokenTable group="success" />
+
+## Warning
+
+States that need attention but aren't errors.
+
+<TokenTable group="warning" />
+
+## Info
+
+Neutral notices and tips.
+
+<TokenTable group="info" />
+
+## Derived roles
+
+shadcn's names for roles that follow another token, such as the focus ring
+following `--primary-text`.
+
+<TokenTable group="derived" />
+
+## Charts
+
+Five data series. Each family picks them; every family reads five steps of
+the primary color's scale.
+
+<TokenTable group="charts" />

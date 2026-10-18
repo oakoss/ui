@@ -5,10 +5,11 @@ import react from '@vitejs/plugin-react';
 import { fumadocsMdx } from 'fumadocs-mdx/vite';
 import { defineConfig } from 'vite';
 
+import { dataModulePlugin } from './src/lib/data-module-plugin.ts';
 import { manualSourcesPlugin } from './src/lib/manual-sources-plugin.ts';
 import { staticPages } from './src/lib/static-pages.ts';
-import { themeItemPaths } from './src/lib/theme-items.ts';
-import { themeOptionsPlugin } from './src/lib/theme-options-plugin.ts';
+import { themeItemPaths, themeOptions } from './src/lib/theme-items.ts';
+import { tokenReference } from './src/lib/token-reference.ts';
 
 export default defineConfig({
   plugins: [
@@ -16,7 +17,12 @@ export default defineConfig({
     optimizeLocales.vite({ locales: ['en', 'ar'] }),
     fumadocsMdx(),
     manualSourcesPlugin(),
-    themeOptionsPlugin(),
+    dataModulePlugin('virtual:theme-options', () => ({
+      themeOptions: themeOptions(),
+    })),
+    dataModulePlugin('virtual:token-reference', () => ({
+      tokenReference: tokenReference(),
+    })),
     tailwindcss(),
     tanstackStart({
       // autoSubfolderIndex false writes /404 to 404.html, which the host

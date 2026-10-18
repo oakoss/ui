@@ -240,6 +240,7 @@ describe('llms.txt page list', () => {
       '## Overview',
       '## Components',
       '## Guides',
+      '## Theming',
     ]);
   });
 
