@@ -39,9 +39,11 @@ ${await page.data.getText('processed')}`,
 
 /**
 llms.txt: the instructions, then a section per area: Overview for the root
-pages, then each top-level folder. Each line links the page's Markdown by
-absolute URL, so an agent fetches Markdown and the list works pasted
-anywhere.
+pages, then each top-level folder, split at its sidebar groups
+(`Components: Buttons`). The format has only H2 sections, so a group is a
+section of its own rather than a heading inside one. Each line links the
+page's Markdown by absolute URL, so an agent fetches Markdown and the list
+works pasted anywhere.
 */
 export function llmsIndex() {
   const { children } = source.getPageTree();
@@ -49,11 +51,15 @@ export function llmsIndex() {
   const folders = children.filter((node) => node.type === 'folder');
   const sections = [
     section('Overview', root),
-    ...folders.map((folder) =>
-      section(folderTitle(folder), [
-        ...(folder.index ? [folder.index] : []),
-        ...folder.children,
-      ]),
+    ...folders.flatMap((folder) =>
+      groups(folder).map(({ name, nodes }) =>
+        section(
+          name === undefined
+            ? folderTitle(folder)
+            : `${folderTitle(folder)}: ${name}`,
+          nodes,
+        ),
+      ),
     ),
   ];
   return `${agentInstructions}\n\n${sections.join('\n\n')}\n`;
@@ -65,6 +71,25 @@ function folderTitle(folder: PageTree.Folder): string {
     throw new TypeError('a docs folder needs a plain-text title');
   }
   return folder.name;
+}
+
+// A folder's nodes split at each named separator; the nodes before the first
+// one form a group without a name.
+function groups(folder: PageTree.Folder) {
+  const nodes = folder.index
+    ? [folder.index, ...folder.children]
+    : folder.children;
+  const result: { name?: string; nodes: PageTree.Node[] }[] = [];
+  for (const node of nodes) {
+    if (node.type === 'separator' && typeof node.name === 'string') {
+      result.push({ name: node.name, nodes: [] });
+      continue;
+    }
+    const current = result.at(-1);
+    if (current === undefined) result.push({ nodes: [node] });
+    else current.nodes.push(node);
+  }
+  return result.filter((group) => group.nodes.length > 0);
 }
 
 function pageLine(node: PageTree.Node): string[] {

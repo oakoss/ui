@@ -2,6 +2,7 @@
 
 How to write a component page in `apps/docs/content/docs/components`. Each entry is a rule and its reason. `button.mdx` is the reference page.
 
+- **A new page goes in a sidebar group** in `content/docs/components/meta.json`, under the heading that names what it's for (Buttons, Inputs, Choices, Date and time, Menus, Overlays, Navigation, Layout, Data display, Feedback). Groups follow what a reader is looking for, not the package folder a component installs into. A page the list leaves out drops from the sidebar, and the prerender never builds it, since it finds pages by their links; `sidebar.test.ts` fails until the page is placed.
 - **Sections in this order:** a preview, then `## Installation`, `## Usage`, `## Examples`, `## Accessibility` and `## API`. Visitors and agents find the same thing in the same place on every page; `build.test.ts` checks the order.
 - **Front matter names the registry item and the React Aria page** (`item: button`, `reactAria: https://react-aria.adobe.com/Button`). The links under the title come from them: Source (the item's component file on GitHub) and React Aria.
 - **The preview is `<ComponentPreview name="<demo>">`** wrapping the demo from `src/components/demos`. A remark plugin turns it into Preview/Code tabs at build time, with the demo file's source in the Code tab, so the code also reaches the `.md` and `llms-full.txt` output (search indexes no code blocks). Demos draw no border of their own; the preview frame does.
