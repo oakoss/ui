@@ -12,6 +12,7 @@ import { defaultTypography } from '#/typographies/default';
 
 export { primaryHues } from '#/bundle';
 export type { Color } from '#/color';
+export { fieldColor, formatColor } from '#/css';
 export type {
   ColorPath,
   ColorRef,
@@ -36,6 +37,7 @@ export {
   themeItem,
 } from '#/registry-items';
 export { type ResolvedFlavor, resolveFlavor } from '#/resolve';
+export { intentStepRules } from '#/role-steps';
 export type {
   ContrastKind,
   ContrastPair,
@@ -64,6 +66,13 @@ export {
 export type { Scale, Step } from '#/scale';
 export { steps } from '#/scale';
 export type { Style, StyleColor, StyleToken, ThemeNamespace } from '#/style';
+export {
+  resolveTheme,
+  type Theme,
+  type ThemeSources,
+  type ThemeTokens,
+  type TokenSource,
+} from '#/theme';
 export type { FontRole, TextStyle, Typography } from '#/typography';
 export { validateFamily } from '#/validate';
 export { validateStyle, validateTypography } from '#/validate-axes';
