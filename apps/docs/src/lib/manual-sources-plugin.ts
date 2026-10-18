@@ -8,7 +8,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { codeThemes } from './code-themes.ts';
-import { targetPath } from './registry-paths.ts';
+import { isShownAsSource, targetPath } from './registry-paths.ts';
 
 const ui = path.dirname(
   fileURLToPath(import.meta.resolve('@oakoss/ui/registry.json')),
@@ -17,13 +17,15 @@ const ui = path.dirname(
 const indexId = 'virtual:manual-sources';
 const sourcePrefix = 'virtual:manual-source/';
 
-// Every registry file once, keyed by its path in packages/ui.
+// Every registry source file once, keyed by its path in packages/ui.
 const files = new Map(
   registry.items.flatMap((item) =>
-    (item.files ?? []).map((file) => [
-      file.path,
-      { item: item.name, title: targetPath(file.target) },
-    ]),
+    (item.files ?? [])
+      .filter((file) => isShownAsSource(file))
+      .map((file) => [
+        file.path,
+        { item: item.name, title: targetPath(file.target) },
+      ]),
   ),
 );
 

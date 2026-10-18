@@ -10,7 +10,7 @@ import {
   packageManagerKey,
   packageManagers,
 } from './package-managers';
-import { targetPath } from './registry-paths';
+import { isShownAsSource, targetPath } from './registry-paths';
 import { githubUrl } from './site';
 
 const demos = path.join(import.meta.dirname, '../components/demos');
@@ -177,7 +177,10 @@ function manualSteps(items: Item[]): Node {
     ...new Set(items.flatMap((item) => item.dependencies ?? [])),
   ].toSorted((a, b) => a.localeCompare(b));
   const files = new Map(
-    items.flatMap((item) => item.files ?? []).map((file) => [file.path, file]),
+    items
+      .flatMap((item) => item.files ?? [])
+      .filter((file) => isShownAsSource(file))
+      .map((file) => [file.path, file]),
   )
     .values()
     .toArray();
