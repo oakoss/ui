@@ -1,0 +1,149 @@
+---
+title: Date Picker
+description: A date input with a calendar in a popover, typed or picked.
+item: date-picker
+reactAria: https://react-aria.adobe.com/DatePicker
+---
+
+import { DatePickerButton } from '#/components/demos/date-picker-button';
+import { DatePickerDemo } from '#/components/demos/date-picker-demo';
+import { DatePickerMonthYear } from '#/components/demos/date-picker-month-year';
+import { DatePickerPresets } from '#/components/demos/date-picker-presets';
+import { DatePickerTime } from '#/components/demos/date-picker-time';
+
+<ComponentPreview name="date-picker-demo">
+  <DatePickerDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="date-picker" />
+
+## Usage
+
+```tsx
+import { parseDate } from '@internationalized/date';
+
+import { DatePicker } from '#/components/ui/inputs/date-picker';
+
+<DatePicker defaultValue={parseDate('2026-03-14')} label="Due date" />;
+```
+
+A [Date Field](/docs/components/date-field) with a
+[Calendar](/docs/components/calendar) in a popover: people who know the date
+type it into the segments, and people who need to see the week pick it.
+Values are the same Internationalized Date objects as Date Field's.
+
+## Examples
+
+### Date and time
+
+A `CalendarDateTime` or `ZonedDateTime` value with a `granularity` of
+`hour`, `minute` or `second` adds a time field under the calendar, named by
+`timeLabel` (default "Time"). It takes the picker's `hourCycle` and
+`hideTimeZone`.
+
+<ComponentPreview name="date-picker-time">
+  <DatePickerTime />
+</ComponentPreview>
+
+### Month and year dropdowns
+
+`calendarProps` reaches the calendar: `heading`, `footer`, `visibleMonths`,
+`renderCell`, `isLoading` and `loadingLabel`. A heading of
+[Calendar Month Year Select](/docs/components/calendar#month-and-year-dropdowns)
+jumps across years, as a date of birth needs.
+
+<ComponentPreview name="date-picker-month-year">
+  <DatePickerMonthYear />
+</ComponentPreview>
+
+### Presets
+
+Buttons in the calendar's `footer` can set common dates. Read
+`DatePickerStateContext` for `setValue` and `close`, and compute today when
+the button is pressed, not when the page renders, so a page left open
+overnight stays right.
+
+<ComponentPreview name="date-picker-presets">
+  <DatePickerPresets />
+</ComponentPreview>
+
+### A button that shows the date
+
+Children replace the layout. Here a button shows the date in words in place
+of the segments, with the date as its name, as the
+[WAI-ARIA date picker dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/)
+names its button. It can't be typed into, and without a `DateInput` a form
+gets no value, so keep the segments where people know the date.
+
+<ComponentPreview name="date-picker-button">
+  <DatePickerButton />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria handles:
+
+- **Group:** the input, its decorations and the trigger form a `group` named
+  by the label. The segments work as in
+  [Date Field](/docs/components/date-field#accessibility).
+- **Trigger:** named "Calendar" (translated) with the field's label, with
+  `aria-haspopup="dialog"` and `aria-expanded`. It isn't linked to the
+  dialog with `aria-controls`.
+- **Calendar:** a dialog named after the field, focused on the current value
+  or today, with the [Calendar](/docs/components/calendar#accessibility)'s
+  keys. Picking a day closes it and returns focus to the trigger.
+- **Keyboard:** <kbd>Alt</kbd>+<kbd>↓</kbd> in a segment opens the calendar,
+  and <kbd>Escape</kbd> closes it.
+
+The popover opens under the field from its start edge and grows to fit
+more than one month. A button in `start`, `end` or the calendar's footer
+keeps its own name and press rather than taking the trigger's.
+
+## API
+
+### DatePicker
+
+Extends React Aria's [`DatePicker`](https://react-aria.adobe.com/DatePicker#api).
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/date-picker.tsx"
+  name="DatePickerLayoutProps"
+/>
+
+Also accepts all [React Aria `DatePicker` props](https://react-aria.adobe.com/DatePicker#api),
+with `granularity` limited to `day` for a `CalendarDate`. Takes the layout
+props or children, not both: children replace the layout, built from the
+Field parts, `DatePickerGroup`, `DateInput` and `DatePickerContent`.
+
+#### Data attributes
+
+| Attribute           | Present when               |
+| ------------------- | -------------------------- |
+| `data-slot`         | Always: `date-picker`      |
+| `data-open`         | The calendar is open       |
+| `data-focus-within` | Focus is inside the picker |
+| `data-invalid`      | The picker is invalid      |
+| `data-disabled`     | The picker is disabled     |
+
+### DatePickerGroup
+
+The picker's group for a layout of your own: an `InputGroup` with `start`
+and `end` decorations and the trigger last. It takes `size` like the field.
+
+### DatePickerContent
+
+The popover around the calendar: our [Popover](/docs/components/popover),
+placed `bottom start` and as wide as its content.
+
+### DatePickerTrigger
+
+The calendar button, `data-slot="date-picker-trigger"`.
+
+### DatePickerTime
+
+The time field the default layout adds to the popover, which renders only
+while the picker's granularity includes a time.

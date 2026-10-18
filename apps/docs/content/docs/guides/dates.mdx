@@ -1,0 +1,132 @@
+---
+title: Dates and Times
+description: Convert date values to and from strings and JavaScript dates, handle time zones, and submit them in forms.
+---
+
+import { DatesDemo } from '#/components/demos/dates-demo';
+
+<DatesDemo />
+
+## Value types
+
+[Date Field](/docs/components/date-field),
+[Time Field](/docs/components/time-field),
+[Date Picker](/docs/components/date-picker) and
+[Date Range Picker](/docs/components/date-range-picker) take values from
+[Internationalized Date](https://react-aria.adobe.com/internationalized/date/),
+not JavaScript `Date` objects. A `Date` is an instant: the day it falls on
+depends on the time zone that reads it. These types say what they hold:
+
+| Type               | Holds                               | Example                                       |
+| ------------------ | ----------------------------------- | --------------------------------------------- |
+| `CalendarDate`     | A day                               | `2026-03-14`                                  |
+| `CalendarDateTime` | A day and a time, with no time zone | `2026-03-14T09:30:00`                         |
+| `ZonedDateTime`    | A day and a time in a time zone     | `2026-03-14T09:30:00-04:00[America/New_York]` |
+| `Time`             | A time of day, for Time Field       | `09:30:00`                                    |
+
+The value's type decides what the field shows: a `CalendarDate` shows
+day segments only, and a `granularity` finer than `day` needs a type with a
+time.
+
+## From and to strings
+
+`toString()` writes the ISO 8601 form, and a parse function for each type
+reads it back. Store and send these strings; they round-trip without losing
+the time zone.
+
+```tsx
+import {
+  parseDate,
+  parseDateTime,
+  parseTime,
+  parseZonedDateTime,
+} from '@internationalized/date';
+
+parseDate('2026-03-14');
+parseDateTime('2026-03-14T09:30');
+parseZonedDateTime('2026-03-14T09:30[America/New_York]');
+parseTime('09:30');
+
+parseDate('2026-03-14').toString(); // '2026-03-14'
+```
+
+An API that sends an instant, such as `2026-03-14T13:30:00Z`, needs a time
+zone to show it in. `parseAbsolute(value, timeZone)` reads it in the zone you
+name, and `parseAbsoluteToLocal(value)` in the user's. A
+`ZonedDateTime`'s `toAbsoluteString()` writes it back in UTC.
+
+## From and to a JavaScript Date
+
+`fromDate(date, timeZone)` reads a `Date` in a time zone, giving a
+`ZonedDateTime`; `toCalendarDate` and `toCalendarDateTime` drop the parts you
+don't need. `toDate()` goes back, and a value without a time zone takes one:
+
+```tsx
+import {
+  fromDate,
+  getLocalTimeZone,
+  toCalendarDate,
+} from '@internationalized/date';
+
+const zoned = fromDate(new Date(), getLocalTimeZone());
+const due = toCalendarDate(zoned);
+
+due.toDate(getLocalTimeZone()); // midnight on that day, in the user's zone
+zoned.toDate(); // the instant, in the value's own zone
+```
+
+Avoid `new Date('2026-03-14')` for a day: JavaScript reads a date-only string
+as midnight UTC, which is the evening before in the Americas. Use
+`parseDate('2026-03-14')`.
+
+## Time zones
+
+A `CalendarDate` or `CalendarDateTime` means the same wall-clock time
+wherever it's read: a birthday, or a meeting everyone attends at 9:00 in
+their own city. Use a `ZonedDateTime` when the instant matters, as for a
+call across time zones. `toZoned(value, timeZone)` adds a zone to a
+`CalendarDateTime`, and a picker with a zoned value shows the zone's
+abbreviation unless `hideTimeZone` is set.
+
+`today(getLocalTimeZone())` and `now(getLocalTimeZone())` read the user's
+clock. The server's clock and zone differ from the browser's, so compute
+them in the browser, or when the user acts, rather than while rendering on
+the server.
+
+## Comparing and arithmetic
+
+Values are immutable. `add`, `subtract`, `set` and `cycle` return new ones,
+and `compare` returns a negative number, zero or a positive number:
+
+```tsx
+import { isSameDay, parseDate } from '@internationalized/date';
+
+const start = parseDate('2026-03-14');
+const end = start.add({ days: 14 });
+end.compare(start); // 14
+isSameDay(start, end); // false
+```
+
+For a `CalendarDate`, the number is the days between them. For a value with
+a time it can be milliseconds, so rely only on its sign.
+
+## Forms
+
+A field with a `name` submits its value's ISO string in a hidden input, as
+Date Range Picker does for `startName` and `endName`, so a plain `<form>`
+posts `2026-03-14` with no conversion.
+
+When your state holds the value, as with
+[TanStack Form](/docs/guides/tanstack-form#date-fields), type it as the
+concrete class, such as `CalendarDate | null` or
+`RangeValue<CalendarDateTime> | null`, not `DateValue`. The fields check
+`granularity` against the value's type, so a `CalendarDate` can't take an
+hour granularity, which React Aria would throw on at render. A `DateValue`
+could hold either, so the check can't run.
+
+`minValue`, `maxValue` and `isDateUnavailable` mark days the user can't
+pick in the calendar and flag a typed one as invalid; see
+[Date Field](/docs/components/date-field) for validation messages. A form
+library that passes `isInvalid` takes over that flag, so its schema repeats
+the checks; see the
+[TanStack Form example](/docs/guides/tanstack-form#date-fields).

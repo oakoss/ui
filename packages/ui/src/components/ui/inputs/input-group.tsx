@@ -7,6 +7,8 @@ import {
 import {
   Group as AriaGroup,
   type GroupProps as AriaGroupProps,
+  GroupContext,
+  useSlottedContext,
 } from 'react-aria-components';
 import { tv } from 'tailwind-variants/lite';
 
@@ -22,15 +24,17 @@ import { cn, cx } from '#/lib/cx';
 import { isEmptyNode } from '#/lib/empty-node';
 
 // The group draws the control's border and focus outline, so the Input or
-// Textarea inside drops its own and fills the space between the addons.
+// Textarea inside drops its own and fills the space between the addons. A
+// DateInput draws neither, and focuses its segments rather than itself. In
+// forced colors a disabled field grays its addons instead of fading.
 const groupStyles = tv({
   base: [
     'group/input-group relative flex w-full min-w-0 items-center rounded-control border border-input bg-field text-ui transition-colors',
-    'has-[>input:focus,>textarea:focus]:outline-(length:--ring-width) has-[>input:focus,>textarea:focus]:outline-offset-2 has-[>input:focus,>textarea:focus]:outline-ring has-[>input:focus,>textarea:focus]:outline-solid',
-    'has-[>:disabled]:opacity-50 has-[>[aria-invalid=true]]:border-destructive-text data-invalid:border-destructive-text',
+    'has-[>input:focus,>textarea:focus,>[data-slot=date-input][data-focus-within],>[data-slot=date-range-input]:focus-within]:outline-(length:--ring-width) has-[>input:focus,>textarea:focus,>[data-slot=date-input][data-focus-within],>[data-slot=date-range-input]:focus-within]:outline-offset-2 has-[>input:focus,>textarea:focus,>[data-slot=date-input][data-focus-within],>[data-slot=date-range-input]:focus-within]:outline-ring has-[>input:focus,>textarea:focus,>[data-slot=date-input][data-focus-within],>[data-slot=date-range-input]:focus-within]:outline-solid',
+    'has-[>:disabled,>[data-slot=date-range-input]>:disabled]:opacity-50 has-[>[aria-invalid=true]]:border-destructive-text data-invalid:border-destructive-text forced-colors:has-[>:disabled,>[data-slot=date-range-input]>:disabled]:opacity-100 forced-colors:has-[>:disabled,>[data-slot=date-range-input]>:disabled]:[&>[data-slot=input-group-addon]]:text-[GrayText]',
     'has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col has-[>textarea]:h-auto',
     '[&>:is(input,textarea)]:flex-1 [&>:is(input,textarea)]:self-stretch [&>:is(input,textarea)]:rounded-none [&>:is(input,textarea)]:border-0 [&>:is(input,textarea)]:bg-transparent [&>:is(input,textarea):disabled]:opacity-100 [&>:is(input,textarea):focus]:outline-none [&>input]:h-auto',
-    'has-[>[data-align=inline-end]]:[&>input]:pe-2 has-[>[data-align=inline-start]]:[&>input]:ps-2',
+    'has-[>[data-align=inline-end]]:[&>:is(input,[data-slot=date-input],[data-slot=date-range-input])]:pe-2 has-[>[data-align=inline-start]]:[&>:is(input,[data-slot=date-input],[data-slot=date-range-input])]:ps-2',
   ],
   defaultVariants: { size: 'md' },
   variants: {
@@ -95,17 +99,18 @@ export function DecoratedInputGroup({
 
 // A named group is announced as one; an unnamed one only lays out its
 // children. Inside a React Aria field it takes the field's invalid and
-// disabled state. Clicking an addon focuses the control, unless the click
-// lands on something interactive of its own.
+// disabled state, and a date picker names it. Clicking an addon focuses the
+// control, unless the click lands on something interactive of its own.
 export function InputGroup({
   className,
   onClick,
   size = 'md',
   ...props
 }: InputGroupProps) {
+  const named = { ...useSlottedContext(GroupContext), ...props };
   const isNamed =
-    (props['aria-label'] ?? '').trim() !== '' ||
-    (props['aria-labelledby'] ?? '').trim() !== '';
+    (named['aria-label'] ?? '').trim() !== '' ||
+    (named['aria-labelledby'] ?? '').trim() !== '';
   function focusControl(event: MouseEvent<HTMLDivElement>) {
     onClick?.(event);
     const { currentTarget, defaultPrevented, target } = event;
@@ -120,7 +125,9 @@ export function InputGroup({
       return;
     }
     currentTarget
-      .querySelector<HTMLElement>(':scope > input, :scope > textarea')
+      .querySelector<HTMLElement>(
+        ':scope > input, :scope > textarea, :scope > :is([data-slot=date-input], [data-slot=date-range-input]) [data-slot=date-segment]:not([data-type=literal])',
+      )
       ?.focus();
   }
   return (

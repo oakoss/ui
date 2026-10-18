@@ -1,5 +1,18 @@
 import { IconPlaceholder, type IconProps } from '#/components/icon-placeholder';
 
+export function Calendar(props: IconProps) {
+  return (
+    <IconPlaceholder
+      hugeicons="Calendar03Icon"
+      lucide="CalendarIcon"
+      phosphor="CalendarBlankIcon"
+      remixicon="RiCalendarLine"
+      tabler="IconCalendar"
+      {...props}
+    />
+  );
+}
+
 export function Check(props: IconProps) {
   return (
     <IconPlaceholder

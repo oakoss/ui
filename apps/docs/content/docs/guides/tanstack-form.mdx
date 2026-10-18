@@ -3,6 +3,7 @@ title: TanStack Form
 description: Build forms with TanStack Form and React Aria fields.
 ---
 
+import { TanStackFormDates } from '#/components/demos/tanstack-form-dates';
 import { TanStackFormDemo } from '#/components/demos/tanstack-form-demo';
 
 <TanStackFormDemo />
@@ -217,6 +218,27 @@ covers TanStack Start (`@tanstack/react-form-start`), Next.js and Remix.
 
 Call `form.reset()` to restore the default values, for example from a cancel
 button with `onPress={() => form.reset()}`.
+
+## Date fields
+
+Date and time fields work the same way: the field's value is an
+[Internationalized Date](/docs/guides/dates) object, or `null` until the
+user enters one. Type it as the concrete class rather than `DateValue`, so
+the picker can check its `granularity`, and validate it with `z.custom`:
+
+<ComponentPreview name="tanstack-form-dates">
+  <TanStackFormDates />
+</ComponentPreview>
+
+- **`abort: true`** on the required check stops the checks after it from
+  reading a `null` value.
+- **A schema check replaces React Aria's own:** with `isInvalid` passed, the
+  pickers no longer flag a value outside `minValue` and `maxValue`, or a
+  range ending before it starts, so the schema checks them.
+- **A rule across fields** goes on the object, with `path` naming the field
+  that shows the error.
+- **`toString()`** turns a value into the ISO string your server expects,
+  and `parseDate` turns one back for `defaultValues`.
 
 ## Going further
 

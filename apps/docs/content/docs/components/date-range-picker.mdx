@@ -1,0 +1,121 @@
+---
+title: Date Range Picker
+description: Start and end dates with a range calendar in a popover, typed or picked.
+item: date-range-picker
+reactAria: https://react-aria.adobe.com/DateRangePicker
+---
+
+import { DateRangePickerDemo } from '#/components/demos/date-range-picker-demo';
+import { DateRangePickerMonths } from '#/components/demos/date-range-picker-months';
+import { DateRangePickerTime } from '#/components/demos/date-range-picker-time';
+
+<ComponentPreview name="date-range-picker-demo">
+  <DateRangePickerDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="date-range-picker" />
+
+## Usage
+
+```tsx
+import { parseDate } from '@internationalized/date';
+
+import { DateRangePicker } from '#/components/ui/inputs/date-range-picker';
+
+<DateRangePicker
+  defaultValue={{
+    end: parseDate('2026-03-16'),
+    start: parseDate('2026-03-14'),
+  }}
+  label="Stay"
+/>;
+```
+
+Two [Date Field](/docs/components/date-field) inputs with a range
+[Calendar](/docs/components/calendar#range-and-months) in a popover. The
+value is `{ start, end }`, each the same Internationalized Date object as
+Date Field's, and `null` until both are set. Both inputs scroll together
+when a long locale doesn't fit.
+
+## Examples
+
+### Date and time
+
+A `CalendarDateTime` or `ZonedDateTime` range with a `granularity` of
+`hour`, `minute` or `second` adds start and end time fields under the
+calendar, named by `startTimeLabel` and `endTimeLabel` (default "Start
+time" and "End time"). They take the picker's `hourCycle` and
+`hideTimeZone`.
+
+<ComponentPreview name="date-range-picker-time">
+  <DateRangePickerTime />
+</ComponentPreview>
+
+### Two months
+
+`calendarProps` reaches the calendar as on
+[Date Picker](/docs/components/date-picker#month-and-year-dropdowns).
+`visibleMonths: 2` shows a longer range at once; the popover grows to fit,
+and the months stack where the screen is too narrow.
+
+<ComponentPreview name="date-range-picker-months">
+  <DateRangePickerMonths />
+</ComponentPreview>
+
+## Accessibility
+
+React Aria handles:
+
+- **Group:** both inputs, their decorations and the trigger form a `group`
+  named by the label. Each input's segments are named "Start Date" or "End
+  Date" (translated) with the label, and work as in
+  [Date Field](/docs/components/date-field#accessibility). Typing past the
+  start's last segment moves into the end.
+- **Trigger and calendar:** as on
+  [Date Picker](/docs/components/date-picker#accessibility). Picking the
+  second day closes the popover and returns focus to the trigger.
+- **Keyboard:** <kbd>Alt</kbd>+<kbd>↓</kbd> in a segment opens the calendar,
+  and <kbd>Escape</kbd> closes it.
+
+## API
+
+### DateRangePicker
+
+Extends React Aria's [`DateRangePicker`](https://react-aria.adobe.com/DateRangePicker#api).
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/date-range-picker.tsx"
+  name="DateRangePickerLayoutProps"
+/>
+
+Also accepts all [React Aria `DateRangePicker` props](https://react-aria.adobe.com/DateRangePicker#api),
+with `granularity` limited to `day` for a `CalendarDate`. A form gets each
+end's ISO value from hidden inputs named by `startName` and `endName`.
+Takes the layout props or children, not both: children replace the layout,
+built from the Field parts, `DatePickerGroup`, `DateRangeInput` and
+`DatePickerContent`.
+
+#### Data attributes
+
+| Attribute           | Present when                |
+| ------------------- | --------------------------- |
+| `data-slot`         | Always: `date-range-picker` |
+| `data-open`         | The calendar is open        |
+| `data-focus-within` | Focus is inside the picker  |
+| `data-invalid`      | The picker is invalid       |
+| `data-disabled`     | The picker is disabled      |
+
+### DateRangeInput
+
+The start and end inputs and the dash between them, in one scrolling
+container, `data-slot="date-range-input"`. Place it in a
+[`DatePickerGroup`](/docs/components/date-picker#datepickergroup).
+
+### DateRangePickerTime
+
+The start and end time fields the default layout adds to the popover,
+which render only while the picker's granularity includes a time.

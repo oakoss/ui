@@ -3899,6 +3899,164 @@
           "target": "@lib/cn-config.ts"
         }
       ]
+    },
+    {
+      "name": "date-field",
+      "type": "registry:ui",
+      "title": "Date Field",
+      "description": "Date input made of one editable segment per unit, ordered and formatted for the locale, with a label, description and error; pass children to compose the field parts.",
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/field",
+        "oakoss/ui/input",
+        "oakoss/ui/input-group"
+      ],
+      "dependencies": [
+        "@internationalized/date",
+        "cn",
+        "react-aria-components"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/date-field.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/date-field.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "time-field",
+      "type": "registry:ui",
+      "title": "Time Field",
+      "description": "Time input made of hour, minute and day-period segments that follow the locale's hour cycle, with a label, description and error; pass children to compose the field parts.",
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/date-field",
+        "oakoss/ui/field",
+        "oakoss/ui/input-group"
+      ],
+      "dependencies": [
+        "@internationalized/date",
+        "cn",
+        "react-aria-components"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/time-field.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/time-field.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "date-picker",
+      "type": "registry:ui",
+      "title": "Date Picker",
+      "description": "A segmented date input with a calendar in a popover, and a time field there when the value includes a time; with a label, description and error, and slots for the calendar's heading and footer.",
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/button",
+        "oakoss/ui/calendar",
+        "oakoss/ui/date-field",
+        "oakoss/ui/field",
+        "oakoss/ui/input-group",
+        "oakoss/ui/popover",
+        "oakoss/ui/time-field"
+      ],
+      "dependencies": [
+        "@internationalized/date",
+        "cn",
+        "react-aria-components"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/date-picker.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/date-picker.tsx"
+        },
+        {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/empty-node.ts",
+          "type": "registry:lib",
+          "target": "@lib/empty-node.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "date-range-picker",
+      "type": "registry:ui",
+      "title": "Date Range Picker",
+      "description": "Start and end date inputs with a range calendar in a popover, and start and end time fields there when the value includes a time; with a label, description and error, and slots for the calendar's heading and footer.",
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/calendar",
+        "oakoss/ui/date-field",
+        "oakoss/ui/date-picker",
+        "oakoss/ui/field",
+        "oakoss/ui/input-group",
+        "oakoss/ui/time-field"
+      ],
+      "dependencies": [
+        "@internationalized/date",
+        "cn",
+        "react-aria-components"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/inputs/date-range-picker.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/date-range-picker.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
     }
   ]
 }

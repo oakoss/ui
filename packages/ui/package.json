@@ -27,6 +27,7 @@
   "devDependencies": {
     "@hugeicons/core-free-icons": "catalog:",
     "@hugeicons/react": "catalog:",
+    "@internationalized/date": "catalog:",
     "@oakoss/eslint-config": "workspace:*",
     "@oakoss/oxlint-config": "workspace:*",
     "@oakoss/tsconfig": "workspace:*",
