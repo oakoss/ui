@@ -2,6 +2,7 @@ import { type ColorFormat, flavorEntries } from '@catppuccin/palette';
 import { describe, expect, it } from 'vitest';
 
 import type { Color } from '#/color';
+import type { Polarity } from '#/family';
 
 import { bundleCss } from '#/bundle';
 import { formatColor, resolved } from '#/css';
@@ -25,8 +26,8 @@ function published({ oklch: { c, h, l } }: ColorFormat): Color {
   return { components: [l, c, h], space: 'oklch' };
 }
 
-function resolvedPrimary(hue: string): string {
-  const { primary } = resolved(catppuccin, 'light', hue);
+function resolvedPrimary(hue: string, polarity: Polarity): string {
+  const { primary } = resolved(catppuccin, polarity, hue);
   if (primary === undefined) throw new Error('no primary');
   return formatColor(primary);
 }
@@ -107,13 +108,21 @@ describe('Catppuccin colors', () => {
     );
   });
 
-  it("scopes its blue primary to its own palette's values", () => {
-    const scoped = blockPrimary(
-      '[data-family="catppuccin"][data-primary="blue"]',
-    );
-    expect(scoped).toBe(resolvedPrimary('blue'));
-    expect(scoped).not.toBe(blockPrimary('[data-primary="blue"]'));
-  });
+  it.each([
+    ['light', (scope: string) => scope],
+    ['dark', (scope: string) => `.dark ${scope}, ${scope}.dark`],
+  ] as const)(
+    "scopes its %s blue primary to its own palette's values",
+    (polarity, selector) => {
+      const scoped = blockPrimary(
+        selector('[data-family="catppuccin"][data-primary="blue"]'),
+      );
+      const shared = blockPrimary(selector('[data-primary="blue"]'));
+      expect(scoped).toBe(resolvedPrimary('blue', polarity));
+      expect(shared).toBeDefined();
+      expect(scoped).not.toBe(shared);
+    },
+  );
 
   it('refuses a flavor of the other polarity', () => {
     expect(() => resolved(catppuccin, 'dark', undefined, 'latte')).toThrow(

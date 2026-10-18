@@ -25,10 +25,12 @@ const themesRules = new Map(
 );
 
 const familyIds = new Set(
-  Array.from(
-    themesCss.matchAll(/\[data-family=['"]([\w-]+)['"]\]/gu),
-    ([, id = '']) => id,
-  ),
+  themesRules
+    .keys()
+    .flatMap(
+      (selector) =>
+        /^\[data-family='([\w-]+)'\]$/u.exec(selector)?.slice(1) ?? [],
+    ),
 );
 
 // The generator owns every registry:theme item but `theme`: one per family
@@ -43,12 +45,8 @@ const flavorItems = generatedItems.filter(
   (item) => !familyItems.includes(item),
 );
 
-function familyOf(name: string): string {
-  const id = [...familyIds].find((family) =>
-    name.startsWith(`theme-${family}-`),
-  );
-  if (id === undefined) throw new Error(`${name} names no family`);
-  return id;
+function familyOf(name: string): string | undefined {
+  return [...familyIds].find((family) => name.startsWith(`theme-${family}-`));
 }
 
 test('every theme family in themes.css has a theme item', () => {
@@ -59,6 +57,12 @@ test('every theme family in themes.css has a theme item', () => {
 });
 
 test('every other generated theme item is a flavor of a family', () => {
+  expect(
+    flavorItems
+      .map(({ name }) => name)
+      .filter((name) => familyOf(name) === undefined),
+    'items whose family has no block in themes.css',
+  ).toEqual([]);
   expect(flavorItems.map(({ name }) => familyOf(name))).toContain('catppuccin');
 });
 
@@ -105,9 +109,10 @@ describe.each(familyItems)('$name', (item) => {
 });
 
 describe.each(flavorItems)('$name', (item) => {
-  const scope = `[data-family='${familyOf(item.name)}']`;
+  const scope = `[data-family='${familyOf(item.name) ?? ''}']`;
 
   test("keeps the family's light colors and changes its dark ones", () => {
+    expect(themesRules.get(scope), `no block for ${scope}`).toBeDefined();
     expect(item.cssVars?.light).toEqual(themesRules.get(scope));
     expect(item.cssVars?.dark).not.toEqual(
       themesRules.get(`.dark ${scope}, ${scope}.dark`),

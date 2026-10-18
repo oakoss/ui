@@ -42,10 +42,13 @@ function offeredPrimary(
   family: string | undefined,
   primary: string | undefined,
 ): string | undefined {
-  const entry = Object.values(families).find(
-    ({ id }) => id === (family ?? axes.family.default),
-  );
-  const choices: readonly string[] = entry?.intents.primary.choices ?? [];
+  const familyId = family ?? axes.family.default;
+  const entry = Object.values(families).find(({ id }) => id === familyId);
+  if (entry === undefined) {
+    console.warn(`No theme family "${familyId}"; using the default colors.`);
+    return undefined;
+  }
+  const choices: readonly string[] = entry.intents.primary.choices;
   return primary !== undefined && choices.includes(primary)
     ? primary
     : undefined;
