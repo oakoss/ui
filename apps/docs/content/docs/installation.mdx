@@ -70,6 +70,37 @@ and gives the command that installs the same theme.
 [Color Tokens](/docs/theming/tokens) lists every color each family sets, and
 [Token Names](/docs/theming/token-names) explains how the names are built.
 
+## Switch themes at runtime
+
+To let users switch families and primary colors while the app runs, add the
+`themes` item:
+
+```npm
+npx shadcn@latest add oakoss/ui/themes
+```
+
+It installs `styles/themes.css` (177 KB, 15 KB gzipped) in `src/`, or at the
+project root when there's no `src/`, and adds `@import "./styles/themes.css";`
+to your stylesheet. The import is relative to the stylesheet, so it suits a
+Vite app's `src/index.css`. Elsewhere, such as Next.js's `app/globals.css` or
+React Router's `app/app.css`, point it at the installed file
+(`../styles/themes.css`); the build fails until you do.
+
+Then set `data-family` and `data-primary` on `<html>` or on any element,
+alongside the `dark` class:
+
+```html
+<html data-family="catppuccin" data-primary="blue" class="dark"></html>
+```
+
+- Pick a primary the family offers; [Color Tokens](/docs/theming/tokens)
+  lists them. A family's own version of a color, such as Catppuccin's blue,
+  applies only when `data-primary` sits on the same element as `data-family`.
+- The theme's selectors outrank `:root` and `.dark`, so a class that sets a
+  theme color on the same element loses to them.
+- Adding the item again asks before replacing a `themes.css` you've edited,
+  and leaves it alone without a terminal; pass `--overwrite` to replace it.
+
 ## Add components
 
 ```npm
