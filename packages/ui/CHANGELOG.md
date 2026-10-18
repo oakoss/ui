@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.5.0 (2026-10-18)
+
+### Added
+
+Date Field and Time Field: segmented inputs on React Aria's `DateField` and `TimeField`, with a label, description, error and `start` and `end` decorations inside the border. Each unit is its own segment, in the user's locale's order, digits and hour cycle; a focused segment fills with the accent color, red when the field is invalid, and the system's highlight color in Windows High Contrast. Segments of a long locale scroll rather than overflow. `granularity` is typed by the value, so a `CalendarDate` can't take an hour granularity, which React Aria throws on at render. Install with `npx shadcn@latest add oakoss/ui/date-field` or `oakoss/ui/time-field`.
+
+Date Picker: a Date Field with a calendar trigger and our Calendar in a popover, placed under the field from its start edge and as wide as its months. `calendarProps` reaches the calendar's heading, footer, months, cells and loading state, so month and year dropdowns and presets work inside it. A date and time value adds a time field under the calendar, named by `timeLabel`. Install with `npx shadcn@latest add oakoss/ui/date-picker`.
+
+Date Range Picker: start and end inputs that scroll together, with a range calendar in the same popover and start and end time fields when the value includes a time, named by `startTimeLabel` and `endTimeLabel`. A form gets each end from hidden inputs named by `startName` and `endName`. Install with `npx shadcn@latest add oakoss/ui/date-range-picker`.
+
+Input Group takes its name from a React Aria field's group as well as its props, so a picker's input and trigger are announced as one group named by the label. In Windows High Contrast a disabled field inside an Input Group, such as a decorated Text Field, stays at full opacity and grays its decorations, where it faded before.
+
+The docs add a Dates and Times guide, on converting values to and from strings and JavaScript dates, time zones and forms, and a date example in the TanStack Form guide.
+
+Catppuccin theme family: install it with `npx shadcn@latest add oakoss/ui/theme-catppuccin` for Latte in light mode and Mocha in dark, or `theme-catppuccin-frappe` or `theme-catppuccin-macchiato` for the other dark flavors. Each accent's scale is generated from Catppuccin's published color, kept unchanged at the step nearest its lightness, with roles picked to pass WCAG AA in all four flavors; primary defaults to mauve and can be any of the 14 accents. The runtime `themes.css` adds Catppuccin's Latte and Mocha blocks, and a primary hue whose values differ between families is now scoped to each family, so the Mauve family's mauve primary moves to `[data-family='mauve'][data-primary='mauve']`.
+
+Runtime theme switching for registry installs: `npx shadcn@latest add oakoss/ui/themes` installs `styles/themes.css`, with every theme family and primary color scoped by `data-family` and `data-primary`, and imports it from your stylesheet. The import suits Vite's `src/index.css`; with a stylesheet elsewhere, such as Next.js's `app/globals.css`, change it to `../styles/themes.css`. The bundle's selectors now repeat an attribute so they outrank the theme's `:root` and `.dark` wherever those sit.
+
+### Fixed
+
+Text Field, Search Field, Sheet and `cx` import their types with `import type`, so an installed copy no longer keeps a runtime import of a module it uses only for types.
+
 ## 0.4.0 (2026-10-16)
 
 ### Added
