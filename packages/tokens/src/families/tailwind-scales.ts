@@ -6,6 +6,11 @@ import { authored, type AuthoredScale } from '#/scale';
 const accent = (steps: AuthoredScale['steps']) =>
   authored({ dark: 800, light: 700 }, steps);
 
+// shadcn fills yellow and lime at 500 in dark mode with dark text, which keeps
+// them yellow. Its light 400 fails 3:1 against white, so light stays at 700.
+const brightAccent = (steps: AuthoredScale['steps']) =>
+  authored({ dark: 500, light: 700 }, steps);
+
 // Tailwind's color scales (`theme.css`), copied unchanged.
 export const tailwindScales = {
   ...tailwindGrays,
@@ -100,7 +105,7 @@ export const tailwindScales = {
     900: oklch(35.9, 0.144, 278.697),
     950: oklch(25.7, 0.09, 281.288),
   }),
-  lime: accent({
+  lime: brightAccent({
     100: oklch(96.7, 0.067, 122.328),
     200: oklch(93.8, 0.127, 124.321),
     300: oklch(89.7, 0.196, 126.665),
@@ -217,7 +222,7 @@ export const tailwindScales = {
     900: oklch(38, 0.189, 293.745),
     950: oklch(28.3, 0.141, 291.089),
   }),
-  yellow: accent({
+  yellow: brightAccent({
     100: oklch(97.3, 0.071, 103.193),
     200: oklch(94.5, 0.129, 101.54),
     300: oklch(90.5, 0.182, 98.111),
