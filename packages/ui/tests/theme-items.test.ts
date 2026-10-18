@@ -29,7 +29,9 @@ const familyIds = new Set(
     .keys()
     .flatMap(
       (selector) =>
-        /^\[data-family='([\w-]+)'\]$/u.exec(selector)?.slice(1) ?? [],
+        /^\[data-family='([\w-]+)'\]\[data-family\]$/u
+          .exec(selector)
+          ?.slice(1) ?? [],
     ),
 );
 
@@ -97,7 +99,7 @@ describe.each(generatedItems)('$name', (item) => {
 });
 
 describe.each(familyItems)('$name', (item) => {
-  const scope = `[data-family='${item.name.slice('theme-'.length)}']`;
+  const scope = `[data-family='${item.name.slice('theme-'.length)}'][data-family]`;
 
   // themes.css comes from the runtime bundle, a separate code path.
   test("matches the family's runtime bundle in themes.css", () => {
@@ -109,7 +111,7 @@ describe.each(familyItems)('$name', (item) => {
 });
 
 describe.each(flavorItems)('$name', (item) => {
-  const scope = `[data-family='${familyOf(item.name) ?? ''}']`;
+  const scope = `[data-family='${familyOf(item.name) ?? ''}'][data-family]`;
 
   test("keeps the family's light colors and changes its dark ones", () => {
     expect(themesRules.get(scope), `no block for ${scope}`).toBeDefined();

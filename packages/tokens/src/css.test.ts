@@ -66,27 +66,29 @@ describe('bundleCss', () => {
   const css = bundleCss(Object.values(families), vega);
 
   it('scopes each family and primary hue in both modes', () => {
-    expect(css).toContain('[data-family="stone"] {');
+    expect(css).toContain('[data-family="stone"][data-family] {');
     expect(css).toContain(
-      '.dark [data-family="stone"], [data-family="stone"].dark {',
+      '.dark [data-family="stone"][data-family], [data-family="stone"][data-family].dark {',
     );
-    expect(css).toContain('[data-primary="blue"] {');
+    expect(css).toContain('[data-primary="blue"][data-primary] {');
     expect(css).toContain(
       `--primary: ${formatColor(tailwindScales.blue.steps[700])};`,
     );
   });
 
   it('sets color-scheme on each family block', () => {
-    expect(css).toContain('[data-family="stone"] {\n  color-scheme: light;');
     expect(css).toContain(
-      '[data-family="stone"].dark {\n  color-scheme: dark;',
+      '[data-family="stone"][data-family] {\n  color-scheme: light;',
+    );
+    expect(css).toContain(
+      '[data-family="stone"][data-family].dark {\n  color-scheme: dark;',
     );
   });
 
   it('puts primary blocks after family blocks so they win a tie', () => {
     const familyBlocks = css
       .matchAll(
-        /^(?:\.dark )?\[data-family="\w+"\](?:, \[data-family="\w+"\]\.dark)? \{$/gmu,
+        /^(?:\.dark )?\[data-family="\w+"\]\[data-family\](?:, \[data-family="\w+"\]\[data-family\]\.dark)? \{$/gmu,
       )
       .toArray();
     expect(familyBlocks).toHaveLength(2 * Object.keys(families).length);
@@ -96,16 +98,79 @@ describe('bundleCss', () => {
   });
 });
 
+// One for the doubled scope attribute, one per further attribute or class.
+function intendedSpecificity(selector: string): number {
+  const extras = [
+    selector.includes('.dark'),
+    selector.includes('data-family') && selector.includes('data-primary'),
+  ].filter(Boolean).length;
+  return 2 + extras;
+}
+
+function selectorsOf(css: string): string[] {
+  return css
+    .replaceAll(/\/\*[\s\S]*?\*\//gu, '')
+    .matchAll(/([^{}]+)\{/gu)
+    .flatMap(([, list = '']) => list.split(',').map((part) => part.trim()))
+    .toArray();
+}
+
+// Counts classes, attributes and pseudo-classes, the only parts of the
+// selector shapes the first test allows.
+function specificity(selector: string): number {
+  return selector.match(/[[.:]/gu)?.length ?? 0;
+}
+
+describe('bundleCss specificity', () => {
+  const selectors = selectorsOf(bundleCss(Object.values(families), vega));
+  const themeSelectors = selectorsOf(
+    themeCss(families.zinc, vega, typographies.default),
+  ).filter((selector) => !selector.startsWith('@'));
+
+  it('uses only attribute and .dark selectors', () => {
+    expect(selectors.length).toBeGreaterThan(0);
+    expect(
+      selectors.filter(
+        (selector) =>
+          !/^(?:\.dark )?(?:\[[\w-]+(?:='[\w-]+'|="[\w-]+")?\])+(?:\.dark)?$/u.test(
+            selector,
+          ),
+      ),
+    ).toEqual([]);
+  });
+
+  it("outranks the theme's :root and .dark", () => {
+    expect(themeSelectors).toEqual([':root', '.dark']);
+    expect(
+      Math.min(...selectors.map((selector) => specificity(selector))),
+    ).toBeGreaterThan(
+      Math.max(...themeSelectors.map((selector) => specificity(selector))),
+    );
+  });
+
+  it('keeps family and primary blocks level, so their order decides', () => {
+    expect(
+      selectors.filter(
+        (selector) => specificity(selector) !== intendedSpecificity(selector),
+      ),
+    ).toEqual([]);
+  });
+});
+
 describe('bundleCss primary coverage', () => {
   const css = bundleCss(Object.values(families), vega);
 
   it('gives every family a light block for each primary hue it offers', () => {
     const shared = new Set(
-      css.matchAll(/^\[data-primary="(\w+)"\] \{$/gmu).map(([, hue]) => hue),
+      css
+        .matchAll(/^\[data-primary="(\w+)"\]\[data-primary\] \{$/gmu)
+        .map(([, hue]) => hue),
     );
     const scoped = new Set(
       css
-        .matchAll(/^\[data-family="(\w+)"\]\[data-primary="(\w+)"\] \{$/gmu)
+        .matchAll(
+          /^\[data-family="(\w+)"\]\[data-primary="(\w+)"\]\[data-family\] \{$/gmu,
+        )
         .map(([, family, hue]) => `${family}/${hue}`),
     );
     for (const family of Object.values(families)) {
@@ -120,8 +185,10 @@ describe('bundleCss primary coverage', () => {
   });
 
   it("scopes Catppuccin's hues, which differ from Tailwind's", () => {
-    expect(css).toContain('[data-family="catppuccin"][data-primary="blue"] {');
-    expect(css).toContain('\n[data-primary="blue"] {');
+    expect(css).toContain(
+      '[data-family="catppuccin"][data-primary="blue"][data-family] {',
+    );
+    expect(css).toContain('\n[data-primary="blue"][data-primary] {');
   });
 });
 
@@ -147,11 +214,13 @@ describe('bundleCss primary blocks', () => {
   it('scopes a family whose hue differs only in dark mode', () => {
     const darkOnly = withOwnBlue({ dark: 300, light: 700 });
     const css = bundleCss([families.stone, families.mauve, darkOnly], vega);
-    expect(css).toContain('\n[data-primary="blue"] {');
+    expect(css).toContain('\n[data-primary="blue"][data-primary] {');
     expect(css).toContain(
-      '.dark [data-family="zinc"][data-primary="blue"], [data-family="zinc"][data-primary="blue"].dark {',
+      '.dark [data-family="zinc"][data-primary="blue"][data-family], [data-family="zinc"][data-primary="blue"][data-family].dark {',
     );
-    expect(css).not.toContain('\n[data-family="zinc"][data-primary="blue"] {');
+    expect(css).not.toContain(
+      '\n[data-family="zinc"][data-primary="blue"][data-family] {',
+    );
   });
 
   it('scopes every family when no group of them is largest', () => {
