@@ -10,6 +10,7 @@ import {
   derivedRoles,
   type Intent,
   intentRole,
+  type IntentRole,
   intentRoleKinds,
   intents,
   neutralRoles,
@@ -17,17 +18,41 @@ import {
 import { type AuthoredScale, isStep, orderedSteps, type Step } from '#/scale';
 import { validateFamily } from '#/validate';
 
-export type Theme = { polarity: Polarity; tokens: ThemeTokens };
+export type Theme = {
+  polarity: Polarity;
+  sources: ThemeSources;
+  tokens: ThemeTokens;
+};
+
+/**
+What each token resolves from, keyed like `ThemeTokens`.
+*/
+export type ThemeSources = Readonly<Record<string, TokenSource>>;
 
 /**
 Every color token of one flavor, keyed by CSS variable name without `--`:
 the roles, plus each intent's scale (`primary-50` … `primary-950`).
 */
-export type ThemeTokens = Readonly<Record<string, Color>>;
+export type ThemeTokens = Readonly<Record<string, Readonly<Color>>>;
+
+/**
+A palette color, at an alpha when the reference sets one, or the token a
+derived role follows.
+*/
+export type TokenSource = DerivedSource | Readonly<ColorRef<string, string>>;
 
 type AnyPalette = ResolvedFlavor['palette'];
 
 type AnyScale = AuthoredScale<string, string>;
+
+type Built = {
+  sources: Record<string, TokenSource>;
+  tokens: Record<string, Color>;
+};
+
+type ChartScale = { hue: string; scale: AnyScale; steps: readonly Step[] };
+
+type DerivedSource = { readonly role: IntentRole };
 
 /**
 Resolves a flavor, with `primary` overriding the family's default primary
@@ -53,13 +78,14 @@ export function resolveTheme(
       ? primary
       : family.intents[intent].default;
 
-  const tokens = neutralTokens(resolved);
+  const built = neutralTokens(resolved);
+  const { sources, tokens } = built;
   const page = tokens.background;
   if (page === undefined) return [at('has no background')];
   if (!isOpaque(page)) return [at('role "background" is translucent')];
 
   const errors = intents.flatMap((intent) => {
-    const intentErrors = addIntent(tokens, intent, hueOf(intent), {
+    const intentErrors = addIntent(built, intent, hueOf(intent), {
       page,
       palette: resolved.palette,
       polarity: resolved.polarity,
@@ -70,18 +96,19 @@ export function resolveTheme(
 
   for (const [role, target] of Object.entries(derivedRoles)) {
     tokens[role] = tokenOf(tokens, target);
+    sources[role] = { role: target };
   }
-  const charts = chartColors(family, resolved.palette, hueOf);
+  const charts = chartScale(family, resolved.palette, hueOf);
   if (typeof charts === 'string') return [at(charts)];
   for (const [index, role] of chartRoles.entries()) {
-    const color = charts[index];
-    if (color !== undefined) tokens[role] = color;
+    const step = charts.steps[index];
+    if (step !== undefined) addStep(built, role, charts, step);
   }
-  return { polarity: resolved.polarity, tokens };
+  return { polarity: resolved.polarity, sources, tokens };
 }
 
 function addIntent(
-  tokens: Record<string, Color>,
+  built: Built,
   intent: Intent,
   hue: string,
   context: { page: Color; palette: AnyPalette; polarity: Polarity },
@@ -95,22 +122,34 @@ function addIntent(
   }
   const steps = pickIntentSteps(scale, context.polarity, context.page);
   if (typeof steps === 'string') return [`${intent} (${hue}): ${steps}`];
+  const source = { hue, scale };
   for (const step of orderedSteps) {
-    const color = scale.steps[step];
-    if (color !== undefined) tokens[`${intent}-${step}`] = color;
+    if (scale.steps[step] !== undefined) {
+      addStep(built, `${intent}-${step}`, source, step);
+    }
   }
   for (const kind of intentRoleKinds) {
-    tokens[intentRole(intent, kind)] = stepColor(scale, steps[kind]);
+    addStep(built, intentRole(intent, kind), source, steps[kind]);
   }
   return [];
 }
 
+function addStep(
+  { sources, tokens }: Built,
+  name: string,
+  { hue, scale }: { hue: string; scale: AnyScale },
+  step: Step,
+) {
+  tokens[name] = copied(stepColor(scale, step));
+  sources[name] = { ref: `color.${hue}.${step}` };
+}
+
 // A ramp reads fixed steps of one scale.
-function chartColors(
+function chartScale(
   family: Family,
   palette: AnyPalette,
   hueOf: (intent: Intent) => string,
-): Color[] | string {
+): ChartScale | string {
   const { charts } = family;
   if (charts.kind === 'categorical') {
     return 'categorical charts are not generated yet';
@@ -121,16 +160,23 @@ function chartColors(
       : hueOf(charts.source.intent);
   const scale = scaleOf(palette, hue);
   if (scale === undefined) return `chart hue "${hue}" has no scale`;
-  return charts.steps.map((step) => stepColor(scale, step));
+  return { hue, scale, steps: charts.steps };
 }
 
-function neutralTokens(resolved: ResolvedFlavor): Record<string, Color> {
-  const tokens: Record<string, Color> = {};
+// A returned theme owns its colors, so writing to one can't reach the family.
+function copied(color: Color): Color {
+  return { ...color, components: [...color.components] };
+}
+
+function neutralTokens(resolved: ResolvedFlavor): Built {
+  const built: Built = { sources: {}, tokens: {} };
   for (const role of neutralRoles) {
     const ref = resolved.roles[role];
-    if (ref !== undefined) tokens[role] = resolveRef(ref, resolved.palette);
+    if (ref === undefined) continue;
+    built.tokens[role] = copied(resolveRef(ref, resolved.palette));
+    built.sources[role] = { ...ref };
   }
-  return tokens;
+  return built;
 }
 
 // `validateFamily` has checked the path against the expanded scale.

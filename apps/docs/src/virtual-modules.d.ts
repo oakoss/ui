@@ -4,6 +4,12 @@ declare module 'virtual:theme-options' {
   export const themeOptions: ThemeOptions;
 }
 
+declare module 'virtual:token-reference' {
+  import type { TokenReference } from '#/lib/token-reference-types';
+
+  export const tokenReference: TokenReference;
+}
+
 declare module 'virtual:manual-sources' {
   import type { MDXContent } from 'mdx/types';
 

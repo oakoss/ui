@@ -1,0 +1,69 @@
+---
+title: Token Names
+description: How color token names are built, and how each role gets its color when a theme family is made.
+---
+
+A color token is named for its role, not its color: `--primary`, not
+`--blue-600`. Changing the family or primary color changes the values, and
+every name stays the same. The [Color Tokens](/docs/theming/tokens) page
+lists every token with its value.
+
+## Neutral roles
+
+Neutral roles keep shadcn's names, so code written for shadcn reads the same
+tokens. A surface and the text on it share a stem:
+
+- `--card` is the surface, and `--card-foreground` is text on it.
+- `--sidebar-*` repeats the set for the sidebar.
+- `--border` is for dividers and decoration, with no contrast minimum.
+  `--input` is the border of a form control, held to 3:1.
+- `--field` is the background of a form control, set by the style rather
+  than the family.
+
+Each family maps its neutral roles by hand to palette colors, such as
+`zinc-950` or `white` at 10% opacity. Zinc's map:
+
+<TokenRules set="neutral" />
+
+## Intent roles
+
+Each of the five intents, `primary`, `destructive`, `success`, `warning` and
+`info`, gets the same set of roles. The bare intent name is the solid fill,
+and a suffix names the rest:
+
+<TokenRules set="intent" />
+
+The family chooses each intent's color, and you can change the primary. The
+steps aren't fixed: the generator picks them for each color and flavor by
+contrast, so `--primary` isn't the same step in every scale or flavor.
+
+## Scales
+
+Each intent also exposes its whole scale, `--primary-50` to `--primary-950`,
+for the rare color no role covers. Prefer a role: a step keeps its value
+when the flavor changes, so text on it can fail contrast in dark mode.
+
+## Derived roles
+
+shadcn names a few roles that follow another token rather than a palette
+color:
+
+<TokenRules set="derived" />
+
+Focus rings follow `--primary-text` rather than `--primary`: the fill only
+has to pass 3:1 on the page, and fails it on dark cards and popovers.
+
+## Charts
+
+`--chart-1` to `--chart-5` color data series. Every family reads five steps
+of the primary color's scale; Zinc's:
+
+<TokenRules set="charts" />
+
+## Contrast
+
+Every family, flavor and primary color passes these pairs, which the token
+package checks in its tests. Decorative pairs, such as `--border` on the
+page, have no minimum.
+
+<TokenRules set="contrast" />

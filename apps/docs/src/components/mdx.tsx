@@ -12,6 +12,7 @@ import defaultMdxComponents from 'fumadocs-ui/mdx';
 import { CodePre } from '#/components/code-pre';
 import { ManualSource, ManualSources } from '#/components/manual-sources';
 import { OwnPropsTable } from '#/components/own-props-table';
+import { TokenTable } from '#/components/token-table';
 
 // Demos are imported by the MDX page that uses them, not registered here.
 export function getMDXComponents(components?: MDXComponents) {
@@ -26,6 +27,7 @@ export function getMDXComponents(components?: MDXComponents) {
     TabsContent,
     TabsList,
     TabsTrigger,
+    TokenTable,
     TypeTable: OwnPropsTable,
     ...components,
   } satisfies MDXComponents;

@@ -11,11 +11,18 @@ type AnyScale = AuthoredScale<string, string>;
 
 type Foreground = { end: 50 | 950; ratio: number };
 
-// Fixed by mode; their pairs are decorative or checked through `text`.
-const subtleStep = { dark: 950, light: 50 } as const;
-const borderStep = { dark: 800, light: 200 } as const;
-// Accent text starts here and moves away from the page until it passes.
-const textStart = { dark: 400, light: 600 } as const;
+/**
+`subtle` and `border` are fixed by mode; their pairs are decorative or
+checked through `text`. Accent text starts at `textStart` and moves away
+from the page until it passes.
+*/
+export const intentStepRules = {
+  border: { dark: 800, light: 200 },
+  subtle: { dark: 950, light: 50 },
+  textStart: { dark: 400, light: 600 },
+} as const satisfies Record<string, Record<Polarity, Step>>;
+
+const { border: borderStep, subtle: subtleStep, textStart } = intentStepRules;
 
 /**
 Picks each intent role's step for one scale on one page (note 0004). The

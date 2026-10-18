@@ -1,8 +1,13 @@
+import { isDeepStrictEqual } from 'node:util';
 import { describe, expect, it } from 'vitest';
 
-import { oklch } from '#/color';
+import type { Family } from '#/family';
+
+import { type Color, oklch } from '#/color';
 import { tailwindScales } from '#/families/tailwind-scales';
 import { families } from '#/index';
+import { resolveFlavor } from '#/resolve';
+import { isStep } from '#/scale';
 import { expandSeeded } from '#/seeded';
 import { withLightRole, withScale } from '#/testing';
 import { resolveTheme, type Theme } from '#/theme';
@@ -12,6 +17,44 @@ const seeded = { kind: 'seeded', seed: oklch(60, 0.2, 250) } as const;
 
 function errorsOf(result: string[] | Theme): string[] {
   return Array.isArray(result) ? result : [];
+}
+
+// Writes past the readonly types, as untyped code can.
+function overwrite(target: object | undefined, change: object) {
+  if (target === undefined) throw new Error('nothing to overwrite');
+  Object.assign(target, change);
+}
+
+function referenced(
+  family: Family,
+  flavor: string,
+  path: string,
+): Color | undefined {
+  const resolved = resolveFlavor(family, flavor);
+  if (typeof resolved === 'string') throw new Error(resolved);
+  const [, name = '', step] = path.split('.', 3);
+  if (step === undefined) return resolved.palette.neutrals[name];
+  const number = Number(step);
+  return isStep(number)
+    ? resolved.palette.scales[name]?.steps[number]
+    : undefined;
+}
+
+// The color a token's recorded source points at, following derived roles.
+function sourceColor(
+  family: Family,
+  flavor: string,
+  sources: Theme['sources'],
+  name: string,
+): Color | undefined {
+  let source = sources[name];
+  while (source !== undefined && 'role' in source)
+    source = sources[source.role];
+  if (source === undefined) return undefined;
+  const color = referenced(family, flavor, source.ref);
+  return color === undefined || source.alpha === undefined
+    ? color
+    : { ...color, alpha: source.alpha };
 }
 
 function theme(result: string[] | Theme): Theme {
@@ -56,6 +99,71 @@ describe('resolveTheme', () => {
       components: [1, 0, null],
       space: 'oklch',
     });
+  });
+});
+
+describe('resolveTheme copies', () => {
+  // A caller changing a returned theme mustn't change the family data the
+  // next resolve reads.
+  it('returns colors and sources the family data does not share', () => {
+    const first = theme(resolveTheme(families.zinc, 'light'));
+    const before = structuredClone(first);
+    overwrite(first.tokens.background, { alpha: 0 });
+    // A new hue keeps the scale valid, so only the comparison can catch it.
+    overwrite(first.tokens.foreground?.components, { 2: 10 });
+    overwrite(first.tokens['primary-500'], { alpha: 0 });
+    overwrite(first.tokens['primary-600']?.components, { 2: 10 });
+    overwrite(first.sources.background, { ref: 'color.black' });
+    const next = theme(resolveTheme(families.zinc, 'light'));
+    expect(next).toEqual(before);
+  });
+});
+
+describe('resolveTheme sources', () => {
+  it('records where each token comes from', () => {
+    const { sources } = theme(resolveTheme(families.zinc, 'light'));
+    expect(sources).toMatchObject({
+      background: { ref: 'color.white' },
+      'chart-1': { ref: 'color.zinc.300' },
+      primary: { ref: 'color.zinc.900' },
+      'primary-500': { ref: 'color.zinc.500' },
+      'primary-foreground': { ref: 'color.zinc.50' },
+      ring: { role: 'primary-text' },
+      'sidebar-primary': { role: 'primary' },
+    });
+  });
+
+  it('records the picked steps of the chosen primary', () => {
+    const { sources } = theme(resolveTheme(families.zinc, 'dark', 'blue'));
+    expect(sources).toMatchObject({
+      border: { alpha: 0.1, ref: 'color.white' },
+      'chart-1': { ref: 'color.blue.300' },
+      primary: { ref: 'color.blue.600' },
+      'primary-hover': { ref: 'color.blue.700' },
+      'primary-text': { ref: 'color.blue.400' },
+    });
+  });
+
+  // A source has to resolve to the token's own color, or the docs show a
+  // primitive the theme doesn't use.
+  it('gives every token a source that resolves to its color', () => {
+    const mismatches = Object.values(families).flatMap((family) =>
+      Object.keys(family.flavors).flatMap((flavor) =>
+        family.intents.primary.choices.flatMap((hue) => {
+          const resolved = theme(resolveTheme(family, flavor, hue));
+          return Object.keys(resolved.tokens)
+            .filter(
+              (name) =>
+                !isDeepStrictEqual(
+                  sourceColor(family, flavor, resolved.sources, name),
+                  resolved.tokens[name],
+                ),
+            )
+            .map((name) => `${family.id} ${flavor} ${hue}: ${name}`);
+        }),
+      ),
+    );
+    expect(mismatches).toEqual([]);
   });
 });
 

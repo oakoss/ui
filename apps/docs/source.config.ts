@@ -3,6 +3,7 @@ import { remarkAutoTypeTable } from 'fumadocs-typescript';
 
 import { codeThemes } from './src/lib/code-themes';
 import { remarkComponentDocs } from './src/lib/remark-component-docs';
+import { remarkTokenDocs } from './src/lib/remark-token-docs';
 import {
   remarkTypeTableMarkdown,
   typeTableOptions,
@@ -16,6 +17,7 @@ export default defineConfig({
       [remarkAutoTypeTable, typeTableOptions],
       remarkTypeTableMarkdown,
       remarkComponentDocs,
+      remarkTokenDocs,
     ],
   },
 });
