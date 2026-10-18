@@ -101,15 +101,27 @@ describe('groupValues', () => {
 describe('tokenReference families', () => {
   it('opens each family on its default light flavor, listed first', () => {
     expect(
-      reference.families.map(({ defaultFlavor, flavors }) => [
+      reference.families.map(({ defaultFlavor, flavors, id }) => [
+        id,
         defaultFlavor,
-        flavors[0],
+        flavors[0]?.id,
       ]),
     ).toEqual(
-      reference.families.map(() => [
-        'light',
-        expect.objectContaining({ id: 'light' }),
+      Object.values(families).map(({ defaults, id }) => [
+        id,
+        defaults.light,
+        defaults.light,
       ]),
     );
+  });
+
+  it("lists all four of Catppuccin's flavors", () => {
+    const catppuccin = reference.families.find(({ id }) => id === 'catppuccin');
+    expect(catppuccin?.flavors.map(({ name }) => name)).toEqual([
+      'Latte',
+      'Frappé',
+      'Macchiato',
+      'Mocha',
+    ]);
   });
 });

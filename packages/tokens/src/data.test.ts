@@ -90,17 +90,28 @@ describe('default data', () => {
   });
 });
 
+// shadcn's base colors; Catppuccin brings its own neutrals.
+const baseColors = [
+  families.mauve,
+  families.mist,
+  families.neutral,
+  families.olive,
+  families.stone,
+  families.taupe,
+  families.zinc,
+];
+
 describe('base colors', () => {
   it('maps every base color to the same steps of its own gray', () => {
     expect(grayPattern(families.zinc)).toMatchSnapshot();
-    for (const family of Object.values(families)) {
+    for (const family of baseColors) {
       expect(grayPattern(family)).toEqual(grayPattern(families.zinc));
     }
   });
 
-  it('offers shadcn base colors with zinc as the default family', () => {
+  it('offers the base colors and Catppuccin, with zinc as the default', () => {
     expect(axes.family).toEqual({
-      contexts: ['mauve', 'mist', 'neutral', 'olive', 'stone', 'taupe', 'zinc'],
+      contexts: ['catppuccin', ...baseColors.map(({ id }) => id)],
       default: 'zinc',
     });
   });

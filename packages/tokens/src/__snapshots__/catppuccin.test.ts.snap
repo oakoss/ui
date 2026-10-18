@@ -1,0 +1,242 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Catppuccin choices > pins the role map 1`] = `
+{
+  "frappe": {
+    "accent": {
+      "ref": "color.surface0",
+    },
+    "accent-foreground": {
+      "ref": "color.text",
+    },
+    "background": {
+      "ref": "color.base",
+    },
+    "border": {
+      "ref": "color.surface1",
+    },
+    "card": {
+      "ref": "color.base",
+    },
+    "card-foreground": {
+      "ref": "color.text",
+    },
+    "foreground": {
+      "ref": "color.text",
+    },
+    "input": {
+      "ref": "color.overlay1",
+    },
+    "muted": {
+      "ref": "color.surface0",
+    },
+    "muted-foreground": {
+      "ref": "color.subtext1",
+    },
+    "popover": {
+      "ref": "color.base",
+    },
+    "popover-foreground": {
+      "ref": "color.text",
+    },
+    "secondary": {
+      "ref": "color.surface0",
+    },
+    "secondary-foreground": {
+      "ref": "color.text",
+    },
+    "sidebar": {
+      "ref": "color.mantle",
+    },
+    "sidebar-accent": {
+      "ref": "color.surface0",
+    },
+    "sidebar-accent-foreground": {
+      "ref": "color.text",
+    },
+    "sidebar-border": {
+      "ref": "color.surface1",
+    },
+    "sidebar-foreground": {
+      "ref": "color.text",
+    },
+  },
+  "latte": {
+    "accent": {
+      "ref": "color.mantle",
+    },
+    "accent-foreground": {
+      "ref": "color.text",
+    },
+    "background": {
+      "ref": "color.base",
+    },
+    "border": {
+      "ref": "color.surface1",
+    },
+    "card": {
+      "ref": "color.base",
+    },
+    "card-foreground": {
+      "ref": "color.text",
+    },
+    "foreground": {
+      "ref": "color.text",
+    },
+    "input": {
+      "ref": "color.overlay2",
+    },
+    "muted": {
+      "ref": "color.mantle",
+    },
+    "muted-foreground": {
+      "ref": "color.subtext1",
+    },
+    "popover": {
+      "ref": "color.base",
+    },
+    "popover-foreground": {
+      "ref": "color.text",
+    },
+    "secondary": {
+      "ref": "color.mantle",
+    },
+    "secondary-foreground": {
+      "ref": "color.text",
+    },
+    "sidebar": {
+      "ref": "color.mantle",
+    },
+    "sidebar-accent": {
+      "ref": "color.mantle",
+    },
+    "sidebar-accent-foreground": {
+      "ref": "color.text",
+    },
+    "sidebar-border": {
+      "ref": "color.surface1",
+    },
+    "sidebar-foreground": {
+      "ref": "color.text",
+    },
+  },
+  "macchiato": {
+    "accent": {
+      "ref": "color.surface0",
+    },
+    "accent-foreground": {
+      "ref": "color.text",
+    },
+    "background": {
+      "ref": "color.base",
+    },
+    "border": {
+      "ref": "color.surface1",
+    },
+    "card": {
+      "ref": "color.base",
+    },
+    "card-foreground": {
+      "ref": "color.text",
+    },
+    "foreground": {
+      "ref": "color.text",
+    },
+    "input": {
+      "ref": "color.overlay1",
+    },
+    "muted": {
+      "ref": "color.surface0",
+    },
+    "muted-foreground": {
+      "ref": "color.subtext1",
+    },
+    "popover": {
+      "ref": "color.base",
+    },
+    "popover-foreground": {
+      "ref": "color.text",
+    },
+    "secondary": {
+      "ref": "color.surface0",
+    },
+    "secondary-foreground": {
+      "ref": "color.text",
+    },
+    "sidebar": {
+      "ref": "color.mantle",
+    },
+    "sidebar-accent": {
+      "ref": "color.surface0",
+    },
+    "sidebar-accent-foreground": {
+      "ref": "color.text",
+    },
+    "sidebar-border": {
+      "ref": "color.surface1",
+    },
+    "sidebar-foreground": {
+      "ref": "color.text",
+    },
+  },
+  "mocha": {
+    "accent": {
+      "ref": "color.surface0",
+    },
+    "accent-foreground": {
+      "ref": "color.text",
+    },
+    "background": {
+      "ref": "color.base",
+    },
+    "border": {
+      "ref": "color.surface1",
+    },
+    "card": {
+      "ref": "color.base",
+    },
+    "card-foreground": {
+      "ref": "color.text",
+    },
+    "foreground": {
+      "ref": "color.text",
+    },
+    "input": {
+      "ref": "color.overlay1",
+    },
+    "muted": {
+      "ref": "color.surface0",
+    },
+    "muted-foreground": {
+      "ref": "color.subtext1",
+    },
+    "popover": {
+      "ref": "color.base",
+    },
+    "popover-foreground": {
+      "ref": "color.text",
+    },
+    "secondary": {
+      "ref": "color.surface0",
+    },
+    "secondary-foreground": {
+      "ref": "color.text",
+    },
+    "sidebar": {
+      "ref": "color.mantle",
+    },
+    "sidebar-accent": {
+      "ref": "color.surface0",
+    },
+    "sidebar-accent-foreground": {
+      "ref": "color.text",
+    },
+    "sidebar-border": {
+      "ref": "color.surface1",
+    },
+    "sidebar-foreground": {
+      "ref": "color.text",
+    },
+  },
+}
+`;

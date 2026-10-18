@@ -28,9 +28,10 @@ export function familyCssVars(
   family: Family,
   style: Style,
   primary?: string,
+  darkFlavor?: string,
 ): Pick<CssVars, 'dark' | 'light'> {
   const light = resolved(family, 'light', primary);
-  const dark = resolved(family, 'dark', primary);
+  const dark = resolved(family, 'dark', primary, darkFlavor);
   return {
     dark: { field: fieldColor(style, 'dark', dark), ...colors(dark) },
     light: { field: fieldColor(style, 'light', light), ...colors(light) },

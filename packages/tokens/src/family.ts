@@ -31,6 +31,8 @@ export type Family<
   FlavorId extends string = string,
 > = {
   charts: Charts<NoInfer<Hue>>;
+  // The palette's copyright notice.
+  credit?: string;
   defaults: { dark: NoInfer<FlavorId>; light?: NoInfer<FlavorId> };
   flavors: Readonly<
     Record<FlavorId, Flavor<NoInfer<Hue>, NoInfer<Neutral>, NoInfer<FlavorId>>>

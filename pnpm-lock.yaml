@@ -164,6 +164,9 @@ settings:
 
 catalogs:
   default:
+    '@catppuccin/palette':
+      specifier: 1.8.0
+      version: 1.8.0
     '@hugeicons/core-free-icons':
       specifier: ^4.3.5
       version: 4.3.5
@@ -522,6 +525,9 @@ importers:
 
   packages/tokens:
     devDependencies:
+      '@catppuccin/palette':
+        specifier: 'catalog:'
+        version: 1.8.0
       '@oakoss/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint-config
@@ -866,6 +872,9 @@ packages:
 
   '@cacheable/utils@2.5.0':
     resolution: {integrity: sha512-buipgOVDkkPXNR5+xBpDw7Zk2n1EvU7qBJCNUcL7rhQ//kfpOXPAvQ511Os0vpLYJ1pZnvudNytkQt2hst3wqA==}
+
+  '@catppuccin/palette@1.8.0':
+    resolution: {integrity: sha512-qXhwKiLzQomUygUJYB36YAFgs+dET5bIocfkiaFIatQF5Pwc7L112TlF9P8J5Oqs3x3XTjYSucG0ncHXSCuk7Q==}
 
   '@cloudflare/kv-asset-handler@0.5.0':
     resolution: {integrity: sha512-jxQYkj8dSIzc0cD6cMMNdOc1UVjqSqu8BZdor5s8cGjW2I8BjODt/kWPVdY+u9zj3ms75Q5qaZgnxUad83+eAg==}
@@ -7408,6 +7417,8 @@ snapshots:
     dependencies:
       hashery: 1.5.1
       keyv: 5.6.0
+
+  '@catppuccin/palette@1.8.0': {}
 
   '@cloudflare/kv-asset-handler@0.5.0': {}
 

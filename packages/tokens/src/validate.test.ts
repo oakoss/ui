@@ -65,6 +65,12 @@ describe('validateFamily: names', () => {
     expect(validateFamily(onScale)).toEqual([`name "${name}" ${message}`]);
     expect(validateFamily(onNeutral)).toEqual([`name "${name}" ${message}`]);
   });
+
+  it('reports a credit that would end its CSS comment', () => {
+    expect(validateFamily({ ...base, credit: 'MIT */ a {}' })).toEqual([
+      'credit contains "*/"',
+    ]);
+  });
 });
 
 describe('validateFamily: default flavors', () => {
