@@ -73,7 +73,9 @@ and gives the command that installs the same theme.
 ## Switch themes at runtime
 
 To let users switch families and primary colors while the app runs, add the
-`themes` item:
+`themes` item after `base`. In a project set up with another theme instead,
+add it without `base`: it keeps that theme's values and adds only the tokens
+the theme lacks.
 
 ```npm
 npx shadcn@latest add oakoss/ui/themes
