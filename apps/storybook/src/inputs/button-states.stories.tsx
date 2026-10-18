@@ -16,8 +16,9 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-// A press shrinks the button, except a trigger whose popup is open, which
-// React Aria keeps pressed for as long as a menu stays open.
+// A press shrinks the button, except an open trigger, which React Aria keeps
+// pressed while its overlay is open. Dialog and popover triggers set
+// aria-expanded without aria-haspopup.
 export const Pressed: Story = {
   play: async ({ canvas }) => {
     const button = canvas.getByRole('button', { name: 'Save' });
@@ -26,18 +27,20 @@ export const Pressed: Story = {
       return getComputedStyle(button).scale;
     };
     button.toggleAttribute('data-pressed', true);
+    await expect(
+      button
+        .getAnimations()
+        .some(
+          (a) => a instanceof CSSTransition && a.transitionProperty === 'scale',
+        ),
+    ).toBe(true);
     await expect(await scale()).toBe('0.97');
-    // An expanded disclosure still shrinks; an open menu or listbox trigger
-    // doesn't.
     button.setAttribute('aria-expanded', 'true');
-    await expect(await scale()).toBe('0.97');
-    button.setAttribute('aria-haspopup', 'true');
+    // Snapped, not eased, so a popup placed from the box as it opens lands on it.
+    await expect(button.getAnimations()).toEqual([]);
+    await expect(getComputedStyle(button).scale).toBe('1');
+    button.setAttribute('aria-haspopup', 'menu');
     await expect(await scale()).toBe('1');
-    button.setAttribute('aria-haspopup', 'listbox');
-    await expect(await scale()).toBe('1');
-    button.setAttribute('aria-haspopup', 'false');
-    await expect(await scale()).toBe('0.97');
-    button.setAttribute('aria-haspopup', 'true');
     button.setAttribute('aria-expanded', 'false');
     await expect(await scale()).toBe('0.97');
   },

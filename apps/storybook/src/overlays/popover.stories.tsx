@@ -99,8 +99,9 @@ export const InsideDialog: Story = {
       screen.getByRole('button', { name: 'Open settings' }),
     );
     const { box, dialog, panel, trigger } = await settledPopover();
-    // The panel's top snaps to a whole pixel; the trigger's bottom doesn't.
-    await expect(Math.abs(box.top - trigger.bottom - 8)).toBeLessThan(1);
+    // The open trigger keeps its full size, so the panel lands on a whole pixel.
+    await expect(trigger.height).toBe(36);
+    await expect(box.top - trigger.bottom).toBe(8);
     await expect(panel.closest('[inert], [aria-hidden=true]')).toBeNull();
     await expect(getComputedStyle(panel).zIndex).toBe('1400');
     await expect(
@@ -116,6 +117,22 @@ export const InsideDialog: Story = {
       <PopoverDemo {...args} defaultOpen={false} />
     </Dialog>
   ),
+};
+
+// A held press shrinks the trigger; on release it snaps back before React Aria
+// places the panel from its box.
+export const OpensFromAHeldPress: Story = {
+  args: { defaultOpen: false },
+  play: async () => {
+    const target = screen.getByRole('button', { name: 'Open settings' });
+    const user = userEvent.setup();
+    await user.pointer({ keys: '[MouseLeft>]', target });
+    await Promise.all(target.getAnimations().map((a) => a.finished));
+    await expect(getComputedStyle(target).scale).toBe('0.97');
+    await user.pointer({ keys: '[/MouseLeft]', target });
+    const { box, trigger } = await settledPopover();
+    await expect(box.top - trigger.bottom).toBe(8);
+  },
 };
 
 export const LabelWithoutTitle: Story = {
