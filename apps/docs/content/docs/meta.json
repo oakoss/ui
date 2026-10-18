@@ -1,0 +1,11 @@
+{
+  "pages": [
+    "---Getting started---",
+    "index",
+    "installation",
+    "---",
+    "components",
+    "guides",
+    "theming"
+  ]
+}

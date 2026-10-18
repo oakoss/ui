@@ -44,10 +44,13 @@ function llmsArea(slug: string) {
   return `${folder.charAt(0).toUpperCase()}${folder.slice(1)}`;
 }
 
+// An area's sections, its sidebar groups included (`Components: Buttons`).
 function llmsSection(title: string) {
-  return (
-    read('llms.txt').split(`## ${title}\n`, 2)[1]?.split('\n## ', 1)[0] ?? ''
-  );
+  const heading = new RegExp(`^${title}(?:\n|: )`, 'u');
+  return read('llms.txt')
+    .split('\n## ')
+    .filter((section) => heading.test(section))
+    .join('\n');
 }
 
 // The rendered text between the Props heading and the React Aria link.
@@ -235,7 +238,10 @@ describe('llms.txt page list', () => {
   });
 
   it('groups llms.txt by area', () => {
-    expect(read('llms.txt').match(/^## .+$/gmu)).toEqual([
+    const areas = read('llms.txt')
+      .match(/^## .+$/gmu)
+      ?.map((heading) => heading.replace(/: .+$/u, ''));
+    expect([...new Set(areas)]).toEqual([
       '## Instructions for agents',
       '## Overview',
       '## Components',
