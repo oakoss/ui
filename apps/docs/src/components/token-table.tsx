@@ -8,23 +8,10 @@ import {
 import { useState } from 'react';
 import { tokenReference } from 'virtual:token-reference';
 
-import type {
-  TokenEntry,
-  TokenGroup,
-  TokenRow,
-} from '#/lib/token-reference-types';
-
 import { CopyButton } from '#/components/copy-button';
+import { groupValues, type TokenValue } from '#/lib/token-values';
 
-const {
-  colors,
-  defaultFamily,
-  families,
-  groups,
-  primaryThemes,
-  sources,
-  themes,
-} = tokenReference;
+const { defaultFamily, families } = tokenReference;
 
 type ControlProps = {
   family: Family;
@@ -42,8 +29,6 @@ Primary group, primary switcher. Swatches take the color inline, so a group
 can show light values on a dark page.
 */
 export function TokenTable({ group: groupId }: { group: string }) {
-  const group = groups.find(({ id }) => id === groupId);
-  if (group === undefined) throw new Error(`no token group "${groupId}"`);
   const first = familyById(defaultFamily);
   const [selection, setSelection] = useState<Selection>({
     family: first.id,
@@ -51,7 +36,7 @@ export function TokenTable({ group: groupId }: { group: string }) {
     primary: first.primary,
   });
   const family = familyById(selection.family);
-  const entries = themeEntries(group, selection);
+  const { group, values } = groupValues(tokenReference, groupId, selection);
 
   return (
     <div aria-label={group.title} className="not-prose my-6" role="group">
@@ -77,8 +62,8 @@ export function TokenTable({ group: groupId }: { group: string }) {
             </tr>
           </thead>
           <tbody>
-            {group.rows.map((row, index) => (
-              <Row entry={entryAt(entries, index)} key={row.name} row={row} />
+            {values.map((token) => (
+              <Row key={token.name} token={token} />
             ))}
           </tbody>
         </table>
@@ -130,12 +115,6 @@ function Controls({
   );
 }
 
-function entryAt(entries: TokenEntry[], index: number): TokenEntry {
-  const entry = entries[index];
-  if (entry === undefined) throw new Error(`no token entry ${index}`);
-  return entry;
-}
-
 function familyById(id: string): Family {
   const family = families.find((entry) => entry.id === id);
   if (family === undefined) throw new Error(`no family "${id}"`);
@@ -164,13 +143,8 @@ function FlavorChoice({ family, onChange, selection }: ControlProps) {
   );
 }
 
-function Row({ entry, row }: { entry: TokenEntry; row: TokenRow }) {
-  const [sourceIndex, colorIndex] = entry;
-  const source = sources[sourceIndex];
-  const value = colors[colorIndex];
-  if (source === undefined || value === undefined) {
-    throw new Error(`no source or color for ${row.name}`);
-  }
+function Row({ token }: { token: TokenValue }) {
+  const { color, name, source } = token;
   return (
     <tr className="border-t">
       <td className="px-3 py-2">
@@ -178,44 +152,30 @@ function Row({ entry, row }: { entry: TokenEntry; row: TokenRow }) {
           <span
             aria-hidden
             className="size-6 shrink-0 rounded-md border"
-            data-token={row.name}
-            style={{ background: value }}
+            data-token={name}
+            style={{ background: color }}
           />
           <CopyButton
-            aria-label={`Copy var(--${row.name})`}
+            aria-label={`Copy var(--${name})`}
             className="font-mono"
-            text={() => `var(--${row.name})`}
+            text={() => `var(--${name})`}
             variant="ghost"
           >
-            {`--${row.name}`}
+            {`--${name}`}
           </CopyButton>
         </span>
       </td>
       <td className="px-3 py-2 font-mono whitespace-nowrap">{source}</td>
-      <td className="px-3 py-2 font-mono whitespace-nowrap">{value}</td>
+      <td className="px-3 py-2 font-mono whitespace-nowrap">{color}</td>
       <td className="text-fd-muted-foreground px-3 py-2">
         {withCode(
-          row.usage === undefined
-            ? row.description
-            : `${row.description} ${row.usage}`,
+          token.usage === undefined
+            ? token.description
+            : `${token.description} ${token.usage}`,
         )}
       </td>
     </tr>
   );
-}
-
-function themeEntries(
-  group: TokenGroup,
-  { family, flavor, primary }: Selection,
-): TokenEntry[] {
-  const entries =
-    group.id === 'primary'
-      ? primaryThemes[`${family}/${flavor}/${primary}`]
-      : themes[`${family}/${flavor}`]?.[group.id];
-  if (entries?.length !== group.rows.length) {
-    throw new Error(`no ${group.id} tokens for ${family}/${flavor}`);
-  }
-  return entries;
 }
 
 // Token descriptions mark names with backticks, as Markdown does.

@@ -11,7 +11,7 @@ import {
   intentStepRules,
 } from '@oakoss/tokens';
 
-import type { TokenEntry, TokenRow } from './token-reference-types';
+import type { TokenRow } from './token-reference-types';
 
 import {
   type File,
@@ -19,11 +19,10 @@ import {
   recordExpansion,
   recordMarkdown,
 } from './expansion-output';
-import { tokenGroups, tokenReference } from './token-reference';
+import { tokenReference } from './token-reference';
+import { groupValues, type TokenValue } from './token-values';
 
 type Cell = Node | string;
-
-type Resolved = { color: string; source: string };
 
 const family = families[axes.family.default];
 
@@ -56,7 +55,7 @@ function attribute(node: Node, name: string): string | undefined {
   return typeof value === 'string' ? value : undefined;
 }
 
-function cell(token: Resolved | undefined): string {
+function cell(token: TokenValue | undefined): string {
   return `\`${token?.source ?? ''}\` \`${token?.color ?? ''}\``;
 }
 
@@ -97,26 +96,12 @@ function contrastRows(): Cell[][] {
   ];
 }
 
-// Throws on missing data rather than writing blank cells.
+// The default family's tokens in its light and dark flavors.
 function defaultFamilyTokens(groupId: string) {
-  const reference = tokenReference();
-  const group = tokenGroups.find(({ id }) => id === groupId);
-  if (group === undefined) throw new Error(`no token group "${groupId}"`);
-  const column = (flavor: string): Resolved[] => {
-    const entries = reference.themes[`${family.id}/${flavor}`]?.[groupId];
-    if (entries?.length !== group.rows.length) {
-      throw new Error(`no ${groupId} tokens for ${family.id}/${flavor}`);
-    }
-    return entries.map(([sourceIndex, colorIndex]: TokenEntry) => {
-      const source = reference.sources[sourceIndex];
-      const color = reference.colors[colorIndex];
-      if (source === undefined || color === undefined) {
-        throw new Error(`no source or color in ${groupId}`);
-      }
-      return { color, source };
-    });
-  };
-  return { dark: column('dark'), light: column('light'), rows: group.rows };
+  const values = (flavor: string) =>
+    groupValues(tokenReference(), groupId, { family: family.id, flavor })
+      .values;
+  return { dark: values('dark'), light: values('light') };
 }
 
 function derivedRows(): Cell[][] {
@@ -181,13 +166,13 @@ function markdownTable(rows: Cell[][]): string {
 
 // Each family maps these by hand, so the table shows the default family's.
 function neutralRows(): Cell[][] {
-  const { dark, light, rows } = defaultFamilyTokens('neutral');
+  const { dark, light } = defaultFamilyTokens('neutral');
   return [
     ['Token', 'Description', `${family.name} light`, `${family.name} dark`],
-    ...rows.map((row, index) => [
-      code(`--${row.name}`),
-      described(row),
-      code(light[index]?.source ?? ''),
+    ...light.map((token, index) => [
+      code(`--${token.name}`),
+      described(token),
+      code(token.source),
       code(dark[index]?.source ?? ''),
     ]),
   ];
@@ -228,14 +213,14 @@ function tokenRules(set: string): Cell[][] {
 }
 
 function tokenValues(groupId: string): Cell[][] {
-  const { dark, light, rows } = defaultFamilyTokens(groupId);
+  const { dark, light } = defaultFamilyTokens(groupId);
   return [
     ['Token', `${family.name} light`, `${family.name} dark`, 'Description'],
-    ...rows.map((row, index) => [
-      code(`--${row.name}`),
-      cell(light[index]),
+    ...light.map((token, index) => [
+      code(`--${token.name}`),
+      cell(token),
       cell(dark[index]),
-      described(row),
+      described(token),
     ]),
   ];
 }

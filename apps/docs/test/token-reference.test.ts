@@ -2,6 +2,7 @@ import { families } from '@oakoss/tokens';
 import { describe, expect, it } from 'vitest';
 
 import { tokenReference } from '#/lib/token-reference';
+import { groupValues } from '#/lib/token-values';
 
 const reference = tokenReference();
 
@@ -53,6 +54,47 @@ describe('tokenReference', () => {
       reference.colors[color],
     ]);
     expect(looked).not.toContain(undefined);
+  });
+});
+
+function valueOf(
+  groupId: string,
+  name: string,
+  choice: Parameters<typeof groupValues>[2],
+) {
+  return groupValues(reference, groupId, choice).values.find(
+    (token) => token.name === name,
+  );
+}
+
+describe('groupValues', () => {
+  it("decodes a token's source and color", () => {
+    expect(
+      valueOf('neutral', 'background', { family: 'zinc', flavor: 'dark' }),
+    ).toMatchObject({
+      color: 'oklch(0.141 0.005 285.823)',
+      source: 'zinc-950',
+    });
+  });
+
+  // Every group reads the default primary unless the Primary group is asked
+  // for another.
+  it('reads the chosen primary for the Primary group only', () => {
+    const choice = { family: 'zinc', flavor: 'dark', primary: 'blue' };
+    expect(valueOf('primary', 'primary', choice)?.source).toBe('blue-600');
+    expect(valueOf('derived', 'ring', choice)?.source).toBe('--primary-text');
+    expect(
+      valueOf('primary', 'primary', { family: 'zinc', flavor: 'dark' })?.source,
+    ).toBe('zinc-200');
+  });
+
+  it('throws on a choice the data lacks', () => {
+    expect(() =>
+      groupValues(reference, 'neutral', { family: 'zinc', flavor: 'dim' }),
+    ).toThrow('no neutral tokens for zinc/dim');
+    expect(() =>
+      groupValues(reference, 'nope', { family: 'zinc', flavor: 'light' }),
+    ).toThrow('no token group "nope"');
   });
 });
 
