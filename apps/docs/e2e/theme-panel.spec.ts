@@ -136,6 +136,18 @@ test('the panel restyles the page and builds the install command', async ({
   );
 });
 
+test('the panel links the runtime theme install', async ({ page }) => {
+  await gotoHydrated(page, shared);
+  const panel = await openPanel(page);
+  await panel.getByRole('link', { name: /Install them all/u }).click();
+  await expect(page).toHaveURL(
+    /\/docs\/installation#switch-themes-at-runtime$/u,
+  );
+  await expect(
+    page.getByRole('heading', { name: 'Switch themes at runtime' }),
+  ).toBeInViewport();
+});
+
 test('a choice made in the panel stays on the next page', async ({ page }) => {
   await gotoHydrated(page, '/docs/components/button');
   const panel = await openPanel(page);

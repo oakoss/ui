@@ -1,5 +1,3 @@
-import type { Key } from 'react-aria-components';
-
 import { Button } from '@oakoss/ui/components/ui/inputs/button';
 import { Select, SelectItem } from '@oakoss/ui/components/ui/inputs/select';
 import {
@@ -19,6 +17,7 @@ import {
 } from '@oakoss/ui/components/ui/overlays/tooltip';
 import { Palette } from 'lucide-react';
 import { type ReactNode, useId, useState } from 'react';
+import { type Key, Link } from 'react-aria-components';
 import { themeOptions } from 'virtual:theme-options';
 
 import { CopyButton } from '#/components/copy-button';
@@ -197,6 +196,12 @@ function Install({ theme, update }: { theme: ThemeState; update: Update }) {
           Reset
         </Button>
       </div>
+      <Link
+        className="text-xs text-muted-foreground underline underline-offset-3 hover:text-foreground"
+        href="/docs/installation#switch-themes-at-runtime"
+      >
+        Switching themes at runtime? Install them all
+      </Link>
     </div>
   );
 }
