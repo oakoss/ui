@@ -4795,6 +4795,99 @@
           "target": "@lib/cn-config.ts"
         }
       ]
+    },
+    {
+      "name": "sidebar",
+      "type": "registry:ui",
+      "title": "Sidebar",
+      "description": "Composable app sidebar that collapses off-canvas or to icons, remembers its state in a cookie, toggles with Cmd or Ctrl+B and becomes a sheet on phones; a named sidebar is a navigation landmark with the current page marked.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/sidebar.tsx"
+      },
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/button",
+        "oakoss/ui/collapsible",
+        "oakoss/ui/input",
+        "oakoss/ui/kbd",
+        "oakoss/ui/separator",
+        "oakoss/ui/sheet",
+        "oakoss/ui/skeleton",
+        "oakoss/ui/tooltip"
+      ],
+      "dependencies": ["cn", "react-aria-components", "tailwind-variants"],
+      "files": [
+        {
+          "path": "src/components/ui/navigation/sidebar.tsx",
+          "type": "registry:ui",
+          "target": "@ui/navigation/sidebar.tsx"
+        },
+        {
+          "path": "src/components/ui/navigation/sidebar-provider.tsx",
+          "type": "registry:ui",
+          "target": "@ui/navigation/sidebar-provider.tsx"
+        },
+        {
+          "path": "src/components/ui/navigation/sidebar-trigger.tsx",
+          "type": "registry:ui",
+          "target": "@ui/navigation/sidebar-trigger.tsx"
+        },
+        {
+          "path": "src/components/ui/navigation/sidebar-layout.tsx",
+          "type": "registry:ui",
+          "target": "@ui/navigation/sidebar-layout.tsx"
+        },
+        {
+          "path": "src/components/ui/navigation/sidebar-group.tsx",
+          "type": "registry:ui",
+          "target": "@ui/navigation/sidebar-group.tsx"
+        },
+        {
+          "path": "src/components/ui/navigation/sidebar-menu.tsx",
+          "type": "registry:ui",
+          "target": "@ui/navigation/sidebar-menu.tsx"
+        },
+        {
+          "path": "src/hooks/use-cookie-state.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-cookie-state.ts"
+        },
+        {
+          "path": "src/hooks/use-media-query.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-media-query.ts"
+        },
+        {
+          "path": "src/hooks/use-scroll-region.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-scroll-region.ts"
+        },
+        {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
     }
   ]
 }
