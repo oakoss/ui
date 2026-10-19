@@ -24,10 +24,9 @@ const styles = tv({
   base: [
     focusRing,
     'relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-control border border-transparent text-ui font-medium whitespace-nowrap transition select-none',
-    // React Aria keeps a popup's trigger pressed while the popup is open, so
-    // an open menu or listbox trigger, whose popup is placed from its box,
-    // stays full size.
-    'not-data-rac:active:scale-97 disabled:pointer-events-none disabled:opacity-50 pending:cursor-default pressed:scale-97 pressed:[&[aria-expanded=true][aria-haspopup]:not([aria-haspopup=false])]:scale-100',
+    // React Aria keeps an open overlay's trigger pressed and places a popup from
+    // its box as it opens, so an open trigger snaps to full size, unanimated.
+    'not-data-rac:active:scale-97 disabled:pointer-events-none disabled:opacity-50 aria-expanded:transition-colors pending:cursor-default pressed:scale-97 pressed:aria-expanded:scale-100',
     // Forced colors gray a disabled button but not a disabled link styled as
     // one, and the fade would dim the gray past a native disabled button's.
     'forced-colors:disabled:text-[GrayText] forced-colors:disabled:opacity-100',
