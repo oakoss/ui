@@ -7,7 +7,8 @@ import { toMarkdown } from 'mdast-util-to-markdown';
 
 import { manualSources } from './manual-sources';
 
-const clientOnly = 'ClientOnly';
+// Docs-site wrappers a demo renders inside, which its Markdown leaves out.
+const wrappers = new Set(['ClientOnly', 'DemoFrame']);
 
 export type File = Parameters<typeof replaceSource>[0];
 
@@ -71,7 +72,7 @@ function withLinkText(node: Node): Node {
 }
 
 // The output links the manual-install files instead of inlining them, and
-// shows a demo without the docs site's ClientOnly around it.
+// shows a demo without the docs site's wrappers around it.
 function withoutManualSources(node: Node): Node {
   if (!node.children) return node;
   return {
@@ -79,7 +80,7 @@ function withoutManualSources(node: Node): Node {
     children: node.children
       .filter((child) => child.name !== manualSources)
       .flatMap((child) =>
-        child.name === clientOnly ? (child.children ?? []) : [child],
+        wrappers.has(child.name ?? '') ? (child.children ?? []) : [child],
       )
       .map((child) => withoutManualSources(child)),
   };
