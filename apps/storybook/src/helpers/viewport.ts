@@ -5,17 +5,31 @@ export async function atViewportWidth(
   width: number,
   check: () => Promise<void>,
 ) {
-  let browser;
-  try {
-    browser = await import('vitest/browser');
-  } catch {
-    throw new Error('atViewportWidth runs only in the Vitest browser run');
-  }
+  const browser = await loadBrowser();
   const { innerHeight, innerWidth } = globalThis;
   await browser.page.viewport(width, innerHeight);
   try {
     await check();
   } finally {
     await browser.page.viewport(innerWidth, innerHeight);
+  }
+}
+
+// A story's beforeEach that runs the whole story, its Visual capture
+// included, at a phone's width, and puts the viewport back after.
+export async function phoneWidth() {
+  const browser = await loadBrowser();
+  const { innerHeight, innerWidth } = globalThis;
+  await browser.page.viewport(375, innerHeight);
+  return async () => {
+    await browser.page.viewport(innerWidth, innerHeight);
+  };
+}
+
+async function loadBrowser() {
+  try {
+    return await import('vitest/browser');
+  } catch {
+    throw new Error('Viewport helpers run only in the Vitest browser run');
   }
 }

@@ -54,6 +54,7 @@ const forked = [
   'select',
   'separator',
   'sheet',
+  'sidebar',
   'skeleton',
   'slider',
   'spinner',
@@ -66,8 +67,7 @@ const forked = [
   'tooltip',
 ];
 
-// The base each port came from: React Aria's, except Table, a plain HTML
-// table from the Radix base (docs/research/0002).
+// Each port's base: React Aria's, except Table's Radix one (docs/research/0002).
 const bases: Record<string, string> = {
   ...Object.fromEntries(forked.map((name) => [name, 'aria'])),
   table: 'radix',

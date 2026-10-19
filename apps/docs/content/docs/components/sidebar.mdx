@@ -1,0 +1,289 @@
+---
+title: Sidebar
+description: A composable app sidebar that collapses, remembers its state and becomes a sheet on phones.
+item: sidebar
+reactAria: https://react-aria.adobe.com/Link
+---
+
+import { DemoFrame } from '#/components/demo-frame';
+import { SidebarDemo } from '#/components/demos/sidebar-demo';
+import { SidebarFloating } from '#/components/demos/sidebar-floating';
+import { SidebarIcon } from '#/components/demos/sidebar-icon';
+
+<ComponentPreview name="sidebar-demo">
+  <DemoFrame>
+    <SidebarDemo />
+  </DemoFrame>
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="sidebar" />
+
+This also installs [Sheet](/docs/components/sheet), which the sidebar becomes
+on phones, [Tooltip](/docs/components/tooltip),
+[Collapsible](/docs/components/collapsible) and the other parts it composes.
+
+## Usage
+
+The parts live in six files, so an app imports the ones it uses:
+
+```tsx
+import { Sidebar, SidebarInset } from '#/components/ui/navigation/sidebar';
+import {
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+} from '#/components/ui/navigation/sidebar-group';
+import {
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+} from '#/components/ui/navigation/sidebar-layout';
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from '#/components/ui/navigation/sidebar-menu';
+import { SidebarProvider } from '#/components/ui/navigation/sidebar-provider';
+import { SidebarTrigger } from '#/components/ui/navigation/sidebar-trigger';
+
+<SidebarProvider>
+  <Sidebar aria-label="Main">
+    <SidebarHeader />
+    <SidebarContent>
+      <SidebarGroup>
+        <SidebarGroupLabel>Platform</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton href="/inbox">Inbox</SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    </SidebarContent>
+    <SidebarFooter />
+  </Sidebar>
+  <SidebarInset>
+    <SidebarTrigger />
+  </SidebarInset>
+</SidebarProvider>;
+```
+
+A menu button with `href` is a link, otherwise a button. Mark the current page
+with `isCurrent`; a router link that sets `aria-current` itself, such as
+TanStack Router's `Link` through `createLink`, needs no prop.
+
+## Examples
+
+### Icon mode
+
+`collapsible="icon"` collapses the sidebar to a rail of icons. Each item's
+`tooltip` names it while collapsed, and a collapsible group shows its items
+there, with lines where the labels were. `collapsible="offcanvas"` (the
+default) slides it off the page instead, and `"none"` keeps it open.
+
+<ComponentPreview name="sidebar-icon">
+  <DemoFrame>
+    <SidebarIcon />
+  </DemoFrame>
+</ComponentPreview>
+
+### Floating, with collapsible groups
+
+`variant="floating"` insets the panel with a border, and `"inset"` makes the
+page content a card beside it. `isCollapsible` turns a group's label into the
+button that opens it; a group opens by itself when it holds the current page,
+unless `defaultExpanded` or `isExpanded` says otherwise. An action with
+`showOnHover` shows on hover or focus, and always on touch screens.
+
+<ComponentPreview name="sidebar-floating">
+  <DemoFrame>
+    <SidebarFloating />
+  </DemoFrame>
+</ComponentPreview>
+
+### Remembering the state
+
+An uncontrolled sidebar saves its open state in a cookie (`persistKey`,
+`sidebar_state` by default) and reads it back, so it opens the way the user
+left it. Writes use the Cookie Store API, which only secure (https or
+localhost) pages have; elsewhere the state lasts until the page reloads. A
+blocked cookie, as in a sandboxed iframe, starts it from `defaultOpen`. A
+server-rendered app reads the cookie on the
+server and passes it as `defaultOpen`, so the first paint is right. In
+TanStack Start:
+
+```tsx
+import { createServerFn } from '@tanstack/react-start';
+import { getCookie } from '@tanstack/react-start/server';
+
+export const getSidebarOpen = createServerFn({ method: 'GET' }).handler(
+  () => getCookie('sidebar_state') !== 'false',
+);
+
+// In a route loader: const isSidebarOpen = await getSidebarOpen();
+<SidebarProvider defaultOpen={isSidebarOpen}>…</SidebarProvider>;
+```
+
+An app that skips the server read flips to the saved state as it hydrates.
+`isOpen` and `onOpenChange` control the sidebar instead, and then it saves
+nothing; `persistKey={false}` turns saving off. Give each sidebar on a page
+its own `persistKey`, and don't set the same cookie elsewhere: a cookie with
+that name on a narrower path wins on every read.
+
+### Keyboard shortcut
+
+Cmd+B on Apple devices and Ctrl+B elsewhere toggle the sidebar, except while
+typing in a field, where the keys mean bold. `keyboardShortcut` picks another
+key, and `false` turns it off; with several sidebars on a page, only one
+should keep it. Other modifiers and held keys don't toggle. The trigger's
+tooltip shows the shortcut, except for a sidebar that can't collapse.
+
+## Accessibility
+
+React Aria provides the links and buttons (`Link`, `Button`), the trigger's
+tooltip, the collapsible groups (`Disclosure`) and, on phones, the sheet's
+focus trap, dismissal and focus return.
+
+This component adds:
+
+- **Landmark:** a sidebar with `aria-label` or `aria-labelledby` is a `<nav>`,
+  and on phones its sheet takes the same name; otherwise the sheet is named
+  by `mobileLabel`, and `mobileDescription` describes it. Menus are lists of
+  links, as the
+  [WAI-ARIA disclosure navigation pattern](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/examples/disclosure-navigation/)
+  recommends, not `role="menu"`.
+- **Current page:** a current link has `aria-current="page"`, and Windows High
+  Contrast shows it in the system highlight color. The content scrolls it into
+  view when it mounts, unless the user has already scrolled, pressed or typed
+  in the sidebar, and is a tab stop while it overflows.
+- **Trigger:** `aria-expanded` reports the state, and on desktop
+  `aria-controls` names the panel. When an off-canvas sidebar hides with focus
+  inside, by the trigger, the shortcut or a controlled `isOpen`, or unmounts
+  as the window narrows to a phone, focus moves to a trigger outside it. The
+  hidden sidebar leaves the tab order and the accessibility tree. Put a
+  `SidebarTrigger` outside an off-canvas sidebar: one inside hides with it,
+  and the rail isn't in the tab order. Icon mode keeps focus where it is.
+- **Phones:** below Tailwind's `md` width the sidebar is a sheet, and a link
+  closes it as it navigates. A phone's first render is the sheet; a page
+  rendered on a server shows the desktop panel only to wider screens, by CSS.
+- **Rail:** `SidebarRail` is a mouse convenience at the edge, out of the tab
+  order.
+
+A badge reads after its link, not as part of its name, so give a bare number
+context where it's unclear ("24 unread").
+
+| Key              | Action                                   |
+| ---------------- | ---------------------------------------- |
+| `Cmd+B`/`Ctrl+B` | Toggles the sidebar, outside text fields |
+| `Tab`            | Moves through the links and buttons      |
+| `Enter`          | Follows a link, opens or closes a group  |
+| `Space`          | Opens or closes a group                  |
+| `Escape`         | Closes the phone's sheet                 |
+
+## API
+
+### SidebarProvider
+
+The state the parts share, on a wrapper `<div>` that lays out the sidebar and
+page content. `useSidebar()` returns it: `isOpen`, `isOpenMobile`, `isMobile`,
+`state`, `setOpen`, `setOpenMobile` and `toggleSidebar`.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/navigation/sidebar-provider.tsx"
+  name="SidebarProviderProps"
+/>
+
+Also accepts all `<div>` props.
+
+#### CSS variables
+
+| Variable               | Sets                          |
+| ---------------------- | ----------------------------- |
+| `--sidebar-width`      | The open width, `16rem`       |
+| `--sidebar-width-icon` | The icon rail's width, `3rem` |
+
+### Sidebar
+
+The panel: fixed on desktop, a [Sheet](/docs/components/sheet) on phones.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/navigation/sidebar.tsx"
+  name="SidebarProps"
+/>
+
+Also accepts all `<div>` props.
+
+#### Data attributes
+
+| Attribute          | Present when                                 |
+| ------------------ | -------------------------------------------- |
+| `data-slot`        | `sidebar`, on the outer element              |
+| `data-state`       | Desktop; `expanded` or `collapsed`           |
+| `data-collapsible` | Desktop and collapsed; `offcanvas` or `icon` |
+| `data-variant`     | Desktop; `sidebar`, `floating` or `inset`    |
+| `data-side`        | Desktop; `start` or `end`                    |
+| `data-mobile`      | The phone sheet's content                    |
+
+#### CSS variables
+
+| Variable                 | Sets                                                                                                                |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| `--sidebar-width-mobile` | The phone sheet's width, `18rem`; set it in the sidebar's `className`, since the sheet renders outside the provider |
+
+### SidebarTrigger and SidebarRail
+
+Toggle the sidebar, from `sidebar-trigger.tsx`. The trigger extends
+[Button](/docs/components/button) and the rail React Aria's
+[`Button`](https://react-aria.adobe.com/Button#api); each takes a `label`,
+`Toggle sidebar` by default or when blank.
+
+### Layout parts
+
+`SidebarHeader`, `SidebarFooter`, `SidebarContent` (the scrolling middle),
+`SidebarSeparator`, `SidebarInput` and `SidebarInset`, the page's `<main>`;
+`elementType="div"` makes it a `div` where the layout already has a `<main>`,
+as on this page.
+
+### SidebarGroup
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/navigation/sidebar-group.tsx"
+  name="SidebarGroupProps"
+/>
+
+`SidebarGroupLabel`, `SidebarGroupContent` and `SidebarGroupAction` go inside;
+an action needs `aria-label` or `aria-labelledby`.
+
+### SidebarMenuButton
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/navigation/sidebar-menu.tsx"
+  name="SidebarMenuButtonProps"
+/>
+
+Also accepts React Aria's [`Link`](https://react-aria.adobe.com/Link#api)
+props with `href`, or [`Button`](https://react-aria.adobe.com/Button#api)
+props without; a link rejects button-only props such as `type`. `SidebarMenu`, `SidebarMenuItem`, `SidebarMenuAction`,
+`SidebarMenuBadge`, `SidebarMenuSkeleton`, `SidebarMenuSub`,
+`SidebarMenuSubItem` and `SidebarMenuSubButton` complete the menu.
+
+#### Data attributes
+
+| Attribute      | Present when               |
+| -------------- | -------------------------- |
+| `data-slot`    | `sidebar-menu-button`      |
+| `data-size`    | Always; `sm`, `md` or `lg` |
+| `data-current` | It's the current page      |
+| `data-hovered` | A pointer hovers it        |
+| `data-pressed` | It's being pressed         |

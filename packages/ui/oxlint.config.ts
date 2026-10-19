@@ -195,6 +195,26 @@ const arbitraryValues: Record<string, string[]> = {
   'src/components/ui/layout/accordion.tsx': disclosurePanel,
   'src/components/ui/layout/collapsible.tsx': disclosurePanel,
   'src/components/ui/navigation/pagination.tsx': selectionStates,
+  // Icon mode fades a group label out, then takes it out of the tab order.
+  'src/components/ui/navigation/sidebar-group.tsx': [
+    'transition-[margin,opacity,visibility]',
+  ],
+  'src/components/ui/navigation/sidebar-menu.tsx': [
+    'transition-[width,height,padding]',
+    ...selectionStates,
+  ],
+  // Widths a consumer's style can override; the floating rail adds padding.
+  'src/components/ui/navigation/sidebar-provider.tsx': [
+    '[--sidebar-width-icon:3rem]',
+    '[--sidebar-width:16rem]',
+  ],
+  'src/components/ui/navigation/sidebar.tsx': [
+    '[--sidebar-width-mobile:18rem]',
+    'transition-[inset-inline-start,inset-inline-end,width,visibility]',
+    'transition-[width]',
+    'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4)))]',
+    'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]',
+  ],
   'src/components/ui/navigation/tabs.tsx': selectionStates,
   'src/components/ui/overlays/menu-item.tsx': colorVariables('menu'),
   'src/components/ui/overlays/menu.tsx': scrollsInPopover,

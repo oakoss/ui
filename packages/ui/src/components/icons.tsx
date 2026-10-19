@@ -182,6 +182,19 @@ export function Minus(props: IconProps) {
   );
 }
 
+export function PanelLeft(props: IconProps) {
+  return (
+    <IconPlaceholder
+      hugeicons="SidebarLeftIcon"
+      lucide="PanelLeftIcon"
+      phosphor="SidebarIcon"
+      remixicon="RiSideBarLine"
+      tabler="IconLayoutSidebar"
+      {...props}
+    />
+  );
+}
+
 export function Plus(props: IconProps) {
   return (
     <IconPlaceholder
