@@ -22,6 +22,7 @@ import { Suspense, use, useEffect } from 'react';
 
 import { baseOptions, docsOptions } from '#/components/layout';
 import { useMDXComponents } from '#/components/mdx';
+import { tocSlots } from '#/components/toc-slots';
 import { itemSourceUrl } from '#/lib/registry';
 import { githubSourceUrl, markdownUrl } from '#/lib/site';
 import { docs, source } from '#/lib/source';
@@ -83,7 +84,7 @@ function Content({
   const editUrl = githubSourceUrl(path);
 
   return (
-    <DocsPage toc={toc}>
+    <DocsPage slots={{ toc: tocSlots }} toc={toc}>
       <DocsTitle>{page.title}</DocsTitle>
       <DocsDescription>{page.description}</DocsDescription>
       <div className="-mt-4 flex flex-row flex-wrap items-center gap-2 border-b pb-6">

@@ -18,9 +18,22 @@ const disabledRules = [
   'region',
 ];
 
-// Only docs pages mark <html> once they hydrate.
+// Only docs pages mark <html> once they hydrate. Axe reads colors mid-fade,
+// such as the table of contents button's heading, so finite animations
+// finish first.
 async function open(page: Page, url: string) {
   await (url.startsWith('/docs/') ? gotoHydrated(page, url) : page.goto(url));
+  await page.evaluate(() =>
+    Promise.allSettled(
+      document
+        .getAnimations()
+        .filter(
+          (animation) =>
+            animation.effect?.getComputedTiming().endTime !== Infinity,
+        )
+        .map((animation) => animation.finished),
+    ),
+  );
 }
 
 // Every prerendered page, as the URL the static host serves it at.
