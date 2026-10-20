@@ -29,11 +29,20 @@ import {
 } from '@oakoss/ui/lib/data-table-query';
 import {
   isAllMatching,
+  noSelection,
   selectionTest,
 } from '@oakoss/ui/lib/data-table-selection';
 import { useState } from 'react';
 
 import { type Payment, paymentColumns, payments } from './data-table-demo';
+
+type BulkPaymentsTableProps = {
+  // A selection the app restores, such as from the URL.
+  initialSelection?: DataTableSelection;
+  onSelectionChange?: (selection: DataTableSelection) => void;
+  // How long the app takes to apply a selection, as a router might.
+  selectionCommitMs?: number;
+};
 
 type Result = {
   deleted: number;
@@ -50,12 +59,16 @@ type ServerState = Pick<
 // what a selection names, applying a saved filter when the action runs. Paid
 // payments refuse, so a delete can partly fail.
 export function BulkPaymentsTable({
+  initialSelection = noSelection,
   onSelectionChange,
-}: {
-  onSelectionChange?: (selection: DataTableSelection) => void;
-}) {
+  selectionCommitMs,
+}: BulkPaymentsTableProps) {
   const [rows, setRows] = useState(payments);
-  const { select, set, state } = useServerState(onSelectionChange);
+  const { select, set, state } = useServerState(
+    initialSelection,
+    onSelectionChange,
+    selectionCommitMs,
+  );
   const [result, setResult] = useState<Result>();
   const matching = rows.filter((row) => matches(row, dataTableMatch(state)));
   const start = state.pagination.pageIndex * state.pagination.pageSize;
@@ -70,7 +83,9 @@ export function BulkPaymentsTable({
     onPaginationChange: set('pagination'),
     onSelectionChange: select,
     rowCount: matching.length,
-    state,
+    // A new selection object each render, as an app reading it from the URL
+    // would pass.
+    state: { ...state, selection: { ...state.selection } },
   });
 
   function remove(selection: DataTableSelection, requested: number) {
@@ -196,13 +211,15 @@ function serverDelete(rows: Payment[], selection: DataTableSelection) {
 }
 
 function useServerState(
+  initialSelection: DataTableSelection,
   onSelectionChange: ((selection: DataTableSelection) => void) | undefined,
+  commitMs: number | undefined,
 ) {
   const [state, setState] = useState<ServerState>({
     columnFilters: [],
     globalFilter: '',
     pagination: { pageIndex: 0, pageSize: 10 },
-    selection: { ids: [] },
+    selection: initialSelection,
   });
   const set =
     <K extends keyof ServerState>(key: K) =>
@@ -210,7 +227,8 @@ function useServerState(
       setState((previous) => ({ ...previous, [key]: value }));
   const select = (selection: DataTableSelection) => {
     onSelectionChange?.(selection);
-    set('selection')(selection);
+    if (commitMs === undefined) set('selection')(selection);
+    else setTimeout(() => set('selection')(selection), commitMs);
   };
   return { select, set, state };
 }

@@ -110,6 +110,27 @@ export const AppSearchEndsAllMatching: Story = {
   render: () => <FiltersTable appSearch="" />,
 };
 
+// Made again after the table ended it, it still ends on an app search.
+export const EndsAgainAfterReselecting: Story = {
+  play: async ({ canvas }) => {
+    await selectAllMatching(canvas);
+    const list = await openFacet('Status');
+    await userEvent.click(list.getByRole('option', { name: /Pending/u }));
+    await userEvent.click(list.getByRole('option', { name: /Pending/u }));
+    await userEvent.keyboard('{Escape}');
+    await expect(bar(canvas)).not.toBeInTheDocument();
+    await selectAllMatching(canvas);
+    await userEvent.click(canvas.getByRole('button', { name: 'App search' }));
+    await expect(bar(canvas)).not.toBeInTheDocument();
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'App resets search' }),
+    );
+    await waitFor(() => expect(bodyRows(canvas)).toHaveLength(10));
+    await expect(bar(canvas)).not.toBeInTheDocument();
+  },
+  render: () => <FiltersTable appSearch="" />,
+};
+
 // Rows a filter hides don't count toward the page, so the bar still offers
 // the matching rows left unselected.
 export const SelectAllPastHiddenRows: Story = {

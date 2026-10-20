@@ -6,6 +6,7 @@ import {
   nextSelection,
   noSelection,
   rowSelectionOf,
+  selectionKey,
   selectionTest,
   summarizeSelection,
 } from '#/lib/data-table-selection';
@@ -156,7 +157,34 @@ test('a summary is for a client or a server table, never both', () => {
     rowCount: undefined,
     selection: noSelection,
   });
-  expect(unknown).toBeDefined();
+  const neither = summarizeSelection(
+    // @ts-expect-error neither the loaded rows nor a total
+    { isPageSelected: false, selection: noSelection, shownIds: [] },
+  );
+  // @ts-expect-error both a client's rows and a server's total
+  const both = summarizeSelection({
+    ...client,
+    rowCount: 1,
+    selection: noSelection,
+  });
+  expect([unknown, neither, both]).toHaveLength(3);
+});
+
+test('a selection reads the same whatever order its keys came in', () => {
+  const ordered = selectionKey({
+    all: { filters: { a: 1, b: 2 }, search: 'x' },
+    except: ['z'],
+  });
+  // Spreads put each key after the ones before it, out of name order.
+  const except = { except: ['z'] };
+  const search = { search: 'x' };
+  const b = { b: 2 };
+  const shuffled = selectionKey({
+    ...except,
+    all: { ...search, filters: { ...b, a: 1 } },
+  });
+  expect(shuffled).toBe(ordered);
+  expect(selectionKey({ ids: ['a'] })).not.toBe(selectionKey({ ids: ['b'] }));
 });
 
 test('a row is in the selection by id, or by not being unticked', () => {

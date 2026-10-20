@@ -88,6 +88,17 @@ export function rowSelectionOf(
   return Object.fromEntries(ids.map((id) => [id, true]));
 }
 
+// The selection as text, the same whatever order its object keys came in.
+export function selectionKey(selection: DataTableSelection) {
+  return JSON.stringify(selection, (_key, value: unknown) =>
+    value !== null && typeof value === 'object' && !Array.isArray(value)
+      ? Object.fromEntries(
+          Object.entries(value).toSorted(([a], [b]) => a.localeCompare(b)),
+        )
+      : value,
+  );
+}
+
 // Whether a row is in the selection, for a row the caller knows matches
 // when everything matching is selected.
 export function selectionTest(
@@ -102,27 +113,25 @@ export function selectionTest(
 }
 
 // One reading of the selection for every part, so counts can't disagree.
-export function summarizeSelection({
-  isPageSelected,
-  loadedIds,
-  rowCount,
-  selection,
-  shownIds,
-}: SummaryInput): DataTableSelectionSummary {
-  const matching = rowCount ?? shownIds.length;
+export function summarizeSelection(
+  input: SummaryInput,
+): DataTableSelectionSummary {
+  const { isPageSelected, selection, shownIds } = input;
+  // The one check for a server table: it passes no loaded rows.
+  const loaded = input.loadedIds;
+  const total = loaded === undefined ? input.rowCount : undefined;
+  const matching = total ?? shownIds.length;
   const isAll = isAllMatching(selection);
   // A client table holds every row, so an id it lacks is a row that's gone.
   const picked = isAll
     ? []
-    : selection.ids.filter(
-        (id) => loadedIds === undefined || loadedIds.has(id),
-      );
+    : selection.ids.filter((id) => loaded === undefined || loaded.has(id));
   const selected = isAll
-    ? countAllMatching(selection, shownIds, rowCount)
+    ? countAllMatching(selection, shownIds, total)
     : picked.length;
   const shown = new Set(shownIds);
   const hidden =
-    loadedIds === undefined ? 0 : picked.filter((id) => !shown.has(id)).length;
+    loaded === undefined ? 0 : picked.filter((id) => !shown.has(id)).length;
   return {
     canSelectAll: !isAll && isPageSelected && matching > selected - hidden,
     hidden,
