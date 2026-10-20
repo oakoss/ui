@@ -137,6 +137,32 @@ test('the Manual tab shows each file it installs', async ({ page }) => {
   await expect(cx.getByRole('button', { name: 'Copy Text' })).toBeVisible();
 });
 
+test("a code block's button copies its code", async ({ page }) => {
+  await page.addInitScript(() => {
+    navigator.clipboard.writeText = (text) => {
+      document.documentElement.dataset.copied = text;
+      return Promise.resolve();
+    };
+  });
+  await gotoHydrated(page, '/docs/installation');
+  const block = page.getByRole('figure').filter({ hasText: 'shadcn@latest' });
+  await block.first().getByRole('button', { name: 'Copy Text' }).click();
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-copied',
+    'npx shadcn@latest init oakoss/ui/base',
+  );
+});
+
+test('a code block that fits is neither a tab stop nor a region', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/docs/installation');
+  const block = page.getByRole('figure').filter({ hasText: 'shadcn@latest' });
+  const viewport = block.first().locator('pre').locator('..');
+  await expect(viewport).not.toHaveAttribute('tabindex');
+  await expect(viewport).not.toHaveAttribute('role');
+});
+
 for (const { files, slug } of manualInstalls()) {
   test(`the Manual tab loads every file it lists on ${slug}`, async ({
     page,

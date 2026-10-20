@@ -5,8 +5,19 @@ import {
   TOCProvider,
 } from 'fumadocs-ui/layouts/docs/page/slots/toc';
 
+// The desktop table of contents, named by its own heading, is a navigation
+// landmark, so its links aren't content outside every landmark.
 export const tocSlots = {
-  main: TOC,
+  main: (props: Parameters<typeof TOC>[0]) => (
+    <TOC
+      {...props}
+      container={{
+        ...props.container,
+        'aria-labelledby': 'toc-title',
+        role: 'navigation',
+      }}
+    />
+  ),
   popover: TocPopover,
   provider: TOCProvider,
 };
