@@ -24,13 +24,13 @@ function selectedIds(canvas: ReturnType<typeof within>) {
 }
 
 // A selected row is marked aria-selected, which its tint follows, and the
-// count under the table updates.
+// action bar's count updates.
 export const SelectRow: Story = {
   play: async ({ canvas }) => {
     await expect(bodyRows(canvas)[0]).toHaveAttribute('aria-selected', 'false');
     await userEvent.click(rowBox(canvas, 'PAY-002'));
     await expect(selectedIds(canvas)).toEqual(['PAY-002']);
-    await expect(canvas.getByText('1 of 25 selected')).toBeVisible();
+    await expect(canvas.getByText('1 selected')).toBeVisible();
   },
 };
 
@@ -103,7 +103,7 @@ export const SelectPage: Story = {
     await userEvent.click(all);
     await expect(all).toBeChecked();
     await expect(selectedIds(canvas)).toHaveLength(10);
-    await expect(canvas.getByText('10 of 25 selected')).toBeVisible();
+    await expect(canvas.getByText('10 selected')).toBeVisible();
   },
 };
 
@@ -118,7 +118,7 @@ export const PageBoxFollowsThePage: Story = {
     await userEvent.click(canvas.getByRole('button', { name: 'Next page' }));
     await expect(all).not.toBeChecked();
     await expect(all).not.toBePartiallyChecked();
-    await expect(canvas.getByText('10 of 25 selected')).toBeVisible();
+    await expect(canvas.getByText('10 selected')).toBeVisible();
   },
 };
 
@@ -129,7 +129,7 @@ export const SelectionSurvivesSort: Story = {
     const header = canvas.getByRole('columnheader', { name: /Amount/u });
     await userEvent.click(within(header).getByRole('button'));
     await userEvent.click(within(header).getByRole('button'));
-    await expect(canvas.getByText('1 of 25 selected')).toBeVisible();
+    await expect(canvas.getByText('1 selected')).toBeVisible();
     await expect(rowBox(canvas, 'PAY-006')).not.toBeChecked();
   },
 };

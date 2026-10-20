@@ -6,6 +6,7 @@ import { fumadocsMdx } from 'fumadocs-mdx/vite';
 import { defineConfig } from 'vite';
 
 import { dataModulePlugin } from './src/lib/data-module-plugin.ts';
+import { demoSourcesPlugin } from './src/lib/demo-sources-plugin.ts';
 import { manualSourcesPlugin } from './src/lib/manual-sources-plugin.ts';
 import { staticPages } from './src/lib/static-pages.ts';
 import { themeItemPaths, themeOptions } from './src/lib/theme-items.ts';
@@ -17,6 +18,7 @@ export default defineConfig({
     optimizeLocales.vite({ locales: ['en', 'ar'] }),
     fumadocsMdx(),
     manualSourcesPlugin(),
+    demoSourcesPlugin(),
     dataModulePlugin('virtual:theme-options', () => ({
       themeOptions: themeOptions(),
     })),

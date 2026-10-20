@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 
-import { dataTableQuery } from '#/lib/data-table-query';
+import { dataTableMatch, dataTableQuery } from '#/lib/data-table-query';
 
 const base = {
   columnFilters: [],
@@ -38,6 +38,20 @@ test('filters key each value by its column', () => {
     amount: [100, 500],
     status: ['paid'],
   });
+});
+
+test('filters key in column order, whatever order they were set in', () => {
+  const status = { id: 'status', value: ['paid'] };
+  const amount = { id: 'amount', value: [100, 500] };
+  expect(
+    JSON.stringify(
+      dataTableMatch({ columnFilters: [status, amount], globalFilter: '' }),
+    ),
+  ).toBe(
+    JSON.stringify(
+      dataTableMatch({ columnFilters: [amount, status], globalFilter: '' }),
+    ),
+  );
 });
 
 test('search is trimmed, and blank search is left out', () => {

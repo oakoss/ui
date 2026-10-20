@@ -202,6 +202,20 @@ test('a Manual tab whose files fail to load keeps the page', async ({
   ).toBeVisible();
 });
 
+test('a Code tab whose source fails to load keeps the page', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/docs/components/button');
+  await page.route('**/assets/*.js', (route) => route.abort());
+  await page.getByRole('tab', { name: 'Code' }).first().click();
+  await expect(page.getByRole('alert')).toContainText(
+    'The code couldn’t be shown.',
+  );
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Button' }),
+  ).toBeVisible();
+});
+
 test('search finds a component page', async ({ page }) => {
   await gotoHydrated(page, '/docs');
   await page

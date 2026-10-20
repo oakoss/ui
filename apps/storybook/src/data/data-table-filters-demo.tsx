@@ -3,6 +3,7 @@ import {
   DataTableContent,
   DataTableToolbar,
 } from '@oakoss/ui/components/ui/data/data-table';
+import { DataTableActionBar } from '@oakoss/ui/components/ui/data/data-table-action-bar';
 import { DataTableFacetedFilter } from '@oakoss/ui/components/ui/data/data-table-faceted-filter';
 import { DataTableFilterChips } from '@oakoss/ui/components/ui/data/data-table-filter-chips';
 import { DataTablePagination } from '@oakoss/ui/components/ui/data/data-table-pagination';
@@ -55,15 +56,11 @@ export function FiltersTable({
   searchColumn,
   statusCounts,
 }: FiltersTableProps) {
-  const [search, setSearch] = useState(appSearch);
+  const { commit, search, setSearch } = useAppSearch(appSearch, appCommitMs);
   const customerColumns = useMemo(
     () => withCustomerOptions(columns ?? paymentColumns, data),
     [columns, data],
   );
-  const commit = (value: string) => {
-    if (appCommitMs === undefined) setSearch(value);
-    else setTimeout(() => setSearch(value), appCommitMs);
-  };
   const table = useDataTable({
     columns: customerColumns,
     data,
@@ -91,6 +88,7 @@ export function FiltersTable({
       </DataTableToolbar>
       <DataTableFilterChips />
       <DataTableContent aria-label="Payments" />
+      <DataTableActionBar />
       <DataTablePagination />
     </DataTable>
   );
@@ -114,6 +112,15 @@ function AppControls({ onSearch }: { onSearch: (() => void) | undefined }) {
       )}
     </>
   );
+}
+
+function useAppSearch(appSearch?: string, appCommitMs?: number) {
+  const [search, setSearch] = useState(appSearch);
+  const commit = (value: string) => {
+    if (appCommitMs === undefined) setSearch(value);
+    else setTimeout(() => setSearch(value), appCommitMs);
+  };
+  return { commit, search, setSearch };
 }
 
 function withCustomerOptions(

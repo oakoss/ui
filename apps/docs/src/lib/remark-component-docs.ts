@@ -2,6 +2,7 @@ import registry from '@oakoss/ui/registry.json';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
+import { demoCode, demos, demoSource } from './demo-sources';
 import { type File, type Node, recordExpansion } from './expansion-output';
 import { itemCss } from './item-css';
 import { manualSources } from './manual-sources';
@@ -12,8 +13,6 @@ import {
 } from './package-managers';
 import { isShownAsSource, targetPath } from './registry-paths';
 import { githubUrl } from './site';
-
-const demos = path.join(import.meta.dirname, '../components/demos');
 
 type Item = (typeof registry.items)[number];
 
@@ -32,8 +31,8 @@ export function remarkComponentDocs() {
       if (hasAddDependency(compiler)) compiler.addDependency(source);
       return readFileSync(source, 'utf-8');
     };
-    transform(tree, read, (node, expanded) =>
-      recordExpansion(file, node, expanded),
+    transform(tree, read, (node, expanded, markdown) =>
+      recordExpansion(file, node, expanded, markdown),
     );
   };
 }
@@ -230,18 +229,20 @@ function paragraph(...parts: (Node | string)[]): Node {
   };
 }
 
-function preview(node: Node, read: Read): Node {
+// The page's tabs load the source on open; the Markdown's show it inline.
+function preview(node: Node, read: Read): { markdown: Node; page: Node } {
   const name = attribute(node, 'name');
   if (name === undefined) throw new Error('<ComponentPreview> needs a name');
-  // Shown with the import paths an installed project uses.
-  const source = read(path.join(demos, `${name}.tsx`)).replaceAll(
-    "from '@oakoss/ui/",
-    "from '#/",
-  );
-  return tabs([
-    ['Preview', node.children ?? []],
-    ['Code', [code('tsx', source)]],
-  ]);
+  const source = demoCode(read(path.join(demos, `${name}.tsx`)));
+  const withCode = (code: Node) =>
+    tabs([
+      ['Preview', node.children ?? []],
+      ['Code', [code]],
+    ]);
+  return {
+    markdown: withCode(code('tsx', source)),
+    page: withCode(element(demoSource, { name }, [])),
+  };
 }
 
 function tabs(entries: [string, Node[]][]): Node {
@@ -264,10 +265,11 @@ function tabs(entries: [string, Node[]][]): Node {
 function transform(
   node: Node,
   read: Read,
-  expand: (node: Node, expanded: Node) => Node,
+  expand: (node: Node, expanded: Node, markdown?: Node) => Node,
 ): Node {
   if (node.type === 'mdxJsxFlowElement' && node.name === 'ComponentPreview') {
-    return expand(node, preview(node, read));
+    const { markdown, page } = preview(node, read);
+    return expand(node, page, markdown);
   }
   if (node.type === 'mdxJsxFlowElement' && node.name === 'ComponentInstall') {
     const item = attribute(node, 'item');

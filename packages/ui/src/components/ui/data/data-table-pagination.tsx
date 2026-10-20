@@ -14,7 +14,6 @@ import {
 import {
   defaultPageLabel,
   pageOf,
-  selectedCount,
   useDataTableContext,
 } from '#/hooks/use-data-table';
 import { cn } from '#/lib/cx';
@@ -27,7 +26,6 @@ export type DataTablePaginationProps = {
   pageSizeLabel?: string;
   pageSizes?: number[];
   previousLabel?: string;
-  selectedLabel?: (selected: number, total: number) => string;
 } & ComponentProps<'div'>;
 
 type StepLabels = Pick<
@@ -48,41 +46,29 @@ export function DataTablePagination({
   pageSizeLabel = 'Rows per page',
   pageSizes = defaultPageSizes,
   previousLabel,
-  selectedLabel = defaultSelectedLabel,
   ...props
 }: DataTablePaginationProps) {
   const table = useDataTableContext();
   const { page, pageCount } = pageOf(table);
-  const canSelect = table.options.enableRowSelection !== false;
-  const selected = selectedCount(table);
   return (
     <div
       className={cn(
-        'flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-sm',
+        'flex flex-wrap items-center justify-end gap-x-6 gap-y-2 text-sm',
         className,
       )}
       data-slot="data-table-pagination"
       {...props}
     >
-      <p className="text-muted-foreground">
-        {canSelect ? selectedLabel(selected, table.getRowCount()) : null}
-      </p>
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-        <PageSize label={pageSizeLabel} pageSizes={pageSizes} />
-        <p className="font-medium">{pageLabel(page, pageCount)}</p>
-        <PageSteps
-          firstLabel={firstLabel}
-          lastLabel={lastLabel}
-          nextLabel={nextLabel}
-          previousLabel={previousLabel}
-        />
-      </div>
+      <PageSize label={pageSizeLabel} pageSizes={pageSizes} />
+      <p className="font-medium">{pageLabel(page, pageCount)}</p>
+      <PageSteps
+        firstLabel={firstLabel}
+        lastLabel={lastLabel}
+        nextLabel={nextLabel}
+        previousLabel={previousLabel}
+      />
     </div>
   );
-}
-
-function defaultSelectedLabel(selected: number, total: number) {
-  return `${String(selected)} of ${String(total)} selected`;
 }
 
 function PageSize({

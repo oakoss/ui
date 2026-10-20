@@ -10,6 +10,7 @@ import {
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 
 import { CodePre } from '#/components/code-pre';
+import { DemoSource } from '#/components/demo-source';
 import { ManualSource, ManualSources } from '#/components/manual-sources';
 import { OwnPropsTable } from '#/components/own-props-table';
 import { TokenTable } from '#/components/token-table';
@@ -18,6 +19,7 @@ import { TokenTable } from '#/components/token-table';
 export function getMDXComponents(components?: MDXComponents) {
   return {
     ...defaultMdxComponents,
+    DemoSource,
     ManualSource,
     ManualSources,
     pre: CodePre,

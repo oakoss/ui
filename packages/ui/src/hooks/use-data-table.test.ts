@@ -4,7 +4,6 @@ import type { DataTableError } from '#/components/ui/data/data-table-body';
 
 import {
   optionValues,
-  selectedCount,
   type UseDataTableOptions,
   valueText,
 } from '#/hooks/use-data-table';
@@ -93,16 +92,6 @@ test('column meta takes only the keys the parts read', () => {
     { accessorKey: 'amount', meta: { width: 120 } },
   ];
   expect([aligned, unknown]).toHaveLength(2);
-});
-
-test('selection kept while selecting is off counts as none', () => {
-  const state = { rowSelection: { a: true, b: true } } as const;
-  expect(selectedCount({ options: { enableRowSelection: true }, state })).toBe(
-    2,
-  );
-  expect(selectedCount({ options: { enableRowSelection: false }, state })).toBe(
-    0,
-  );
 });
 
 test('a filter value reads as picked options', () => {

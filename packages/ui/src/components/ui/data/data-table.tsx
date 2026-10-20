@@ -82,6 +82,7 @@ export function DataTable<TData extends RowData>({
 }
 
 export function DataTableContent({
+  className,
   clearFiltersLabel,
   emptyLabel,
   error,
@@ -95,6 +96,7 @@ export function DataTableContent({
 }: DataTableContentProps) {
   const tableRef = useLinkedRow(linkedRowId, isLoading);
   const status = useStatus(error, isLoading);
+  const canSelect = useDataTableContext().options.enableRowSelection !== false;
   const range =
     status.kind === 'rows' && !status.isError ? status.range : undefined;
   return (
@@ -102,6 +104,8 @@ export function DataTableContent({
       <Table
         aria-busy={isLoading || isRefetching || undefined}
         aria-rowcount={range?.rowCount}
+        // Focus scrolled into view stays clear of the sticky action bar.
+        className={cn(canSelect && '**:scroll-mb-24', className)}
         ref={tableRef}
         {...props}
       >

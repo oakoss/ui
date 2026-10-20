@@ -4,6 +4,7 @@ import {
   type DataTableContentProps,
   DataTableToolbar,
 } from '@oakoss/ui/components/ui/data/data-table';
+import { DataTableActionBar } from '@oakoss/ui/components/ui/data/data-table-action-bar';
 import {
   actionsColumn,
   currencyColumn,
@@ -18,6 +19,7 @@ import {
   type DataTableState,
   useDataTable,
 } from '@oakoss/ui/hooks/use-data-table';
+import { selectedRows } from '@oakoss/ui/hooks/use-data-table-selection';
 import {
   type DataTableQuery,
   dataTableQuery,
@@ -93,22 +95,28 @@ export const paymentColumns: DataTableColumn<Payment>[] = [
 ];
 
 export type PaymentsTableProps = {
+  // Which payments can be selected; all of them by default.
+  canSelect?: (payment: Payment) => boolean;
   columns?: DataTableColumn<Payment>[];
   data?: Payment[];
   defaultState?: Partial<DataTableState>;
+  // Lists the selected payments in the action bar, as a client action reads them.
+  showSelected?: boolean;
 } & Omit<DataTableContentProps, 'aria-label'>;
 
 export function PaymentsTable({
+  canSelect,
   columns = paymentColumns,
   data = payments,
   defaultState,
+  showSelected = false,
   ...props
 }: PaymentsTableProps) {
   const table = useDataTable({
     columns,
     data,
     defaultState,
-    enableRowSelection: true,
+    enableRowSelection: canSelect ? (row) => canSelect(row.original) : true,
     getRowId: (row) => row.id,
   });
   return (
@@ -117,6 +125,15 @@ export function PaymentsTable({
         <DataTableViewOptions />
       </DataTableToolbar>
       <DataTableContent aria-label="Payments" {...props} />
+      <DataTableActionBar>
+        {showSelected ? (
+          <span data-testid="selected-rows">
+            {selectedRows(table)
+              .map((payment) => payment.id)
+              .join(' ')}
+          </span>
+        ) : null}
+      </DataTableActionBar>
       <DataTablePagination />
     </DataTable>
   );
