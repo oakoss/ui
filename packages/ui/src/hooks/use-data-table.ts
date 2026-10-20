@@ -123,12 +123,20 @@ export function columnLabel(
   return meta?.label ?? (typeof header === 'string' ? header : column.id);
 }
 
+export function defaultPageLabel(page: number, pageCount: number) {
+  return `Page ${String(page)} of ${String(pageCount)}`;
+}
+
 // The page to show and the page count, each at least 1. A server table can
 // sit past its total while a failed or shrunk page loads.
 export function pageOf(table: DataTableInstance<RowData>) {
   const pageCount = Math.max(table.getPageCount(), 1);
   const page = Math.min(table.state.pagination.pageIndex + 1, pageCount);
   return { page, pageCount };
+}
+
+export function selectedCount(table: DataTableInstance<RowData>) {
+  return Object.keys(table.state.rowSelection).length;
 }
 
 export function useDataTable<TData extends RowData>(

@@ -5,7 +5,9 @@ import { useState } from 'react';
 import {
   columnLabel,
   type DataTableInstance,
+  defaultPageLabel,
   pageOf,
+  selectedCount,
   useDataTableContext,
 } from '#/hooks/use-data-table';
 
@@ -20,7 +22,7 @@ export type DataTableMessages = {
 type Snapshot = ReturnType<typeof snapshotOf>;
 
 const defaultMessages: DataTableMessages = {
-  page: (page, pageCount) => `Page ${String(page)} of ${String(pageCount)}`,
+  page: defaultPageLabel,
   results: (count) => `${String(count)} ${count === 1 ? 'result' : 'results'}`,
   selected: (count) =>
     `${String(count)} ${count === 1 ? 'row' : 'rows'} selected`,
@@ -76,11 +78,11 @@ function describe(
 }
 
 function snapshotOf(table: DataTableInstance<RowData>) {
-  const { pagination, rowSelection, sorting } = table.state;
+  const { pagination, sorting } = table.state;
   return {
     page: `${String(pagination.pageIndex)}/${String(table.getPageCount())}`,
     results: table.getRowCount(),
-    selected: Object.keys(rowSelection).length,
+    selected: selectedCount(table),
     sorting: JSON.stringify(sorting),
   };
 }

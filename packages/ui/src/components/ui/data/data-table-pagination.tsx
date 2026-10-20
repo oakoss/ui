@@ -11,7 +11,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '#/components/ui/inputs/select';
-import { pageOf, useDataTableContext } from '#/hooks/use-data-table';
+import {
+  defaultPageLabel,
+  pageOf,
+  selectedCount,
+  useDataTableContext,
+} from '#/hooks/use-data-table';
 import { cn } from '#/lib/cx';
 
 export type DataTablePaginationProps = {
@@ -49,7 +54,7 @@ export function DataTablePagination({
   const table = useDataTableContext();
   const { page, pageCount } = pageOf(table);
   const canSelect = table.options.enableRowSelection !== false;
-  const selected = Object.keys(table.state.rowSelection).length;
+  const selected = selectedCount(table);
   return (
     <div
       className={cn(
@@ -74,10 +79,6 @@ export function DataTablePagination({
       </div>
     </div>
   );
-}
-
-function defaultPageLabel(page: number, pageCount: number) {
-  return `Page ${String(page)} of ${String(pageCount)}`;
 }
 
 function defaultSelectedLabel(selected: number, total: number) {

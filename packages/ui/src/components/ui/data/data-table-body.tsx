@@ -7,6 +7,8 @@ import {
   type RowData,
 } from '@tanstack/react-table';
 
+import type { DataTableError, DataTableStatus } from '#/lib/data-table-status';
+
 import {
   TableBody,
   TableCell,
@@ -20,78 +22,68 @@ import {
 } from '#/hooks/use-data-table';
 import { cn } from '#/lib/cx';
 
-export type DataTableBodyProps = {
+export type { DataTableError } from '#/lib/data-table-status';
+
+export type DataTableBodyLabels = {
   emptyLabel?: ReactNode;
-  // A bare `true` renders an empty alert and `count && message` can pass a
-  // 0, so the type asks for a message.
-  error?: DataTableError;
-  isLoading?: boolean;
-  isRefetching?: boolean;
-  linkedRowId?: string;
   loadingLabel?: string;
   noResultsLabel?: ReactNode;
-  // The rows' place in the whole result, for aria-rowindex; omitted when
-  // every row is on screen.
-  rowIndexStart?: number;
 };
 
-export type DataTableError = Exclude<ReactNode, bigint | number | true>;
+type DataTableBodyProps = {
+  error: DataTableError;
+  isRefetching: boolean;
+  linkedRowId: string | undefined;
+  status: DataTableStatus;
+} & DataTableBodyLabels;
 
 export function DataTableBody({
   emptyLabel = 'No data.',
   error,
-  isLoading = false,
-  isRefetching = false,
+  isRefetching,
   linkedRowId,
   loadingLabel = 'Loading',
   noResultsLabel = 'No results.',
-  rowIndexStart,
+  status,
 }: DataTableBodyProps) {
   const table = useDataTableContext();
-  const rows = table.getRowModel().rows;
   const columns = table.getVisibleLeafColumns().length;
-  if (isLoading) return <LoadingRows columns={columns} label={loadingLabel} />;
-  const isError = hasError(error);
-  if (isError && rows.length === 0) {
+  if (status.kind === 'loading') {
+    return <LoadingRows columns={columns} label={loadingLabel} />;
+  }
+  if (status.kind !== 'rows') {
     return (
       <MessageRow columns={columns}>
-        <div role="alert">{error}</div>
+        {status.kind === 'failed' ? (
+          <div role="alert">{error}</div>
+        ) : status.kind === 'noResults' ? (
+          noResultsLabel
+        ) : (
+          emptyLabel
+        )}
       </MessageRow>
     );
   }
-  if (rows.length === 0) {
-    const { columnFilters, globalFilter } = table.state;
-    const isFiltered = columnFilters.length > 0 || globalFilter !== '';
-    return (
-      <MessageRow columns={columns}>
-        {isFiltered ? noResultsLabel : emptyLabel}
-      </MessageRow>
-    );
-  }
+  const firstRowIndex = status.isError
+    ? undefined
+    : status.range?.firstRowIndex;
   return (
     <TableBody
       className={cn(isRefetching && 'opacity-60')}
       data-slot="data-table-body"
     >
-      {isError ? <ErrorRow columns={columns} error={error} /> : null}
-      {rows.map((row, index) => (
+      {status.isError ? <ErrorRow columns={columns} error={error} /> : null}
+      {table.getRowModel().rows.map((row, index) => (
         <DataTableRow
           isLinked={row.id === linkedRowId}
           key={row.id}
           row={row}
           rowIndex={
-            rowIndexStart === undefined ? undefined : rowIndexStart + index
+            firstRowIndex === undefined ? undefined : firstRowIndex + index
           }
         />
       ))}
     </TableBody>
-  );
-}
-
-// `isError && message` passes false when nothing failed.
-export function hasError(error: DataTableError) {
-  return (
-    error !== undefined && error !== null && error !== false && error !== ''
   );
 }
 

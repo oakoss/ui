@@ -14,7 +14,7 @@ import {
   useDataTable,
 } from '@oakoss/ui/hooks/use-data-table';
 import { type Dispatch, type SetStateAction, useState } from 'react';
-import { expect, fn, userEvent, waitFor } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import {
   bodyRows,
@@ -31,6 +31,8 @@ type StateTableProps = {
   isEmptyAtFirst?: boolean;
   linkedRowId?: string;
   onPaginationChange?: (pagination: PaginationState) => void;
+  // A sort handler that changes the page size itself.
+  resizesOnSort?: boolean;
   state?: Partial<DataTableState>;
 };
 
@@ -41,6 +43,7 @@ function StateTable({
   isEmptyAtFirst = false,
   linkedRowId,
   onPaginationChange,
+  resizesOnSort = false,
   state,
 }: StateTableProps) {
   const [data, setData] = useState(isEmptyAtFirst ? [] : payments);
@@ -54,6 +57,9 @@ function StateTable({
     onPaginationChange: (next) => {
       onPaginationChange?.(next);
       if (pagination) setTimeout(() => setPagination(next), 0);
+    },
+    onSortingChange: () => {
+      if (resizesOnSort) table.setPageSize(25);
     },
     state: pagination ? { ...state, pagination } : state,
   });
@@ -213,6 +219,18 @@ export const AppMovedPageThenFilter: Story = {
     await waitFor(() =>
       expect(pageLabel(canvas)).toHaveTextContent('Page 1 of 3'),
     );
+  },
+};
+
+// The first-page reset builds on what a sort handler changed, so a page size
+// it sets survives.
+export const SortHandlerSetsPageSize: Story = {
+  args: { defaultState: lastPage, resizesOnSort: true },
+  play: async ({ canvas }) => {
+    const header = canvas.getByRole('columnheader', { name: /Amount/u });
+    await userEvent.click(within(header).getByRole('button'));
+    await expect(pageLabel(canvas)).toHaveTextContent('Page 1 of 1');
+    await expect(bodyRows(canvas)).toHaveLength(25);
   },
 };
 

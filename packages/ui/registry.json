@@ -4967,6 +4967,16 @@
           "target": "@lib/data-table-query.ts"
         },
         {
+          "path": "src/lib/data-table-state.ts",
+          "type": "registry:lib",
+          "target": "@lib/data-table-state.ts"
+        },
+        {
+          "path": "src/lib/data-table-status.ts",
+          "type": "registry:lib",
+          "target": "@lib/data-table-status.ts"
+        },
+        {
           "path": "src/components/icons.tsx",
           "type": "registry:component",
           "target": "@components/icons.tsx"

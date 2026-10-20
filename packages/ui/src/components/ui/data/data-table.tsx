@@ -8,8 +8,7 @@ import {
 } from '#/components/ui/data/data-table-announcer';
 import {
   DataTableBody,
-  type DataTableBodyProps,
-  hasError,
+  type DataTableBodyLabels,
 } from '#/components/ui/data/data-table-body';
 import { DataTableHead } from '#/components/ui/data/data-table-header';
 import {
@@ -25,8 +24,16 @@ import {
 } from '#/hooks/use-data-table';
 import { useLatest } from '#/hooks/use-latest';
 import { cn } from '#/lib/cx';
+import { type DataTableError, dataTableStatus } from '#/lib/data-table-status';
 
-export type DataTableContentProps = DataTableBodyProps &
+export type DataTableContentBaseProps = {
+  error?: DataTableError;
+  isLoading?: boolean;
+  isRefetching?: boolean;
+  linkedRowId?: string;
+} & DataTableBodyLabels;
+
+export type DataTableContentProps = DataTableContentBaseProps &
   Omit<TableProps, 'children'>;
 
 export type DataTableProps<TData extends RowData> = {
@@ -67,31 +74,36 @@ export function DataTableContent({
 }: DataTableContentProps) {
   const table = useDataTableContext();
   const tableRef = useLinkedRow(linkedRowId, isLoading);
-  const headerRows = table.getHeaderGroups().length;
-  const { pageIndex, pageSize } = table.state.pagination;
-  const total = table.getRowCount();
-  // Row counts say where a page sits in the whole result.
-  const rows = table.getRowModel().rows.length;
-  const isPartial = !isLoading && !hasError(error) && rows > 0 && rows < total;
+  const { columnFilters, globalFilter, pagination } = table.state;
+  const status = dataTableStatus({
+    error,
+    headerRows: table.getHeaderGroups().length,
+    isFiltered: columnFilters.length > 0 || globalFilter !== '',
+    isLoading,
+    pageIndex: pagination.pageIndex,
+    pageSize: pagination.pageSize,
+    rows: table.getRowModel().rows.length,
+    total: table.getRowCount(),
+  });
+  const range =
+    status.kind === 'rows' && !status.isError ? status.range : undefined;
+  const rowCount = range?.rowCount;
   return (
     <Table
       aria-busy={isLoading || isRefetching || undefined}
-      aria-rowcount={isPartial ? total + headerRows : undefined}
+      aria-rowcount={rowCount}
       ref={tableRef}
       {...props}
     >
-      <DataTableHeader isPartial={isPartial} />
+      <DataTableHeader isPartial={rowCount !== undefined} />
       <DataTableBody
         emptyLabel={emptyLabel}
         error={error}
-        isLoading={isLoading}
         isRefetching={isRefetching}
         linkedRowId={linkedRowId}
         loadingLabel={loadingLabel}
         noResultsLabel={noResultsLabel}
-        rowIndexStart={
-          isPartial ? headerRows + pageIndex * pageSize + 1 : undefined
-        }
+        status={status}
       />
     </Table>
   );
