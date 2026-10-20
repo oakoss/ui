@@ -95,7 +95,10 @@ doesn't fetch, so any data library fits.
 faded, while new ones load, such as with TanStack Query's
 `placeholderData: keepPreviousData`. An `error` shows as an alert, which
 can hold a retry button: above the rows when a refetch fails, so they stay
-readable, or in place of them when the first load fails. Rows kept under
+readable, or in place of them when the first load fails. The alert stays
+through a retry, so focus on a retry button inside it stays put; when an
+`isRefetching` retry ends with the error still set, the table announces
+`retryFailedLabel` ("Retry failed"). Rows kept under
 an error should be the current page's: data held over from another page or
 order would sit under a pager and headers that no longer describe it. With
 no rows the body says `emptyLabel`, or `noResultsLabel` while a filter is set.
@@ -222,6 +225,6 @@ column menu, accepting `div` props.
 
 ### Data attributes
 
-| Attribute   | Present when                                                                                                                                                                                                                                             |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data-slot` | Always: `data-table`, `data-table-toolbar`, `data-table-head`, `data-table-sort`, `data-table-body`, `data-table-row`, `data-table-pagination`, `data-table-view-options` or `data-table-announcer`; `data-table-error` on the alert row above kept rows |
+| Attribute   | Present when                                                                                                                                                                                                                                                                                                                             |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data-slot` | Always: `data-table`, `data-table-toolbar`, `data-table-head`, `data-table-sort`, `data-table-body`, `data-table-row`, `data-table-pagination`, `data-table-view-options` or `data-table-announcer`; `data-table-error` on the alert row above kept rows; `data-table-retry` on the visually hidden region that announces a failed retry |

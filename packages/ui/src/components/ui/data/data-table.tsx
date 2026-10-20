@@ -1,6 +1,6 @@
 import type { RowData } from '@tanstack/react-table';
 
-import { type ComponentProps, useEffect, useRef } from 'react';
+import { type ComponentProps, useEffect, useRef, useState } from 'react';
 
 import {
   DataTableAnnouncer,
@@ -24,13 +24,18 @@ import {
 } from '#/hooks/use-data-table';
 import { useLatest } from '#/hooks/use-latest';
 import { cn } from '#/lib/cx';
-import { type DataTableError, dataTableStatus } from '#/lib/data-table-status';
+import {
+  type DataTableError,
+  dataTableStatus,
+  hasError,
+} from '#/lib/data-table-status';
 
 export type DataTableContentBaseProps = {
   error?: DataTableError;
   isLoading?: boolean;
   isRefetching?: boolean;
   linkedRowId?: string;
+  retryFailedLabel?: string;
 } & DataTableBodyLabels;
 
 export type DataTableContentProps = DataTableContentBaseProps &
@@ -70,42 +75,38 @@ export function DataTableContent({
   linkedRowId,
   loadingLabel,
   noResultsLabel,
+  retryFailedLabel = 'Retry failed',
   ...props
 }: DataTableContentProps) {
-  const table = useDataTableContext();
   const tableRef = useLinkedRow(linkedRowId, isLoading);
-  const { columnFilters, globalFilter, pagination } = table.state;
-  const status = dataTableStatus({
-    error,
-    headerRows: table.getHeaderGroups().length,
-    isFiltered: columnFilters.length > 0 || globalFilter !== '',
-    isLoading,
-    pageIndex: pagination.pageIndex,
-    pageSize: pagination.pageSize,
-    rows: table.getRowModel().rows.length,
-    total: table.getRowCount(),
-  });
+  const status = useStatus(error, isLoading);
   const range =
     status.kind === 'rows' && !status.isError ? status.range : undefined;
-  const rowCount = range?.rowCount;
   return (
-    <Table
-      aria-busy={isLoading || isRefetching || undefined}
-      aria-rowcount={rowCount}
-      ref={tableRef}
-      {...props}
-    >
-      <DataTableHeader isPartial={rowCount !== undefined} />
-      <DataTableBody
-        emptyLabel={emptyLabel}
-        error={error}
+    <>
+      <Table
+        aria-busy={isLoading || isRefetching || undefined}
+        aria-rowcount={range?.rowCount}
+        ref={tableRef}
+        {...props}
+      >
+        <DataTableHeader isPartial={range !== undefined} />
+        <DataTableBody
+          emptyLabel={emptyLabel}
+          error={error}
+          isRefetching={isRefetching}
+          linkedRowId={linkedRowId}
+          loadingLabel={loadingLabel}
+          noResultsLabel={noResultsLabel}
+          status={status}
+        />
+      </Table>
+      <RetryAnnouncer
+        isError={hasError(error)}
         isRefetching={isRefetching}
-        linkedRowId={linkedRowId}
-        loadingLabel={loadingLabel}
-        noResultsLabel={noResultsLabel}
-        status={status}
+        label={retryFailedLabel}
       />
-    </Table>
+    </>
   );
 }
 
@@ -137,6 +138,33 @@ function DataTableHeader({ isPartial }: { isPartial: boolean }) {
         </TableRow>
       ))}
     </TableHeader>
+  );
+}
+
+// The alert stays on screen through a retry, so focus on a retry button
+// inside it stays put; an alert that doesn't change isn't announced again,
+// so a retry that fails is said here. It clears when a retry starts, so each
+// failure is a change.
+function RetryAnnouncer({
+  isError,
+  isRefetching,
+  label,
+}: {
+  isError: boolean;
+  isRefetching: boolean;
+  label: string;
+}) {
+  // A refetch is a retry only when it started over an error.
+  const [refetch, setRefetch] = useState({ isError, isRefetching });
+  const [hasFailed, setHasFailed] = useState(false);
+  if (isRefetching !== refetch.isRefetching) {
+    setRefetch({ isError, isRefetching });
+    setHasFailed(!isRefetching && isError && refetch.isError);
+  } else if (hasFailed && !isError) setHasFailed(false);
+  return (
+    <span aria-live="polite" className="sr-only" data-slot="data-table-retry">
+      {hasFailed && isError ? label : ''}
+    </span>
   );
 }
 
@@ -179,4 +207,19 @@ function useLinkedRow(linkedRowId: string | undefined, isLoading: boolean) {
   }, [index, isShown, latestTable, linkedRowId, page, pageIndex]);
 
   return tableRef;
+}
+
+function useStatus(error: DataTableError, isLoading: boolean) {
+  const table = useDataTableContext();
+  const { columnFilters, globalFilter, pagination } = table.state;
+  return dataTableStatus({
+    error,
+    headerRows: table.getHeaderGroups().length,
+    isFiltered: columnFilters.length > 0 || globalFilter !== '',
+    isLoading,
+    pageIndex: pagination.pageIndex,
+    pageSize: pagination.pageSize,
+    rows: table.getRowModel().rows.length,
+    total: table.getRowCount(),
+  });
 }

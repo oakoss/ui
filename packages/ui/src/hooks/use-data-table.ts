@@ -19,6 +19,7 @@ import {
   type RowData,
   rowPaginationFeature,
   rowSelectionFeature,
+  type RowSelectionState,
   rowSortingFeature,
   sortFn_alphanumeric,
   sortFn_basic,
@@ -135,8 +136,14 @@ export function pageOf(table: DataTableInstance<RowData>) {
   return { page, pageCount };
 }
 
-export function selectedCount(table: DataTableInstance<RowData>) {
-  return Object.keys(table.state.rowSelection).length;
+// Selection kept in state while selecting is off isn't a selection.
+export function selectedCount(table: {
+  options: { enableRowSelection?: unknown };
+  state: { rowSelection: RowSelectionState };
+}) {
+  return table.options.enableRowSelection === false
+    ? 0
+    : Object.keys(table.state.rowSelection).length;
 }
 
 export function useDataTable<TData extends RowData>(
@@ -185,7 +192,8 @@ function isDataTable(value: unknown): value is DataTableInstance<RowData> {
 
 // Rows removed from under the last page leave the client table past its end,
 // so it steps back to the last page that has rows. No rows at all is a load,
-// a failure or an empty filter, which keeps the page.
+// a failure or an empty filter, which keeps the page. A negative page is
+// never valid.
 function usePageInRange<TData extends RowData>(
   table: DataTableInstance<TData>,
   isServer: boolean,
@@ -194,8 +202,12 @@ function usePageInRange<TData extends RowData>(
   const { pageIndex } = table.state.pagination;
   const pageCount = table.getPageCount();
   useEffect(() => {
-    if (!isServer && pageCount > 0 && pageIndex >= pageCount) {
-      tableRef.current.setPageIndex(pageCount - 1);
+    // Both build on the latest page, which a linked row may have moved this
+    // commit.
+    if (pageIndex < 0)
+      tableRef.current.setPageIndex((index) => Math.max(index, 0));
+    else if (!isServer && pageCount > 0 && pageIndex >= pageCount) {
+      tableRef.current.setPageIndex((index) => Math.min(index, pageCount - 1));
     }
   }, [isServer, pageCount, pageIndex, tableRef]);
 }

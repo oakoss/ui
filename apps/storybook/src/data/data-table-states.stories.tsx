@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Button } from '@oakoss/ui/components/ui/inputs/button';
-import { expect } from 'storybook/test';
+import { useState } from 'react';
+import { expect, userEvent, waitFor, type within } from 'storybook/test';
 
 import { bodyRows, PaymentsTable } from './data-table-demo';
 
@@ -91,6 +92,91 @@ export const ErrorState: Story = {
       'aria-rowcount',
     );
   },
+};
+
+// Every fetch fails. Refresh refetches from wherever the table is; Recover
+// and Fail set the error without a refetch.
+function FailingFetches({ isFailingAtFirst }: { isFailingAtFirst: boolean }) {
+  const [isFailing, setIsFailing] = useState(isFailingAtFirst);
+  const [isRefetching, setIsRefetching] = useState(false);
+  const refetch = () => {
+    setIsRefetching(true);
+    setTimeout(() => {
+      setIsRefetching(false);
+      setIsFailing(true);
+    }, 50);
+  };
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex gap-2">
+        <Button onPress={refetch}>Refresh</Button>
+        <Button onPress={() => setIsFailing(false)}>Recover</Button>
+        <Button onPress={() => setIsFailing(true)}>Fail</Button>
+      </div>
+      <PaymentsTable
+        error={
+          isFailing && (
+            <>
+              Payments failed to load.{' '}
+              <Button onPress={refetch} size="sm" variant="outline">
+                Retry
+              </Button>
+            </>
+          )
+        }
+        isRefetching={isRefetching}
+      />
+    </div>
+  );
+}
+
+function retryRegion(canvas: ReturnType<typeof within>) {
+  return canvas.getByText('', { selector: '[data-slot=data-table-retry]' });
+}
+
+// The alert stays through a retry, so focus stays on its Retry button, and a
+// retry that fails again is announced, every time.
+export const RetryFailsAgain: Story = {
+  play: async ({ canvas }) => {
+    const retry = canvas.getByRole('button', { name: 'Retry' });
+    const status = retryRegion(canvas);
+    const attempt = async () => {
+      await userEvent.click(retry);
+      await expect(status).toBeEmptyDOMElement();
+      await expect(retry).toHaveFocus();
+      await waitFor(() => expect(status).toHaveTextContent('Retry failed'));
+      await expect(retry).toHaveFocus();
+    };
+    await attempt();
+    await attempt();
+  },
+  render: () => <FailingFetches isFailingAtFirst />,
+};
+
+// A refresh that fails with nothing failed before isn't a retry: the new
+// alert says what happened.
+export const RefreshFailureIsNotARetry: Story = {
+  play: async ({ canvas }) => {
+    await userEvent.click(canvas.getByRole('button', { name: 'Refresh' }));
+    await waitFor(() => expect(canvas.getByRole('alert')).toBeVisible());
+    await expect(retryRegion(canvas)).toBeEmptyDOMElement();
+  },
+  render: () => <FailingFetches isFailingAtFirst={false} />,
+};
+
+// A failed retry is forgotten once its error clears, so a later failure
+// isn't called a retry.
+export const NewErrorAfterRecovery: Story = {
+  play: async ({ canvas }) => {
+    const status = retryRegion(canvas);
+    await userEvent.click(canvas.getByRole('button', { name: 'Retry' }));
+    await waitFor(() => expect(status).toHaveTextContent('Retry failed'));
+    await userEvent.click(canvas.getByRole('button', { name: 'Recover' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Fail' }));
+    await expect(canvas.getByRole('alert')).toBeVisible();
+    await expect(status).toBeEmptyDOMElement();
+  },
+  render: () => <FailingFetches isFailingAtFirst />,
 };
 
 // A first load that fails has no rows to keep, so the error takes their place.

@@ -2,7 +2,12 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { bodyRows, PaymentsTable, rowHeaders } from './data-table-demo';
+import {
+  bodyRows,
+  pageLabel,
+  PaymentsTable,
+  rowHeaders,
+} from './data-table-demo';
 
 const meta = {
   component: PaymentsTable,
@@ -59,6 +64,16 @@ export const RowIndexOnLaterPages: Story = {
   },
 };
 
+// A negative page, from a bad link or app state, steps up to the first.
+export const NegativePage: Story = {
+  args: { defaultState: { pagination: { pageIndex: -1, pageSize: 10 } } },
+  play: async ({ canvas }) => {
+    await waitFor(() =>
+      expect(pageLabel(canvas)).toHaveTextContent('Page 1 of 3'),
+    );
+    await expect(rowHeaders(canvas)[0]).toBe('PAY-001');
+  },
+};
 // A header press sorts ascending, then descending, then clears.
 export const SortCycle: Story = {
   play: async ({ canvas }) => {

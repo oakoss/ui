@@ -1,124 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { PaginationState } from '@tanstack/react-table';
 
-import {
-  DataTable,
-  DataTableContent,
-  DataTableToolbar,
-} from '@oakoss/ui/components/ui/data/data-table';
-import { DataTablePagination } from '@oakoss/ui/components/ui/data/data-table-pagination';
-import { Button } from '@oakoss/ui/components/ui/inputs/button';
-import {
-  type DataTableInstance,
-  type DataTableState,
-  useDataTable,
-} from '@oakoss/ui/hooks/use-data-table';
-import { type Dispatch, type SetStateAction, useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import {
-  bodyRows,
-  pageLabel,
-  type Payment,
-  paymentColumns,
-  payments,
-} from './data-table-demo';
-
-type StateTableProps = {
-  // Pagination the app owns and applies a tick later, as a router would.
-  appPagination?: PaginationState;
-  defaultState?: Partial<DataTableState>;
-  isEmptyAtFirst?: boolean;
-  linkedRowId?: string;
-  onPaginationChange?: (pagination: PaginationState) => void;
-  // A sort handler that changes the page size itself.
-  resizesOnSort?: boolean;
-  state?: Partial<DataTableState>;
-};
-
-// Toolbar buttons drive the table the way app code would.
-function StateTable({
-  appPagination,
-  defaultState,
-  isEmptyAtFirst = false,
-  linkedRowId,
-  onPaginationChange,
-  resizesOnSort = false,
-  state,
-}: StateTableProps) {
-  const [data, setData] = useState(isEmptyAtFirst ? [] : payments);
-  const [pagination, setPagination] = useState(appPagination);
-  const table = useDataTable({
-    columns: paymentColumns,
-    data,
-    defaultState,
-    enableRowSelection: true,
-    getRowId: (row) => row.id,
-    onPaginationChange: (next) => {
-      onPaginationChange?.(next);
-      if (pagination) setTimeout(() => setPagination(next), 0);
-    },
-    onSortingChange: () => {
-      if (resizesOnSort) table.setPageSize(25);
-    },
-    state: pagination ? { ...state, pagination } : state,
-  });
-  return (
-    <DataTable className="w-4xl max-w-full" table={table}>
-      <StateToolbar
-        onAppPage={
-          pagination
-            ? () => setPagination({ ...pagination, pageIndex: 2 })
-            : undefined
-        }
-        setData={setData}
-        table={table}
-      />
-      <DataTableContent
-        aria-label="Payments"
-        isLoading={data.length === 0}
-        linkedRowId={linkedRowId}
-      />
-      <DataTablePagination />
-    </DataTable>
-  );
-}
-
-function StateToolbar({
-  onAppPage,
-  setData,
-  table,
-}: {
-  onAppPage: (() => void) | undefined;
-  setData: Dispatch<SetStateAction<Payment[]>>;
-  table: DataTableInstance<Payment>;
-}) {
-  return (
-    <DataTableToolbar>
-      {onAppPage ? <Button onPress={onAppPage}>App to page 3</Button> : null}
-      <Button onPress={() => setData(payments)}>Load</Button>
-      <Button onPress={() => setData([])}>Clear</Button>
-      <Button onPress={() => setData((rows) => rows.slice(0, 15))}>
-        Remove 10
-      </Button>
-      <Button onPress={() => table.setGlobalFilter('customer')}>Search</Button>
-      <Button
-        onPress={() => table.getColumn('amount')?.setFilterValue([200, 800])}
-      >
-        Amounts 200–800
-      </Button>
-      <Button
-        onPress={() => {
-          const [first, second] = table.getRowModel().rows;
-          first?.toggleSelected(true);
-          second?.toggleSelected(true);
-        }}
-      >
-        Select two
-      </Button>
-    </DataTableToolbar>
-  );
-}
+import { bodyRows, pageLabel } from './data-table-demo';
+import { StateTable } from './data-table-state-demo';
 
 const meta = {
   component: StateTable,
@@ -219,6 +105,46 @@ export const AppMovedPageThenFilter: Story = {
     await waitFor(() =>
       expect(pageLabel(canvas)).toHaveTextContent('Page 1 of 3'),
     );
+  },
+};
+
+// A larger page size and a link in one change move the page once, to the
+// link's page, never by way of the page the old size left past the end.
+export const ResizeAndLinkTogether: Story = {
+  args: {
+    appPagination: { pageIndex: 2, pageSize: 10 },
+    onPaginationChange: fn<(pagination: PaginationState) => void>(),
+  },
+  play: async ({ args, canvas }) => {
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'App resizes and links' }),
+    );
+    await waitFor(() =>
+      expect(pageLabel(canvas)).toHaveTextContent('Page 1 of 2'),
+    );
+    await expect(args.onPaginationChange).not.toHaveBeenCalledWith({
+      pageIndex: 1,
+      pageSize: 20,
+    });
+  },
+};
+
+// A negative page with a link goes straight to the link's page, never by way
+// of page 1.
+export const NegativePageWithLink: Story = {
+  args: {
+    appPagination: { pageIndex: -1, pageSize: 10 },
+    linkedRowId: 'PAY-015',
+    onPaginationChange: fn<(pagination: PaginationState) => void>(),
+  },
+  play: async ({ args, canvas }) => {
+    await waitFor(() =>
+      expect(pageLabel(canvas)).toHaveTextContent('Page 2 of 3'),
+    );
+    await expect(args.onPaginationChange).not.toHaveBeenCalledWith({
+      pageIndex: 0,
+      pageSize: 10,
+    });
   },
 };
 
