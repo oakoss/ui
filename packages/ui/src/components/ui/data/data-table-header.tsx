@@ -9,13 +9,18 @@ import {
 } from '#/hooks/use-data-table';
 import { cn } from '#/lib/cx';
 
-export type DataTableHeadProps = { header: Header<DataTableFeatures, RowData> };
+export type DataTableHeadProps = {
+  header: Header<DataTableFeatures, RowData>;
+  // Rows the header spans, for a column outside the groups above it.
+  rowSpan?: number;
+};
 
 const sortNames = { asc: 'ascending', desc: 'descending' } as const;
 
 // Only the first sort column carries aria-sort, which ARIA allows on one
-// header at a time; later ones show their place in the order.
-export function DataTableHead({ header }: DataTableHeadProps) {
+// header at a time; later ones show their place in the order. A header
+// spanning group rows sits at their foot, in line with the grouped columns'.
+export function DataTableHead({ header, rowSpan = 1 }: DataTableHeadProps) {
   const { column } = header;
   const meta = column.columnDef.meta;
   const sorted = column.getIsSorted();
@@ -27,9 +32,10 @@ export function DataTableHead({ header }: DataTableHeadProps) {
           ? sortNames[sorted]
           : undefined
       }
-      className={cn(meta?.className)}
+      className={cn(rowSpan > 1 && 'align-bottom', meta?.className)}
       colSpan={header.colSpan > 1 ? header.colSpan : undefined}
       data-slot="data-table-head"
+      rowSpan={rowSpan > 1 ? rowSpan : undefined}
     >
       {header.isPlaceholder ? null : column.getCanSort() ? (
         <DataTableSortButton header={header} />

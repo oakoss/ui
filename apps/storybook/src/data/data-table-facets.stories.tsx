@@ -131,9 +131,8 @@ export const ExactValues: Story = {
 // A column in a group matches exactly too.
 export const GroupedColumn: Story = {
   args: {
-    // Every column sits in a group, so no header is a placeholder.
     columns: [
-      { columns: paymentColumns.slice(1, 2), header: 'Order', id: 'order' },
+      ...paymentColumns.slice(1, 2),
       { columns: paymentColumns.slice(2, 4), header: 'Details', id: 'details' },
     ],
     data: withUnpaid,

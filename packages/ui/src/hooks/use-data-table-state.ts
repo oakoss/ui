@@ -10,7 +10,12 @@ import type {
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { useLatest } from '#/hooks/use-latest';
-import { nextSelection, noSelection } from '#/lib/data-table-selection';
+import {
+  type DataTableSelection,
+  nextSelection,
+  noSelection,
+  selectionKey,
+} from '#/lib/data-table-selection';
 import {
   type DataTableState,
   firstPageAfter,
@@ -52,9 +57,11 @@ export function useDataTableState(
   const state = isStale
     ? { ...controlled, selection: noSelection }
     : controlled;
-  const update = useUpdate(state, setOwn, options);
-  useWhenStale(isStale, () =>
-    update('selection', noSelection, options.onSelectionChange),
+  const update = useUpdate(
+    state,
+    setOwn,
+    options,
+    isStale ? controlled.selection : null,
   );
   const handlers = {
     onColumnFiltersChange: (updater: Updater<ColumnFiltersState>) =>
@@ -88,7 +95,11 @@ export function useDataTableState(
 // Several changes in one event each build on the one before, not on the last
 // render. The ref syncs in a layout effect, ahead of the parts' effects.
 // TanStack's own page reset waits a tick and fires on every data change too,
-// so the table turns it off and resets here.
+// so the table turns it off and resets here. A `stale` selection the app's
+// own filters ended is ended once, after render; `ended` remembers it by
+// value, so an app applying the end late or rebuilding the selection each
+// render doesn't hear it again. The effect runs every commit, so a current
+// selection clears `ended` even after a render that was current too.
 function useUpdate(
   state: DataTableState,
   setOwn: (update: (own: DataTableState) => DataTableState) => void,
@@ -96,10 +107,21 @@ function useUpdate(
     onPaginationChange,
     onSelectionChange,
   }: Pick<DataTableChangeHandlers, 'onPaginationChange' | 'onSelectionChange'>,
+  stale: DataTableSelection | null,
 ) {
   const latest = useRef(state);
+  const ended = useRef<string>(null);
   useLayoutEffect(() => {
     latest.current = state;
+  });
+  const staleKey = stale === null ? null : selectionKey(stale);
+  const endRef = useLatest(() => {
+    ended.current = staleKey;
+    apply('selection', noSelection, onSelectionChange);
+  });
+  useEffect(() => {
+    if (staleKey === null) ended.current = null;
+    else if (staleKey !== ended.current) endRef.current();
   });
 
   function apply<K extends keyof DataTableState>(
@@ -122,15 +144,8 @@ function useUpdate(
     apply(key, nextDataTableState(latest.current, key, updater)[key], onChange);
     const pagination = firstPageAfter(latest.current, key);
     if (pagination) apply('pagination', pagination, onPaginationChange);
-    if (isSelectionStale(latest.current)) {
-      apply('selection', noSelection, onSelectionChange);
-    }
+    if (!isSelectionStale(latest.current)) return;
+    ended.current = selectionKey(latest.current.selection);
+    apply('selection', noSelection, onSelectionChange);
   };
-}
-
-function useWhenStale(isStale: boolean, end: () => void) {
-  const endRef = useLatest(end);
-  useEffect(() => {
-    if (isStale) endRef.current();
-  }, [endRef, isStale]);
 }

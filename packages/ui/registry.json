@@ -4977,6 +4977,11 @@
           "target": "@hooks/use-latest.ts"
         },
         {
+          "path": "src/lib/data-table-headers.ts",
+          "type": "registry:lib",
+          "target": "@lib/data-table-headers.ts"
+        },
+        {
           "path": "src/lib/data-table-query.ts",
           "type": "registry:lib",
           "target": "@lib/data-table-query.ts"

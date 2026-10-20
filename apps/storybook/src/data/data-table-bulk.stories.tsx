@@ -35,13 +35,17 @@ function pageBox(canvas: Canvas) {
   return canvas.getByRole('checkbox', { name: 'Select all on this page' });
 }
 
+// Waits on each step, since an app may apply the selection late.
 async function selectAllMatching(canvas: Canvas, count: number) {
   await userEvent.click(pageBox(canvas));
+  await waitFor(() => expect(pageBox(canvas)).toBeChecked());
   const all = canvas.queryByRole('button', {
     name: `Select all ${String(count)} matching`,
   });
   if (all !== null) await userEvent.click(all);
-  await expect(canvas.getByText(`All ${String(count)} selected`)).toBeVisible();
+  await expect(
+    await canvas.findByText(`All ${String(count)} selected`),
+  ).toBeVisible();
 }
 
 // A server table counts everything matching from its total, and unticking a
@@ -68,6 +72,45 @@ export const FilterChangeTellsTheApp: Story = {
     await waitFor(() =>
       expect(args.onSelectionChange).toHaveBeenLastCalledWith({ ids: [] }),
     );
+  },
+};
+
+// An app that applies the selection a moment late hears the end once, not
+// again on the render where its old selection meets the new filter.
+export const LateAppHearsTheEndOnce: Story = {
+  args: {
+    onSelectionChange: fn<(selection: DataTableSelection) => void>(),
+    selectionCommitMs: 50,
+  },
+  play: async ({ args, canvas }) => {
+    await selectAllMatching(canvas, 25);
+    const list = await openFacet('Status');
+    await userEvent.click(list.getByRole('option', { name: /Pending/u }));
+    await userEvent.keyboard('{Escape}');
+    await new Promise((resolve) => {
+      setTimeout(resolve, 200);
+    });
+    // The page, everything matching, then the end.
+    await expect(args.onSelectionChange).toHaveBeenCalledTimes(3);
+    await expect(args.onSelectionChange).toHaveBeenLastCalledWith({ ids: [] });
+  },
+};
+
+// A restored selection made under other filters ends at mount, reported
+// once.
+export const StaleAtMountEndsOnce: Story = {
+  args: {
+    initialSelection: { all: { filters: { status: ['paid'] } }, except: [] },
+    onSelectionChange: fn<(selection: DataTableSelection) => void>(),
+  },
+  play: async ({ args, canvas }) => {
+    await expect(
+      canvas.queryByRole('toolbar', { name: 'Selected rows' }),
+    ).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(args.onSelectionChange).toHaveBeenCalledWith({ ids: [] }),
+    );
+    await expect(args.onSelectionChange).toHaveBeenCalledTimes(1);
   },
 };
 

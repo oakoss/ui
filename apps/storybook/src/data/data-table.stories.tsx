@@ -5,6 +5,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import {
   bodyRows,
   pageLabel,
+  paymentColumns,
   PaymentsTable,
   rowHeaders,
 } from './data-table-demo';
@@ -24,6 +25,45 @@ function sortButton(canvas: ReturnType<typeof within>, name: string) {
   });
   return { button: within(header).getByRole('button'), header };
 }
+
+// Columns outside a group span the group row with one header, at its foot,
+// so no header cell is empty; sorting works from the spanned header.
+export const GroupedHeaders: Story = {
+  args: {
+    columns: [
+      ...paymentColumns.slice(0, 2),
+      {
+        columns: paymentColumns.slice(2, 4),
+        header: 'Customer',
+        id: 'customer',
+      },
+      ...paymentColumns.slice(4),
+    ],
+  },
+  play: async ({ canvas }) => {
+    const [header] = canvas.getAllByRole('rowgroup');
+    const headers = within(header ?? document.body).getAllByRole(
+      'columnheader',
+    );
+    await expect(
+      headers.map(
+        (cell) =>
+          cell.textContent.trim() !== '' ||
+          within(cell).queryByRole('checkbox') !== null,
+      ),
+    ).not.toContain(false);
+    const { button, header: amount } = sortButton(canvas, 'Amount');
+    await expect(amount).toHaveAttribute('rowspan', '2');
+    await expect(getComputedStyle(amount).verticalAlign).toBe('bottom');
+    await expect(
+      canvas
+        .getByRole('checkbox', { name: 'Select all on this page' })
+        .closest('th'),
+    ).toHaveAttribute('rowspan', '2');
+    await userEvent.click(button);
+    await expect(amount).toHaveAttribute('aria-sort', 'ascending');
+  },
+};
 
 // The first page of ten, each row headed by its payment. Row counts place
 // the page in the whole result: 25 rows plus the header row.
