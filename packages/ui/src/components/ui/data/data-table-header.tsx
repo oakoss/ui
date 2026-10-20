@@ -52,6 +52,7 @@ function DataTableSortButton({ header }: DataTableHeadProps) {
     <Button
       className={cn('gap-1.5', isEnd ? '-me-2.5' : '-ms-2.5')}
       data-slot="data-table-sort"
+      intent="neutral"
       onPress={(event) =>
         column.toggleSorting(
           undefined,

@@ -142,9 +142,11 @@ for (const { files, slug } of manualInstalls()) {
     page,
   }) => {
     await gotoHydrated(page, `/docs/${slug}`);
-    await page.getByRole('tab', { name: 'Manual' }).click();
-    const panel = page.getByRole('tabpanel', { name: 'Manual' });
-    await expect(panel.locator('figure figcaption')).toHaveText(files);
+    // A page can install more than one item, each with its own tabs.
+    const tabs = await page.getByRole('tab', { name: 'Manual' }).all();
+    await Promise.all(tabs.map((tab) => tab.click()));
+    const panels = page.getByRole('tabpanel', { name: 'Manual' });
+    await expect(panels.locator('figure figcaption')).toHaveText(files);
   });
 }
 

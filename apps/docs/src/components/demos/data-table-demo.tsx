@@ -56,7 +56,7 @@ const columns: DataTableColumn<Payment>[] = [
   currencyColumn<Payment>('amount', { currency: 'USD', header: 'Amount' }),
   actionsColumn<Payment>({
     cell: (row) => (
-      <Button size="sm" variant="ghost">
+      <Button intent="neutral" size="sm" variant="ghost">
         Refund<span className="sr-only"> {row.original.id}</span>
       </Button>
     ),

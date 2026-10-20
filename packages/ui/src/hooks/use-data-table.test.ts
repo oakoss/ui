@@ -3,8 +3,10 @@ import { expect, test } from 'vitest';
 import type { DataTableError } from '#/components/ui/data/data-table-body';
 
 import {
+  optionValues,
   selectedCount,
   type UseDataTableOptions,
+  valueText,
 } from '#/hooks/use-data-table';
 
 type Payment = { amount: number; id: string };
@@ -101,4 +103,25 @@ test('selection kept while selecting is off counts as none', () => {
   expect(selectedCount({ options: { enableRowSelection: false }, state })).toBe(
     0,
   );
+});
+
+test('a filter value reads as picked options', () => {
+  expect(optionValues(undefined)).toEqual([]);
+  expect(optionValues(null)).toEqual([]);
+  expect(optionValues('paid')).toEqual(['paid']);
+  expect(optionValues([1, 'a', true])).toEqual(['1', 'a', 'true']);
+});
+
+test('a missing value has no text', () => {
+  expect(valueText(undefined)).toBeUndefined();
+  expect(valueText(null)).toBeUndefined();
+  expect(valueText(new Date(NaN))).toBeUndefined();
+  expect(valueText(0)).toBe('0');
+  expect(valueText(false)).toBe('false');
+});
+
+test('a date reads as ISO text and a bigint as its digits', () => {
+  const date = new Date(Date.UTC(2026, 9, 1));
+  expect(valueText(date)).toBe('2026-10-01T00:00:00.000Z');
+  expect(valueText(10n)).toBe('10');
 });

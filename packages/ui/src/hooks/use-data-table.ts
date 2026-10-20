@@ -2,11 +2,16 @@ import {
   type CellData,
   type Column,
   type ColumnDef,
+  columnFacetingFeature,
   columnFilteringFeature,
   columnVisibilityFeature,
+  constructFilterFn,
+  createFacetedRowModel,
+  createFacetedUniqueValues,
   createFilteredRowModel,
   createPaginatedRowModel,
   createSortedRowModel,
+  filterFn_arrHas,
   filterFn_arrIncludes,
   filterFn_equals,
   filterFn_includesString,
@@ -28,7 +33,7 @@ import {
   tableFeatures,
   useTable,
 } from '@tanstack/react-table';
-import { createContext, use, useEffect } from 'react';
+import { createContext, type ReactNode, use, useEffect, useMemo } from 'react';
 
 import {
   type DataTableChangeHandlers,
@@ -44,20 +49,46 @@ export type DataTableColumnMeta = {
   className?: string;
   isRowHeader?: boolean;
   label?: string;
+  // The values a faceted filter offers, in order. A column with options
+  // keeps rows whose value equals a picked one, unless it names its own
+  // filterFn, which receives the picked values as strings.
+  options?: readonly DataTableOption[];
 };
 
+export type DataTableOption = {
+  icon?: ReactNode;
+  label: string;
+  value: string;
+};
+
+// Options are strings, so values compare as strings, and a missing value
+// matches none. A single value, as a URL might restore, counts as one pick,
+// and stays set when another filter changes.
+const filterFn_inOptions = constructFilterFn({
+  ...filterFn_arrHas,
+  autoRemove: (value: unknown) =>
+    value === '' || optionValues(value).length === 0,
+  resolveDataValue: valueText,
+  resolveFilterValue: optionValues,
+});
+
 export const dataTableFeatures = tableFeatures({
+  columnFacetingFeature,
   columnFilteringFeature,
   columnMeta: metaHelper<DataTableColumnMeta>(),
   columnVisibilityFeature,
+  facetedRowModel: createFacetedRowModel(),
+  facetedUniqueValues: createFacetedUniqueValues(),
   filteredRowModel: createFilteredRowModel(),
-  // The functions TanStack picks for a column's value type.
+  // The functions TanStack picks for a column's value type, and inOptions
+  // for a column with options.
   filterFns: {
     arrIncludes: filterFn_arrIncludes,
     equals: filterFn_equals,
     includesString: filterFn_includesString,
     inDateRange: filterFn_inDateRange,
     inNumberRange: filterFn_inNumberRange,
+    inOptions: filterFn_inOptions,
   },
   globalFilteringFeature,
   paginatedRowModel: createPaginatedRowModel(),
@@ -128,6 +159,13 @@ export function defaultPageLabel(page: number, pageCount: number) {
   return `Page ${String(page)} of ${String(pageCount)}`;
 }
 
+export function optionValues(value: unknown): string[] {
+  if (value === undefined || value === null) return [];
+  return (Array.isArray(value) ? value : [value]).map(
+    (part) => valueText(part) ?? '',
+  );
+}
+
 // The page to show and the page count, each at least 1. A server table can
 // sit past its total while a failed or shrunk page loads.
 export function pageOf(table: DataTableInstance<RowData>) {
@@ -151,10 +189,14 @@ export function useDataTable<TData extends RowData>(
 ): DataTableInstance<TData> {
   const { handlers, state } = useDataTableState(options);
   const isServer = options.mode === 'server';
+  const columns = useMemo(
+    () => options.columns.map((column) => withOptionsFilter(column)),
+    [options.columns],
+  );
   const table = useTable({
     ...handlers,
     autoResetPageIndex: false,
-    columns: options.columns,
+    columns,
     data: options.data,
     enableRowSelection: options.enableRowSelection ?? false,
     features: dataTableFeatures,
@@ -176,6 +218,22 @@ export function useDataTableContext(): DataTableInstance<RowData> {
     throw new Error('Data table parts render inside a DataTable.');
   }
   return table;
+}
+
+export function valueText(value: unknown): string | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (typeof value === 'string') return value;
+  if (
+    typeof value === 'number' ||
+    typeof value === 'boolean' ||
+    typeof value === 'bigint'
+  ) {
+    return String(value);
+  }
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? undefined : value.toISOString();
+  }
+  return JSON.stringify(value);
 }
 
 function isDataTable(value: unknown): value is DataTableInstance<RowData> {
@@ -210,4 +268,17 @@ function usePageInRange<TData extends RowData>(
       tableRef.current.setPageIndex((index) => Math.min(index, pageCount - 1));
     }
   }, [isServer, pageCount, pageIndex, tableRef]);
+}
+
+// TanStack picks a text filter for text values, which would match "paid"
+// inside "unpaid"; a faceted filter's values match exactly.
+function withOptionsFilter<TData extends RowData>(
+  column: DataTableColumn<TData>,
+): DataTableColumn<TData> {
+  if ('columns' in column && column.columns !== undefined) {
+    return { ...column, columns: column.columns.map(withOptionsFilter) };
+  }
+  return column.meta?.options === undefined || column.filterFn !== undefined
+    ? column
+    : { ...column, filterFn: 'inOptions' };
 }

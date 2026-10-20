@@ -1,6 +1,12 @@
 import type { RowData } from '@tanstack/react-table';
 
-import { type ComponentProps, useEffect, useRef, useState } from 'react';
+import {
+  type ComponentProps,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import {
   DataTableAnnouncer,
@@ -22,6 +28,7 @@ import {
   type DataTableInstance,
   useDataTableContext,
 } from '#/hooks/use-data-table';
+import { DataTableClearsContext } from '#/hooks/use-data-table-filters';
 import { useLatest } from '#/hooks/use-latest';
 import { cn } from '#/lib/cx';
 import {
@@ -53,21 +60,29 @@ export function DataTable<TData extends RowData>({
   table,
   ...props
 }: DataTableProps<TData>) {
+  const [clears, setClears] = useState(0);
+  const clearsValue = useMemo(
+    () => ({ clears, onClear: () => setClears((count) => count + 1) }),
+    [clears],
+  );
   return (
     <DataTableContext value={table}>
-      <div
-        className={cn('flex flex-col gap-4', className)}
-        data-slot="data-table"
-        {...props}
-      >
-        {children}
-        <DataTableAnnouncer messages={messages} />
-      </div>
+      <DataTableClearsContext value={clearsValue}>
+        <div
+          className={cn('flex flex-col gap-4', className)}
+          data-slot="data-table"
+          {...props}
+        >
+          {children}
+          <DataTableAnnouncer messages={messages} />
+        </div>
+      </DataTableClearsContext>
     </DataTableContext>
   );
 }
 
 export function DataTableContent({
+  clearFiltersLabel,
   emptyLabel,
   error,
   isLoading = false,
@@ -92,6 +107,7 @@ export function DataTableContent({
       >
         <DataTableHeader isPartial={range !== undefined} />
         <DataTableBody
+          clearFiltersLabel={clearFiltersLabel}
           emptyLabel={emptyLabel}
           error={error}
           isRefetching={isRefetching}

@@ -38,7 +38,12 @@ export function DataTableViewOptions({
 
   return (
     <DropdownMenuTrigger>
-      <Button data-slot="data-table-view-options" size="sm" variant="outline">
+      <Button
+        data-slot="data-table-view-options"
+        intent="neutral"
+        size="sm"
+        variant="outline"
+      >
         <Icon.Columns aria-hidden data-icon="inline-start" />
         {label}
       </Button>

@@ -44,8 +44,14 @@ export function useDataTableState(options: SliceOptions) {
       update('columnFilters', updater, options.onColumnFiltersChange),
     onColumnVisibilityChange: (updater: Updater<ColumnVisibilityState>) =>
       update('columnVisibility', updater, options.onColumnVisibilityChange),
-    onGlobalFilterChange: (updater: Updater<string>) =>
-      update('globalFilter', updater, options.onGlobalFilterChange),
+    // TanStack's reset clears it to undefined; an empty string means the same.
+    onGlobalFilterChange: (updater: Updater<string | undefined>) =>
+      update(
+        'globalFilter',
+        (previous) =>
+          (typeof updater === 'function' ? updater(previous) : updater) ?? '',
+        options.onGlobalFilterChange,
+      ),
     onPaginationChange: (updater: Updater<PaginationState>) =>
       update('pagination', updater, options.onPaginationChange),
     onRowSelectionChange: (updater: Updater<RowSelectionState>) =>

@@ -213,7 +213,7 @@ export const NoResults: Story = {
   args: { defaultState: { globalFilter: 'nobody' } },
   play: async ({ canvas }) => {
     await expect(
-      canvas.getByRole('cell', { name: 'No results.' }),
+      canvas.getByRole('cell', { name: 'No results. Clear filters' }),
     ).toBeVisible();
   },
 };

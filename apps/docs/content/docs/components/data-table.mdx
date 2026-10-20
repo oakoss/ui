@@ -5,6 +5,7 @@ item: data-table
 ---
 
 import { DataTableDemo } from '#/components/demos/data-table-demo';
+import { DataTableFilters } from '#/components/demos/data-table-filters';
 import { DataTableServer } from '#/components/demos/data-table-server';
 
 <ComponentPreview name="data-table-demo">
@@ -122,6 +123,32 @@ cell that covers the whole row, so a click anywhere opens it while the
 checkbox and actions keep their own clicks; it suits a table whose first
 column isn't sticky.
 
+### Filters
+
+Filters ship as their own item, which adds a search, faceted filters and the
+active filters:
+
+<ComponentInstall item="data-table-filters" />
+
+`DataTableSearch` filters the whole table, or one column with `column`, once
+typing pauses (150ms, or 300ms when the server filters), and shows a change
+the app makes to the search, such as from the URL. It matches the raw values,
+not their formatting, so "$100" doesn't find an amount of 100.
+`DataTableFacetedFilter` picks values from a column's `meta.options`, which it
+requires; build them from the data when the values aren't known ahead. An
+option's value is the cell's value as text, and a date's is its ISO string. Each
+option shows a count that follows the other filters, and a column with options
+keeps rows whose value equals a picked one. A column that names its own
+`filterFn` receives the picked values as an array of strings. A server table
+passes `counts` from its API, keyed by option value, since a page of rows
+can't count the whole result. `DataTableFilterChips` shows one chip per
+filtered column and a Reset button. A column takes one kind of filter: a
+search or a facet, not both.
+
+<ComponentPreview name="data-table-filters">
+  <DataTableFilters />
+</ComponentPreview>
+
 ### Linking to a row
 
 `linkedRowId` marks the row a link points to, such as `?payment=PAY-014` in
@@ -153,13 +180,26 @@ moving focus, so a polite live region says what changed, such as "Sorted by
 Amount, ascending". The table is busy (`aria-busy`) while loading or
 refetching.
 
-| Key                | Action                                             |
-| ------------------ | -------------------------------------------------- |
-| `Tab`              | Moves to the next control in the table             |
-| `Enter` or `Space` | On a header button, steps the sort                 |
-| `Shift` + `Enter`  | On a header button, adds the column to the sort    |
-| `Space`            | On a row checkbox, selects or clears the row       |
-| `Shift` + `Space`  | On a row checkbox, selects the range from the last |
+A faceted filter is a [Select](/docs/components/select) with multiple
+selection, so its list follows the
+[WAI-ARIA listbox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/):
+each option is named by its label and reads its count as its description,
+and the trigger's name includes how many values are chosen. Past seven
+options a search field leads the list and takes focus as it opens. The
+active filters are a [Tag Group](/docs/components/tag-group), whose tags
+remove with `Delete` or `Backspace`. Clearing every filter, from Reset or the
+no-results state, moves focus to the search field.
+
+| Key                    | Action                                             |
+| ---------------------- | -------------------------------------------------- |
+| `Tab`                  | Moves to the next control in the table             |
+| `Enter` or `Space`     | On a header button, steps the sort                 |
+| `Shift` + `Enter`      | On a header button, adds the column to the sort    |
+| `Space`                | On a row checkbox, selects or clears the row       |
+| `Shift` + `Space`      | On a row checkbox, selects the range from the last |
+| `Arrow Up` / `Down`    | In a faceted filter's list, moves between options  |
+| `Enter` or `Space`     | In a faceted filter's list, chooses or clears one  |
+| `Delete` / `Backspace` | On an active filter, removes it                    |
 
 Every string is a prop with an English default: the labels on
 `DataTableContent`, `DataTablePagination`, `DataTableViewOptions` and the
@@ -223,8 +263,50 @@ data columns that can hide.
 A `div` that lays out controls above the table, such as filters and the
 column menu, accepting `div` props.
 
+### DataTableSearch
+
+A [Search Field](/docs/components/search-field) that filters the table, from
+the `data-table-filters` item.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/data-table-search.tsx"
+  name="DataTableSearchProps"
+/>
+
+Also accepts [Search Field](/docs/components/search-field)'s props, except
+its value.
+
+### DataTableFacetedFilter
+
+A multiple-selection [Select](/docs/components/select) that filters a column
+to the values chosen, from the `data-table-filters` item.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/data-table-faceted-filter.tsx"
+  name="DataTableFacetedFilterProps"
+/>
+
+### DataTableFilterChips
+
+A [Tag Group](/docs/components/tag-group) of the active filters and a Reset
+button, from the `data-table-filters` item; it renders nothing while nothing
+is filtered.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/data-table-filter-chips.tsx"
+  name="DataTableFilterChipsProps"
+/>
+
+Also accepts `div` props.
+
 ### Data attributes
 
-| Attribute   | Present when                                                                                                                                                                                                                                                                                                                             |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data-slot` | Always: `data-table`, `data-table-toolbar`, `data-table-head`, `data-table-sort`, `data-table-body`, `data-table-row`, `data-table-pagination`, `data-table-view-options` or `data-table-announcer`; `data-table-error` on the alert row above kept rows; `data-table-retry` on the visually hidden region that announces a failed retry |
+| Attribute   | Present when                                                                                                                                                                                                                                                                                                                                                                                     |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `data-slot` | Always: `data-table`, `data-table-toolbar`, `data-table-head`, `data-table-sort`, `data-table-body`, `data-table-row`, `data-table-pagination`, `data-table-view-options`, `data-table-announcer`, `data-table-faceted-filter` or `data-table-filter-chips`; `data-table-error` on the alert row above kept rows; `data-table-retry` on the visually hidden region that announces a failed retry |
