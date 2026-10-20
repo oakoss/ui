@@ -11,6 +11,8 @@
   },
   "exports": {
     "./components/*": "./src/components/*.tsx",
+    "./hooks/*": "./src/hooks/*.ts",
+    "./lib/*": "./src/lib/*.ts",
     "./registry.json": "./registry.json",
     "./styles.css": "./src/styles/globals.css",
     "./themes.css": "./src/styles/themes.css"
@@ -34,6 +36,7 @@
     "@phosphor-icons/react": "catalog:",
     "@remixicon/react": "catalog:",
     "@tabler/icons-react": "catalog:",
+    "@tanstack/react-table": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

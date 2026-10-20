@@ -1,5 +1,44 @@
 import { IconPlaceholder, type IconProps } from '#/components/icon-placeholder';
 
+export function ArrowDown(props: IconProps) {
+  return (
+    <IconPlaceholder
+      hugeicons="ArrowDown02Icon"
+      lucide="ArrowDownIcon"
+      phosphor="ArrowDownIcon"
+      remixicon="RiArrowDownLine"
+      tabler="IconArrowDown"
+      {...props}
+    />
+  );
+}
+
+export function ArrowUp(props: IconProps) {
+  return (
+    <IconPlaceholder
+      hugeicons="ArrowUp02Icon"
+      lucide="ArrowUpIcon"
+      phosphor="ArrowUpIcon"
+      remixicon="RiArrowUpLine"
+      tabler="IconArrowUp"
+      {...props}
+    />
+  );
+}
+
+export function ArrowUpDown(props: IconProps) {
+  return (
+    <IconPlaceholder
+      hugeicons="ArrowUpDownIcon"
+      lucide="ArrowUpDownIcon"
+      phosphor="ArrowsDownUpIcon"
+      remixicon="RiArrowUpDownLine"
+      tabler="IconArrowsSort"
+      {...props}
+    />
+  );
+}
+
 export function Calendar(props: IconProps) {
   return (
     <IconPlaceholder
@@ -65,6 +104,32 @@ export function ChevronRight(props: IconProps) {
   );
 }
 
+export function ChevronsLeft(props: IconProps) {
+  return (
+    <IconPlaceholder
+      hugeicons="ArrowLeftDoubleIcon"
+      lucide="ChevronsLeftIcon"
+      phosphor="CaretDoubleLeftIcon"
+      remixicon="RiArrowLeftDoubleLine"
+      tabler="IconChevronsLeft"
+      {...props}
+    />
+  );
+}
+
+export function ChevronsRight(props: IconProps) {
+  return (
+    <IconPlaceholder
+      hugeicons="ArrowRightDoubleIcon"
+      lucide="ChevronsRightIcon"
+      phosphor="CaretDoubleRightIcon"
+      remixicon="RiArrowRightDoubleLine"
+      tabler="IconChevronsRight"
+      {...props}
+    />
+  );
+}
+
 export function ChevronUp(props: IconProps) {
   return (
     <IconPlaceholder
@@ -112,6 +177,19 @@ export function CircleCheck(props: IconProps) {
       phosphor="CheckCircleIcon"
       remixicon="RiCheckboxCircleLine"
       tabler="IconCircleCheck"
+      {...props}
+    />
+  );
+}
+
+export function Columns(props: IconProps) {
+  return (
+    <IconPlaceholder
+      hugeicons="LayoutThreeColumnIcon"
+      lucide="Columns3Icon"
+      phosphor="ColumnsIcon"
+      remixicon="RiLayoutColumnLine"
+      tabler="IconColumns3"
       {...props}
     />
   );

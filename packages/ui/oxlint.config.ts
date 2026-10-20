@@ -254,6 +254,11 @@ const componentVariables = defineConfig({
       ],
       rules: { 'shadcn/no-inline-styles': 'off' },
     },
+    {
+      // shadcn swaps only literal IconPlaceholder elements, one per icon.
+      files: ['src/components/icons.tsx'],
+      rules: { 'max-lines': 'off' },
+    },
   ],
 });
 

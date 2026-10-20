@@ -119,9 +119,11 @@ function installedPaths(name: string, seen = new Set<string>()): string[] {
   ];
 }
 
+// From an import path or a dependency that pins a range (`pkg@^9`).
 function packageName(specifier: string): string {
   const [first = '', second = ''] = specifier.split('/', 2);
-  return first.startsWith('@') ? `${first}/${second}` : first;
+  const name = first.startsWith('@') ? `${first}/${second}` : first;
+  return name.replace(/(?<=.)@.*/u, '');
 }
 
 const shipped = ui.items.flatMap(({ dependencies, files, name }) => {
@@ -129,7 +131,7 @@ const shipped = ui.items.flatMap(({ dependencies, files, name }) => {
   const paths = files.map((file) => file.path);
   const installed = installedPaths(name);
   const imports = paths.flatMap((path) => importsOf(path));
-  const listed = new Set(dependencies);
+  const listed = new Set(dependencies?.map((dep) => packageName(dep)));
   const unlistedFiles = imports
     .filter((specifier) => specifier.startsWith('#/'))
     .map((specifier) => `src/${specifier.slice(2)}`)
@@ -141,16 +143,14 @@ const shipped = ui.items.flatMap(({ dependencies, files, name }) => {
   return { name, unlistedFiles, unlistedPackages };
 });
 
-// No field import needs Input; the dependency keeps `add field` installing it
-// for code that imports Input alongside the field parts.
+// No field import needs Input; the dependency installs it for code using both.
 test('field keeps installing Input', () => {
   const field = ui.items.find(({ name }) => name === 'field');
   expect(field?.registryDependencies).toContain('oakoss/ui/input');
 });
 
-// Components use the plugin's pressed:/pending: variants, which Tailwind
-// drops without it; shadcn merges the theme's css and devDependencies into
-// every install that depends on it.
+// Tailwind drops the plugin's pressed:/pending: variants without it; shadcn
+// merges the theme's css and devDependencies into every install.
 test('the theme installs the React Aria Tailwind plugin', () => {
   const theme = ui.items.find(({ name }) => name === 'theme');
   expect(theme).toMatchObject({

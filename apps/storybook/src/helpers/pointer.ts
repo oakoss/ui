@@ -5,6 +5,18 @@ declare module 'vitest/browser' {
   }
 }
 
+// Storybook's userEvent dispatches on the element itself, so it never lands
+// on an overlay above it, such as a stretched link's.
+export async function clickReal(element: Element) {
+  let browser;
+  try {
+    browser = await import('vitest/browser');
+  } catch {
+    throw new Error('clickReal runs only in the Vitest browser run');
+  }
+  await browser.userEvent.click(element, { force: true });
+}
+
 // Hovers element with the real mouse. On a plain element, hover: matches only
 // :hover, which data-hovered and simulated events don't reach.
 export async function hoverReal(element: Element) {

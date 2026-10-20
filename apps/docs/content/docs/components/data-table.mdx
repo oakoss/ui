@@ -1,0 +1,230 @@
+---
+title: Data Table
+description: A table that sorts, selects and pages through data, on TanStack Table.
+item: data-table
+---
+
+import { DataTableDemo } from '#/components/demos/data-table-demo';
+import { DataTableServer } from '#/components/demos/data-table-server';
+
+<ComponentPreview name="data-table-demo">
+  <DataTableDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="data-table" />
+
+## Usage
+
+```tsx
+import {
+  DataTable,
+  DataTableContent,
+  DataTableToolbar,
+} from '#/components/ui/data/data-table';
+import {
+  currencyColumn,
+  selectionColumn,
+} from '#/components/ui/data/data-table-columns';
+import { DataTablePagination } from '#/components/ui/data/data-table-pagination';
+import { DataTableViewOptions } from '#/components/ui/data/data-table-view-options';
+import { type DataTableColumn, useDataTable } from '#/hooks/use-data-table';
+
+const columns: DataTableColumn<Payment>[] = [
+  selectionColumn<Payment>(),
+  { accessorKey: 'id', header: 'Payment', meta: { isRowHeader: true } },
+  currencyColumn<Payment>('amount', { currency: 'USD', header: 'Amount' }),
+];
+
+function Payments({ payments }: { payments: Payment[] }) {
+  const table = useDataTable({
+    columns,
+    data: payments,
+    enableRowSelection: true,
+    getRowId: (payment) => payment.id,
+  });
+  return (
+    <DataTable table={table}>
+      <DataTableToolbar>
+        <DataTableViewOptions />
+      </DataTableToolbar>
+      <DataTableContent aria-label="Payments" />
+      <DataTablePagination />
+    </DataTable>
+  );
+}
+```
+
+`useDataTable` creates a [TanStack Table](https://tanstack.com/table) with
+sorting, filtering, pagination, selection and column visibility registered,
+and `DataTable` hands it to every part inside, so the parts compose in any
+layout. Keep `columns` outside the component, or memoize them: a new array
+each render rebuilds the rows.
+
+Each state slice (`sorting`, `pagination`, `rowSelection`, `columnVisibility`,
+`columnFilters` and `globalFilter`) is the hook's own until you pass it in
+`state`, and its change handler (`onSortingChange` and so on) hears every
+change either way. That's how a slice moves into the URL or a store. Set
+starting values with `defaultState`.
+
+Column `meta` tells the parts what a header can't: `label` names the column
+in the column menu and announcements when its header isn't text, `align`
+and `className` style its cells, and `isRowHeader` makes its cells head their
+rows. To add your own keys, edit `DataTableColumnMeta` in the installed hook.
+
+## Examples
+
+### Server data
+
+With `mode: 'server'`, the table shows `data` as given and pages through
+`rowCount` rows, and the type asks for that count. Sorting or filtering
+returns to the first page. `dataTableQuery` turns the state into a 1-based
+`page`, `pageSize`, a `sort` like `-total` and the filters, for a URL or a
+fetch; put the same values in your data library's cache key. The table
+doesn't fetch, so any data library fits.
+
+<ComponentPreview name="data-table-server">
+  <DataTableServer />
+</ComponentPreview>
+
+### Loading, refetching, empty and errors
+
+`isLoading` shows skeleton rows for the first load, with a visually hidden
+`loadingLabel` for screen readers. `isRefetching` keeps the rows on screen,
+faded, while new ones load, such as with TanStack Query's
+`placeholderData: keepPreviousData`. An `error` shows as an alert, which
+can hold a retry button: above the rows when a refetch fails, so they stay
+readable, or in place of them when the first load fails. The alert stays
+through a retry, so focus on a retry button inside it stays put; when an
+`isRefetching` retry ends with the error still set, the table announces
+`retryFailedLabel` ("Retry failed"). Rows kept under
+an error should be the current page's: data held over from another page or
+order would sit under a pager and headers that no longer describe it. With
+no rows the body says `emptyLabel`, or `noResultsLabel` while a filter is set.
+
+```tsx
+<DataTableContent
+  aria-label="Payments"
+  error={query.isError && 'Payments failed to load.'}
+  isLoading={query.isPending}
+  isRefetching={query.isPlaceholderData}
+/>
+```
+
+### Column presets
+
+`selectionColumn` adds row checkboxes and a box for the page. `numberColumn`,
+`currencyColumn` and `dateColumn` format values for the app's locale and align
+numbers to the end. `actionsColumn` takes a cell per row, under a header
+named for screen readers only. `linkColumn` puts a link in each row's heading
+cell that covers the whole row, so a click anywhere opens it while the
+checkbox and actions keep their own clicks; it suits a table whose first
+column isn't sticky.
+
+### Linking to a row
+
+`linkedRowId` marks the row a link points to, such as `?payment=PAY-014` in
+the URL. On client data it brings up that row's page, scrolls the row into
+view and focuses its row header, once per link, so paging away afterwards
+stays put. With server data, fetch the page holding the row yourself.
+
+## Accessibility
+
+DataTable renders [Table](/docs/components/table)'s native table elements,
+following the
+[WAI-ARIA table pattern](https://www.w3.org/WAI/ARIA/apg/patterns/table/), with
+each control inside a tab stop of its own. Name the table with `aria-label`
+or `aria-labelledby` on `DataTableContent`.
+
+A sortable column's header holds a button: each press sorts ascending,
+descending, then unsorted, and Shift adds the column to the order instead of
+replacing it. The first sort column's header carries `aria-sort`, which ARIA
+allows on one header at a time; later ones show their place in the order.
+
+Selected rows carry `aria-selected` and their checkbox is checked. Shift with
+a click or Space selects the range from the last row pressed. The header box
+selects the page's rows, and reads mixed while only some are selected.
+
+While a page holds part of the result, the table carries `aria-rowcount` and
+each row `aria-rowindex`, so screen readers say where a row sits in the
+whole. Sorting, paging, filtering and selecting change the table without
+moving focus, so a polite live region says what changed, such as "Sorted by
+Amount, ascending". The table is busy (`aria-busy`) while loading or
+refetching.
+
+| Key                | Action                                             |
+| ------------------ | -------------------------------------------------- |
+| `Tab`              | Moves to the next control in the table             |
+| `Enter` or `Space` | On a header button, steps the sort                 |
+| `Shift` + `Enter`  | On a header button, adds the column to the sort    |
+| `Space`            | On a row checkbox, selects or clears the row       |
+| `Shift` + `Space`  | On a row checkbox, selects the range from the last |
+
+Every string is a prop with an English default: the labels on
+`DataTableContent`, `DataTablePagination`, `DataTableViewOptions` and the
+column presets, and the announcements through `DataTable`'s `messages`.
+
+## API
+
+### DataTable
+
+A `div` that holds the table for the parts inside it and its live region.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/data-table.tsx"
+  name="DataTableProps"
+/>
+
+Also accepts `div` props.
+
+### DataTableContent
+
+[Table](/docs/components/table) with the table's header and rows.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/data-table.tsx"
+  name="DataTableContentBaseProps"
+/>
+
+Also accepts [Table](/docs/components/table)'s props.
+
+### DataTablePagination
+
+The selected count, a page size select, the page and step buttons.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/data-table-pagination.tsx"
+  name="DataTablePaginationProps"
+/>
+
+Also accepts `div` props.
+
+### DataTableViewOptions
+
+A [Dropdown Menu](/docs/components/dropdown-menu) that shows and hides the
+data columns that can hide.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/data-table-view-options.tsx"
+  name="DataTableViewOptionsProps"
+/>
+
+### DataTableToolbar
+
+A `div` that lays out controls above the table, such as filters and the
+column menu, accepting `div` props.
+
+### Data attributes
+
+| Attribute   | Present when                                                                                                                                                                                                                                                                                                                             |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data-slot` | Always: `data-table`, `data-table-toolbar`, `data-table-head`, `data-table-sort`, `data-table-body`, `data-table-row`, `data-table-pagination`, `data-table-view-options` or `data-table-announcer`; `data-table-error` on the alert row above kept rows; `data-table-retry` on the visually hidden region that announces a failed retry |
