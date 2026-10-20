@@ -13,10 +13,11 @@ Before editing files for a substantial task:
 
 <!-- intent-skills:end -->
 
-# Component conventions
+# Layout and conventions
 
 Read every file whose trigger matches before acting:
 
+- Work that spans packages, touches the registry or theme pipeline, or needs the repo's layout: `ARCHITECTURE.md`
 - Writing or changing a component in `packages/ui`: `docs/best-practices/components.md`. A new component also adds stories, a registry item and a docs page, so read the other three as well.
 - Writing stories or tests: `docs/best-practices/testing.md`
 - Adding or changing items in `packages/ui/registry.json`: `docs/best-practices/registry.md`
