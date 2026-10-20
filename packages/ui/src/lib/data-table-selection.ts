@@ -90,13 +90,7 @@ export function rowSelectionOf(
 
 // The selection as text, the same whatever order its object keys came in.
 export function selectionKey(selection: DataTableSelection) {
-  return JSON.stringify(selection, (_key, value: unknown) =>
-    value !== null && typeof value === 'object' && !Array.isArray(value)
-      ? Object.fromEntries(
-          Object.entries(value).toSorted(([a], [b]) => a.localeCompare(b)),
-        )
-      : value,
-  );
+  return stableJson(selection);
 }
 
 // Whether a row is in the selection, for a row the caller knows matches
@@ -154,10 +148,22 @@ function countAllMatching(
   return shownIds.filter((id) => isPicked(id)).length;
 }
 
+// A filter value restored from a URL can come back with its keys in another
+// order, such as a range's min and max.
 function isSameMatch(a: DataTableMatch, b: DataTableMatch) {
-  return JSON.stringify(a) === JSON.stringify(b);
+  return stableJson(a) === stableJson(b);
 }
 
 function picked(selection: RowSelectionState) {
   return Object.keys(selection).filter((id) => selection[id] === true);
+}
+
+function stableJson(value: unknown) {
+  return JSON.stringify(value, (_key, part: unknown) =>
+    part !== null && typeof part === 'object' && !Array.isArray(part)
+      ? Object.fromEntries(
+          Object.entries(part).toSorted(([a], [b]) => a.localeCompare(b)),
+        )
+      : part,
+  );
 }

@@ -217,3 +217,13 @@ test('a selection matches while its filters and search do', () => {
   ).toBe(false);
   expect(isSelectionCurrent(noSelection, { search: 'ada' })).toBe(true);
 });
+
+test('a filter value restored in another key order still matches', () => {
+  const max = { max: 5 };
+  const range: DataTableSelection = {
+    all: { filters: { amount: { min: 1, ...max } } },
+    except: [],
+  };
+  const restored = { filters: { amount: { ...max, min: 1 } } };
+  expect(isSelectionCurrent(range, restored)).toBe(true);
+});
