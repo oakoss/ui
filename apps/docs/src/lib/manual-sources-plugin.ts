@@ -29,6 +29,14 @@ const files = new Map(
   ),
 );
 
+// An MDX module rendering the code highlighted, as a docs page would.
+export async function highlightedModule(code: string, title?: string) {
+  const compiled = await compile(fence(code, title), {
+    rehypePlugins: [[rehypeCode, { themes: codeThemes }]],
+  });
+  return String(compiled);
+}
+
 /**
 Serves each registry file's highlighted source as its own module, which the
 Manual tab loads on open. Pages then share one copy of each file instead of
@@ -36,7 +44,7 @@ inlining every file they install.
 */
 export function manualSourcesPlugin(): Plugin {
   return {
-    async load(this: Rollup.PluginContext, id: string) {
+    load(this: Rollup.PluginContext, id: string) {
       if (id === `\0${indexId}`) return index();
       if (!id.startsWith(`\0${sourcePrefix}`)) return null;
       const file = id.slice(`\0${sourcePrefix}`.length);
@@ -50,11 +58,7 @@ export function manualSourcesPlugin(): Plugin {
       }
       // Rebuilds the module, in dev and watch builds, when the file changes.
       this.addWatchFile(source);
-      const markdown = fence(readFileSync(source, 'utf-8'), entry.title);
-      const compiled = await compile(markdown, {
-        rehypePlugins: [[rehypeCode, { themes: codeThemes }]],
-      });
-      return String(compiled);
+      return highlightedModule(readFileSync(source, 'utf-8'), entry.title);
     },
     name: 'oakoss:manual-sources',
     resolveId(id) {
@@ -66,13 +70,14 @@ export function manualSourcesPlugin(): Plugin {
 }
 
 // A fenced block whose fence is longer than any backtick run in the code.
-function fence(code: string, title: string): string {
+function fence(code: string, title: string | undefined): string {
   const longest = Math.max(
     2,
     ...(code.match(/`+/gu) ?? []).map((run) => run.length),
   );
   const ticks = '`'.repeat(longest + 1);
-  return `${ticks}tsx title="${title}"\n${code}\n${ticks}\n`;
+  const meta = title === undefined ? '' : ` title="${title}"`;
+  return `${ticks}tsx${meta}\n${code}\n${ticks}\n`;
 }
 
 function index(): string {

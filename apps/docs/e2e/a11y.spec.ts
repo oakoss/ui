@@ -43,13 +43,21 @@ for (const colorScheme of ['light', 'dark'] as const) {
   test.describe(`${colorScheme} theme`, () => {
     test.use({ colorScheme });
 
-    // The Manual tab's sources load on open, so the page sweep never sees them.
-    test('passes color contrast on an open Manual tab', async ({ page }) => {
+    // The Manual and Code tabs' sources load on open, so the page sweep never
+    // sees them.
+    test('passes color contrast on open source tabs', async ({ page }) => {
       await gotoHydrated(page, '/docs/components/button');
       await expect(page.locator('html')).toHaveClass(themeClass[colorScheme]);
       await page.getByRole('tab', { name: 'Manual' }).click();
       await expect(
         page.getByRole('figure').filter({ hasText: 'createCn' }),
+      ).toBeVisible();
+      await page.getByRole('tab', { name: 'Code' }).first().click();
+      await expect(
+        page
+          .getByRole('tabpanel', { name: 'Code' })
+          .first()
+          .getByRole('figure'),
       ).toBeVisible();
       const { violations } = await new AxeBuilder({ page })
         .withRules(['color-contrast'])

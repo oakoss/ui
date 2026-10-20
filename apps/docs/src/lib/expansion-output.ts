@@ -28,10 +28,16 @@ export type Node = {
 /**
 Records the Markdown and search text of `expanded` in place of the authored
 `node` it replaces: the `.md` output and search records come from the
-authored source, which a generated node isn't part of.
+authored source, which a generated node isn't part of. `output` stands in
+for `expanded` there when the page loads part of it later.
 */
-export function recordExpansion(file: File, node: Node, expanded: Node): Node {
-  const shown = withoutManualSources(expanded);
+export function recordExpansion(
+  file: File,
+  node: Node,
+  expanded: Node,
+  output: Node = expanded,
+): Node {
+  const shown = withoutManualSources(output);
   recordMarkdown(file, node, markdown(shown));
   const contents = paragraphs(shown).map((paragraph) => ({
     content: markdown(withLinkText(paragraph)).trim(),

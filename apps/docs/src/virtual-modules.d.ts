@@ -10,6 +10,16 @@ declare module 'virtual:token-reference' {
   export const tokenReference: TokenReference;
 }
 
+declare module 'virtual:demo-sources' {
+  import type { MDXContent } from 'mdx/types';
+
+  // Each demo's highlighted source, keyed by its file name without `.tsx`.
+  export const demoModules: Record<
+    string,
+    () => Promise<{ default: MDXContent }>
+  >;
+}
+
 declare module 'virtual:manual-sources' {
   import type { MDXContent } from 'mdx/types';
 
