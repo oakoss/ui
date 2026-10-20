@@ -16,15 +16,18 @@ import {
   TableRow,
 } from '#/components/ui/data/table';
 import { Skeleton } from '#/components/ui/feedback/skeleton';
+import { Button } from '#/components/ui/inputs/button';
 import {
   type DataTableFeatures,
   useDataTableContext,
 } from '#/hooks/use-data-table';
+import { useClearFilters } from '#/hooks/use-data-table-filters';
 import { cn } from '#/lib/cx';
 
 export type { DataTableError } from '#/lib/data-table-status';
 
 export type DataTableBodyLabels = {
+  clearFiltersLabel?: string;
   emptyLabel?: ReactNode;
   loadingLabel?: string;
   noResultsLabel?: ReactNode;
@@ -37,7 +40,9 @@ type DataTableBodyProps = {
   status: DataTableStatus;
 } & DataTableBodyLabels;
 
+// A failed refetch keeps the rows it had, under the error.
 export function DataTableBody({
+  clearFiltersLabel = 'Clear filters',
   emptyLabel = 'No data.',
   error,
   isRefetching,
@@ -57,7 +62,7 @@ export function DataTableBody({
         {status.kind === 'failed' ? (
           <div role="alert">{error}</div>
         ) : status.kind === 'noResults' ? (
-          noResultsLabel
+          <NoResults clearLabel={clearFiltersLabel} label={noResultsLabel} />
         ) : (
           emptyLabel
         )}
@@ -143,7 +148,6 @@ function DataTableRow({
   );
 }
 
-// A failed refetch keeps the rows it had, under the error.
 function ErrorRow({ columns, error }: { columns: number; error: ReactNode }) {
   return (
     <TableRow data-slot="data-table-error">
@@ -200,5 +204,28 @@ function MessageRow({
         </TableCell>
       </TableRow>
     </TableBody>
+  );
+}
+
+function NoResults({
+  clearLabel,
+  label,
+}: {
+  clearLabel: string;
+  label: ReactNode;
+}) {
+  const clearFilters = useClearFilters();
+  return (
+    <div className="flex flex-col items-center gap-2">
+      {label}
+      <Button
+        intent="neutral"
+        onPress={(event) => clearFilters(event.target)}
+        size="sm"
+        variant="outline"
+      >
+        {clearLabel}
+      </Button>
+    </div>
   );
 }

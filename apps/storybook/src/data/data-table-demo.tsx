@@ -69,13 +69,23 @@ export const paymentColumns: DataTableColumn<Payment>[] = [
     header: 'Payment',
     meta: { isRowHeader: true },
   },
-  { accessorKey: 'status', header: 'Status' },
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    meta: {
+      options: [
+        { label: 'Paid', value: 'paid' },
+        { label: 'Pending', value: 'pending' },
+        { label: 'Failed', value: 'failed' },
+      ],
+    },
+  },
   { accessorKey: 'email', header: 'Email' },
   dateColumn<Payment>('createdAt', { header: 'Created' }),
   currencyColumn<Payment>('amount', { currency: 'USD', header: 'Amount' }),
   actionsColumn<Payment>({
     cell: (row) => (
-      <Button size="sm" variant="ghost">
+      <Button intent="neutral" size="sm" variant="ghost">
         Refund {row.original.id}
       </Button>
     ),

@@ -4952,6 +4952,11 @@
           "target": "@hooks/use-data-table.ts"
         },
         {
+          "path": "src/hooks/use-data-table-filters.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-data-table-filters.ts"
+        },
+        {
           "path": "src/hooks/use-data-table-state.ts",
           "type": "registry:hook",
           "target": "@hooks/use-data-table-state.ts"
@@ -4995,6 +5000,44 @@
           "path": "src/lib/cn-config.ts",
           "type": "registry:lib",
           "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
+      "name": "data-table-filters",
+      "type": "registry:ui",
+      "title": "Data Table Filters",
+      "description": "Filters for the Data Table: a debounced search, faceted value filters with counts, and active filter chips with Reset.",
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/badge",
+        "oakoss/ui/button",
+        "oakoss/ui/data-table",
+        "oakoss/ui/search-field",
+        "oakoss/ui/select",
+        "oakoss/ui/tag-group"
+      ],
+      "dependencies": [
+        "@tanstack/react-table@^9",
+        "cn",
+        "react-aria-components",
+        "tailwind-variants"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/data/data-table-faceted-filter.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/data-table-faceted-filter.tsx"
+        },
+        {
+          "path": "src/components/ui/data/data-table-filter-chips.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/data-table-filter-chips.tsx"
+        },
+        {
+          "path": "src/components/ui/data/data-table-search.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/data-table-search.tsx"
         }
       ]
     }

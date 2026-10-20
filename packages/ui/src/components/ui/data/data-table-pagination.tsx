@@ -167,7 +167,16 @@ function StepButton({
   label,
   ...props
 }: { label: string } & Omit<ButtonProps, 'aria-label' | 'size'>) {
+  // Steps sit 4px apart, closer than a 44px target, so neighbors would take
+  // each other's clicks.
   return (
-    <Button aria-label={label} size="icon-sm" variant="outline" {...props} />
+    <Button
+      aria-label={label}
+      intent="neutral"
+      size="icon-sm"
+      targetSize={false}
+      variant="outline"
+      {...props}
+    />
   );
 }
