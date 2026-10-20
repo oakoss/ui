@@ -49,7 +49,7 @@ export function DataTableServer() {
   });
   return (
     <DataTable className="not-prose w-full" table={table}>
-      <DataTableContent aria-label="Orders" />
+      <DataTableContent aria-label="Orders by page" />
       <DataTablePagination pageSizes={[5, 10]} />
       <p className="text-sm text-muted-foreground">
         Query:{' '}

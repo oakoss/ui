@@ -9,7 +9,10 @@ import {
 
 export function BreadcrumbEllipsisDemo() {
   return (
-    <Breadcrumb className="not-prose">
+    <Breadcrumb
+      aria-label="Breadcrumb with hidden levels"
+      className="not-prose"
+    >
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink href="/">Home</BreadcrumbLink>

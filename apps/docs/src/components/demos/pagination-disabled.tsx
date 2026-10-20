@@ -9,7 +9,7 @@ import {
 
 export function PaginationDisabled() {
   return (
-    <Pagination className="not-prose">
+    <Pagination className="not-prose" label="Pagination on the first page">
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious isDisabled />

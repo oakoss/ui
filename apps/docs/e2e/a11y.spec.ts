@@ -7,20 +7,22 @@ import { gotoHydrated } from './hydrated';
 
 const client = path.join(import.meta.dirname, '../dist/client');
 
-// Best-practice rules that flag Fumadocs' own markup, not WCAG failures.
-// Storybook still runs both on the components. Tracked in ui-dqp.18.
-const disabledRules = [
-  // Every code block is a focusable scroll region (role="region"), which
-  // keyboard scrolling needs, and an untitled block has no name to tell it
-  // apart from the next.
-  'landmark-unique',
-  // The table of contents sits outside any landmark in Fumadocs' layout.
-  'region',
-];
-
-// Only docs pages mark <html> once they hydrate.
+// Only docs pages mark <html> once they hydrate. Axe reads colors mid-fade,
+// such as the table of contents button's heading, so finite animations
+// finish first.
 async function open(page: Page, url: string) {
   await (url.startsWith('/docs/') ? gotoHydrated(page, url) : page.goto(url));
+  await page.evaluate(() =>
+    Promise.allSettled(
+      document
+        .getAnimations()
+        .filter(
+          (animation) =>
+            animation.effect?.getComputedTiming().endTime !== Infinity,
+        )
+        .map((animation) => animation.finished),
+    ),
+  );
 }
 
 // Every prerendered page, as the URL the static host serves it at.
@@ -74,9 +76,7 @@ for (const colorScheme of ['light', 'dark'] as const) {
       test(`passes axe on ${url}`, async ({ page }) => {
         await open(page, url);
         await expect(page.locator('html')).toHaveClass(themeClass[colorScheme]);
-        const { violations } = await new AxeBuilder({ page })
-          .disableRules(disabledRules)
-          .analyze();
+        const { violations } = await new AxeBuilder({ page }).analyze();
         expect(
           violations.map(
             ({ id, nodes }) =>
