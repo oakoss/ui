@@ -16,6 +16,31 @@ type PickedIds = { all?: never; except?: never; ids: readonly string[] };
 
 export const noSelection: DataTableSelection = { ids: [] };
 
+export type DataTableSelectionSummary = {
+  // Offer to select every matching row: the page is all ticked and more rows
+  // match than the selected ones the filters show.
+  canSelectAll: boolean;
+  // Selected rows a filter hides. Always 0 on a server table, which can't
+  // tell a filtered-out row from one on another page.
+  hidden: number;
+  isAllMatching: boolean;
+  isEverything: boolean;
+  matching: number;
+  selected: number;
+};
+
+// A client table holds every row and counts its shown ones; a server table
+// gives its total and holds only the page.
+type SummaryInput = {
+  isPageSelected: boolean;
+  selection: DataTableSelection;
+  // Ids of the selectable rows the filters show.
+  shownIds: readonly string[];
+} & (
+  | { loadedIds: ReadonlySet<string>; rowCount?: never }
+  | { loadedIds?: never; rowCount: number }
+);
+
 export function isAllMatching(
   selection: DataTableSelection,
 ): selection is AllMatching {
@@ -56,13 +81,68 @@ export function rowSelectionOf(
   selection: DataTableSelection,
   rowIds: readonly string[],
 ): RowSelectionState {
-  if (!isAllMatching(selection)) {
-    return Object.fromEntries(selection.ids.map((id) => [id, true]));
+  const isPicked = selectionTest(selection);
+  const ids = isAllMatching(selection)
+    ? rowIds.filter((id) => isPicked(id))
+    : selection.ids;
+  return Object.fromEntries(ids.map((id) => [id, true]));
+}
+
+// Whether a row is in the selection, for a row the caller knows matches
+// when everything matching is selected.
+export function selectionTest(
+  selection: DataTableSelection,
+): (id: string) => boolean {
+  if (isAllMatching(selection)) {
+    const except = new Set(selection.except);
+    return (id) => !except.has(id);
   }
-  const except = new Set(selection.except);
-  return Object.fromEntries(
-    rowIds.filter((id) => !except.has(id)).map((id) => [id, true]),
-  );
+  const ids = new Set(selection.ids);
+  return (id) => ids.has(id);
+}
+
+// One reading of the selection for every part, so counts can't disagree.
+export function summarizeSelection({
+  isPageSelected,
+  loadedIds,
+  rowCount,
+  selection,
+  shownIds,
+}: SummaryInput): DataTableSelectionSummary {
+  const matching = rowCount ?? shownIds.length;
+  const isAll = isAllMatching(selection);
+  // A client table holds every row, so an id it lacks is a row that's gone.
+  const picked = isAll
+    ? []
+    : selection.ids.filter(
+        (id) => loadedIds === undefined || loadedIds.has(id),
+      );
+  const selected = isAll
+    ? countAllMatching(selection, shownIds, rowCount)
+    : picked.length;
+  const shown = new Set(shownIds);
+  const hidden =
+    loadedIds === undefined ? 0 : picked.filter((id) => !shown.has(id)).length;
+  return {
+    canSelectAll: !isAll && isPageSelected && matching > selected - hidden,
+    hidden,
+    isAllMatching: isAll,
+    isEverything: isAll && selected === matching,
+    matching,
+    selected,
+  };
+}
+
+function countAllMatching(
+  selection: AllMatching,
+  shownIds: readonly string[],
+  rowCount: number | undefined,
+) {
+  if (rowCount !== undefined) {
+    return Math.max(rowCount - new Set(selection.except).size, 0);
+  }
+  const isPicked = selectionTest(selection);
+  return shownIds.filter((id) => isPicked(id)).length;
 }
 
 function isSameMatch(a: DataTableMatch, b: DataTableMatch) {

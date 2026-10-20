@@ -27,7 +27,10 @@ import {
   type DataTableMatch,
   dataTableMatch,
 } from '@oakoss/ui/lib/data-table-query';
-import { isAllMatching } from '@oakoss/ui/lib/data-table-selection';
+import {
+  isAllMatching,
+  selectionTest,
+} from '@oakoss/ui/lib/data-table-selection';
 import { useState } from 'react';
 
 import { type Payment, paymentColumns, payments } from './data-table-demo';
@@ -136,12 +139,6 @@ function DeleteBar({
   );
 }
 
-function isSelected(row: Payment, selection: DataTableSelection) {
-  return isAllMatching(selection)
-    ? matches(row, selection.all) && !selection.except.includes(row.id)
-    : selection.ids.includes(row.id);
-}
-
 // A server answers with the last page that still has rows.
 function lastPageWithRows(
   { pageIndex, pageSize }: ServerState['pagination'],
@@ -182,7 +179,12 @@ function ResultAlert({ result }: { result: Result }) {
 }
 
 function serverDelete(rows: Payment[], selection: DataTableSelection) {
-  const targets = rows.filter((row) => isSelected(row, selection));
+  const isPicked = selectionTest(selection);
+  const targets = rows.filter(
+    (row) =>
+      (!isAllMatching(selection) || matches(row, selection.all)) &&
+      isPicked(row.id),
+  );
   const failed = targets
     .filter((row) => row.status === 'paid')
     .map((row) => ({ id: row.id, reason: 'Paid payments can’t be deleted' }));

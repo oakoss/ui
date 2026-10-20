@@ -148,15 +148,10 @@ function SelectionStatus({
   onSelectAll: () => void;
   summary: DataTableSelectionSummary;
 }) {
-  const isAll = summary.isAllMatching && summary.selected === summary.matching;
-  const canSelectAll =
-    !summary.isAllMatching &&
-    summary.isPageSelected &&
-    summary.matching > summary.selected - summary.hidden;
   return (
     <>
       <p className="px-2 font-medium">
-        {isAll
+        {summary.isEverything
           ? labels.allSelectedLabel(summary.selected)
           : labels.selectedLabel(summary.selected)}
         {summary.hidden > 0 ? (
@@ -165,7 +160,7 @@ function SelectionStatus({
           </span>
         ) : null}
       </p>
-      {canSelectAll ? (
+      {summary.canSelectAll ? (
         <Button
           intent="neutral"
           onPress={onSelectAll}

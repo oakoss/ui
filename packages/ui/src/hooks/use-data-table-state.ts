@@ -15,8 +15,8 @@ import {
   type DataTableState,
   firstPageAfter,
   initialDataTableState,
+  isSelectionStale,
   nextDataTableState,
-  selectionAfter,
   withControlled,
 } from '#/lib/data-table-state';
 
@@ -48,16 +48,14 @@ export function useDataTableState(
   // Filters the app changed itself end a stale selection too: hidden at once,
   // then ended through onSelectionChange, so once applied, restoring the
   // filters can't bring it back.
-  const selection = selectionAfter(controlled);
-  const state = selection ? { ...controlled, selection } : controlled;
+  const isStale = isSelectionStale(controlled);
+  const state = isStale
+    ? { ...controlled, selection: noSelection }
+    : controlled;
   const update = useUpdate(state, setOwn, options);
-  const endRef = useLatest(() =>
+  useWhenStale(isStale, () =>
     update('selection', noSelection, options.onSelectionChange),
   );
-  const isStale = selection !== undefined;
-  useEffect(() => {
-    if (isStale) endRef.current();
-  }, [endRef, isStale]);
   const handlers = {
     onColumnFiltersChange: (updater: Updater<ColumnFiltersState>) =>
       update('columnFilters', updater, options.onColumnFiltersChange),
@@ -124,7 +122,15 @@ function useUpdate(
     apply(key, nextDataTableState(latest.current, key, updater)[key], onChange);
     const pagination = firstPageAfter(latest.current, key);
     if (pagination) apply('pagination', pagination, onPaginationChange);
-    const selection = selectionAfter(latest.current);
-    if (selection) apply('selection', selection, onSelectionChange);
+    if (isSelectionStale(latest.current)) {
+      apply('selection', noSelection, onSelectionChange);
+    }
   };
+}
+
+function useWhenStale(isStale: boolean, end: () => void) {
+  const endRef = useLatest(end);
+  useEffect(() => {
+    if (isStale) endRef.current();
+  }, [endRef, isStale]);
 }

@@ -7,19 +7,14 @@ import {
 import { dataTableMatch } from '#/lib/data-table-query';
 import {
   type DataTableSelection,
+  type DataTableSelectionSummary,
   isAllMatching,
   noSelection,
+  selectionTest,
+  summarizeSelection,
 } from '#/lib/data-table-selection';
 
-export type DataTableSelectionSummary = {
-  // Selected rows a filter hides. Client tables only: a server table can't
-  // tell a filtered-out row from one on another page.
-  hidden: number;
-  isAllMatching: boolean;
-  isPageSelected: boolean;
-  matching: number;
-  selected: number;
-};
+export type { DataTableSelectionSummary } from '#/lib/data-table-selection';
 
 // The selected rows a client table holds, for an action to act on. A server
 // table's action sends the selection instead.
@@ -28,11 +23,12 @@ export function selectedRows<TData extends RowData>(
 ): TData[] {
   const selection = selectionOf(table);
   if (isAllMatching(selection)) {
-    const except = new Set(selection.except);
+    const isSelected = selectionTest(selection);
     return selectableRows(table)
-      .filter((row) => !except.has(row.id))
+      .filter((row) => isSelected(row.id))
       .map((row) => row.original);
   }
+  // Picked rows come back in the order they were picked.
   const { rowsById } = table.getCoreRowModel();
   return selection.ids.flatMap((id) => {
     const row = rowsById[id];
@@ -40,43 +36,19 @@ export function selectedRows<TData extends RowData>(
   });
 }
 
-// One reading of the selection for every part, so counts can't disagree.
 export function selectionSummary<TData extends RowData>(
   table: DataTableInstance<TData>,
 ): DataTableSelectionSummary {
-  const selection = selectionOf(table);
-  const isServer = table.options.manualFiltering === true;
-  const rows = selectableRows(table);
-  const matching = isServer ? table.getRowCount() : rows.length;
-  const none = {
-    hidden: 0,
-    isAllMatching: false,
-    isPageSelected: false,
-    matching,
-    selected: 0,
-  };
-  if (table.options.enableRowSelection === false) return none;
-  const isPageSelected = table.getIsAllPageRowsSelected();
-  if (isAllMatching(selection)) {
-    const except = new Set(selection.except);
-    const selected = isServer
-      ? Math.max(matching - except.size, 0)
-      : rows.filter((row) => !except.has(row.id)).length;
-    return { ...none, isAllMatching: true, isPageSelected, selected };
-  }
-  const shown = new Set(rows.map((row) => row.id));
-  const loaded = table.getCoreRowModel().rowsById;
-  // A client table holds every row, so an id it lacks is a row that's gone;
-  // a server table's other pages aren't loaded.
-  const ids = isServer
-    ? selection.ids
-    : selection.ids.filter((id) => Object.hasOwn(loaded, id));
-  return {
-    ...none,
-    hidden: ids.filter((id) => !isServer && !shown.has(id)).length,
-    isPageSelected,
-    selected: ids.length,
-  };
+  const isOff = table.options.enableRowSelection === false;
+  const loaded = Object.keys(table.getCoreRowModel().rowsById);
+  return summarizeSelection({
+    isPageSelected: table.getIsAllPageRowsSelected(),
+    selection: isOff ? noSelection : selectionOf(table),
+    shownIds: selectableRows(table).map((row) => row.id),
+    ...(table.options.manualFiltering === true
+      ? { rowCount: table.getRowCount() }
+      : { loadedIds: new Set(loaded) }),
+  });
 }
 
 export function useDataTableSelection() {

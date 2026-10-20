@@ -47,6 +47,12 @@ export function firstPageAfter(
     : undefined;
 }
 
+// A selection of everything matching ends once the filters or search no
+// longer match what it was made under.
+export function isSelectionStale(state: DataTableState) {
+  return !isSelectionCurrent(state.selection, dataTableMatch(state));
+}
+
 export function nextDataTableState<K extends keyof DataTableState>(
   state: DataTableState,
   key: K,
@@ -56,16 +62,6 @@ export function nextDataTableState<K extends keyof DataTableState>(
   const next = { ...state, [key]: value };
   const pagination = firstPageAfter(state, key);
   return pagination ? { ...next, pagination } : next;
-}
-
-// A selection of everything matching ends once the filters or search no
-// longer match what it was made under.
-export function selectionAfter(
-  state: DataTableState,
-): DataTableSelection | undefined {
-  return isSelectionCurrent(state.selection, dataTableMatch(state))
-    ? undefined
-    : noSelection;
 }
 
 export function withControlled(

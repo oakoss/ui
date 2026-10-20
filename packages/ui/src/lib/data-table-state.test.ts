@@ -4,8 +4,8 @@ import {
   type DataTableState,
   firstPageAfter,
   initialDataTableState,
+  isSelectionStale,
   nextDataTableState,
-  selectionAfter,
   withControlled,
 } from '#/lib/data-table-state';
 
@@ -90,23 +90,19 @@ const allPaid: DataTableState = {
 };
 
 test('a selection of everything matching ends with its filters', () => {
-  expect(selectionAfter(allPaid)).toBeUndefined();
-  expect(selectionAfter({ ...allPaid, columnFilters: [] })).toEqual({
-    ids: [],
-  });
-  expect(selectionAfter({ ...allPaid, globalFilter: 'ada' })).toEqual({
-    ids: [],
-  });
+  expect(isSelectionStale(allPaid)).toBe(false);
+  expect(isSelectionStale({ ...allPaid, columnFilters: [] })).toBe(true);
+  expect(isSelectionStale({ ...allPaid, globalFilter: 'ada' })).toBe(true);
 });
 
 test('order and page keep a selection of everything matching', () => {
   const sorted = { ...allPaid, sorting: [{ desc: true, id: 'amount' }] };
   const paged = { ...allPaid, pagination: { pageIndex: 3, pageSize: 10 } };
-  expect(selectionAfter(sorted)).toBeUndefined();
-  expect(selectionAfter(paged)).toBeUndefined();
+  expect(isSelectionStale(sorted)).toBe(false);
+  expect(isSelectionStale(paged)).toBe(false);
 });
 
 test('picked ids stay through a filter change', () => {
   const picked = { ...allPaid, selection: { ids: ['a', 'b'] } };
-  expect(selectionAfter({ ...picked, columnFilters: [] })).toBeUndefined();
+  expect(isSelectionStale({ ...picked, columnFilters: [] })).toBe(false);
 });

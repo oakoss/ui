@@ -24,6 +24,7 @@ import {
   type DataTableState,
   useDataTable,
 } from '@oakoss/ui/hooks/use-data-table';
+import { selectionTest } from '@oakoss/ui/lib/data-table-selection';
 import { useState } from 'react';
 
 type Invoice = { id: string; status: 'draft' | 'sent' };
@@ -130,12 +131,12 @@ function DeleteBar({
 // "all" means every invoice matching it apart from the exceptions, and it
 // refuses sent invoices.
 function deleteInvoices(rows: Invoice[], selection: DataTableSelection) {
-  const targets =
+  const pool =
     selection.all === undefined
-      ? rows.filter((row) => selection.ids.includes(row.id))
-      : search(rows, selection.all.search ?? '').filter(
-          (row) => !selection.except.includes(row.id),
-        );
+      ? rows
+      : search(rows, selection.all.search ?? '');
+  const isPicked = selectionTest(selection);
+  const targets = pool.filter((row) => isPicked(row.id));
   return {
     deleted: targets
       .filter((row) => row.status === 'draft')
