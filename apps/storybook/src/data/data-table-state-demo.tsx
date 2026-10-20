@@ -5,6 +5,7 @@ import {
   DataTableContent,
   DataTableToolbar,
 } from '@oakoss/ui/components/ui/data/data-table';
+import { DataTableActionBar } from '@oakoss/ui/components/ui/data/data-table-action-bar';
 import { DataTablePagination } from '@oakoss/ui/components/ui/data/data-table-pagination';
 import { Button } from '@oakoss/ui/components/ui/inputs/button';
 import {
@@ -71,6 +72,7 @@ export function StateTable({
         isLoading={data.length === 0}
         linkedRowId={linked}
       />
+      <DataTableActionBar />
       <DataTablePagination />
     </DataTable>
   );

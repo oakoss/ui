@@ -7,13 +7,16 @@ import type {
   Updater,
 } from '@tanstack/react-table';
 
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
+import { useLatest } from '#/hooks/use-latest';
+import { nextSelection, noSelection } from '#/lib/data-table-selection';
 import {
   type DataTableState,
   firstPageAfter,
   initialDataTableState,
   nextDataTableState,
+  selectionAfter,
   withControlled,
 } from '#/lib/data-table-state';
 
@@ -32,13 +35,29 @@ type SliceOptions = {
 
 // Each slice is the consumer's when they pass it in `state`, and the hook's
 // own otherwise; either way their change handler hears the new value.
-export function useDataTableState(options: SliceOptions) {
+// `rowIds` are the loaded rows', which TanStack's selection covers.
+export function useDataTableState(
+  options: SliceOptions,
+  rowIds: readonly string[],
+) {
   const [own, setOwn] = useState<DataTableState>(() => ({
     ...initialDataTableState,
     ...options.defaultState,
   }));
-  const state = withControlled(own, options.state);
-  const update = useUpdate(state, setOwn, options.onPaginationChange);
+  const controlled = withControlled(own, options.state);
+  // Filters the app changed itself end a stale selection too: hidden at once,
+  // then ended through onSelectionChange, so once applied, restoring the
+  // filters can't bring it back.
+  const selection = selectionAfter(controlled);
+  const state = selection ? { ...controlled, selection } : controlled;
+  const update = useUpdate(state, setOwn, options);
+  const endRef = useLatest(() =>
+    update('selection', noSelection, options.onSelectionChange),
+  );
+  const isStale = selection !== undefined;
+  useEffect(() => {
+    if (isStale) endRef.current();
+  }, [endRef, isStale]);
   const handlers = {
     onColumnFiltersChange: (updater: Updater<ColumnFiltersState>) =>
       update('columnFilters', updater, options.onColumnFiltersChange),
@@ -55,7 +74,13 @@ export function useDataTableState(options: SliceOptions) {
     onPaginationChange: (updater: Updater<PaginationState>) =>
       update('pagination', updater, options.onPaginationChange),
     onRowSelectionChange: (updater: Updater<RowSelectionState>) =>
-      update('rowSelection', updater, options.onRowSelectionChange),
+      update(
+        'selection',
+        (previous) => nextSelection(previous, rowIds, updater),
+        options.onSelectionChange,
+      ),
+    onSelectionChange: (updater: Updater<DataTableState['selection']>) =>
+      update('selection', updater, options.onSelectionChange),
     onSortingChange: (updater: Updater<SortingState>) =>
       update('sorting', updater, options.onSortingChange),
   };
@@ -69,7 +94,10 @@ export function useDataTableState(options: SliceOptions) {
 function useUpdate(
   state: DataTableState,
   setOwn: (update: (own: DataTableState) => DataTableState) => void,
-  onPaginationChange: DataTableChangeHandlers['onPaginationChange'],
+  {
+    onPaginationChange,
+    onSelectionChange,
+  }: Pick<DataTableChangeHandlers, 'onPaginationChange' | 'onSelectionChange'>,
 ) {
   const latest = useRef(state);
   useLayoutEffect(() => {
@@ -86,8 +114,8 @@ function useUpdate(
     onChange?.(value);
   }
 
-  // The reset reads the state after `onChange`, which may have changed the
-  // pagination itself.
+  // The resets read the state after `onChange`, which may have changed the
+  // pagination or selection itself.
   return function update<K extends keyof DataTableState>(
     key: K,
     updater: Updater<DataTableState[K]>,
@@ -96,5 +124,7 @@ function useUpdate(
     apply(key, nextDataTableState(latest.current, key, updater)[key], onChange);
     const pagination = firstPageAfter(latest.current, key);
     if (pagination) apply('pagination', pagination, onPaginationChange);
+    const selection = selectionAfter(latest.current);
+    if (selection) apply('selection', selection, onSelectionChange);
   };
 }

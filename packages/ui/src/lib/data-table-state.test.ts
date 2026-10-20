@@ -5,6 +5,7 @@ import {
   firstPageAfter,
   initialDataTableState,
   nextDataTableState,
+  selectionAfter,
   withControlled,
 } from '#/lib/data-table-state';
 
@@ -30,7 +31,7 @@ test.each(['columnFilters', 'globalFilter', 'sorting'] as const)(
   },
 );
 
-test.each(['columnVisibility', 'rowSelection'] as const)(
+test.each(['columnVisibility', 'selection'] as const)(
   'a %s change keeps the page',
   (key) => {
     const next = nextDataTableState(onPage3, key, initialDataTableState[key]);
@@ -44,15 +45,17 @@ test('a sort on the first page keeps the same pagination', () => {
 });
 
 test('changes applied in turn build on each other', () => {
-  const first = nextDataTableState(onPage3, 'rowSelection', (selection) => ({
-    ...selection,
-    a: true,
-  }));
-  const second = nextDataTableState(first, 'rowSelection', (selection) => ({
-    ...selection,
-    b: true,
-  }));
-  expect(second.rowSelection).toEqual({ a: true, b: true });
+  const first = nextDataTableState(
+    onPage3,
+    'globalFilter',
+    (value) => `${value}a`,
+  );
+  const second = nextDataTableState(
+    first,
+    'globalFilter',
+    (value) => `${value}b`,
+  );
+  expect(second.globalFilter).toBe('ab');
 });
 
 test('only a reset slice moves the page, after the change', () => {
@@ -60,7 +63,7 @@ test('only a reset slice moves the page, after the change', () => {
     pageIndex: 0,
     pageSize: 10,
   });
-  expect(firstPageAfter(onPage3, 'rowSelection')).toBeUndefined();
+  expect(firstPageAfter(onPage3, 'selection')).toBeUndefined();
   expect(firstPageAfter(onPage3, 'pagination')).toBeUndefined();
   expect(firstPageAfter(initialDataTableState, 'sorting')).toBeUndefined();
 });
@@ -71,11 +74,39 @@ test('every controlled slice wins while defined, even when empty', () => {
     columnVisibility: { email: false },
     globalFilter: 'abc',
     pagination: { pageIndex: 2, pageSize: 10 },
-    rowSelection: { a: true },
+    selection: { ids: ['a'] },
     sorting: [{ desc: false, id: 'amount' }],
   };
   expect(withControlled(own, initialDataTableState)).toEqual(
     initialDataTableState,
   );
   expect(withControlled(own, { globalFilter: undefined })).toEqual(own);
+});
+
+const allPaid: DataTableState = {
+  ...initialDataTableState,
+  columnFilters: [{ id: 'status', value: ['paid'] }],
+  selection: { all: { filters: { status: ['paid'] } }, except: ['a'] },
+};
+
+test('a selection of everything matching ends with its filters', () => {
+  expect(selectionAfter(allPaid)).toBeUndefined();
+  expect(selectionAfter({ ...allPaid, columnFilters: [] })).toEqual({
+    ids: [],
+  });
+  expect(selectionAfter({ ...allPaid, globalFilter: 'ada' })).toEqual({
+    ids: [],
+  });
+});
+
+test('order and page keep a selection of everything matching', () => {
+  const sorted = { ...allPaid, sorting: [{ desc: true, id: 'amount' }] };
+  const paged = { ...allPaid, pagination: { pageIndex: 3, pageSize: 10 } };
+  expect(selectionAfter(sorted)).toBeUndefined();
+  expect(selectionAfter(paged)).toBeUndefined();
+});
+
+test('picked ids stay through a filter change', () => {
+  const picked = { ...allPaid, selection: { ids: ['a', 'b'] } };
+  expect(selectionAfter({ ...picked, columnFilters: [] })).toBeUndefined();
 });

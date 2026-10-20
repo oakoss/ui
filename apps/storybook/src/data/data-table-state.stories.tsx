@@ -199,7 +199,7 @@ export const NumberRangeFilter: Story = {
 export const TwoChangesInOneEvent: Story = {
   play: async ({ canvas }) => {
     await userEvent.click(canvas.getByRole('button', { name: 'Select two' }));
-    await expect(canvas.getByText('2 of 25 selected')).toBeVisible();
+    await expect(canvas.getByText('2 selected')).toBeVisible();
   },
 };
 

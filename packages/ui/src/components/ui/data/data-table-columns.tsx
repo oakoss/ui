@@ -203,7 +203,9 @@ function RowCheckbox<TData extends RowData>({
       aria-label={label}
       className={cn(raised)}
       isDisabled={!row.getCanSelect()}
-      isSelected={table.state.rowSelection[row.id] === true}
+      isSelected={
+        row.getCanSelect() && table.state.rowSelection[row.id] === true
+      }
       onChange={(checked) =>
         row.getToggleSelectedHandler()({
           shiftKey: shiftRef.current,

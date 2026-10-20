@@ -7,14 +7,15 @@ import {
   type DataTableInstance,
   defaultPageLabel,
   pageOf,
-  selectedCount,
   useDataTableContext,
 } from '#/hooks/use-data-table';
+import { selectionSummary } from '#/hooks/use-data-table-selection';
 
 export type DataTableMessages = {
   page: (page: number, pageCount: number) => string;
   results: (count: number) => string;
   selected: (count: number) => string;
+  selectionCleared: string;
   sorted: (column: string, direction: 'ascending' | 'descending') => string;
   unsorted: string;
 };
@@ -26,6 +27,7 @@ const defaultMessages: DataTableMessages = {
   results: (count) => `${String(count)} ${count === 1 ? 'result' : 'results'}`,
   selected: (count) =>
     `${String(count)} ${count === 1 ? 'row' : 'rows'} selected`,
+  selectionCleared: 'Selection cleared',
   sorted: (column, direction) => `Sorted by ${column}, ${direction}`,
   unsorted: 'Sorting cleared',
 };
@@ -73,7 +75,15 @@ function describe(
     const { page, pageCount } = pageOf(table);
     parts.push(text.page(page, pageCount));
   }
-  if (changed.has('selected')) parts.push(text.selected(current.selected));
+  // A filter change that ends a selection of everything matching says so
+  // after the new results.
+  if (changed.has('selected')) {
+    parts.push(
+      current.selected === 0
+        ? text.selectionCleared
+        : text.selected(current.selected),
+    );
+  }
   return parts.join('. ');
 }
 
@@ -82,7 +92,7 @@ function snapshotOf(table: DataTableInstance<RowData>) {
   return {
     page: `${String(pagination.pageIndex)}/${String(table.getPageCount())}`,
     results: table.getRowCount(),
-    selected: selectedCount(table),
+    selected: selectionSummary(table).selected,
     sorting: JSON.stringify(sorting),
   };
 }

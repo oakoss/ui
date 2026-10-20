@@ -24,13 +24,13 @@ import {
   type RowData,
   rowPaginationFeature,
   rowSelectionFeature,
-  type RowSelectionState,
   rowSortingFeature,
   sortFn_alphanumeric,
   sortFn_basic,
   sortFn_datetime,
   sortFn_text,
   tableFeatures,
+  type Updater,
   useTable,
 } from '@tanstack/react-table';
 import { createContext, type ReactNode, use, useEffect, useMemo } from 'react';
@@ -41,8 +41,13 @@ import {
   useDataTableState,
 } from '#/hooks/use-data-table-state';
 import { useLatest } from '#/hooks/use-latest';
+import {
+  type DataTableSelection,
+  rowSelectionOf,
+} from '#/lib/data-table-selection';
 
 export type { DataTableState } from '#/hooks/use-data-table-state';
+export type { DataTableSelection } from '#/lib/data-table-selection';
 
 export type DataTableColumnMeta = {
   align?: 'center' | 'end' | 'start';
@@ -53,6 +58,13 @@ export type DataTableColumnMeta = {
   // keeps rows whose value equals a picked one, unless it names its own
   // filterFn, which receives the picked values as strings.
   options?: readonly DataTableOption[];
+};
+
+// The selection lives beside TanStack's state, which holds only the loaded
+// rows' part of it.
+export type DataTableMeta = {
+  onSelectionChange: (updater: Updater<DataTableSelection>) => void;
+  selection: DataTableSelection;
 };
 
 export type DataTableOption = {
@@ -102,6 +114,7 @@ export const dataTableFeatures = tableFeatures({
     datetime: sortFn_datetime,
     text: sortFn_text,
   },
+  tableMeta: metaHelper<DataTableMeta>(),
 });
 
 // A table's row type can't widen to a general one, so the context holds it
@@ -174,39 +187,37 @@ export function pageOf(table: DataTableInstance<RowData>) {
   return { page, pageCount };
 }
 
-// Selection kept in state while selecting is off isn't a selection.
-export function selectedCount(table: {
-  options: { enableRowSelection?: unknown };
-  state: { rowSelection: RowSelectionState };
-}) {
-  return table.options.enableRowSelection === false
-    ? 0
-    : Object.keys(table.state.rowSelection).length;
-}
-
 export function useDataTable<TData extends RowData>(
   options: UseDataTableOptions<TData>,
 ): DataTableInstance<TData> {
-  const { handlers, state } = useDataTableState(options);
+  const { data, getRowId } = options;
+  const rowIds = useMemo(
+    () => data.map((row, index) => getRowId?.(row, index) ?? String(index)),
+    [data, getRowId],
+  );
+  const { handlers, state } = useDataTableState(options, rowIds);
   const isServer = options.mode === 'server';
   const columns = useMemo(
     () => options.columns.map((column) => withOptionsFilter(column)),
     [options.columns],
   );
+  const { onSelectionChange, ...tableHandlers } = handlers;
+  const { selection, ...tableState } = state;
   const table = useTable({
-    ...handlers,
+    ...tableHandlers,
     autoResetPageIndex: false,
     columns,
-    data: options.data,
+    data,
     enableRowSelection: options.enableRowSelection ?? false,
     features: dataTableFeatures,
-    getRowId: options.getRowId,
+    getRowId,
     manualFiltering: isServer,
     manualPagination: isServer,
     manualSorting: isServer,
+    meta: { onSelectionChange, selection },
     rowCount: options.mode === 'server' ? options.rowCount : undefined,
     sortDescFirst: false,
-    state,
+    state: { ...tableState, rowSelection: rowSelectionOf(selection, rowIds) },
   });
   usePageInRange(table, isServer);
   return table;

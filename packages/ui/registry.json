@@ -4893,7 +4893,7 @@
       "name": "data-table",
       "type": "registry:ui",
       "title": "Data Table",
-      "description": "Table on TanStack Table with sorting by one or several columns, page and range selection, pagination, a column menu, loading, empty and error states, live announcements, server mode and column presets for numbers, currency, dates, row links and actions.",
+      "description": "Table on TanStack Table with sorting by one or several columns, page and range selection, selecting every row a filter matches, a sticky action bar for bulk actions, pagination, a column menu, loading, empty and error states, live announcements, server mode and column presets for numbers, currency, dates, row links and actions.",
       "registryDependencies": [
         "oakoss/ui/theme",
         "oakoss/ui/button",
@@ -4915,6 +4915,11 @@
           "path": "src/components/ui/data/data-table.tsx",
           "type": "registry:ui",
           "target": "@ui/data/data-table.tsx"
+        },
+        {
+          "path": "src/components/ui/data/data-table-action-bar.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/data-table-action-bar.tsx"
         },
         {
           "path": "src/components/ui/data/data-table-announcer.tsx",
@@ -4957,6 +4962,11 @@
           "target": "@hooks/use-data-table-filters.ts"
         },
         {
+          "path": "src/hooks/use-data-table-selection.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-data-table-selection.ts"
+        },
+        {
           "path": "src/hooks/use-data-table-state.ts",
           "type": "registry:hook",
           "target": "@hooks/use-data-table-state.ts"
@@ -4970,6 +4980,11 @@
           "path": "src/lib/data-table-query.ts",
           "type": "registry:lib",
           "target": "@lib/data-table-query.ts"
+        },
+        {
+          "path": "src/lib/data-table-selection.ts",
+          "type": "registry:lib",
+          "target": "@lib/data-table-selection.ts"
         },
         {
           "path": "src/lib/data-table-state.ts",

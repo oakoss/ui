@@ -4,6 +4,7 @@ description: A table that sorts, selects and pages through data, on TanStack Tab
 item: data-table
 ---
 
+import { DataTableBulkActions } from '#/components/demos/data-table-bulk-actions';
 import { DataTableDemo } from '#/components/demos/data-table-demo';
 import { DataTableFilters } from '#/components/demos/data-table-filters';
 import { DataTableServer } from '#/components/demos/data-table-server';
@@ -24,6 +25,7 @@ import {
   DataTableContent,
   DataTableToolbar,
 } from '#/components/ui/data/data-table';
+import { DataTableActionBar } from '#/components/ui/data/data-table-action-bar';
 import {
   currencyColumn,
   selectionColumn,
@@ -51,6 +53,7 @@ function Payments({ payments }: { payments: Payment[] }) {
         <DataTableViewOptions />
       </DataTableToolbar>
       <DataTableContent aria-label="Payments" />
+      <DataTableActionBar />
       <DataTablePagination />
     </DataTable>
   );
@@ -63,7 +66,7 @@ and `DataTable` hands it to every part inside, so the parts compose in any
 layout. Keep `columns` outside the component, or memoize them: a new array
 each render rebuilds the rows.
 
-Each state slice (`sorting`, `pagination`, `rowSelection`, `columnVisibility`,
+Each state slice (`sorting`, `pagination`, `selection`, `columnVisibility`,
 `columnFilters` and `globalFilter`) is the hook's own until you pass it in
 `state`, and its change handler (`onSortingChange` and so on) hears every
 change either way. That's how a slice moves into the URL or a store. Set
@@ -149,6 +152,30 @@ search or a facet, not both.
   <DataTableFilters />
 </ComponentPreview>
 
+### Selection and bulk actions
+
+`DataTableActionBar` appears while rows are selected, with the count, Clear,
+and the actions you pass as children. It sits after the table and sticks to
+the bottom of the screen, so ticking the first row moves only what follows.
+Once a page's rows are all ticked and more rows match, it offers to select
+every matching row; a server table counts those from `rowCount`. A new filter
+or search ends that selection, while sorting and paging keep it. A client
+table notes selected rows a filter hides; a server table can't tell those
+from rows on another page.
+
+The `selection` slice is `{ ids }`, or `{ all, except }` for every row
+matching `all`, the filters and search it was made under, apart from the
+`except` ids. A server action receives the selection and applies `all` when
+it runs, so it acts on the rows matching then; its own rules decide which
+rows it may change, as `enableRowSelection` does on the page. A client action
+reads the rows with `selectedRows(table)`. Confirm a destructive action with
+the count in an [Alert Dialog](/docs/components/alert-dialog), which focuses
+Cancel, and keep the rows that failed selected:
+
+<ComponentPreview name="data-table-bulk-actions">
+  <DataTableBulkActions />
+</ComponentPreview>
+
 ### Linking to a row
 
 `linkedRowId` marks the row a link points to, such as `?payment=PAY-014` in
@@ -171,7 +198,12 @@ allows on one header at a time; later ones show their place in the order.
 
 Selected rows carry `aria-selected` and their checkbox is checked. Shift with
 a click or Space selects the range from the last row pressed. The header box
-selects the page's rows, and reads mixed while only some are selected.
+selects the page's rows, and reads mixed while only some are selected. The
+action bar is a [toolbar](https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/)
+named "Selected rows", after the table in the reading order; `Escape` inside
+it clears the selection. When it goes, focus left in it moves to the header
+box, or with no rows left, to the table's first control. Controls in the table keep a bottom scroll margin, so focus scrolled
+into view stays clear of the bar.
 
 While a page holds part of the result, the table carries `aria-rowcount` and
 each row `aria-rowindex`, so screen readers say where a row sits in the
@@ -200,10 +232,13 @@ no-results state, moves focus to the search field.
 | `Arrow Up` / `Down`    | In a faceted filter's list, moves between options  |
 | `Enter` or `Space`     | In a faceted filter's list, chooses or clears one  |
 | `Delete` / `Backspace` | On an active filter, removes it                    |
+| `Arrow Left` / `Right` | In the action bar, moves between its controls      |
+| `Escape`               | In the action bar, clears the selection            |
 
 Every string is a prop with an English default: the labels on
-`DataTableContent`, `DataTablePagination`, `DataTableViewOptions` and the
-column presets, and the announcements through `DataTable`'s `messages`.
+`DataTableContent`, `DataTableActionBar`, `DataTablePagination`,
+`DataTableViewOptions` and the column presets, and the announcements through
+`DataTable`'s `messages`.
 
 ## API
 
@@ -233,9 +268,24 @@ Also accepts `div` props.
 
 Also accepts [Table](/docs/components/table)'s props.
 
+### DataTableActionBar
+
+A React Aria [Toolbar](https://react-aria.adobe.com/Toolbar) with the
+selected count, Clear and your actions; it renders nothing while nothing is
+selected. `children` can be a function of the selection and its counts.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/data-table-action-bar.tsx"
+  name="DataTableActionBarProps"
+/>
+
+Also accepts React Aria Toolbar's props.
+
 ### DataTablePagination
 
-The selected count, a page size select, the page and step buttons.
+A page size select, the page and step buttons.
 
 #### Props
 
@@ -307,6 +357,6 @@ Also accepts `div` props.
 
 ### Data attributes
 
-| Attribute   | Present when                                                                                                                                                                                                                                                                                                                                                                                     |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `data-slot` | Always: `data-table`, `data-table-toolbar`, `data-table-head`, `data-table-sort`, `data-table-body`, `data-table-row`, `data-table-pagination`, `data-table-view-options`, `data-table-announcer`, `data-table-faceted-filter` or `data-table-filter-chips`; `data-table-error` on the alert row above kept rows; `data-table-retry` on the visually hidden region that announces a failed retry |
+| Attribute   | Present when                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data-slot` | Always: `data-table`, `data-table-toolbar`, `data-table-head`, `data-table-sort`, `data-table-body`, `data-table-row`, `data-table-action-bar`, `data-table-action-bar-clear`, `data-table-pagination`, `data-table-view-options`, `data-table-announcer`, `data-table-faceted-filter` or `data-table-filter-chips`; `data-table-error` on the alert row above kept rows; `data-table-retry` on the visually hidden region that announces a failed retry |

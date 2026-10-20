@@ -3,6 +3,7 @@ import {
   DataTableContent,
   DataTableToolbar,
 } from '@oakoss/ui/components/ui/data/data-table';
+import { DataTableActionBar } from '@oakoss/ui/components/ui/data/data-table-action-bar';
 import {
   actionsColumn,
   currencyColumn,
@@ -77,6 +78,7 @@ export function DataTableDemo() {
         <DataTableViewOptions />
       </DataTableToolbar>
       <DataTableContent aria-label="Payments" />
+      <DataTableActionBar />
       <DataTablePagination pageSizes={[5, 10]} />
     </DataTable>
   );

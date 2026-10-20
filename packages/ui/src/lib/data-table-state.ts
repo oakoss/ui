@@ -2,17 +2,23 @@ import type {
   ColumnFiltersState,
   ColumnVisibilityState,
   PaginationState,
-  RowSelectionState,
   SortingState,
   Updater,
 } from '@tanstack/react-table';
+
+import { dataTableMatch } from '#/lib/data-table-query';
+import {
+  type DataTableSelection,
+  isSelectionCurrent,
+  noSelection,
+} from '#/lib/data-table-selection';
 
 export type DataTableState = {
   columnFilters: ColumnFiltersState;
   columnVisibility: ColumnVisibilityState;
   globalFilter: string;
   pagination: PaginationState;
-  rowSelection: RowSelectionState;
+  selection: DataTableSelection;
   sorting: SortingState;
 };
 
@@ -21,7 +27,7 @@ export const initialDataTableState: DataTableState = {
   columnVisibility: {},
   globalFilter: '',
   pagination: { pageIndex: 0, pageSize: 10 },
-  rowSelection: {},
+  selection: noSelection,
   sorting: [],
 };
 
@@ -52,6 +58,16 @@ export function nextDataTableState<K extends keyof DataTableState>(
   return pagination ? { ...next, pagination } : next;
 }
 
+// A selection of everything matching ends once the filters or search no
+// longer match what it was made under.
+export function selectionAfter(
+  state: DataTableState,
+): DataTableSelection | undefined {
+  return isSelectionCurrent(state.selection, dataTableMatch(state))
+    ? undefined
+    : noSelection;
+}
+
 export function withControlled(
   own: DataTableState,
   controlled: Partial<DataTableState> = {},
@@ -61,7 +77,7 @@ export function withControlled(
     columnVisibility: controlled.columnVisibility ?? own.columnVisibility,
     globalFilter: controlled.globalFilter ?? own.globalFilter,
     pagination: controlled.pagination ?? own.pagination,
-    rowSelection: controlled.rowSelection ?? own.rowSelection,
+    selection: controlled.selection ?? own.selection,
     sorting: controlled.sorting ?? own.sorting,
   };
 }
