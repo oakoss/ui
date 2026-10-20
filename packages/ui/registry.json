@@ -4888,6 +4888,105 @@
           "target": "@lib/cn-config.ts"
         }
       ]
+    },
+    {
+      "name": "data-table",
+      "type": "registry:ui",
+      "title": "Data Table",
+      "description": "Table on TanStack Table with sorting by one or several columns, page and range selection, pagination, a column menu, loading, empty and error states, live announcements, server mode and column presets for numbers, currency, dates, row links and actions.",
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/button",
+        "oakoss/ui/checkbox",
+        "oakoss/ui/dropdown-menu",
+        "oakoss/ui/field",
+        "oakoss/ui/select",
+        "oakoss/ui/skeleton",
+        "oakoss/ui/table"
+      ],
+      "dependencies": [
+        "@tanstack/react-table@^9",
+        "cn",
+        "react-aria-components",
+        "tailwind-variants"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/data/data-table.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/data-table.tsx"
+        },
+        {
+          "path": "src/components/ui/data/data-table-announcer.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/data-table-announcer.tsx"
+        },
+        {
+          "path": "src/components/ui/data/data-table-body.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/data-table-body.tsx"
+        },
+        {
+          "path": "src/components/ui/data/data-table-columns.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/data-table-columns.tsx"
+        },
+        {
+          "path": "src/components/ui/data/data-table-header.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/data-table-header.tsx"
+        },
+        {
+          "path": "src/components/ui/data/data-table-pagination.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/data-table-pagination.tsx"
+        },
+        {
+          "path": "src/components/ui/data/data-table-view-options.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/data-table-view-options.tsx"
+        },
+        {
+          "path": "src/hooks/use-data-table.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-data-table.ts"
+        },
+        {
+          "path": "src/hooks/use-data-table-state.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-data-table-state.ts"
+        },
+        {
+          "path": "src/hooks/use-latest.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-latest.ts"
+        },
+        {
+          "path": "src/lib/data-table-query.ts",
+          "type": "registry:lib",
+          "target": "@lib/data-table-query.ts"
+        },
+        {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
     }
   ]
 }
