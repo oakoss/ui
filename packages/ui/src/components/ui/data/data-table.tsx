@@ -31,6 +31,7 @@ import {
 import { DataTableClearsContext } from '#/hooks/use-data-table-filters';
 import { useLatest } from '#/hooks/use-latest';
 import { cn } from '#/lib/cx';
+import { headerCells } from '#/lib/data-table-headers';
 import {
   type DataTableError,
   dataTableStatus,
@@ -144,16 +145,17 @@ export function DataTableToolbar({
 }
 
 function DataTableHeader({ isPartial }: { isPartial: boolean }) {
-  const table = useDataTableContext();
+  const groups = useDataTableContext().getHeaderGroups();
+  const rows = headerCells(groups.map((group) => group.headers));
   return (
     <TableHeader>
-      {table.getHeaderGroups().map((group, index) => (
+      {groups.map((group, index) => (
         <TableRow
           aria-rowindex={isPartial ? index + 1 : undefined}
           key={group.id}
         >
-          {group.headers.map((header) => (
-            <DataTableHead header={header} key={header.id} />
+          {rows[index]?.map(({ header, rowSpan }) => (
+            <DataTableHead header={header} key={header.id} rowSpan={rowSpan} />
           ))}
         </TableRow>
       ))}
