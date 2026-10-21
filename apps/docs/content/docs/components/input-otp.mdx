@@ -1,0 +1,192 @@
+---
+title: Input OTP
+description: A field for one-time codes, typed or pasted one character per slot.
+item: input-otp
+---
+
+import { InputOTPDemo } from '#/components/demos/input-otp-demo';
+import { InputOTPGroups } from '#/components/demos/input-otp-groups';
+import { InputOTPLetters } from '#/components/demos/input-otp-letters';
+import { InputOTPResend } from '#/components/demos/input-otp-resend';
+import { InputOTPVerify } from '#/components/demos/input-otp-verify';
+
+<ComponentPreview name="input-otp-demo">
+  <InputOTPDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="input-otp" />
+
+## Usage
+
+```tsx
+import { InputOTP } from '#/components/ui/inputs/input-otp';
+
+<InputOTP
+  description="Enter the 6-digit code we sent to your phone."
+  label="Verification code"
+  name="code"
+  onComplete={(code) => verify(code)}
+/>;
+```
+
+`length` sets the number of slots (6 by default) and `groupSize` splits
+them, with a separator between groups. `InputOTPGroup`, `InputOTPSlot` and
+`InputOTPSeparator` lay out the slots by hand instead, as shadcn's do.
+
+Say how long the code is in the description ("the 6-digit code"): the slots
+are hidden from screen readers, so that's how they learn it. Use `autoFocus`
+only on a page or step whose one job is the code; elsewhere it skips readers
+past whatever comes before the field.
+
+### Forms
+
+The code works like a `TextField`'s value: `value` and `onChange` control
+it, `name` submits it with the form, and `isRequired`, `validate`, `errors`
+and `errorMessage` validate it. `isRequired` rejects only an empty code; to
+require all of it, add `validate={(code) => (code.length < 6 ? 'Enter all
+6 digits.' : null)}`. With TanStack Form, pass the field's state
+as the [TanStack Form guide](/docs/guides/tanstack-form) does for a
+`TextField`. `onComplete` runs when the last slot fills, which is where to
+submit the code if it should go without a button.
+
+### Password managers and SMS
+
+The input carries `autocomplete="one-time-code"`, so Safari offers a code
+from Messages, and 1Password and Bitwarden can fill a saved one. When a
+password manager draws its icon in the input, the input widens so the icon
+sits past the last slot. Two password managers can't fill the field yet:
+Bitwarden's inline fill dismisses itself
+([input-otp#152](https://github.com/guilhermerodz/input-otp/issues/152)),
+and Dashlane doesn't fill it
+([input-otp#92](https://github.com/guilhermerodz/input-otp/issues/92)).
+Don't name the field `password` or put it in a form with one, or password
+managers may offer to save the code as a password.
+
+Android Chrome fills a code from an SMS through the
+[WebOTP API](https://developer.mozilla.org/docs/Web/API/WebOTP_API), which
+needs the message formatted for your domain and a call from your page:
+
+```tsx
+// TypeScript's DOM types don't describe WebOTP yet.
+const sms = { otp: { transport: ['sms'] } } as CredentialRequestOptions;
+
+useEffect(() => {
+  const controller = new AbortController();
+  navigator.credentials
+    .get({ ...sms, signal: controller.signal })
+    .then((credential) => {
+      if (credential !== null && 'code' in credential) {
+        setCode(String(credential.code));
+      }
+    })
+    .catch(() => {});
+  return () => controller.abort();
+}, []);
+```
+
+### Content Security Policy
+
+input-otp adds a small style tag to the page; under a policy that requires
+a nonce on styles, pass it as `nonce`.
+
+## Examples
+
+### Groups and placeholder
+
+`groupSize={3}` splits six slots into two groups; `placeholder` gives each
+empty slot a character.
+
+<ComponentPreview name="input-otp-groups">
+  <InputOTPGroups />
+</ComponentPreview>
+
+### Letters and digits
+
+`characters="alphanumeric"` takes letters as well as digits, brings up a
+text keyboard on phones and keeps letters in capitals. Pasted codes drop
+spaces and dashes either way; `pasteTransformer` replaces that.
+
+<ComponentPreview name="input-otp-letters">
+  <InputOTPLetters />
+</ComponentPreview>
+
+### Verifying
+
+`onComplete` checks the code as soon as it's whole. The field disables
+while it checks; on a wrong code it clears and takes focus back, so the
+error is read and the code can be typed again.
+
+<ComponentPreview name="input-otp-verify">
+  <InputOTPVerify />
+</ComponentPreview>
+
+### Resending
+
+A button that waits before it can resend. Its countdown isn't a live
+region, so screen readers aren't interrupted every second; the
+confirmation after resending is.
+
+<ComponentPreview name="input-otp-resend">
+  <InputOTPResend />
+</ComponentPreview>
+
+## Accessibility
+
+Input OTP is one real text input, wired to React Aria's
+[TextField](https://react-aria.adobe.com/TextField), behind slots that show
+its value. The label, description and error name and describe that input,
+which reports itself invalid, required or disabled as any text field does.
+The slots are hidden from assistive tech, which reads the input's value
+instead.
+
+This component adds:
+
+- **Keyboards:** a numeric keyboard on phones for digit codes, and a text
+  keyboard for `characters="alphanumeric"`.
+- **Direction:** codes read left to right in every language, so the slots
+  don't reverse on right-to-left pages.
+- **Focus:** the slot taking the next character draws the focus outline,
+  and the caret holds still under reduced motion.
+- **Visibility:** slot borders and the focus outline stay in forced
+  colors, and a disabled field grays like a native one.
+- **Targets:** slots grow to 44px on touch screens.
+
+The keys are the input's own:
+
+| Key                                    | Action                          |
+| -------------------------------------- | ------------------------------- |
+| `ArrowLeft` / `ArrowRight`             | Moves between slots             |
+| `Home` / `End`                         | Moves to the first or last slot |
+| `Backspace`                            | Deletes the character before    |
+| `Ctrl+A` (`⌘A` on macOS) then `Delete` | Clears the code                 |
+
+## API
+
+### InputOTP
+
+A React Aria [`TextField`](https://react-aria.adobe.com/TextField) holding
+input-otp's input. A `ref` reaches the input.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/inputs/input-otp.tsx"
+  name="InputOTPProps"
+/>
+
+Also accepts `TextField` props, such as `name`, `isRequired`, `isDisabled`
+and `autoFocus`.
+
+### InputOTPGroup, InputOTPSlot and InputOTPSeparator
+
+`div`s for laying out the slots by hand. `InputOTPSlot` takes the `index`
+of the character it shows.
+
+#### Data attributes
+
+| Attribute     | Present when                                                                      |
+| ------------- | --------------------------------------------------------------------------------- |
+| `data-slot`   | Always: `input-otp`, `input-otp-group`, `input-otp-slot` or `input-otp-separator` |
+| `data-active` | On the slot taking the next character, while the input has focus                  |

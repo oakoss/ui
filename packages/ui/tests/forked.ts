@@ -23,6 +23,7 @@ export const forked = [
   'hover-card',
   'input',
   'input-group',
+  'input-otp',
   'item',
   'kbd',
   'native-select',

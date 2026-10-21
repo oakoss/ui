@@ -30,6 +30,7 @@
     "fumadocs-core": "^16.17.1",
     "fumadocs-mdx": "^15.4.7",
     "fumadocs-ui": "^16.17.1",
+    "input-otp": "catalog:",
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-aria-components": "catalog:",

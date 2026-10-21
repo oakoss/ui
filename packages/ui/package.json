@@ -42,6 +42,7 @@
     "@types/react-dom": "catalog:",
     "embla-carousel-react": "catalog:",
     "eslint": "catalog:",
+    "input-otp": "catalog:",
     "lucide-react": "catalog:",
     "oxlint": "catalog:",
     "react": "catalog:",

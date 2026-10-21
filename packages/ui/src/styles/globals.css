@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import './theme.css';
 @import './base.css';
+@import './input-otp.css';
 @import './progress.css';
 @import './table.css';
 @plugin 'tailwindcss-react-aria-components';
