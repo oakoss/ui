@@ -4863,6 +4863,11 @@
           "target": "@hooks/use-cookie-state.ts"
         },
         {
+          "path": "src/lib/cookies.ts",
+          "type": "registry:lib",
+          "target": "@lib/cookies.ts"
+        },
+        {
           "path": "src/hooks/use-media-query.ts",
           "type": "registry:hook",
           "target": "@hooks/use-media-query.ts"
