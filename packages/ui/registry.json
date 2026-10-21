@@ -4182,6 +4182,54 @@
       ]
     },
     {
+      "name": "resizable",
+      "type": "registry:ui",
+      "title": "Resizable",
+      "description": "Panels that share a space, with named window-splitter handles that resize them by pointer or keyboard and an optional layout kept in a cookie.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/resizable.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": [
+        "cn",
+        "react-aria-components",
+        "react-resizable-panels@^4",
+        "tailwind-variants"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/layout/resizable.tsx",
+          "type": "registry:ui",
+          "target": "@ui/layout/resizable.tsx"
+        },
+        {
+          "path": "src/hooks/use-scroll-region.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-scroll-region.ts"
+        },
+        {
+          "path": "src/lib/cookies.ts",
+          "type": "registry:lib",
+          "target": "@lib/cookies.ts"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
       "name": "scroll-area",
       "type": "registry:ui",
       "title": "Scroll Area",

@@ -51,6 +51,7 @@
     "card",
     "separator",
     "scroll-area",
+    "resizable",
     "---Data display---",
     "table",
     "data-table",

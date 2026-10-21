@@ -1,0 +1,153 @@
+---
+title: Resizable
+description: Panels that share a space, with handles to resize them by pointer or keyboard.
+item: resizable
+---
+
+import { ResizableCollapsible } from '#/components/demos/resizable-collapsible';
+import { ResizableDemo } from '#/components/demos/resizable-demo';
+import { ResizableVertical } from '#/components/demos/resizable-vertical';
+
+<ComponentPreview name="resizable-demo">
+  <ResizableDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="resizable" />
+
+## Usage
+
+```tsx
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from '#/components/ui/layout/resizable';
+
+<div className="h-96">
+  <ResizablePanelGroup>
+    <ResizablePanel defaultSize="30%" minSize="20%">
+      Sidebar
+    </ResizablePanel>
+    <ResizableHandle aria-label="Resize sidebar" />
+    <ResizablePanel>Content</ResizablePanel>
+  </ResizablePanelGroup>
+</div>;
+```
+
+The group fills its container, so size the container rather than the group;
+`min-h-*` and `max-w-*` on the group work too. Sizes are percentages as
+strings (`"30%"`) or pixels as numbers (`200`).
+
+## Examples
+
+### Vertical with a grip
+
+`orientation="vertical"` stacks the panels, and the handle runs across them.
+`withHandle` draws a grip on the handle's line.
+
+<ComponentPreview name="resizable-vertical">
+  <ResizableVertical />
+</ComponentPreview>
+
+### Collapsible
+
+A `collapsible` panel collapses when dragged past its `minSize`, or, when it
+comes before the handle, with Enter on the handle. Its `panelRef` (`usePanelRef` from
+`react-resizable-panels`) also collapses and expands it from a button.
+
+<ComponentPreview name="resizable-collapsible">
+  <ResizableCollapsible />
+</ComponentPreview>
+
+### Keeping the layout
+
+`persistKey` keeps the layout in a cookie under that key, so the panels open
+at the size the visitor left them. Give each panel an `id`, which the layout
+is keyed by. A server-rendered app renders the default and switches after
+hydration; to avoid that shift, read the cookie on the server and pass its
+layout as `defaultLayout`.
+
+```tsx
+<ResizablePanelGroup persistKey="editor-layout">
+  <ResizablePanel id="files" defaultSize="25%">
+    …
+  </ResizablePanel>
+  <ResizableHandle aria-label="Resize files" />
+  <ResizablePanel id="editor">…</ResizablePanel>
+</ResizablePanelGroup>
+```
+
+## Accessibility
+
+Each handle is a
+[window splitter](https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/):
+a focusable `separator` whose value is the size of the panel it controls, in
+percent, with that panel's limits as its minimum and maximum. Its name is
+required (`aria-label` or `aria-labelledby`); name it for the panel it
+resizes.
+
+This component adds:
+
+- **Drag area:** the handle is a 1px line, but a pointer within 12px of it
+  drags it, and within 22px on touch, so the target meets 24px with a mouse
+  and 44px by touch.
+- **Scrolling panels:** a panel whose content overflows scrolls, and is a
+  Tab stop only while it does.
+- **Visibility:** the line and grip are borders, and the focus ring an
+  outline, so forced colors keep them.
+
+| Key                        | Action                                                                     |
+| -------------------------- | -------------------------------------------------------------------------- |
+| `ArrowLeft` / `ArrowRight` | Moves a vertical handle 5% the way the arrow points                        |
+| `ArrowUp` / `ArrowDown`    | Moves a horizontal handle 5% the way the arrow points                      |
+| `Home` / `End`             | Moves the handle to its limit                                              |
+| `Enter`                    | Collapses the panel before the handle, if it's collapsible, or restores it |
+| `F6` / `Shift+F6`          | Moves focus to the next or previous handle in the group                    |
+
+## API
+
+### ResizablePanelGroup
+
+Extends `react-resizable-panels`'
+[`Group`](https://react-resizable-panels.vercel.app/), and lays out its panels
+in a row, or a column with `orientation="vertical"`.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/layout/resizable.tsx"
+  name="ResizablePanelGroupProps"
+/>
+
+Also accepts all `Group` props, such as `onLayoutChanged` and `groupRef`.
+
+### ResizablePanel
+
+Extends `react-resizable-panels`' `Panel` (`defaultSize`, `minSize`,
+`maxSize`, `collapsible`, `collapsedSize`, `panelRef`). Its `className`
+styles the content.
+
+### ResizableHandle
+
+Extends `react-resizable-panels`' `Separator`.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/layout/resizable.tsx"
+  name="ResizableHandleProps"
+/>
+
+#### Data attributes
+
+| Attribute          | Present when                                                    |
+| ------------------ | --------------------------------------------------------------- |
+| `data-slot`        | Always: `resizable-handle`                                      |
+| `data-separator`   | Always: `inactive`, `hover`, `active`, `focus` or `disabled`    |
+| `aria-orientation` | Always: `vertical` in a row of panels, `horizontal` in a column |
+
+The group's `data-slot` is `resizable-panel-group`, a panel's
+`resizable-panel`, its content `resizable-panel-content`, and the grip
+`resizable-handle-icon`.
