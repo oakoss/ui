@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@oakoss/ui/components/ui/overlays/dialog';
-import { expect, screen, userEvent } from 'storybook/test';
+import { expect, screen, userEvent, waitFor } from 'storybook/test';
 
 import { Demo, type DemoProps, dialogParts } from './dialog-demo';
 import { settled } from './overlay-test';
@@ -27,6 +27,13 @@ async function contentBox() {
   const { content } = dialogParts(await screen.findByRole('dialog'));
   await settled(content);
   return { box: content.getBoundingClientRect(), content };
+}
+
+// Content added outside React, as content that loads late would be.
+function tallBlock() {
+  const block = document.createElement('div');
+  block.style.height = '60rem';
+  return block;
 }
 
 // From `sm` up, each size caps the panel's width.
@@ -109,6 +116,34 @@ export const FormWrappedBody: Story = {
         </DialogBody>
         <DialogFooter closeLabel="Done" showCloseButton />
       </form>
+    </Dialog>
+  ),
+};
+
+// A body that fits isn't a tab stop, and neither is one on a short screen,
+// where it stops scrolling and the panel scrolls instead.
+export const BodyTabStop: Story = {
+  play: async () => {
+    const dialog = await screen.findByRole('dialog', { name: 'Terms' });
+    const body = dialog.querySelector('[data-slot=dialog-body]');
+    if (!(body instanceof HTMLElement)) throw new Error('No body');
+    await expect(body).not.toHaveAttribute('tabindex');
+    body.append(tallBlock());
+    await waitFor(() => expect(body).toHaveAttribute('tabindex', '0'));
+    const { overlay } = dialogParts(dialog);
+    overlay.style.setProperty('--visual-viewport-height', '400px');
+    await waitFor(() => expect(body).not.toHaveAttribute('tabindex'));
+    await expect(getComputedStyle(body).overflowY).toBe('visible');
+  },
+  render: () => (
+    <Dialog defaultOpen>
+      <DialogHeader>
+        <DialogTitle>Terms</DialogTitle>
+      </DialogHeader>
+      <DialogBody>
+        <p>Clause 1.</p>
+      </DialogBody>
+      <DialogFooter closeLabel="Done" showCloseButton />
     </Dialog>
   ),
 };

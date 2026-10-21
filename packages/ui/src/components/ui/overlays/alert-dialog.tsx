@@ -134,7 +134,6 @@ export function AlertDialogCancel({
   const pending = use(PendingContext);
   return (
     <DialogClose
-      // oxlint-disable-next-line jsx-a11y/no-autofocus -- the WAI-ARIA alertdialog pattern focuses the least destructive choice
       autoFocus={autoFocus}
       data-slot="alert-dialog-cancel"
       {...props}

@@ -255,6 +255,12 @@ const componentVariables = defineConfig({
       rules: { 'shadcn/no-inline-styles': 'off' },
     },
     {
+      // An alert dialog focuses its least destructive choice (WAI-ARIA), which
+      // React Aria leaves to autoFocus.
+      files: ['src/components/ui/overlays/alert-dialog.tsx'],
+      rules: { 'jsx-a11y/no-autofocus': 'off' },
+    },
+    {
       // shadcn swaps only literal IconPlaceholder elements, one per icon.
       files: ['src/components/icons.tsx'],
       rules: { 'max-lines': 'off' },
