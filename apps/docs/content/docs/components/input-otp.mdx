@@ -51,20 +51,10 @@ as the [TanStack Form guide](/docs/guides/tanstack-form) does for a
 `TextField`. `onComplete` runs when the last slot fills, which is where to
 submit the code if it should go without a button.
 
-### Password managers and SMS
+### SMS codes
 
 The input carries `autocomplete="one-time-code"`, so Safari offers a code
-from Messages, and 1Password and Bitwarden can fill a saved one. When a
-password manager draws its icon in the input, the input widens so the icon
-sits past the last slot. Two password managers can't fill the field yet:
-Bitwarden's inline fill dismisses itself
-([input-otp#152](https://github.com/guilhermerodz/input-otp/issues/152)),
-and Dashlane doesn't fill it
-([input-otp#92](https://github.com/guilhermerodz/input-otp/issues/92)).
-Don't name the field `password` or put it in a form with one, or password
-managers may offer to save the code as a password.
-
-Android Chrome fills a code from an SMS through the
+from Messages. Android Chrome fills a code from an SMS through the
 [WebOTP API](https://developer.mozilla.org/docs/Web/API/WebOTP_API), which
 needs the message formatted for your domain and a call from your page:
 
