@@ -170,6 +170,10 @@ const arbitraryValues: Record<string, string[]> = {
   'src/components/ui/inputs/input-group.tsx': [
     'forced-colors:has-[>:disabled,>[data-slot=date-range-input]>:disabled]:[&>[data-slot=input-group-addon]]:text-[GrayText]',
   ],
+  // Slots are divs, so a disabled field's slots gray themselves.
+  'src/components/ui/inputs/input-otp.tsx': [
+    'forced-colors:group-data-disabled/otp:text-[GrayText]',
+  ],
   // The list stays inside React Aria's 12px viewport padding on each side.
   'src/components/ui/inputs/list-box.tsx': [
     ...scrollsInPopover,

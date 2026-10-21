@@ -3933,6 +3933,69 @@
       ]
     },
     {
+      "name": "input-otp",
+      "type": "registry:ui",
+      "title": "Input OTP",
+      "description": "One-time code field on input-otp, wired to React Aria's TextField: one real input with the one-time-code hint behind slots hidden from assistive tech, labels, descriptions and errors, digits or letters (kept in capitals, with a text keyboard), pasted codes cleaned of spaces and dashes, slot placeholders, sizes, groups, room for password managers' icons, and codes kept left to right in every language.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/input-otp.tsx"
+      },
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/field",
+        "oakoss/ui/input"
+      ],
+      "dependencies": [
+        "cn",
+        "input-otp@^1",
+        "react-aria-components",
+        "tailwind-variants"
+      ],
+      "cssVars": {
+        "theme": {
+          "animate-caret-blink": "caret-blink 1.25s ease-out infinite"
+        }
+      },
+      "css": {
+        "@keyframes caret-blink": {
+          "0%, 70%, 100%": { "opacity": "1" },
+          "20%, 50%": { "opacity": "0" }
+        }
+      },
+      "files": [
+        {
+          "path": "src/components/ui/inputs/input-otp.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inputs/input-otp.tsx"
+        },
+        {
+          "path": "src/hooks/use-otp-paste.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-otp-paste.ts"
+        },
+        {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
       "name": "input-group",
       "type": "registry:ui",
       "title": "Input Group",
