@@ -8,7 +8,6 @@ export function ScrollAreaHorizontal() {
       aria-label="Releases"
       className="not-prose w-full max-w-sm rounded-md border"
       orientation="horizontal"
-      role="region"
     >
       <ul className="flex w-max gap-4 p-4">
         {releases.map((name) => (

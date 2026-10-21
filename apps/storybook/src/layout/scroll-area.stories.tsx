@@ -21,7 +21,6 @@ const meta = {
       </ul>
     ),
     className: 'h-48 w-48 rounded-md border',
-    role: 'region',
   },
   component: ScrollArea,
   title: 'Layout/ScrollArea',
@@ -30,6 +29,14 @@ const meta = {
 export default meta;
 
 type Story = StoryObj<typeof meta>;
+
+function nextFrame() {
+  return new Promise<void>((resolve) => {
+    requestAnimationFrame(() => {
+      resolve();
+    });
+  });
+}
 
 // Keyboard users reach the region and scroll it with the arrow keys, which
 // browsers handle once it has focus; the ring sits inside its edge, where a
@@ -44,6 +51,80 @@ export const Default: Story = {
     const style = getComputedStyle(area);
     await expect(style.outlineStyle).toBe('solid');
     await expect(style.outlineOffset).toBe('-3px');
+  },
+};
+
+// Content that fits needs no scrolling, so the area is neither a tab stop nor
+// a landmark until it overflows. With no scrollbar taking space, as with
+// overlay scrollbars, overflowing doesn't resize the area.
+export const Fits: Story = {
+  args: {
+    children: <p className="p-4 text-sm">v1.0.0</p>,
+    style: { scrollbarWidth: 'none' },
+  },
+  play: async ({ canvas }) => {
+    const area = part('scroll-area');
+    await expect(area).not.toHaveAttribute('tabindex');
+    await expect(canvas.queryByRole('region')).toBeNull();
+    // A name on a div with no role fails axe, so it waits for the region.
+    await expect(area).not.toHaveAttribute('aria-label');
+    // Past the observers' first callbacks, which would measure anyway.
+    await nextFrame();
+    await nextFrame();
+    // Content added outside React, as content that loads late would be.
+    const block = document.createElement('div');
+    block.style.height = '24rem';
+    area.append(block);
+    await expect(
+      await canvas.findByRole('region', { name: 'Tags' }),
+    ).toHaveAttribute('tabindex', '0');
+  },
+};
+
+// A ref reaches the area's element, as it would a div's.
+const refs: (HTMLDivElement | null)[] = [];
+export const Ref: Story = {
+  args: {
+    ref: (node: HTMLDivElement | null) => {
+      refs.push(node);
+    },
+  },
+  play: async () => {
+    await expect(refs.at(-1)).toBe(part('scroll-area'));
+  },
+};
+
+// A role the caller sets keeps their name, so a region that fits isn't an
+// unnamed landmark.
+export const OwnRole: Story = {
+  args: { children: <p className="p-4 text-sm">v1.0.0</p>, role: 'region' },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole('region', { name: 'Tags' })).toBe(
+      part('scroll-area'),
+    );
+  },
+};
+
+// The area keeps a caller's scroll padding, which clears content scrolled
+// into view from a header of their own.
+export const ScrollPadding: Story = {
+  args: { style: { scrollPaddingTop: '12px' } },
+  play: async () => {
+    await nextFrame();
+    await expect(getComputedStyle(part('scroll-area')).scrollPaddingTop).toBe(
+      '12px',
+    );
+  },
+};
+
+// Content spilling out of an area that can't scroll scrolls the page, so the
+// area doesn't take focus for it.
+export const NotScrolling: Story = {
+  args: { style: { overflow: 'visible' } },
+  play: async () => {
+    const area = part('scroll-area');
+    await expect(area.scrollHeight).toBeGreaterThan(area.clientHeight);
+    await expect(area).not.toHaveAttribute('tabindex');
   },
 };
 
