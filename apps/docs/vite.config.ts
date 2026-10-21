@@ -32,7 +32,14 @@ export default defineConfig({
       pages: [...staticPages.map(({ path }) => path), ...themeItemPaths].map(
         (path) => ({ path, prerender: { autoSubfolderIndex: false } }),
       ),
-      prerender: { crawlLinks: true, enabled: true, failOnError: true },
+      // Parallel requests gained little, and on a busy machine their
+      // connections to the in-process preview server timed out.
+      prerender: {
+        concurrency: 1,
+        crawlLinks: true,
+        enabled: true,
+        failOnError: true,
+      },
     }),
     react(),
   ],
