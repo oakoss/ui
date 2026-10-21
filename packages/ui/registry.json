@@ -4182,6 +4182,53 @@
       ]
     },
     {
+      "name": "carousel",
+      "type": "registry:ui",
+      "title": "Carousel",
+      "description": "Slides on Embla in a named carousel region, each named \"n of m\", with slides out of view kept out of the tab order and the accessibility tree, an announcement of the slides on screen once it comes to rest, Previous and Next that hand focus over at the ends, steps that jump under reduced motion, and nested carousels that drag on their own.",
+      "meta": {
+        "upstream": "shadcn-ui/ui@d75a96a:apps/v4/registry/bases/aria/ui/carousel.tsx"
+      },
+      "registryDependencies": ["oakoss/ui/theme", "oakoss/ui/button"],
+      "dependencies": [
+        "cn",
+        "embla-carousel-react@^8",
+        "react-aria-components"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/layout/carousel.tsx",
+          "type": "registry:ui",
+          "target": "@ui/layout/carousel.tsx"
+        },
+        {
+          "path": "src/hooks/use-carousel-state.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-carousel-state.ts"
+        },
+        {
+          "path": "src/components/icons.tsx",
+          "type": "registry:component",
+          "target": "@components/icons.tsx"
+        },
+        {
+          "path": "src/components/icon-placeholder.tsx",
+          "type": "registry:component",
+          "target": "@components/icon-placeholder.tsx"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
       "name": "resizable",
       "type": "registry:ui",
       "title": "Resizable",

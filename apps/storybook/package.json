@@ -17,6 +17,7 @@
     "@internationalized/date": "catalog:",
     "@oakoss/ui": "workspace:*",
     "@tanstack/react-table": "catalog:",
+    "embla-carousel-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-resizable-panels": "catalog:"
