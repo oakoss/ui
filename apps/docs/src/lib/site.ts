@@ -12,10 +12,6 @@ export function decodeMarkdownUrl(segments: string[]) {
   return slugs.length === 1 && slugs[0] === 'index' ? [] : slugs;
 }
 
-export function githubSourceUrl(contentPath: string) {
-  return `${githubUrl}/blob/main/apps/docs/content/docs/${contentPath}`;
-}
-
 // The Markdown version of a docs page; the index page is /docs/index.md.
 export function markdownUrl(slugs: string[]) {
   return `${docsRoute}/${slugs.length === 0 ? 'index' : slugs.join('/')}.md`;
