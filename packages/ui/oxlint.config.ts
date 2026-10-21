@@ -215,7 +215,12 @@ const arbitraryValues: Record<string, string[]> = {
     'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4)))]',
     'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]',
   ],
-  'src/components/ui/navigation/tabs.tsx': selectionStates,
+  // The line slides by its size and offset, which no transition utility
+  // covers together.
+  'src/components/ui/navigation/tabs.tsx': [
+    ...selectionStates,
+    'motion-safe:transition-[width,height,translate]',
+  ],
   'src/components/ui/overlays/menu-item.tsx': colorVariables('menu'),
   'src/components/ui/overlays/menu.tsx': scrollsInPopover,
   'src/components/ui/overlays/popover.tsx': overlayArrow,

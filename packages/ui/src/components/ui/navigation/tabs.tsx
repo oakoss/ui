@@ -8,10 +8,12 @@ import {
   type TabProps as AriaTabProps,
   Tabs as AriaTabs,
   type TabsProps as AriaTabsProps,
+  composeRenderProps,
+  SelectionIndicator,
 } from 'react-aria-components';
 import { tv } from 'tailwind-variants/lite';
 
-import { cx } from '#/lib/cx';
+import { cn, cx } from '#/lib/cx';
 import { focusRing } from '#/lib/recipes';
 
 export type TabsProps = { variant?: TabsVariant } & AriaTabsProps;
@@ -49,10 +51,18 @@ const tabStyles = tv({
     variant: {
       default:
         'h-full selected:bg-background selected:shadow-sm dark:selected:bg-input/30 forced-colors:selected:not-disabled:bg-[Highlight] forced-colors:selected:not-disabled:text-[HighlightText] forced-colors:selected:not-disabled:forced-color-adjust-none forced-colors:selected:not-disabled:focus-visible:outline-[Highlight]',
-      line: 'after:absolute group-orientation-horizontal/tabs-list:after:inset-x-0 group-orientation-horizontal/tabs-list:after:bottom-0 group-orientation-vertical/tabs-list:after:inset-y-0 group-orientation-vertical/tabs-list:after:end-0 selected:after:border-foreground group-orientation-horizontal/tabs-list:selected:after:border-b-2 group-orientation-vertical/tabs-list:selected:after:border-e-2',
+      line: '',
     },
   },
 });
+
+// React Aria slides the line by left edges, so it's anchored left in both
+// directions, with a set width since auto widths don't animate.
+const indicatorStyles = [
+  'absolute border-foreground motion-safe:transition-[width,height,translate]',
+  'group-orientation-horizontal/tabs-list:bottom-0 group-orientation-horizontal/tabs-list:w-full group-orientation-horizontal/tabs-list:border-b-2 group-orientation-horizontal/tabs-list:ltr:start-0 group-orientation-horizontal/tabs-list:rtl:end-0',
+  'group-orientation-vertical/tabs-list:end-0 group-orientation-vertical/tabs-list:top-0 group-orientation-vertical/tabs-list:h-full group-orientation-vertical/tabs-list:border-e-2',
+];
 
 export function Tabs({ className, variant = 'default', ...props }: TabsProps) {
   return (
@@ -99,13 +109,26 @@ export function TabsList<T extends object>({
   );
 }
 
-export function TabsTrigger({ className, ...props }: AriaTabProps) {
+export function TabsTrigger({ children, className, ...props }: AriaTabProps) {
   const variant = use(TabsVariantContext);
   return (
     <AriaTab
       data-slot="tabs-trigger"
       {...props}
       className={cx(tabStyles({ variant }), className)}
-    />
+    >
+      {composeRenderProps(children, (content) => (
+        <>
+          {content}
+          {variant === 'line' ? (
+            <SelectionIndicator
+              aria-hidden
+              className={cn(indicatorStyles)}
+              data-slot="tabs-indicator"
+            />
+          ) : null}
+        </>
+      ))}
+    </AriaTab>
   );
 }

@@ -44,7 +44,10 @@ Each `TabsContent` shares its `id` with a `TabsTrigger`.
 ### Line
 
 `variant="line"` marks the selected tab with a line under it instead of a
-filled chip.
+filled chip. The line slides to the tab selected and sizes to it, or jumps
+there when the visitor prefers reduced motion. To restyle it, target its slot
+from the tab, as in
+`className="[&_[data-slot=tabs-indicator]]:border-primary"`.
 
 <ComponentPreview name="tabs-line">
   <TabsLine />
@@ -71,7 +74,8 @@ This component adds:
 
 - **Selected state:** in Windows High Contrast the default look's selected
   tab takes the system's selection colors, and the line look's line is a
-  border, which the mode keeps. The selected tab opts out of the text
+  border, which the mode keeps. The line is decorative: hidden from
+  assistive technology, and never focused. The selected tab opts out of the text
   backplate the mode draws, which would hide its label. A disabled tab takes
   the system's disabled color, selected or not.
 - **Focus:** tabs show the focus outline. A panel with nothing focusable
@@ -145,6 +149,9 @@ accepts all its props. Its `id` is the key `selectedKey` refers to.
 | `data-pressed`       | It's being pressed    |
 | `data-focus-visible` | It has keyboard focus |
 | `data-disabled`      | It's disabled         |
+
+In the line look, the selected tab holds the line, an element with
+`data-slot="tabs-indicator"`.
 
 ### TabsContent
 
