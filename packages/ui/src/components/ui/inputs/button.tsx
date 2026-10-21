@@ -1,4 +1,4 @@
-import { createContext, use } from 'react';
+import { createContext, type Ref, use } from 'react';
 import {
   Button as AriaButton,
   type ButtonProps as AriaButtonProps,
@@ -71,7 +71,10 @@ const styles = tv({
   },
 });
 
-export type ButtonProps = { pendingLabel?: string } & AriaButtonProps &
+export type ButtonProps = {
+  pendingLabel?: string;
+  ref?: Ref<HTMLButtonElement>;
+} & AriaButtonProps &
   ButtonSizeProps &
   Omit<ButtonStyleProps, 'size'>;
 
