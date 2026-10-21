@@ -95,7 +95,9 @@ export const Vertical: Story = {
 export const Nested: Story = {
   play: async ({ canvas }) => {
     const inner = canvas.getByRole('tab', { name: 'Inbox' });
-    const line = getComputedStyle(inner, '::after');
+    const indicator = inner.querySelector('[data-slot=tabs-indicator]');
+    if (!indicator) throw new Error('No indicator');
+    const line = getComputedStyle(indicator);
     await expect(line.borderBottomWidth).toBe('2px');
     await expect(line.borderRightWidth).toBe('0px');
     await expect(getComputedStyle(inner).justifyContent).toBe('center');

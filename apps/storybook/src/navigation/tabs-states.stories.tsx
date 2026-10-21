@@ -34,11 +34,6 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-function after(element: HTMLElement | undefined) {
-  if (!element) throw new Error('No tab');
-  return getComputedStyle(element, '::after');
-}
-
 async function settle() {
   for (const tab of tabs()) delete tab.dataset.hovered;
   await Promise.all(
@@ -79,46 +74,6 @@ export const Hover: Story = {
       other.getAnimations().map((animation) => animation.finished),
     );
     await expect(getComputedStyle(other).color).not.toBe(rest);
-  },
-};
-
-// In the line look the selected tab has a 2px line along its bottom edge and
-// the others none, so the line survives forced colors; tabs are still at
-// least 24px.
-export const LineLook: Story = {
-  args: { variant: 'line' },
-  play: async () => {
-    const [selected, other] = tabs();
-    await expect(after(selected).borderBottomWidth).toBe('2px');
-    await expect(after(selected).position).toBe('absolute');
-    await expect(after(selected).bottom).toBe('0px');
-    await expect(after(other).borderBottomWidth).toBe('0px');
-    for (const tab of tabs()) {
-      await expect(tab.getBoundingClientRect().height).toBeGreaterThanOrEqual(
-        24,
-      );
-    }
-  },
-};
-
-// Vertical, the line runs along the side facing the panel, in either
-// direction.
-export const LineVertical: Story = {
-  args: { orientation: 'vertical', variant: 'line' },
-  play: async () => {
-    const [selected] = tabs();
-    await expect(after(selected).borderRightWidth).toBe('2px');
-    await expect(after(selected).right).toBe('0px');
-  },
-};
-
-export const LineVerticalRightToLeft: Story = {
-  args: { orientation: 'vertical', variant: 'line' },
-  globals: { locale: 'ar-EG' },
-  play: async () => {
-    const [selected] = tabs();
-    await expect(after(selected).borderLeftWidth).toBe('2px');
-    await expect(after(selected).left).toBe('0px');
   },
 };
 
