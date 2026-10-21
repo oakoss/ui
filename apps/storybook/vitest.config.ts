@@ -44,6 +44,9 @@ export default defineConfig({
     // CI runs story files one at a time, one project after another: on a
     // shared runner, parallel browser files starve each other's timers.
     fileParallelism: !isCI,
+    // Locally, half the cores leave room for the docs build and browser
+    // tests, which `turbo run test` runs at the same time.
+    maxWorkers: '50%',
     projects: projects.map(({ forcedColors = false, name, theme }, index) => ({
       define: { 'import.meta.env.VITE_STORY_THEME': JSON.stringify(theme) },
       plugins: [
