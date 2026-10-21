@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { INHERITED_PREFIX, NO_OWN_PROPS, ownEntries } from '#/lib/props';
 import { isShownAsSource } from '#/lib/registry-paths';
-import { decodeMarkdownUrl, githubSourceUrl, markdownUrl } from '#/lib/site';
+import { decodeMarkdownUrl, markdownUrl } from '#/lib/site';
 import { typeTableMarkdown } from '#/lib/type-tables';
 
 describe('markdownUrl', () => {
@@ -33,14 +33,6 @@ describe('isShownAsSource', () => {
     expect(shown.length).toBeGreaterThan(0);
     expect(shown.filter((file) => !/\.tsx?$/u.test(file.path))).toEqual([]);
     expect(files.map((file) => file.path)).toContain('src/styles/themes.css');
-  });
-});
-
-describe('githubSourceUrl', () => {
-  it('points at the content file on main', () => {
-    expect(githubSourceUrl('components/button.mdx')).toBe(
-      'https://github.com/oakoss/ui/blob/main/apps/docs/content/docs/components/button.mdx',
-    );
   });
 });
 

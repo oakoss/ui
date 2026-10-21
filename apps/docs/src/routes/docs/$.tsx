@@ -24,7 +24,7 @@ import { baseOptions, docsOptions } from '#/components/layout';
 import { useMDXComponents } from '#/components/mdx';
 import { tocSlots } from '#/components/toc-slots';
 import { itemSourceUrl } from '#/lib/registry';
-import { githubSourceUrl, markdownUrl } from '#/lib/site';
+import { markdownUrl } from '#/lib/site';
 import { docs, source } from '#/lib/source';
 
 export const Route = createFileRoute('/docs/$')({
@@ -81,7 +81,6 @@ function Content({
 
   const { toc } = use(page.load());
   const MDX = page.body;
-  const editUrl = githubSourceUrl(path);
 
   return (
     <DocsPage slots={{ toc: tocSlots }} toc={toc}>
@@ -101,8 +100,7 @@ function Content({
           </EditOnGitHub>
         )}
         <MarkdownCopyButton markdownUrl={markdownUrl} />
-        <ViewOptionsPopover githubUrl={editUrl} markdownUrl={markdownUrl} />
-        <EditOnGitHub href={editUrl} />
+        <ViewOptionsPopover markdownUrl={markdownUrl} />
       </div>
       <DocsBody>
         <MDX components={useMDXComponents()} />
