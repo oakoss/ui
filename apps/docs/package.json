@@ -33,6 +33,7 @@
     "react": "catalog:",
     "react-aria-components": "catalog:",
     "react-dom": "catalog:",
+    "react-resizable-panels": "catalog:",
     "zod": "^4.6.5"
   },
   "devDependencies": {

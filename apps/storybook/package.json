@@ -18,7 +18,8 @@
     "@oakoss/ui": "workspace:*",
     "@tanstack/react-table": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "react-resizable-panels": "catalog:"
   },
   "devDependencies": {
     "@oakoss/eslint-config": "workspace:*",

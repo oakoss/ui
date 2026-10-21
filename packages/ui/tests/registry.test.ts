@@ -4,6 +4,7 @@ import { describe, expect, test } from 'vitest';
 
 import root from '../../../registry.json';
 import ui from '../registry.json';
+import { forked } from './forked';
 
 const addresses = new Set(ui.items.map((item) => `oakoss/ui/${item.name}`));
 const deps = ui.items.flatMap((item) => item.registryDependencies ?? []);
@@ -18,54 +19,6 @@ test('registryDependencies point at items in this repo', () => {
   expect(deps.length).toBeGreaterThan(0);
   expect(deps.filter((dep) => !addresses.has(dep))).toEqual([]);
 });
-
-// Items ported from shadcn; add each new port here.
-const forked = [
-  'accordion',
-  'alert',
-  'alert-dialog',
-  'avatar',
-  'badge',
-  'breadcrumb',
-  'button',
-  'button-group',
-  'calendar',
-  'card',
-  'checkbox',
-  'collapsible',
-  'combobox',
-  'command',
-  'context-menu',
-  'dialog',
-  'dropdown-menu',
-  'empty',
-  'field',
-  'hover-card',
-  'input',
-  'input-group',
-  'item',
-  'kbd',
-  'native-select',
-  'pagination',
-  'popover',
-  'progress',
-  'radio-group',
-  'scroll-area',
-  'select',
-  'separator',
-  'sheet',
-  'sidebar',
-  'skeleton',
-  'slider',
-  'spinner',
-  'switch',
-  'table',
-  'tabs',
-  'textarea',
-  'toggle',
-  'toggle-group',
-  'tooltip',
-];
 
 // Each port's base: React Aria's, except Table's Radix one (docs/research/0002).
 const bases: Record<string, string> = {

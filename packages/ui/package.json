@@ -45,6 +45,7 @@
     "oxlint": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "react-resizable-panels": "catalog:",
     "shadcn": "catalog:",
     "tailwindcss": "catalog:",
     "tailwindcss-react-aria-components": "catalog:",
