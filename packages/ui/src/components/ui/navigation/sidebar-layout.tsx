@@ -6,7 +6,7 @@ import {
   type SeparatorProps,
 } from '#/components/ui/layout/separator';
 import { currentPage } from '#/components/ui/navigation/sidebar-provider';
-import { useScrollRegion } from '#/hooks/use-scroll-region';
+import { useScrollContainer } from '#/hooks/use-scroll-region';
 import { cn, cx } from '#/lib/cx';
 import { focusRing } from '#/lib/recipes';
 
@@ -18,16 +18,12 @@ export function SidebarContent({
   className,
   ...props
 }: Omit<ComponentProps<'div'>, 'ref'>) {
-  const { props: region } = useScrollRegion<HTMLDivElement>({
-    'aria-label': props['aria-label'],
-    'aria-labelledby': props['aria-labelledby'],
-  });
-  useCurrentInView(region.ref);
+  const container = useScrollContainer<HTMLDivElement>(props);
+  useCurrentInView(container.ref);
   return (
     <div
       data-slot="sidebar-content"
-      {...props}
-      {...region}
+      {...container}
       className={cn(
         focusRing,
         'min-h-0 flex-1 overflow-x-hidden overflow-y-auto focus-visible:-outline-offset-3',

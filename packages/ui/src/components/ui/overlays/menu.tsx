@@ -43,7 +43,7 @@ export function MenuContent<T extends object>({
       shouldFlip={shouldFlip}
     >
       <AriaMenu<T>
-        className="max-h-[inherit] overflow-y-auto outline-hidden"
+        className="max-h-[inherit] overflow-y-auto overscroll-contain outline-hidden"
         data-slot={`${kind}-list`}
         renderEmptyState={emptyState(emptyLabel, 'px-2 py-1.5')}
         {...props}

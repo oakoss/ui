@@ -51,7 +51,7 @@ export function Popover({
         aria-describedby={ariaDescribedby}
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledby}
-        className="-mx-popover -my-1.5 flex flex-1 flex-col gap-4 overflow-y-auto px-popover py-1.5 outline-hidden"
+        className="-mx-popover -my-1.5 flex flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-popover py-1.5 outline-hidden"
         data-slot="popover"
       >
         {children}

@@ -2,6 +2,7 @@ import type { ComponentProps } from 'react';
 
 import { tv } from 'tailwind-variants/lite';
 
+import { useScrollContainer } from '#/hooks/use-scroll-region';
 import { cn } from '#/lib/cx';
 import { focusRing } from '#/lib/recipes';
 
@@ -26,12 +27,11 @@ export function ScrollArea({
   orientation = 'both',
   ...props
 }: ScrollAreaProps) {
+  const container = useScrollContainer(props);
   return (
     <div
       data-slot="scroll-area"
-      // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scrolling region needs keyboard access (axe scrollable-region-focusable)
-      tabIndex={0}
-      {...props}
+      {...container}
       className={cn(focusRing, styles({ orientation }), className)}
       data-orientation={orientation}
     />

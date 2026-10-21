@@ -176,7 +176,7 @@ export function CommandList<T extends object>({
   return (
     <AriaMenu<T>
       className={cn(
-        'max-h-72 scroll-py-1 overflow-y-auto p-1 outline-hidden',
+        'max-h-72 scroll-py-1 overflow-y-auto overscroll-contain p-1 outline-hidden',
         className,
       )}
       data-slot="command-list"

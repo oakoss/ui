@@ -69,7 +69,7 @@ export function ListBox<T extends object>({
   const context = useSlottedContext(ListBoxContext);
   return (
     <AriaListBox<T>
-      className="max-h-[inherit] overflow-y-auto outline-hidden"
+      className="max-h-[inherit] overflow-y-auto overscroll-contain outline-hidden"
       data-slot={`${kind}-list`}
       renderEmptyState={emptyState(emptyLabel, 'px-2 py-1.5')}
     >

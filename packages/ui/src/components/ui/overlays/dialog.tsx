@@ -21,6 +21,7 @@ import {
   type ButtonProps,
   ButtonStyleContext,
 } from '#/components/ui/inputs/button';
+import { useScrollContainer } from '#/hooks/use-scroll-region';
 import { cn, cx } from '#/lib/cx';
 import { focusRing } from '#/lib/recipes';
 
@@ -147,6 +148,7 @@ export function Dialog({
 }
 
 export function DialogBody({ className, ...props }: ComponentProps<'div'>) {
+  const container = useScrollContainer(props);
   return (
     <div
       className={cn(
@@ -155,9 +157,7 @@ export function DialogBody({ className, ...props }: ComponentProps<'div'>) {
         className,
       )}
       data-slot="dialog-body"
-      // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scrolling region needs keyboard access (axe scrollable-region-focusable)
-      tabIndex={0}
-      {...props}
+      {...container}
     />
   );
 }
