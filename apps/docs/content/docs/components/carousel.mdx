@@ -1,0 +1,165 @@
+---
+title: Carousel
+description: Slides that scroll by pointer, touch or the Previous and Next buttons.
+item: carousel
+---
+
+import { CarouselCounter } from '#/components/demos/carousel-counter';
+import { CarouselDemo } from '#/components/demos/carousel-demo';
+import { CarouselLoop } from '#/components/demos/carousel-loop';
+import { CarouselSizes } from '#/components/demos/carousel-sizes';
+import { CarouselVertical } from '#/components/demos/carousel-vertical';
+
+<ComponentPreview name="carousel-demo">
+  <CarouselDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="carousel" />
+
+## Usage
+
+```tsx
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '#/components/ui/layout/carousel';
+
+<Carousel aria-label="Featured products">
+  <CarouselContent>
+    <CarouselItem>…</CarouselItem>
+    <CarouselItem>…</CarouselItem>
+    <CarouselItem>…</CarouselItem>
+  </CarouselContent>
+  <CarouselPrevious />
+  <CarouselNext />
+</Carousel>;
+```
+
+The buttons sit 3rem outside the slides, so leave that room beside the
+carousel, or place them with `className`. `opts` passes options to
+[Embla](https://www.embla-carousel.com/api/options/), such as `loop`,
+`align`, `dragFree` and `breakpoints`, and `plugins` takes Embla plugins.
+
+## Examples
+
+### Sizes
+
+A slide's `basis-*` sets how many show at once, and responsive classes
+change that by width. `opts={{ slidesToScroll: 'auto' }}` steps a view at a
+time rather than a slide.
+
+<ComponentPreview name="carousel-sizes">
+  <CarouselSizes />
+</ComponentPreview>
+
+### Loop and peek
+
+`opts={{ loop: true }}` wraps from the last slide to the first, so neither
+button disables. A basis under full width, such as `basis-4/5`, lets the
+next slide peek in; `align: 'start'` lines the current slide up with the
+start edge.
+
+<ComponentPreview name="carousel-loop">
+  <CarouselLoop />
+</ComponentPreview>
+
+### Vertical
+
+`orientation="vertical"` scrolls up and down; give `CarouselContent` a
+height. The buttons sit above and below.
+
+<ComponentPreview name="carousel-vertical">
+  <CarouselVertical />
+</ComponentPreview>
+
+### Counter
+
+`setApi` hands you Embla's API, for controls and readouts of your own, such
+as a visible count. The carousel already announces each slide, so a
+counter like this one is hidden from screen readers.
+
+<ComponentPreview name="carousel-counter">
+  <CarouselCounter />
+</ComponentPreview>
+
+## Accessibility
+
+The carousel follows the
+[carousel pattern](https://www.w3.org/WAI/ARIA/apg/patterns/carousel/): a
+`region` with the role description "carousel", whose name is required
+(`aria-label` or `aria-labelledby`), holding slides that are `group`s with
+the role description "slide", each named by its position ("2 of 5").
+
+This component adds:
+
+- **Hidden slides:** slides out of view are `inert`, so they leave the tab
+  order and the accessibility tree; a slide keeps focus it already holds as
+  it scrolls away, until focus leaves it.
+- **Announcements:** once the carousel moves and comes to rest, a `status`
+  region names the slides at least half on screen ("Slide 2 of 5", "Slides
+  4 to 6 of 9"); nothing is announced on load or mid-drag.
+- **Focus at the ends:** when Previous or Next disables at the first or last
+  slide, focus moves to the other button rather than to the page.
+- **Reduced motion:** with `prefers-reduced-motion`, the buttons jump
+  between slides rather than animating; a drag still follows the pointer.
+- **Clicks after a drag:** releasing a drag over a link or button in a slide
+  doesn't activate it, which Embla handles.
+- **Nested carousels:** a drag that starts in a carousel inside a slide moves
+  only that one, unless `opts` sets its own `watchDrag`.
+- **Visibility:** the buttons keep their border and focus outline in forced
+  colors.
+
+The carousel takes no arrow keys, since the pattern defines none, so text
+fields and other controls in a slide keep theirs.
+
+| Key               | Action                                                    |
+| ----------------- | --------------------------------------------------------- |
+| `Tab`             | Moves through the buttons and the content of slides shown |
+| `Enter` / `Space` | Shows the previous or next slide from its button          |
+
+## API
+
+### Carousel
+
+A `div` with Embla's carousel. Its strings, from the role descriptions to
+the announcement, can be replaced through `messages`.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/layout/carousel.tsx"
+  name="CarouselProps"
+/>
+
+Also accepts `div` props.
+
+### CarouselContent
+
+The viewport and the row of slides, as `div`s; its `className` styles the
+row.
+
+### CarouselItem
+
+A slide, as a `div`. Size it with `basis-*`.
+
+### CarouselPrevious and CarouselNext
+
+Extend [Button](/docs/components/button), outline and icon-sized by default.
+Their names come from `messages`, or their own `aria-label`.
+
+#### Data attributes
+
+| Attribute   | Present when                                                                                    |
+| ----------- | ----------------------------------------------------------------------------------------------- |
+| `data-slot` | Always: `carousel`, `carousel-content`, `carousel-item`, `carousel-previous` or `carousel-next` |
+| `inert`     | On a `carousel-item` out of view that doesn't hold focus                                        |
+
+### useCarousel
+
+Reads the carousel's state inside it, for parts of your own: the slides in
+view, whether each button can move, and the `go` function the buttons call.

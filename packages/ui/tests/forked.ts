@@ -10,6 +10,7 @@ export const forked = [
   'button-group',
   'calendar',
   'card',
+  'carousel',
   'checkbox',
   'collapsible',
   'combobox',

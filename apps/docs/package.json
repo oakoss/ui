@@ -26,6 +26,7 @@
     "@tanstack/react-start": "^1.168.60",
     "@tanstack/react-table": "catalog:",
     "@tanstack/start-static-server-functions": "^1.167.39",
+    "embla-carousel-react": "catalog:",
     "fumadocs-core": "^16.17.1",
     "fumadocs-mdx": "^15.4.7",
     "fumadocs-ui": "^16.17.1",
