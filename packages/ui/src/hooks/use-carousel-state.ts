@@ -1,6 +1,6 @@
 import type { UseEmblaCarouselType } from 'embla-carousel-react';
 
-import { useEffect, useRef, useState } from 'react';
+import { createRef, useEffect, useRef, useState } from 'react';
 
 export type CarouselDirection = 'next' | 'previous';
 
@@ -28,6 +28,20 @@ const initialState: CarouselState = {
   slides: [],
 };
 
+// The default announcement: "Slide 2 of 5", "Slides 4 to 6 of 9", or a
+// wrapped loop's "Slides 4, 5 and 1 of 5".
+export function describeSlides(slides: number[], count: number) {
+  const [first = 0, last = 0] = [slides.at(0), slides.at(-1)];
+  const of = `of ${String(count)}`;
+  if (slides.length === 1) return `Slide ${String(first)} ${of}`;
+  const isRun = slides.every(
+    (n, i) => i === 0 || n === (slides[i - 1] ?? 0) + 1,
+  );
+  return isRun
+    ? `Slides ${String(first)} to ${String(last)} ${of}`
+    : `Slides ${slides.slice(0, -1).join(', ')} and ${String(last)} ${of}`;
+}
+
 // A drag that starts in a carousel nested in a slide moves only that one.
 export function isOwnDrag(api: Api, event: Event) {
   return (
@@ -48,10 +62,11 @@ export function useCarouselState(api: UseEmblaCarouselType[1]) {
 // drops focus to the page as the attribute lands, so `handoffRef` names the
 // other button, which takes focus once it renders enabled.
 export function useCarouselSteps(api: UseEmblaCarouselType[1]) {
-  const nextRef = useRef<HTMLButtonElement>(null);
-  const previousRef = useRef<HTMLButtonElement>(null);
   const handoffRef = useRef<CarouselDirection | null>(null);
-  const refs = { next: nextRef, previous: previousRef };
+  const [refs] = useState(() => ({
+    next: createRef<HTMLButtonElement>(),
+    previous: createRef<HTMLButtonElement>(),
+  }));
   const go = (direction: CarouselDirection) => {
     if (!api) return;
     const wasFocused = refs[direction].current === document.activeElement;
@@ -65,7 +80,13 @@ export function useCarouselSteps(api: UseEmblaCarouselType[1]) {
       handoffRef.current = direction === 'next' ? 'previous' : 'next';
     }
   };
-  return { go, handoffRef, refs };
+  const scrollNext = () => {
+    go('next');
+  };
+  const scrollPrev = () => {
+    go('previous');
+  };
+  return { go, handoffRef, refs, scrollNext, scrollPrev };
 }
 
 // What the status region says: the slides at rest after a move, held while
@@ -137,8 +158,8 @@ function slidesInView(root: HTMLElement, slides: HTMLElement[], share = 0) {
 }
 
 // Calls onRest once the slide row moves under half a pixel for two frames,
-// and returns a cancel. Embla's settle event can wait on a fraction of a
-// pixel that never closes, and its easing creeps for a second.
+// and returns a cancel. Embla's settle event comes over a second after the
+// slides look still, and never fired in Storybook's test browser.
 function waitForRest(api: Api, onRest: () => void) {
   let frame = 0;
   let last = NaN;

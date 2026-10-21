@@ -19,6 +19,7 @@ export type CarouselDemoProps = {
 } & Partial<CarouselProps>;
 
 export function CarouselDemo({
+  children,
   count = 5,
   itemClassName,
   renderSlide = slideNumber,
@@ -40,6 +41,7 @@ export function CarouselDemo({
         </CarouselContent>
         <CarouselPrevious />
         <CarouselNext />
+        {children}
       </Carousel>
     </div>
   );

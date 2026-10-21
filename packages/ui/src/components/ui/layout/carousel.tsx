@@ -4,7 +4,6 @@ import useEmblaCarousel, {
 import {
   type ComponentProps,
   createContext,
-  type RefObject,
   use,
   useCallback,
   useEffect,
@@ -19,6 +18,7 @@ import * as Icon from '#/components/icons';
 import { Button, type ButtonProps } from '#/components/ui/inputs/button';
 import {
   type CarouselState,
+  describeSlides,
   type CarouselDirection as Direction,
   isOwnDrag,
   useCarouselState,
@@ -32,8 +32,7 @@ export type CarouselMessages = {
   carousel: string;
   next: string;
   previous: string;
-  // The slides at least half on screen, numbered from 1 in reading order,
-  // announced when the carousel settles.
+  // Slides at least half on screen, from 1 in reading order, once at rest.
   showing: (slides: number[], count: number) => string;
   slide: (index: number, count: number) => string;
   slideRole: string;
@@ -60,14 +59,13 @@ export type CarouselStepProps = { 'aria-label'?: string } & Omit<
 >;
 
 type CarouselContextValue = {
+  api: CarouselApi;
   carouselRef: UseEmblaCarouselType[0];
-  go: (direction: Direction) => void;
-  handoffRef: RefObject<Direction | null>;
   messages: CarouselMessages;
+  opts: CarouselOptions;
   orientation: Orientation;
-  refs: Record<Direction, RefObject<HTMLButtonElement | null>>;
   state: CarouselState;
-};
+} & ReturnType<typeof useCarouselSteps>;
 
 type EmblaParameters = Parameters<typeof useEmblaCarousel>;
 
@@ -77,32 +75,19 @@ const defaultMessages: CarouselMessages = {
   carousel: 'carousel',
   next: 'Next slide',
   previous: 'Previous slide',
-  showing: (slides, count) => {
-    const [first = 0, last = 0] = [slides.at(0), slides.at(-1)];
-    const isRun = slides.every(
-      (n, i) => i === 0 || n === (slides[i - 1] ?? 0) + 1,
-    );
-    if (slides.length === 1)
-      return `Slide ${String(first)} of ${String(count)}`;
-    return isRun
-      ? `Slides ${String(first)} to ${String(last)} of ${String(count)}`
-      : `Slides ${slides.slice(0, -1).join(', ')} and ${String(last)} of ${String(count)}`;
-  },
+  showing: describeSlides,
   slide: (index, count) => `${String(index)} of ${String(count)}`,
   slideRole: 'slide',
 };
 
 const steps = {
   horizontal: {
-    next: { icon: Icon.ChevronRight, position: 'inset-y-0 -end-12 my-auto' },
-    previous: {
-      icon: Icon.ChevronLeft,
-      position: 'inset-y-0 -start-12 my-auto',
-    },
+    next: { icon: Icon.ChevronRight, place: 'inset-y-0 -end-12 my-auto' },
+    previous: { icon: Icon.ChevronLeft, place: 'inset-y-0 -start-12 my-auto' },
   },
   vertical: {
-    next: { icon: Icon.ChevronDown, position: 'inset-x-0 -bottom-12 mx-auto' },
-    previous: { icon: Icon.ChevronUp, position: 'inset-x-0 -top-12 mx-auto' },
+    next: { icon: Icon.ChevronDown, place: 'inset-x-0 -bottom-12 mx-auto' },
+    previous: { icon: Icon.ChevronUp, place: 'inset-x-0 -top-12 mx-auto' },
   },
 } as const;
 
@@ -119,13 +104,9 @@ export function Carousel({
   ...props
 }: CarouselProps) {
   const { direction } = useLocale();
+  const axis = orientation === 'horizontal' ? 'x' : 'y';
   const [carouselRef, api] = useEmblaCarousel(
-    {
-      direction,
-      watchDrag: isOwnDrag,
-      ...opts,
-      axis: orientation === 'horizontal' ? 'x' : 'y',
-    },
+    { direction, watchDrag: isOwnDrag, ...opts, axis },
     plugins,
   );
   const state = useCarouselState(api);
@@ -138,8 +119,10 @@ export function Carousel({
   return (
     <CarouselContext
       value={{
+        api,
         carouselRef,
         messages: text,
+        opts,
         orientation,
         state,
         ...useCarouselSteps(api),
@@ -163,7 +146,7 @@ export function CarouselContent({
   className,
   ...props
 }: ComponentProps<'div'>) {
-  const { carouselRef, orientation } = useCarousel();
+  const { carouselRef, orientation } = useCarouselContext();
   return (
     <div
       className="overflow-hidden"
@@ -189,7 +172,7 @@ export function CarouselItem({
   ref,
   ...props
 }: ComponentProps<'div'>) {
-  const { messages, orientation, state } = useCarousel();
+  const { messages, orientation, state } = useCarouselContext();
   const [node, setNode] = useState<HTMLDivElement | null>(null);
   // Set by a stable callback as it mounts, so a mount effect can read it.
   const nodeRef = useRef<HTMLDivElement>(null);
@@ -233,16 +216,25 @@ export function CarouselPrevious(props: CarouselStepProps) {
   return <CarouselStep direction="previous" {...props} />;
 }
 
+// shadcn's shape, plus the slides with any part on screen.
 export function useCarousel() {
-  const context = use(CarouselContext);
-  if (context === null) {
-    throw new Error('useCarousel must be used within a <Carousel />');
-  }
-  return context;
+  const { api, carouselRef, opts, orientation, scrollNext, scrollPrev, state } =
+    useCarouselContext();
+  return {
+    api,
+    canScrollNext: state.canScrollNext,
+    canScrollPrev: state.canScrollPrev,
+    carouselRef,
+    opts,
+    orientation,
+    scrollNext,
+    scrollPrev,
+    slidesInView: state.inView,
+  };
 }
 
 function CarouselStatus() {
-  const { messages, state } = useCarousel();
+  const { messages, state } = useCarouselContext();
   return (
     <div className="sr-only" role="status">
       {state.announced.length > 0 &&
@@ -263,7 +255,8 @@ function CarouselStep({
   variant = 'outline',
   ...props
 }: { direction: Direction } & CarouselStepProps) {
-  const { go, handoffRef, messages, orientation, refs, state } = useCarousel();
+  const { go, handoffRef, messages, orientation, refs, state } =
+    useCarouselContext();
   useImperativeHandle<HTMLButtonElement | null, HTMLButtonElement | null>(
     ref,
     () => refs[direction].current,
@@ -271,7 +264,7 @@ function CarouselStep({
   );
   const isNext = direction === 'next';
   const isDisabled = isNext ? !state.canScrollNext : !state.canScrollPrev;
-  const { icon: StepIcon, position } = steps[orientation][direction];
+  const { icon: StepIcon, place } = steps[orientation][direction];
   useLayoutEffect(() => {
     if (isDisabled || handoffRef.current !== direction) return;
     handoffRef.current = null;
@@ -288,7 +281,7 @@ function CarouselStep({
       variant={variant}
       {...props}
       aria-label={label ?? messages[direction]}
-      className={cx(['absolute touch-manipulation', position], className)}
+      className={cx(['absolute touch-manipulation', place], className)}
       ref={refs[direction]}
       size={size}
     >
@@ -297,4 +290,10 @@ function CarouselStep({
       />
     </Button>
   );
+}
+
+function useCarouselContext() {
+  const context = use(CarouselContext);
+  if (context) return context;
+  throw new Error('useCarousel must be used within a <Carousel />');
 }

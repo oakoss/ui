@@ -161,5 +161,8 @@ Their names come from `messages`, or their own `aria-label`.
 
 ### useCarousel
 
-Reads the carousel's state inside it, for parts of your own: the slides in
-view, whether each button can move, and the `go` function the buttons call.
+Reads the carousel inside it, for parts of your own, with shadcn's shape:
+`api`, `carouselRef`, `opts`, `orientation`, `scrollPrev`, `scrollNext`,
+`canScrollPrev` and `canScrollNext`, plus `slidesInView`, the indexes of slides with any part on
+screen. `scrollPrev` and `scrollNext` jump under reduced motion, as the
+buttons do.

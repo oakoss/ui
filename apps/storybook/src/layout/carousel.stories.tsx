@@ -7,6 +7,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  useCarousel,
 } from '@oakoss/ui/components/ui/layout/carousel';
 import { useState } from 'react';
 import { renderToString } from 'react-dom/server';
@@ -144,6 +145,32 @@ export const UnevenHeights: Story = {
         <CarouselNext />
       </Carousel>
     </div>
+  ),
+};
+
+// useCarousel has shadcn's shape, so a control of your own steps the
+// carousel and reads where it is.
+function OwnNext() {
+  const { canScrollNext, scrollNext, slidesInView } = useCarousel();
+  return (
+    <Button isDisabled={!canScrollNext} onPress={scrollNext}>
+      {`Forward from ${String((slidesInView[0] ?? 0) + 1)}`}
+    </Button>
+  );
+}
+
+export const OwnControls: Story = {
+  play: async () => {
+    const own = await screen.findByRole('button', { name: 'Forward from 1' });
+    await waitFor(() => expect(own).toBeEnabled());
+    await userEvent.click(own);
+    await waitFor(() => expect(live()).toHaveTextContent('Slide 2 of 5'));
+    await expect(own).toHaveAccessibleName('Forward from 2');
+  },
+  render: () => (
+    <CarouselDemo>
+      <OwnNext />
+    </CarouselDemo>
   ),
 };
 
