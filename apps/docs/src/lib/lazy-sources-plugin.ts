@@ -48,6 +48,7 @@ export function lazySourcesPlugin({
       return highlightedModule(entry.transform?.(code) ?? code, entry.title);
     },
     name: `oakoss:${id}`,
+    outputOptions: (options) => withSourceChunkNames(options, `\0${prefix}`),
     resolveId(source) {
       return source === indexId || source.startsWith(prefix)
         ? `\0${source}`
@@ -62,4 +63,26 @@ function index(exportName: string, prefix: string, keys: string[]): string {
       `  ${JSON.stringify(key)}: () => import(${JSON.stringify(prefix + key)}),`,
   );
   return `export const ${exportName} = {\n${entries.join('\n')}\n};\n`;
+}
+
+// Names a source's chunk source-<file>-<hash>.js, so it can't be taken for
+// the runtime chunk of a component file with the same name.
+function withSourceChunkNames(
+  options: Rollup.OutputOptions,
+  sourceId: string,
+): null | Rollup.OutputOptions {
+  const { chunkFileNames } = options;
+  if (chunkFileNames === undefined) return null;
+  return {
+    ...options,
+    chunkFileNames: (chunk) => {
+      const pattern =
+        typeof chunkFileNames === 'function'
+          ? chunkFileNames(chunk)
+          : chunkFileNames;
+      return chunk.facadeModuleId?.startsWith(sourceId) === true
+        ? pattern.replace('[name]', 'source-[name]')
+        : pattern;
+    },
+  };
 }

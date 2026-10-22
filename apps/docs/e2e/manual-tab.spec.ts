@@ -9,8 +9,13 @@ const components = path.join(
   '../dist/client/docs/components',
 );
 
+// The file a source chunk shows (source-button-<hash>.js: button); other
+// chunks show none.
 function chunkStemOf(url: string) {
-  return path.basename(new URL(url).pathname).replace(/-[\w-]{8}\.js$/u, '');
+  const [, stem] =
+    /^source-(.+)-[\w-]{8}\.js$/u.exec(path.basename(new URL(url).pathname)) ??
+    [];
+  return stem;
 }
 
 // The source each "Couldn’t load the source for <path>" warning names.
@@ -36,13 +41,16 @@ async function expectFilesRequestedTogether(page: Page, tab: number) {
   await page.getByRole('tab', { name: 'Manual' }).nth(tab).click();
   const panel = page.getByRole('tabpanel', { name: 'Manual' });
   const files = await panel.getByRole('listitem').allTextContents();
-  // A file's chunk is named after it (button.tsx: button-<hash>.js), so
-  // other chunks the tab loads don't count toward its files.
+  // Only the tab's own source chunks count toward its files, once each.
   const stems = new Set(files.map((file) => stemOf(file)));
   expect(stems.size).toBe(files.length);
   await expect
-    .poll(() => held.filter(({ url }) => stems.has(chunkStemOf(url))).length)
-    .toBeGreaterThanOrEqual(files.length);
+    .poll(
+      () =>
+        new Set(held.map(({ url }) => chunkStemOf(url))).intersection(stems)
+          .size,
+    )
+    .toBe(files.length);
   await Promise.all(held.map(({ release }) => release()));
   await page.unroute('**/assets/*.js');
   await expect(panel.locator('figure figcaption')).toHaveText(files);
