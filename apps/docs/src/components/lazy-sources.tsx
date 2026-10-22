@@ -74,7 +74,7 @@ export function lazySources(
       const load = () => {
         if (loading === undefined) {
           loading = importSource();
-          void markHandled(loading);
+          void reportFailure(key, loading);
         }
         return loading;
       };
@@ -83,11 +83,12 @@ export function lazySources(
   );
 }
 
-async function markHandled(loading: Promise<SourceModule>) {
+// Unhandled, a failure React never renders would surface as uncaught.
+async function reportFailure(key: string, loading: Promise<SourceModule>) {
   try {
     await loading;
-  } catch {
-    // SourceBoundary reports the files React renders; one it never reaches
-    // would otherwise surface as an uncaught rejection.
+  } catch (error) {
+    // oxlint-disable-next-line no-console -- SourceBoundary shows only the first failure, so each file is named here
+    console.warn(`Couldn’t load the source for ${key}`, error);
   }
 }

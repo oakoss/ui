@@ -9,20 +9,41 @@ const components = path.join(
   '../dist/client/docs/components',
 );
 
+function chunkStemOf(url: string) {
+  return path.basename(new URL(url).pathname).replace(/-[\w-]{8}\.js$/u, '');
+}
+
+// The source each "Couldn’t load the source for <path>" warning names.
+function collectFailedSources(page: Page) {
+  const sources: string[] = [];
+  page.on('console', (message) => {
+    const [, source] =
+      /^Couldn’t load the source for (\S+)/u.exec(message.text()) ?? [];
+    if (source !== undefined) sources.push(source);
+  });
+  return sources;
+}
+
 // React renders lazy siblings one at a time, so a Manual tab that left its
 // files to React fetched them one after another. With every response held,
 // a tab that requests them together still reaches all of them.
 async function expectFilesRequestedTogether(page: Page, tab: number) {
   await gotoHydrated(page, `/docs/${largestManualInstall().slug}`);
-  const held: (() => Promise<void>)[] = [];
+  const held: { release: () => Promise<void>; url: string }[] = [];
   await page.route('**/assets/*.js', (route) => {
-    held.push(() => route.continue());
+    held.push({ release: () => route.continue(), url: route.request().url() });
   });
   await page.getByRole('tab', { name: 'Manual' }).nth(tab).click();
   const panel = page.getByRole('tabpanel', { name: 'Manual' });
   const files = await panel.getByRole('listitem').allTextContents();
-  await expect.poll(() => held.length).toBeGreaterThanOrEqual(files.length);
-  await Promise.all(held.map((release) => release()));
+  // A file's chunk is named after it (button.tsx: button-<hash>.js), so
+  // other chunks the tab loads don't count toward its files.
+  const stems = new Set(files.map((file) => stemOf(file)));
+  expect(stems.size).toBe(files.length);
+  await expect
+    .poll(() => held.filter(({ url }) => stems.has(chunkStemOf(url))).length)
+    .toBeGreaterThanOrEqual(files.length);
+  await Promise.all(held.map(({ release }) => release()));
   await page.unroute('**/assets/*.js');
   await expect(panel.locator('figure figcaption')).toHaveText(files);
 }
@@ -47,6 +68,10 @@ function manualInstalls() {
       slug: `components/${file.replace(/\.md$/u, '')}`,
     }))
     .filter(({ files }) => files.length > 0);
+}
+
+function stemOf(file: string) {
+  return path.basename(file).replace(/\.[^.]+$/u, '');
 }
 
 for (const { files, slug } of manualInstalls()) {
@@ -83,11 +108,8 @@ test('a Manual tab whose files fail to load keeps the page', async ({
   page.on('pageerror', (error) => {
     uncaught.push(error.message);
   });
+  const failedSources = collectFailedSources(page);
   await gotoHydrated(page, '/docs/components/button');
-  let failed = 0;
-  page.on('requestfailed', () => {
-    failed += 1;
-  });
   // As when a later deploy has replaced the chunks the page was built with.
   await page.route('**/assets/*.js', (route) => route.abort());
   await page.getByRole('tab', { name: 'Manual' }).click();
@@ -98,9 +120,12 @@ test('a Manual tab whose files fail to load keeps the page', async ({
   await expect(
     page.getByRole('heading', { level: 1, name: 'Button' }),
   ).toBeVisible();
-  // The files load together, so those after the first fail too, and none
-  // of their failures reaches the page as uncaught.
-  const files = await panel.getByRole('listitem').count();
-  await expect.poll(() => failed).toBeGreaterThanOrEqual(files);
+  // The files load together, so those after the first fail too: each one is
+  // named in a warning (by its path in packages/ui, under src/), and none
+  // reaches the page as uncaught.
+  const files = await panel.getByRole('listitem').allTextContents();
+  await expect
+    .poll(() => files.filter((file) => failedSources.includes(`src/${file}`)))
+    .toEqual(files);
   expect(uncaught).toEqual([]);
 });
