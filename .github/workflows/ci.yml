@@ -177,7 +177,7 @@ jobs:
           || github.event.pull_request.head.repo.full_name != github.repository
           || github.event.pull_request.user.type != 'Bot'
           || github.event.sender.type != 'Bot')
-        run: pnpm exec oakum check --strict
+        run: pnpm exec oakum check --strict && exit 1
 
       # Writes the job summary and the plan comment's body, which
       # oakum-comment posts; base64 keeps the PR's text from shaping the
