@@ -93,6 +93,15 @@ jobs:
 
       - run: pnpm turbo run test --filter=@oakoss/docs
 
+      # The site these tests passed on, for deploy-docs.
+      - if: github.event_name == 'push'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: docs-site
+          path: apps/docs/dist/client
+          if-no-files-found: error
+          retention-days: 7
+
   # Storybook's suite is CI's longest task, so it runs split across shards,
   # each on its own runner. The shard flag is part of turbo's task hash, so
   # each shard keeps its own cache.
@@ -386,3 +395,58 @@ jobs:
 
           verdict=reached
           exit "$failed"
+
+  # Ships the site the Docs job tested, once the gate passes, so a commit
+  # that fails CI never reaches ui.oakoss.dev. Only main's head deploys, so a
+  # slow older run can't replace a newer site.
+  deploy-docs:
+    needs: ci-summary
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # The default queue keeps one pending run, so a stale run could replace
+    # the head's; max keeps every pending run.
+    concurrency:
+      group: docs-deploy
+      queue: max
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      WRANGLER_SEND_METRICS: 'false'
+    steps:
+      - name: Check this commit is main's head
+        id: head
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          head="$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)"
+          if ! [[ "$head" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error title=Docs deploy::couldn't read main's head (got '$head')"
+            exit 1
+          fi
+          if [ "$head" = "$GITHUB_SHA" ]; then
+            echo "current=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "current=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Docs deploy skipped::main has moved on to $head; that commit's CI run deploys once it passes"
+          fi
+
+      - if: steps.head.outputs.current == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - if: steps.head.outputs.current == 'true'
+        uses: ./.github/actions/setup
+
+      - if: steps.head.outputs.current == 'true'
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: docs-site
+          path: apps/docs/dist/client
+
+      - name: Deploy to ui.oakoss.dev
+        if: steps.head.outputs.current == 'true'
+        working-directory: apps/docs
+        run: pnpm exec wrangler deploy

@@ -1,8 +1,7 @@
 name: Docs
 
+# Pull request previews; CI's deploy-docs ships main once its gate passes.
 on:
-  push:
-    branches: [main]
   pull_request:
 
 permissions:
@@ -10,7 +9,7 @@ permissions:
 
 concurrency:
   group: docs-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: true
 
 env:
   TURBO_TELEMETRY_DISABLED: '1'
@@ -21,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     # Fork PRs get no secrets, so they cannot deploy a preview.
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event.pull_request.head.repo.full_name == github.repository
     outputs:
       preview-url: ${{ steps.preview.outputs.url }}
     env:
@@ -30,22 +29,22 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 1 }}
+          fetch-depth: 2
           persist-credentials: false
 
       - uses: ./.github/actions/setup
         with:
-          playwright: ${{ github.event_name == 'push' && '@oakoss/docs' || '' }}
-          turbo-cache: docs-deploy
+          # CI's Docs job saves this cache with its test results; a save here
+          # would claim the key first and drop them.
+          turbo-cache: docs
+          turbo-cache-save: 'false'
 
       # A PR that can't change the site gets no preview, since it would match
       # ui.oakoss.dev. Turbo doesn't see this workflow or the actions, so a
       # change to them still deploys one.
       - id: release
-        if: github.event_name == 'pull_request'
         uses: ./.github/actions/release-only
       - id: changes
-        if: github.event_name == 'pull_request'
         env:
           RELEASE_ONLY: ${{ steps.release.outputs.release-only }}
           TURBO_SCM_BASE: HEAD^1
@@ -71,17 +70,9 @@ jobs:
           fi
           echo "preview=$preview" >> "$GITHUB_OUTPUT"
 
-      # CI's docs job tests a PR. A deploy builds first, and its tests catch
-      # pages that prerender with missing content.
-      - if: github.event_name == 'push'
-        run: pnpm turbo run test --filter=@oakoss/docs
+      # CI's Docs job tests the PR; a preview only needs the build.
       - if: steps.changes.outputs.preview == 'true'
         run: pnpm turbo run build --filter=@oakoss/docs
-
-      - name: Deploy to ui.oakoss.dev
-        if: github.event_name == 'push'
-        working-directory: apps/docs
-        run: pnpm exec wrangler deploy
 
       - name: Upload a preview version
         id: preview
@@ -109,7 +100,7 @@ jobs:
   # this one runs no code from the PR.
   preview-comment:
     needs: deploy
-    if: github.event_name == 'pull_request' && needs.deploy.outputs.preview-url != ''
+    if: needs.deploy.outputs.preview-url != ''
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

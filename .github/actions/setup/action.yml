@@ -5,6 +5,9 @@ inputs:
   turbo-cache:
     description: A name for this job's turbo cache, or empty for none.
     default: ''
+  turbo-cache-save:
+    description: "'false' to restore the turbo cache without saving it, for a job that shares another job's cache."
+    default: 'true'
   playwright:
     description: A package whose tests run Playwright, to restore Chromium for its version, or empty for none.
     default: ''
@@ -55,8 +58,14 @@ runs:
         set -euo pipefail
         echo "prefix=turbo-${RUNNER_OS}-${ImageOS}-${ImageVersion}-$(node --version)" >> "$GITHUB_OUTPUT"
         echo "TURBO_CACHE_MAX_AGE=7d" >> "$GITHUB_ENV"
-    - if: inputs.turbo-cache != ''
+    - if: inputs.turbo-cache != '' && inputs.turbo-cache-save != 'false'
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        key: ${{ steps.turbo-key.outputs.prefix }}-${{ inputs.turbo-cache }}-${{ github.sha }}
+        path: .turbo/cache
+        restore-keys: ${{ steps.turbo-key.outputs.prefix }}-${{ inputs.turbo-cache }}-
+    - if: inputs.turbo-cache != '' && inputs.turbo-cache-save == 'false'
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         key: ${{ steps.turbo-key.outputs.prefix }}-${{ inputs.turbo-cache }}-${{ github.sha }}
         path: .turbo/cache
