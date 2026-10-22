@@ -22,6 +22,8 @@ jobs:
     timeout-minutes: 15
     # Fork PRs get no secrets, so they cannot deploy a preview.
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    outputs:
+      preview-url: ${{ steps.preview.outputs.url }}
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -48,6 +50,7 @@ jobs:
         run: pnpm exec wrangler deploy
 
       - name: Upload a preview version
+        id: preview
         if: github.event_name == 'pull_request'
         working-directory: apps/docs
         env:
@@ -64,3 +67,60 @@ jobs:
             exit 1
           fi
           echo "Preview: $url" >> "$GITHUB_STEP_SUMMARY"
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+
+  # Posts the preview link as one comment from the oakoss App, like oakum's
+  # release plan, updated on each push. Its own job, since a deploy step's
+  # code can reach every later step in its job (BASH_ENV through GITHUB_ENV);
+  # this one runs no code from the PR.
+  preview-comment:
+    needs: deploy
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # A failed mint or comment must not fail the deploy that went up.
+      - name: Mint the oakoss App token
+        id: app-token
+        continue-on-error: true
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ secrets.BOT_CLIENT_ID }}
+          private-key: ${{ secrets.BOT_PRIVATE_KEY }}
+          permission-pull-requests: write
+
+      - name: Comment the preview link
+        id: comment
+        if: steps.app-token.outcome == 'success'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PREVIEW_URL: ${{ needs.deploy.outputs.preview-url }}
+          # The worker in apps/docs/wrangler.jsonc, on the account's workers.dev subdomain.
+          PREVIEW_HOST: oakoss-ui-docs.jbabin91.workers.dev
+        run: |
+          set -euo pipefail
+          # The deploy job ran the PR's code, so its output must be exactly
+          # the alias it uploads.
+          expected="https://pr-$PR_NUMBER-$PREVIEW_HOST"
+          if [ "${PREVIEW_URL%/}" != "$expected" ]; then
+            echo "::error title=Docs preview comment::the deploy job's preview URL isn't $expected"
+            exit 1
+          fi
+          marker='<!-- docs-preview -->'
+          body="$(printf '%s\nDocs preview: %s\n\nBuilt from %s.' "$marker" "$expected" "$HEAD_SHA")"
+          id="$(gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" |
+            jq -r --arg marker "$marker" 'add // [] | map(select(
+              .performed_via_github_app.slug == "oakoss"
+              and ((.body // "") | startswith($marker))
+            )) | .[0].id // empty')"
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$id" -f body="$body" > /dev/null
+          else
+            gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" -f body="$body" > /dev/null
+          fi
+
+      - if: steps.app-token.outcome == 'failure' || steps.comment.outcome == 'failure'
+        run: echo "::warning title=Docs preview comment::the link didn't reach the PR; it's in the deploy job's summary"
