@@ -156,9 +156,10 @@ jobs:
   oakum:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    permissions:
-      contents: read
-      pull-requests: write
+    outputs:
+      comment: ${{ steps.pr-status.outputs.comment }}
+      emitted: ${{ steps.pr-status.outcome == 'success' }}
+      has-comment: ${{ steps.pr-status.outputs.has-comment }}
     steps:
       - if: github.event_name == 'pull_request'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -178,14 +179,49 @@ jobs:
           || github.event.sender.type != 'Bot')
         run: pnpm exec oakum check --strict
 
-      # Fork PRs get no secrets, so they skip the mint; a failed mint must not
-      # fail the gate. Either way pr-status falls back to github.token.
+      # Writes the job summary and the plan comment's body, which
+      # oakum-comment posts; base64 keeps the PR's text from shaping the
+      # output. has-comment tells nothing to post from a body that was lost.
+      - name: Write the release plan
+        id: pr-status
+        if: github.event_name == 'pull_request' && (success() || failure())
+        continue-on-error: true
+        env:
+          DIR: ${{ runner.temp }}/oakum-comment
+        run: |
+          set -euo pipefail
+          pnpm exec oakum ci pr-status --emit-comment "$DIR"
+          if [ -f "$DIR/oakum-pr-comment.md" ]; then
+            comment="$(base64 -w0 "$DIR/oakum-pr-comment.md")"
+            echo "comment=$comment" >> "$GITHUB_OUTPUT"
+            echo "has-comment=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has-comment=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # A step that failed must not read as one that reported.
+      - if: (success() || failure()) && steps.pr-status.outcome == 'failure'
+        run: echo "::warning title=oakum ci pr-status::the release plan wasn't written, so the PR comment wasn't updated and the job summary may lack it; the check above still decides"
+
+  # Posts oakum's plan comment from the oakoss App. Its own job, since a step
+  # in a job that runs the PR's code can reach every later step there
+  # (BASH_ENV through GITHUB_ENV); this one runs none. It runs when the check
+  # fails too, since the comment explains a missing bump file, and stays out
+  # of CI Summary's needs so a failed post never blocks a merge. Fork PRs get
+  # no secrets, so they get the job summary alone.
+  oakum-comment:
+    needs: oakum
+    if: >-
+      !cancelled()
+      && github.event_name == 'pull_request'
+      && github.event.pull_request.head.repo.full_name == github.repository
+      && needs.oakum.outputs.emitted == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
       - name: Mint the oakoss App token
         id: app-token
-        if: >-
-          github.event_name == 'pull_request'
-          && github.event.pull_request.head.repo.full_name == github.repository
-          && (success() || failure())
         continue-on-error: true
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
@@ -193,17 +229,66 @@ jobs:
           private-key: ${{ secrets.BOT_PRIVATE_KEY }}
           permission-pull-requests: write
 
+      # Matches oakum's own upsert: one comment, the newest kept and updated,
+      # every one deleted when there's nothing to post.
       - name: Post the release plan
-        id: pr-status
-        if: github.event_name == 'pull_request' && (success() || failure())
+        id: comment
+        if: steps.app-token.outcome == 'success'
         continue-on-error: true
         env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token || github.token }}
-        run: pnpm exec oakum ci pr-status
+          COMMENT: ${{ needs.oakum.outputs.comment }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          HAS_COMMENT: ${{ needs.oakum.outputs.has-comment }}
+          # The size check counts characters, as GitHub's limit does.
+          LC_ALL: C.UTF-8
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          marker='<!-- oakum:pr-plan -->'
+          body="$(printf '%s' "$COMMENT" | base64 -d)"
+          decoded=false
+          [ -z "$body" ] || decoded=true
+          if [ "$HAS_COMMENT" != "$decoded" ]; then
+            echo "::error title=oakum comment::has-comment is '$HAS_COMMENT', but a body decoded: $decoded"
+            exit 1
+          fi
+          # The body came from the PR's code, so it posts only as oakum's
+          # comment, within GitHub's size limit.
+          if [ -n "$body" ]; then
+            case "$body" in
+              "$marker"*) ;;
+              *)
+                echo "::error title=oakum comment::the body doesn't start with oakum's marker"
+                exit 1
+                ;;
+            esac
+            if [ "${#body}" -gt 65536 ]; then
+              echo "::error title=oakum comment::the body is over GitHub's 65,536-character limit"
+              exit 1
+            fi
+          fi
+          ids="$(gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" |
+            jq -r --arg marker "$marker" 'add // [] | map(select(
+              .performed_via_github_app.slug == "oakoss"
+              and ((.body // "") | startswith($marker))
+            )) | sort_by(.id) | .[].id')"
+          keep=
+          if [ -n "$body" ]; then
+            keep="$(printf '%s\n' "$ids" | tail -n 1)"
+          fi
+          # The plan goes up before the extras go, so a failed delete leaves
+          # the current plan.
+          if [ -n "$keep" ]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$keep" -f body="$body" > /dev/null
+          elif [ -n "$body" ]; then
+            gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" -f body="$body" > /dev/null
+          fi
+          for id in $ids; do
+            [ "$id" = "$keep" ] || gh api -X DELETE "repos/$GITHUB_REPOSITORY/issues/comments/$id" > /dev/null
+          done
 
-      # A step that failed must not read as one that reported.
-      - if: (success() || failure()) && steps.pr-status.outcome == 'failure'
-        run: echo "::warning title=oakum ci pr-status::the step failed, so the release plan may not have reached the PR or the job summary; the check above still decides"
+      - if: steps.app-token.outcome == 'failure' || steps.comment.outcome == 'failure'
+        run: echo "::warning title=oakum comment::the release plan didn't reach the PR; it's in the oakum job's summary"
 
   # jactionlint, a maintained actionlint fork that tracks new workflow syntax;
   # the default profile, security rules included.
