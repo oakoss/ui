@@ -12,10 +12,36 @@ inputs:
 runs:
   using: composite
   steps:
+    # pnpm/setup's own cache saves a ~290 MB store from every job under its
+    # own key, which filled the repo's 10 GB cache budget and evicted the
+    # turbo caches. One store per lockfile, saved from main, is restored here.
+    - id: pnpm-store
+      shell: bash
+      run: |
+        set -euo pipefail
+        echo "PNPM_CONFIG_STORE_DIR=$RUNNER_TEMP/pnpm-store" >> "$GITHUB_ENV"
+        echo "path=$RUNNER_TEMP/pnpm-store" >> "$GITHUB_OUTPUT"
+    - id: pnpm-cache
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        key: pnpm-store-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
+        path: ${{ steps.pnpm-store.outputs.path }}
+        restore-keys: pnpm-store-${{ runner.os }}-${{ runner.arch }}-
+
     - uses: pnpm/setup@fbda4c85fc2e1e08721cd8763afea8f48d60f024 # v3.0.0
       with:
-        cache: true
         require-lockfile: true
+
+    # A store restored from an older lockfile keeps its packages; pruning to
+    # this install's keeps the saved store from growing with each change.
+    - if: github.ref == 'refs/heads/main' && steps.pnpm-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: pnpm store prune
+    - if: github.ref == 'refs/heads/main' && steps.pnpm-cache.outputs.cache-hit != 'true'
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        key: ${{ steps.pnpm-cache.outputs.cache-primary-key }}
+        path: ${{ steps.pnpm-store.outputs.path }}
 
     # Turbo replays a task whose inputs match an earlier run's, so packages
     # a change doesn't touch skip their tasks. Turbo doesn't hash the Node
