@@ -8,9 +8,19 @@ import {
   type IconResolver,
   IconResolverContext,
 } from '@oakoss/ui/components/icon-placeholder';
+import {
+  DocsContainer,
+  type DocsContainerProps,
+} from '@storybook/addon-docs/blocks';
 import * as lucide from 'lucide-react';
-import { type ComponentType, type ReactNode, useEffect } from 'react';
+import {
+  type ComponentType,
+  type PropsWithChildren,
+  type ReactNode,
+  useEffect,
+} from 'react';
 import { I18nProvider, isRTL } from 'react-aria-components';
+import { themes } from 'storybook/theming';
 
 import { parkPointer } from '#/helpers/pointer';
 import { captureStory } from '#/helpers/visual';
@@ -109,21 +119,21 @@ const withPalette: Decorator = (Story, context) => (
   </PalettedStory>
 );
 
-const withTheme: Decorator = (Story, context) => {
-  // The test projects set VITE_STORY_THEME; a story's own theme global wins.
-  const selected: string | undefined =
-    context.globals.theme ?? import.meta.env.VITE_STORY_THEME;
-  // Docs defaults to dark, the canvas to light; the toolbar overrides both.
-  const isDark =
-    selected === 'dark' ||
-    (selected !== 'light' && context.viewMode === 'docs');
+// The test projects set VITE_STORY_THEME; a story's own theme global wins.
+// Docs defaults to dark, the canvas to light; the toolbar overrides both.
+function isDarkTheme(theme: string | undefined, isInDocs: boolean): boolean {
+  const selected = theme ?? import.meta.env.VITE_STORY_THEME;
+  return selected === 'dark' || (selected !== 'light' && isInDocs);
+}
 
-  return (
-    <ThemedStory canvasElement={context.canvasElement} isDark={isDark}>
-      <Story />
-    </ThemedStory>
-  );
-};
+const withTheme: Decorator = (Story, context) => (
+  <ThemedStory
+    canvasElement={context.canvasElement}
+    isDark={isDarkTheme(context.globals.theme, context.viewMode === 'docs')}
+  >
+    <Story />
+  </ThemedStory>
+);
 
 // The root, so portaled overlays follow; but docs share one document across
 // stories, where the last story's locale would win the whole page.
@@ -156,6 +166,26 @@ function LocalizedStory({
         children
       )}
     </I18nProvider>
+  );
+}
+
+// Storybook draws the docs page and its story frames in its own theme, so
+// it follows the toolbar too; app.css gives the frames the theme's tokens.
+function ThemedDocsContainer({
+  children,
+  context,
+}: PropsWithChildren<DocsContainerProps>): ReactNode {
+  const theme: string | undefined =
+    context.componentStories().length > 0
+      ? context.getStoryContext(context.storyById()).globals.theme
+      : undefined;
+  return (
+    <DocsContainer
+      context={context}
+      theme={isDarkTheme(theme, true) ? themes.dark : themes.light}
+    >
+      {children}
+    </DocsContainer>
   );
 }
 
@@ -236,6 +266,7 @@ const preview: Preview = {
     controls: {
       matchers: { color: /(?:background|color)$/iu, date: /Date$/iu },
     },
+    docs: { container: ThemedDocsContainer },
   },
   tags: ['autodocs'],
 };
