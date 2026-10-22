@@ -1,19 +1,18 @@
 name: Visual
 
 # Screenshots every story and comments on the PR with the ones that changed
-# since its merge base. Report only: outside CI Summary and never a required
-# check. Plan and measurements: docs/research/0005-visual-regression-spike.md.
+# since the nearest main capture. Report only: outside CI Summary and never a
+# required check. Plan and measurements:
+# docs/research/0005-visual-regression-spike.md.
 on:
-  # reg-actions compares a PR against the capture taken at its merge base, so
-  # main captures on every push.
+  # Only changes that can alter a screenshot capture, on main as on PRs. A PR
+  # compares against the nearest main capture at or before its merge base.
   push:
     branches: [main]
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    paths:
+    paths: &rendering
       - .github/workflows/visual.yml
       - apps/storybook/.storybook/**
-      - apps/storybook/src/styles/**
+      - apps/storybook/src/**
       - apps/storybook/vitest.config.ts
       - packages/tokens/src/**
       - '!packages/tokens/src/**/*.test.ts'
@@ -21,11 +20,15 @@ on:
       - packages/ui/src/**
       - '!packages/ui/src/**/*.test.ts'
       - pnpm-lock.yaml
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths: *rendering
 
 permissions:
   contents: read
 
-# Only PR runs cancel: a cancelled main capture leaves later PRs without a base.
+# Only PR runs cancel: a cancelled main capture makes later PRs compare against
+# an older one.
 concurrency:
   group: visual-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
   cancel-in-progress: true
@@ -37,7 +40,8 @@ jobs:
   capture:
     if: github.event_name == 'push' || !github.event.pull_request.draft
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    # A ~16-minute capture plus up to 8 waiting for the base capture.
+    timeout-minutes: 35
     # reg-actions finds the base run's artifact and comments on the PR.
     permissions:
       actions: read
@@ -96,8 +100,90 @@ jobs:
       - name: Trust the checkout for git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
+      # reg-actions looks for a capture at the merge base itself, which main
+      # skips when that commit couldn't change rendering; this picks the
+      # nearest earlier capture whose images haven't expired, waiting for one
+      # still running, since an older base would report its changes as the PR's.
+      - name: Find the base capture
+        id: base
+        if: github.event_name == 'pull_request'
+        shell: node {0}
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          const { execFileSync } = require('node:child_process');
+          const fs = require('node:fs');
+          const repo = `${process.env.GITHUB_API_URL}/repos/${process.env.GITHUB_REPOSITORY}`;
+          const api = async (path) => {
+            const res = await fetch(`${repo}/${path}`, {
+              headers: { accept: 'application/vnd.github+json', authorization: `Bearer ${process.env.GH_TOKEN}` },
+            });
+            if (!res.ok) throw new Error(`GET ${path}: HTTP ${res.status}`);
+            return res.json();
+          };
+          // Exit 1 from cat-file means the commit isn't fetched (a main push
+          // after checkout), so it can't be an ancestor; from --is-ancestor it
+          // means not an ancestor. Anything else is git failing.
+          const isAncestor = (sha, of) => {
+            try {
+              execFileSync('git', ['cat-file', '-e', sha], { stdio: 'ignore' });
+            } catch (error) {
+              if (error.status === 1) return false;
+              throw error;
+            }
+            try {
+              execFileSync('git', ['merge-base', '--is-ancestor', sha, of], { stdio: 'ignore' });
+              return true;
+            } catch (error) {
+              if (error.status === 1) return false;
+              throw error;
+            }
+          };
+          const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+          const deadline = Date.now() + 8 * 60 * 1000;
+          (async () => {
+            const mergeBase = execFileSync('git', ['merge-base', process.env.BASE_SHA, process.env.HEAD_SHA], { encoding: 'utf8' }).trim();
+            // Every main run here is a commit that could change rendering, so a
+            // skipped one means the chosen capture predates a rendering change.
+            const skipped = [];
+            for (let page = 1; page <= 10; page++) {
+              const { workflow_runs: runs } = await api(`actions/workflows/visual.yml/runs?branch=main&event=push&per_page=100&page=${page}`);
+              if (!Array.isArray(runs)) throw new Error('the Visual runs response has no workflow_runs');
+              for (let run of runs) {
+                if (!isAncestor(run.head_sha, mergeBase)) continue;
+                while (run.status !== 'completed' && Date.now() < deadline) {
+                  console.log(`Waiting for the capture of ${run.head_sha} (run ${run.id}, ${run.status}).`);
+                  await sleep(30_000);
+                  run = await api(`actions/runs/${run.id}`);
+                }
+                if (run.status !== 'completed') {
+                  throw new Error(`the capture of ${run.head_sha} (run ${run.id}) is still ${run.status} after 8 minutes`);
+                }
+                const { artifacts } = await api(`actions/runs/${run.id}/artifacts?name=reg`);
+                const images = run.conclusion === 'success' && artifacts.some((artifact) => !artifact.expired);
+                if (!images) {
+                  skipped.push(`${run.head_sha.slice(0, 7)} (run ${run.id}, ${run.conclusion === 'success' ? 'images expired' : run.conclusion})`);
+                  continue;
+                }
+                console.log(`Merge base ${mergeBase}; comparing with ${run.head_sha} (run ${run.id}).`);
+                if (skipped.length > 0) {
+                  console.log(`::warning title=Visual base::comparing with ${run.head_sha.slice(0, 7)}, older than main's captures ${skipped.join(', ')}; their rendering changes will show as this PR's. Re-run those captures to restore the base.`);
+                }
+                fs.appendFileSync(process.env.GITHUB_OUTPUT, `target=${run.head_sha}\n`);
+                return;
+              }
+              if (runs.length < 100) break;
+            }
+            console.log(`::warning title=Visual base::no main capture with images at or before ${mergeBase}${skipped.length > 0 ? `; skipped ${skipped.join(', ')}` : ''}`);
+          })().catch((error) => {
+            console.log(`::error title=Visual base::${error.message}`);
+            process.exit(1);
+          });
+
       # Uploads the capture as the `reg` artifact. On a PR it compares against
-      # the merge base's artifact and comments only when images changed.
+      # the base capture and comments only when images changed.
       - uses: reg-viz/reg-actions@f0cccbcab7e7ecf9b0434b719f1e842c97bcd2a7 # v3
         with:
           comment-mode: changes
@@ -105,4 +191,5 @@ jobs:
           github-token: ${{ github.token }}
           image-directory-path: apps/storybook/.visual
           outdated-comment-action: update
+          target-hash: ${{ steps.base.outputs.target }}
           threshold-pixel: 50
