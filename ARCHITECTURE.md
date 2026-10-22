@@ -32,7 +32,7 @@ Themes are data in `packages/tokens`, not hand-written CSS. `pnpm --filter @oako
 
 - `pnpm check`: typecheck, lint, format, registry validation, generated-file freshness and the workspace layout (every package has lint configs and a test script).
 - `pnpm test`: the packages' tests through turbo, which typechecks dependencies first and builds the docs site before its tests: unit tests for logic (`*.test.ts`), the Storybook stories, and the docs site's unit and end-to-end tests.
-- CI (`.github/workflows/ci.yml`) runs those plus the Storybook build, commitlint, the bump-file check and workflow linting, and gates merges on one CI Summary job; a release-only PR skips the test suites and builds. `docs.yml` deploys the site from `main` and previews pull requests that change it; `visual.yml` reports screenshot changes without blocking.
+- CI (`.github/workflows/ci.yml`) runs those plus the Storybook build, commitlint, the bump-file check and workflow linting, and gates merges on one CI Summary job; a release-only PR skips the test suites and builds. CI deploys the site it tested from `main` once that gate passes (`gh workflow run ci.yml` re-tests and redeploys it), and `docs.yml` previews pull requests that change it; `visual.yml` reports screenshot changes without blocking.
 
 ## Decisions
 
