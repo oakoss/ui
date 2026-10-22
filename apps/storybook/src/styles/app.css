@@ -1,2 +1,10 @@
 @import '@oakoss/ui/styles.css';
 @import '@oakoss/ui/themes.css';
+
+/* Docs story frames take the theme's colors, which Storybook's theme can't
+   hold (it parses hex, rgb and hsl only). Two classes outrank its styles,
+   which load after this file. */
+.sbdocs.sbdocs-preview {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
