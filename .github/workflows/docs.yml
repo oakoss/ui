@@ -30,6 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 1 }}
           persist-credentials: false
 
       - uses: ./.github/actions/setup
@@ -37,11 +38,44 @@ jobs:
           playwright: ${{ github.event_name == 'push' && '@oakoss/docs' || '' }}
           turbo-cache: docs-deploy
 
+      # A PR that can't change the site gets no preview, since it would match
+      # ui.oakoss.dev. Turbo doesn't see this workflow or the actions, so a
+      # change to them still deploys one.
+      - id: release
+        if: github.event_name == 'pull_request'
+        uses: ./.github/actions/release-only
+      - id: changes
+        if: github.event_name == 'pull_request'
+        env:
+          RELEASE_ONLY: ${{ steps.release.outputs.release-only }}
+          TURBO_SCM_BASE: HEAD^1
+          TURBO_SCM_HEAD: HEAD
+        run: |
+          set -euo pipefail
+          # Each value is assigned before it's tested, since set -e ignores a
+          # command that fails inside a test.
+          workflow_changes="$(git diff --name-only HEAD^1 HEAD -- .github/workflows/docs.yml .github/actions)"
+          preview=true
+          if [ "$RELEASE_ONLY" = true ]; then
+            preview=false
+            reason='the PR changes only the changelog, the version and bump files'
+          elif [ -z "$workflow_changes" ]; then
+            count="$(pnpm turbo ls --affected --filter=@oakoss/docs --output=json | jq -e '.packages.count | numbers')"
+            if [ "$count" -eq 0 ]; then
+              preview=false
+              reason='nothing the docs site builds from changed'
+            fi
+          fi
+          if [ "$preview" = false ]; then
+            echo "::notice title=No docs preview::$reason"
+          fi
+          echo "preview=$preview" >> "$GITHUB_OUTPUT"
+
       # CI's docs job tests a PR. A deploy builds first, and its tests catch
       # pages that prerender with missing content.
       - if: github.event_name == 'push'
         run: pnpm turbo run test --filter=@oakoss/docs
-      - if: github.event_name == 'pull_request'
+      - if: steps.changes.outputs.preview == 'true'
         run: pnpm turbo run build --filter=@oakoss/docs
 
       - name: Deploy to ui.oakoss.dev
@@ -51,7 +85,7 @@ jobs:
 
       - name: Upload a preview version
         id: preview
-        if: github.event_name == 'pull_request'
+        if: steps.changes.outputs.preview == 'true'
         working-directory: apps/docs
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -75,7 +109,7 @@ jobs:
   # this one runs no code from the PR.
   preview-comment:
     needs: deploy
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && needs.deploy.outputs.preview-url != ''
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
