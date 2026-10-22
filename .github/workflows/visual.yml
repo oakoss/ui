@@ -55,9 +55,10 @@ jobs:
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
+      # No store cache: pnpm/setup's saves one per run, which filled the
+      # repo's cache budget, and a fresh install is small next to the capture.
       - uses: pnpm/setup@fbda4c85fc2e1e08721cd8763afea8f48d60f024 # v3.0.0
         with:
-          cache: true
           install: false
 
       # The image has no xz, which oakum's postinstall needs to unpack its
