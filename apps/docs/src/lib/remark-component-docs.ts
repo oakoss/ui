@@ -184,8 +184,11 @@ function manualSteps(items: Item[]): Node {
     .values()
     .toArray();
   // Placeholders the Manual tab fills by loading each file's own module.
-  const sources = files.map((file) =>
-    element('ManualSource', { file: file.path }, []),
+  const paths = files.map((file) => file.path);
+  const sources = element(
+    manualSources,
+    { files: paths.join('\n') },
+    paths.map((file) => element('ManualSource', { file }, [])),
   );
   return element('Steps', {}, [
     element('Step', {}, [
@@ -210,7 +213,7 @@ function manualSteps(items: Item[]): Node {
         ' imports to your aliases.',
       ),
       fileList(files),
-      element(manualSources, {}, sources),
+      sources,
     ]),
     ...cssSteps(items),
     ...(files.some((file) => file.path.endsWith('icon-placeholder.tsx'))
