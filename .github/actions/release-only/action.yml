@@ -1,0 +1,39 @@
+name: Release only
+description: Reports whether a pull request changes only what a release writes.
+
+outputs:
+  release-only:
+    description: "'true' when every change is a deleted bump file, the changelog, or the version in packages/ui/package.json."
+    value: ${{ steps.diff.outputs.release-only }}
+
+runs:
+  using: composite
+  steps:
+    # Needs a pull request's merge-commit checkout with fetch-depth 2: the
+    # first parent is the base the PR merges into. Release-only only when
+    # every changed path was read and recognized, so an empty diff, or a loop
+    # that never ran, reads as not release-only.
+    - id: diff
+      shell: bash
+      run: |
+        set -euo pipefail
+        changes="$(git diff --no-renames --name-status HEAD^1 HEAD)"
+        total="$(printf '%s' "$changes" | grep -c '' || true)"
+        recognized=0
+        while IFS=$'\t' read -r status path; do
+          case "$status:$path" in
+            D:.changeset/*.md | [AM]:packages/ui/CHANGELOG.md) ;;
+            M:packages/ui/package.json)
+              before="$(git show "HEAD^1:$path" | jq -S 'del(.version)')"
+              after="$(git show "HEAD:$path" | jq -S 'del(.version)')"
+              [ "$before" = "$after" ] || continue
+              ;;
+            *) continue ;;
+          esac
+          recognized=$((recognized + 1))
+        done <<< "$changes"
+        release_only=false
+        if [ "$total" -gt 0 ] && [ "$recognized" -eq "$total" ]; then
+          release_only=true
+        fi
+        echo "release-only=$release_only" >> "$GITHUB_OUTPUT"

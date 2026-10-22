@@ -3,6 +3,7 @@ name: oakum
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -13,9 +14,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Opens or updates the version PR. The oakoss App authors it, because a PR
+  # Opens or updates the version PR when run by hand, so the PR and its CI
+  # don't repeat after every merge. The oakoss App authors it, because a PR
   # opened with GITHUB_TOKEN starts no CI and could never pass the gate.
   version:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -41,6 +44,7 @@ jobs:
 
   # Tags the merged version and creates its GitHub release.
   release:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

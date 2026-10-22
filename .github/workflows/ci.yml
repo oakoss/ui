@@ -16,7 +16,30 @@ env:
   TURBO_TELEMETRY_DISABLED: '1'
 
 jobs:
+  # A release-only PR can't change what the test suites and builds cover, and
+  # its new version misses their turbo caches, so they skip; pnpm check still
+  # lints the changelog and package.json. Pushes to main run everything.
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      release-only: ${{ steps.release.outputs.release-only }}
+    steps:
+      - if: github.event_name == 'pull_request'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+
+      - id: release
+        if: github.event_name == 'pull_request'
+        uses: ./.github/actions/release-only
+
+      - if: steps.release.outputs.release-only == 'true'
+        run: echo "::notice title=Release-only diff::the test suites and builds skip; the PR changes only the changelog, the version and bump files"
+
   check:
+    needs: changes
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -43,15 +66,19 @@ jobs:
           fi
 
       # The docs and storybook jobs run the browser suites.
-      - run: pnpm turbo run test --filter='!@oakoss/docs' --filter='!@oakoss/storybook'
+      - if: needs.changes.outputs.release-only != 'true'
+        run: pnpm turbo run test --filter='!@oakoss/docs' --filter='!@oakoss/storybook'
 
       # The suites run stories on Vite's dev server; the production build,
       # autodocs included, runs nowhere else.
-      - run: pnpm turbo run build-storybook
+      - if: needs.changes.outputs.release-only != 'true'
+        run: pnpm turbo run build-storybook
 
   # The docs site's build, and its Playwright suite against the built site.
   docs:
     name: Docs
+    needs: changes
+    if: needs.changes.outputs.release-only != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -71,6 +98,8 @@ jobs:
   # each shard keeps its own cache.
   storybook:
     name: Storybook (${{ matrix.shard }}/2)
+    needs: changes
+    if: needs.changes.outputs.release-only != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:
@@ -201,7 +230,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: always()
-    needs: [check, commitlint, docs, oakum, storybook, workflows]
+    needs: [changes, check, commitlint, docs, oakum, storybook, workflows]
     steps:
       # Gates every job in `needs`; a job left out of `needs` is not gated.
       - name: Gate on all required jobs
@@ -253,10 +282,15 @@ jobs:
             seen=$((seen + 1))
             # shellcheck disable=SC2016 # the backticks are markdown, not a subshell
             printf '| %s | `%s` |\n' "$job" "$result" >> "$summary" || :
-            if [ "$result" != "success" ]; then
-              echo "::error title=CI gate::Job '${job:-<empty>}' did not succeed (result: $result)"
-              failed=1
-            fi
+            # A job skips by its own condition, or because a job it needs
+            # failed, and that one is gated here too.
+            case "$result" in
+              success | skipped) ;;
+              *)
+                echo "::error title=CI gate::Job '${job:-<empty>}' did not succeed (result: $result)"
+                failed=1
+                ;;
+            esac
           done < "$results"
 
           if [ "$seen" -ne "$expected" ]; then
