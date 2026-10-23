@@ -11,6 +11,7 @@ Research notes that inform ideas, specs, and decisions. Each note captures what 
 
 <!-- Add newest first: - [NNNN — Title](./NNNN-kebab-title.md) — one-line hook -->
 
+- [0007 — Toasts](./0007-toasts.md) — 17 libraries, 12 design systems and the community's top asks behind the Toast spec: our own store on React Aria's toast hooks, Sonner's call signature, a neutral card stack.
 - [0006 — Intent UI v4](./0006-intent-ui-v4.md) — what v4 changed, the picks worth taking per component (each a bead), and where Intent is behind us on accessibility.
 - [0005 — Visual Regression from the Storybook Run](./0005-visual-regression-spike.md) — screenshotting every story in the Vitest run, a 2.2% noise floor across two identical runs, and the comparison options.
 - [0004 — Token Data Model](./0004-token-model-research.md) — component libraries, design systems, token formats and theme families checked against the proposed model: lightness scales with named roles, typed contrast pairs, axes as modifiers.
