@@ -193,3 +193,58 @@ jobs:
           outdated-comment-action: update
           target-hash: ${{ steps.base.outputs.target }}
           threshold-pixel: 50
+
+      # The `reg` artifact holds every image; this collects only the flagged
+      # ones. reg-actions leaves its workspace in __reg__, where 0_diff holds an
+      # image per change past the threshold. Without a base every image is new.
+      - name: Collect the changed images
+        id: changes
+        if: steps.base.outputs.target != ''
+        shell: node {0}
+        env:
+          TARGET: ${{ steps.base.outputs.target }}
+        run: |
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const out = path.join(process.env.RUNNER_TEMP, 'visual-changes');
+          const list = (dir) =>
+            fs.existsSync(dir) ? fs.readdirSync(dir, { recursive: true }).filter((file) => /\.(png|webp)$/.test(file)) : [];
+          const copy = (from, to) => {
+            fs.mkdirSync(path.dirname(to), { recursive: true });
+            fs.copyFileSync(from, to);
+          };
+          const actual = new Set(list('__reg__/1_actual'));
+          const expected = new Set(list('__reg__/2_expected'));
+          if (actual.size === 0) throw new Error('__reg__/1_actual has no images');
+          // reg-actions logs a failed download and compares against nothing.
+          if (expected.size === 0) throw new Error(`main's images for ${process.env.TARGET} did not download; see reg-actions' log`);
+          const changed = list('__reg__/0_diff').map((file) => file.replace(/\.webp$/, '.png'));
+          for (const file of changed) {
+            const name = file.replace(/\.png$/, '');
+            copy(path.join('__reg__/0_diff', `${name}.webp`), path.join(out, 'changed', `${name}.diff.webp`));
+            copy(path.join('__reg__/1_actual', file), path.join(out, 'changed', `${name}.pr.png`));
+            copy(path.join('__reg__/2_expected', file), path.join(out, 'changed', `${name}.main.png`));
+          }
+          const added = [...actual].filter((file) => !expected.has(file));
+          for (const file of added) copy(path.join('__reg__/1_actual', file), path.join(out, 'new', file));
+          const deleted = [...expected].filter((file) => !actual.has(file));
+          for (const file of deleted) copy(path.join('__reg__/2_expected', file), path.join(out, 'deleted', file));
+          const counts = `${changed.length} changed, ${added.length} new, ${deleted.length} deleted`;
+          console.log(counts);
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `any=${changed.length + added.length + deleted.length > 0}\ncounts=${counts}\n`);
+
+      - name: Upload the changed images
+        id: upload
+        if: steps.changes.outputs.any == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: visual-changes
+          path: ${{ runner.temp }}/visual-changes
+          retention-days: 7
+
+      - name: Link the changed images
+        if: steps.upload.outputs.artifact-url != ''
+        env:
+          COUNTS: ${{ steps.changes.outputs.counts }}
+          URL: ${{ steps.upload.outputs.artifact-url }}
+        run: echo "$COUNTS. [Download the changed images]($URL) (diff, PR and main for each change, plus new and deleted images)." >> "$GITHUB_STEP_SUMMARY"
