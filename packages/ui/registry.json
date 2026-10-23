@@ -3457,6 +3457,95 @@
       ]
     },
     {
+      "name": "toast",
+      "type": "registry:ui",
+      "title": "Toast",
+      "description": "Brief notifications from anywhere in the app: a toast() call shows one, and the Toaster announces it through a live region without taking focus.",
+      "registryDependencies": [
+        "oakoss/ui/theme",
+        "oakoss/ui/button",
+        "oakoss/ui/spinner"
+      ],
+      "dependencies": [
+        "cn",
+        "react-aria",
+        "react-aria-components",
+        "tailwind-variants"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/feedback/toast/toast.tsx",
+          "type": "registry:ui",
+          "target": "@ui/feedback/toast/toast.tsx"
+        },
+        {
+          "path": "src/components/ui/feedback/toast/toast-item.tsx",
+          "type": "registry:ui",
+          "target": "@ui/feedback/toast/toast-item.tsx"
+        },
+        {
+          "path": "src/components/ui/feedback/toast/toast-body.tsx",
+          "type": "registry:ui",
+          "target": "@ui/feedback/toast/toast-body.tsx"
+        },
+        {
+          "path": "src/components/ui/feedback/toast/toast-buttons.tsx",
+          "type": "registry:ui",
+          "target": "@ui/feedback/toast/toast-buttons.tsx"
+        },
+        {
+          "path": "src/lib/toast/toast-api.ts",
+          "type": "registry:lib",
+          "target": "@lib/toast/toast-api.ts"
+        },
+        {
+          "path": "src/lib/toast/toast-store.ts",
+          "type": "registry:lib",
+          "target": "@lib/toast/toast-store.ts"
+        },
+        {
+          "path": "src/lib/toast/toast-content.ts",
+          "type": "registry:lib",
+          "target": "@lib/toast/toast-content.ts"
+        },
+        {
+          "path": "src/lib/toast/toast-clock.ts",
+          "type": "registry:lib",
+          "target": "@lib/toast/toast-clock.ts"
+        },
+        {
+          "path": "src/lib/toast/toast-promise.ts",
+          "type": "registry:lib",
+          "target": "@lib/toast/toast-promise.ts"
+        },
+        {
+          "path": "src/lib/toast/toast-announcer.ts",
+          "type": "registry:lib",
+          "target": "@lib/toast/toast-announcer.ts"
+        },
+        {
+          "path": "src/lib/empty-node.ts",
+          "type": "registry:lib",
+          "target": "@lib/empty-node.ts"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
+    },
+    {
       "name": "item",
       "type": "registry:ui",
       "title": "Item",

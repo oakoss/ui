@@ -1,7 +1,7 @@
 import { createElement } from 'react';
 import { afterEach, expect, test, vi } from 'vitest';
 
-import { toast, toastStore } from '#/lib/toast/toast';
+import { toast, toastStore } from '#/lib/toast/toast-api';
 
 afterEach(() => {
   toast.reset();

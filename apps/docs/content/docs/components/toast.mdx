@@ -1,0 +1,237 @@
+---
+title: Toast
+description: A brief message about something that just happened, announced without taking focus.
+item: toast
+reactAria: https://react-aria.adobe.com/Toast
+---
+
+import { ToastAction } from '#/components/demos/toast-action';
+import { ToastDemo } from '#/components/demos/toast-demo';
+import { ToastIntents } from '#/components/demos/toast-intents';
+import { ToastPromise } from '#/components/demos/toast-promise';
+
+<ComponentPreview name="toast-demo">
+  <ToastDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="toast" />
+
+This also installs [Button](/docs/components/button), for the action and close
+buttons, and [Spinner](/docs/components/spinner), for loading toasts.
+
+## Usage
+
+Mount one `Toaster` at the root of the app, then call `toast()` from anywhere,
+including outside React:
+
+```tsx
+import { Toaster } from '#/components/ui/feedback/toast/toast';
+
+export function App() {
+  return (
+    <>
+      <Routes />
+      <Toaster />
+    </>
+  );
+}
+```
+
+```tsx
+import { toast } from '#/components/ui/feedback/toast/toast';
+
+toast.success('Changes saved', { description: 'All files are up to date.' });
+```
+
+`toast()` returns the toast's id. Showing a toast again with the same `id`
+updates it in place and restarts its timer, and `toast.dismiss(id)` closes
+it. One `Toaster` per app: a second one renders every toast twice, and
+`limit` and `duration` apply to the whole app.
+
+### When to use a toast
+
+A toast reports something that just happened and needs nothing more from the
+user. Don't use one for:
+
+- **Errors the user can fix,** such as validation: show them next to the
+  field, where they stay until fixed.
+- **Results the user must see:** a toast closes on its own and can be missed.
+- **The only path to an action or fact:** whatever a toast says or offers has
+  to be reachable elsewhere, such as an undo in the item's own menu.
+
+Keep it to one sentence, two lines at most, and don't narrate an async flow
+step by step; `toast.promise` shows the loading and the result in one toast.
+
+### Text and timing
+
+A toast stays at least 5 seconds, longer with `duration`, and pauses while
+it's hovered or focused and while the page is hidden. A toast with an action,
+and a loading toast, stays until it's closed or updated. Its title and
+description must render on the first pass, since that's the text the
+Toaster announces; text that loads later is never read out.
+
+### After a redirect
+
+A toast shown just before a server action or redirect is lost with the page.
+Pass the message across instead, such as in a short-lived cookie the server
+sets, and show it once the next page loads:
+
+```tsx
+useEffect(() => {
+  const message = readFlashCookie();
+  if (message) {
+    clearFlashCookie();
+    toast.success(message);
+  }
+}, []);
+```
+
+### Coming from Sonner
+
+The calls follow shadcn's Sonner toast. These are the differences that change
+code:
+
+- `toast.error` is `toast.destructive`.
+- An action is an object with `onPress` rather than `onClick`, never an
+  element, and there's no `cancel`; every toast has a close button.
+- `onDismiss` and `onAutoClose` are one `onClose`, which gets the reason:
+  `'user'`, `'programmatic'`, `'timeout'` or `'evicted'`.
+- `toast.custom` takes a `title` option, which names the toast for screen
+  readers.
+- `<Toaster position="bottom-right">` is `placement="bottom end"`, which
+  follows the reading direction, and `visibleToasts` is `limit`.
+- Durations under 5 seconds are raised to 5.
+
+## Examples
+
+### Intents
+
+`toast.info`, `toast.success`, `toast.warning` and `toast.destructive` add an
+icon and color. A destructive toast interrupts screen readers; the others
+wait their turn:
+
+<ComponentPreview name="toast-intents">
+  <ToastIntents />
+</ComponentPreview>
+
+### Actions
+
+`action` adds a button and keeps the toast open until it's closed. A promise
+from `onPress` keeps the button pending until it settles, then the toast
+closes; pass `closeOnAction: false` to keep it. There's no timeout, so the
+promise has to settle. If `onPress` throws or its promise rejects, the toast
+stays and `onError` receives the error, or `reportError` without it. Updating
+a toast in place readies its action again, even while the previous action's
+work is still running, so an action that reports progress in its own toast
+should use another `id` or guard against running twice:
+
+<ComponentPreview name="toast-action">
+  <ToastAction />
+</ComponentPreview>
+
+### Promises
+
+`toast.promise` shows a loading toast, then updates it with the result.
+`success` and `error` can be text, a function of the result or error, or an
+object of title and options:
+
+<ComponentPreview name="toast-promise">
+  <ToastPromise />
+</ComponentPreview>
+
+## Accessibility
+
+Each toast is a non-modal `alertdialog` inside a landmark region named for
+the number of toasts, so it doesn't take focus or trap it. Announcing is the
+`Toaster`'s job rather than the toast's:
+
+- **Announcements:** two live regions, mounted with the `Toaster` so screen
+  readers already watch them, read each toast's title and description once
+  when it appears and again when its text changes. Destructive toasts and
+  `priority: 'high'` go to the assertive region, the rest to the polite one.
+- **Reaching a toast:** F6 moves focus to the toasts, cycling through the
+  landmarks React Aria knows about; plain `<main>` and `<nav>` elements aren't
+  among them. Each toast is in the tab order with its buttons. When the last
+  toast closes, focus returns to where it was before the toasts.
+- **Timing:** a toast stays at least 5 seconds and pauses while hovered,
+  focused or hidden, and a toast with an action never times out, so its
+  action stays reachable.
+- **Modals:** the `Toaster` sits on top of an open React Aria modal and stays
+  outside its inert background, so a toast shown over a dialog is still
+  reachable.
+- **Labels:** React Aria translates the close button's label and the
+  region's name; `messages` replaces them.
+
+| Key             | Action                                                     |
+| --------------- | ---------------------------------------------------------- |
+| `F6`            | Moves focus to the toasts, or the next React Aria landmark |
+| `Shift + F6`    | Moves focus to the previous React Aria landmark            |
+| `Tab`           | Moves between toasts and their buttons                     |
+| `Escape`        | Closes the focused toast                                   |
+| `Enter`/`Space` | Presses the focused button                                 |
+
+Toasts follow React Aria's [Toast](https://react-aria.adobe.com/Toast)
+pattern; WAI-ARIA has no toast pattern of its own.
+
+## API
+
+### Toaster
+
+Renders the toasts in a portal on `document.body`. Its `data-slot`s are
+`toast-portal` (the wrapper with the live regions) and `toast-viewport` (the
+region).
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/feedback/toast/toast.tsx"
+  name="ToasterProps"
+/>
+
+#### Data attributes
+
+| Attribute        | Present when                         |
+| ---------------- | ------------------------------------ |
+| `data-slot`      | `toast-viewport` on the region       |
+| `data-placement` | Always, on the region; the placement |
+
+#### CSS variables
+
+| Variable    | Sets                                      |
+| ----------- | ----------------------------------------- |
+| `--z-toast` | The region's stacking order, above modals |
+
+### toast
+
+| Call                                 | Shows                                               |
+| ------------------------------------ | --------------------------------------------------- |
+| `toast(title, options?)`             | A neutral toast; returns its id                     |
+| `toast.info`, `.success`, `.warning` | A toast with that intent's icon and color           |
+| `toast.destructive`                  | An error toast, announced assertively               |
+| `toast.loading(title, options?)`     | A spinner toast that stays until updated            |
+| `toast.promise(promise, states)`     | Loading, then success or error; returns the promise |
+| `toast.custom(render, { title })`    | Your own content, named by `title`                  |
+| `toast.dismiss(id?)`                 | Closes one toast, or every toast without an id      |
+| `toast.dismissAll()`                 | Closes every toast                                  |
+
+#### Options
+
+<auto-type-table
+  path="../../../../../packages/ui/src/lib/toast/toast-content.ts"
+  name="ToastBaseOptions"
+/>
+
+A toast also takes `duration`, in milliseconds, or an `action` of `label`,
+`onPress` and an optional `onError`, but not both: a toast with an action
+stays until it's closed.
+
+#### Data attributes
+
+| Attribute       | Present when                                                                                                 |
+| --------------- | ------------------------------------------------------------------------------------------------------------ |
+| `data-slot`     | `toast`, and `toast-title`, `toast-description`, `toast-icon`, `toast-action` and `toast-close` on its parts |
+| `data-intent`   | Always; the intent                                                                                           |
+| `data-entering` | During its first frame                                                                                       |
+| `data-exiting`  | While it plays its exit                                                                                      |

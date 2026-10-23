@@ -68,6 +68,7 @@
     "meter",
     "progress",
     "skeleton",
-    "spinner"
+    "spinner",
+    "toast"
   ]
 }

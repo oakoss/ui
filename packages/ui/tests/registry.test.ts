@@ -93,7 +93,13 @@ const shipped = ui.items.flatMap(({ dependencies, files, name }) => {
     .filter((specifier) => !specifier.startsWith('#/'))
     .map((specifier) => packageName(specifier))
     .filter((pkg) => !provided.has(pkg) && !listed.has(pkg));
-  return { name, unlistedFiles, unlistedPackages };
+  const stems = [...new Set(installed)].map((path) =>
+    path.replace(/^.*\//u, '').replace(/\.[^.]+$/u, ''),
+  );
+  const sharedStems = stems.filter(
+    (stem, index) => stems.indexOf(stem) !== index,
+  );
+  return { name, sharedStems, unlistedFiles, unlistedPackages };
 });
 
 // No field import needs Input; the dependency installs it for code using both.
@@ -235,6 +241,31 @@ test('every component depends on the theme', () => {
   expect(ui.items.filter(isThemeless).map(({ name }) => name)).toEqual([]);
 });
 
+// Longest folder first, so ui/ wins over components/.
+const aliases = [
+  ['src/components/ui/', '@ui/'],
+  ['src/components/', '@components/'],
+  ['src/hooks/', '@hooks/'],
+  ['src/lib/', '@lib/'],
+] as const;
+
+function aliasedTarget(path: string) {
+  const alias = aliases.find(([folder]) => path.startsWith(folder));
+  return alias && `${alias[1]}${path.slice(alias[0].length)}`;
+}
+
+const misplaced = ui.items.flatMap(({ files = [] }) =>
+  files
+    .filter(({ target }) => target.startsWith('@'))
+    .filter(({ path, target }) => target !== aliasedTarget(path))
+    .map(({ path }) => path),
+);
+
+// The same-name check reads paths, and shadcn installs at targets.
+test('each aliased target is the path under its alias', () => {
+  expect(misplaced).toEqual([]);
+});
+
 test('item names are unique', () => {
   const names = ui.items.map(({ name }) => name);
   expect(names.filter((name, index) => names.indexOf(name) !== index)).toEqual(
@@ -242,12 +273,21 @@ test('item names are unique', () => {
   );
 });
 
-describe.each(shipped)('$name', ({ unlistedFiles, unlistedPackages }) => {
-  test('lists every local file it imports', () => {
-    expect(unlistedFiles).toEqual([]);
-  });
+describe.each(shipped)(
+  '$name',
+  ({ sharedStems, unlistedFiles, unlistedPackages }) => {
+    test('lists every local file it imports', () => {
+      expect(unlistedFiles).toEqual([]);
+    });
 
-  test('lists every package it imports as a dependency', () => {
-    expect(unlistedPackages).toEqual([]);
-  });
-});
+    // shadcn 4.21.4 rewrites an import by file name, so lib/toast/toast became
+    // the toast component's own path at install.
+    test('installs no two files with the same name', () => {
+      expect(sharedStems).toEqual([]);
+    });
+
+    test('lists every package it imports as a dependency', () => {
+      expect(unlistedPackages).toEqual([]);
+    });
+  },
+);

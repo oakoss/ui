@@ -11,14 +11,14 @@ import {
   ToastItemView,
 } from '#/components/ui/feedback/toast/toast-item';
 import { cn } from '#/lib/cx';
-import { toastStore } from '#/lib/toast/toast';
 import { announce } from '#/lib/toast/toast-announcer';
+import { toastStore } from '#/lib/toast/toast-api';
 import {
   defaultToastDuration,
   defaultToastLimit,
 } from '#/lib/toast/toast-content';
 
-export { toast } from '#/lib/toast/toast';
+export { toast } from '#/lib/toast/toast-api';
 
 export type ToasterMessages = {
   // React Aria's translated "Close" otherwise.
