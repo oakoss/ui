@@ -18,6 +18,7 @@ import {
   expectAfter,
   hoverFresh,
   leave,
+  settled,
   slowTimeout,
 } from './overlay-test';
 
@@ -108,13 +109,24 @@ export const ZIndexOverride: Story = {
   },
 };
 
-// Inside an open dialog the card stays out of the content React Aria makes
-// inert, so its link stays reachable.
+// A card open as the dialog opens stays out of the content React Aria makes
+// inert, so its link stays reachable. It placed itself while the dialog
+// scaled in, so a resize moves it to the settled trigger before the capture.
 export const InsideDialog: Story = {
   play: async () => {
     const card = await screen.findByRole('dialog', { name: 'Grace Hopper' });
     await expect(card.closest('[inert], [aria-hidden=true]')).toBeNull();
-    screen.getByRole('link', { name: '@grace' }).focus();
+    await settled(await screen.findByRole('dialog', { name: 'Team' }));
+    await settled(card);
+    dispatchEvent(new Event('resize'));
+    const trigger = screen.getByRole('link', { name: '@grace' });
+    await waitFor(async () => {
+      const gap =
+        card.getBoundingClientRect().top -
+        trigger.getBoundingClientRect().bottom;
+      await expect(Math.abs(gap - 8)).toBeLessThan(1);
+    });
+    trigger.focus();
     await userEvent.tab();
     await expect(screen.getByRole('link', { name: 'Profile' })).toHaveFocus();
   },
