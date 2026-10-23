@@ -3534,6 +3534,11 @@
           "target": "@lib/toast/toast-stack-open.ts"
         },
         {
+          "path": "src/lib/toast/toast-swipe.ts",
+          "type": "registry:lib",
+          "target": "@lib/toast/toast-swipe.ts"
+        },
+        {
           "path": "src/hooks/use-toast-lifecycle.ts",
           "type": "registry:hook",
           "target": "@hooks/use-toast-lifecycle.ts"
@@ -3547,6 +3552,11 @@
           "path": "src/hooks/use-toast-stack.ts",
           "type": "registry:hook",
           "target": "@hooks/use-toast-stack.ts"
+        },
+        {
+          "path": "src/hooks/use-toast-swipe.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-toast-swipe.ts"
         },
         {
           "path": "src/hooks/use-latest.ts",

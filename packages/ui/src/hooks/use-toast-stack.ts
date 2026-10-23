@@ -23,6 +23,7 @@ import {
   nextStackOpen,
   stackOpenView,
 } from '#/lib/toast/toast-stack-open';
+import { isOnControl } from '#/lib/toast/toast-swipe';
 
 // Places a toast in the stack and reports its natural height, measured from
 // its inner part, which a collapsed stack never clips.
@@ -140,14 +141,11 @@ function useStackOpen(ref: RefObject<HTMLElement | null>, store: ToastStore) {
         send('escape');
       }
     },
-    // A tap on a control presses it without opening the stack; React Aria's
-    // press handling stops most, but a pending button lets them through.
+    // A tap on a control presses it without opening the stack.
     onPointerDown: (event: PointerEvent) => {
-      if (event.pointerType !== 'touch') return;
-      const isOnControl =
-        event.target instanceof Element &&
-        event.target.closest('a, button, input, select, textarea') !== null;
-      if (!isOnControl) send('tap');
+      if (event.pointerType === 'touch' && !isOnControl(event.target)) {
+        send('tap');
+      }
     },
   };
   return { ...view, props: mergeProps(hoverProps, focusWithinProps, props) };

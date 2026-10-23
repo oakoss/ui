@@ -160,7 +160,7 @@ function ToastRegion({
   store,
   visible,
 }: ToastRegionProps) {
-  const { side } = placements[placement];
+  const { align, side } = placements[placement];
   const { ref, regionProps, stack } = useRegionParts({
     isExpanded,
     items,
@@ -180,6 +180,7 @@ function ToastRegion({
     >
       {stack.placed.map(({ item, slot }) => (
         <ToastItemView
+          align={align}
           closeLabel={messages?.close}
           icons={icons}
           item={item}

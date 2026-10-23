@@ -14,6 +14,7 @@ import {
 import { ToastClose } from '#/components/ui/feedback/toast/toast-buttons';
 import { useToastLifecycle } from '#/hooks/use-toast-lifecycle';
 import { useStackSlot } from '#/hooks/use-toast-stack';
+import { useToastSwipe } from '#/hooks/use-toast-swipe';
 import { cn } from '#/lib/cx';
 import { isEmptyNode } from '#/lib/empty-node';
 import { focusRing } from '#/lib/recipes';
@@ -22,6 +23,7 @@ import { announcement } from '#/lib/toast/toast-announcer';
 export type ToastAnnounce = (message: string, priority: ToastPriority) => void;
 
 export type ToastItemProps = {
+  align: 'center' | 'end' | 'start';
   closeLabel: string | undefined;
   icons: ToastIcons | undefined;
   item: ToastItem;
@@ -40,7 +42,7 @@ const styles = tv({
       'flex w-full items-start gap-3 p-4 transition-opacity duration-200 group-data-behind/toast:opacity-0',
     toast: [
       focusRing,
-      'group/toast absolute inset-x-4 z-(--toast-z) translate-y-(--toast-offset) scale-(--toast-scale) overflow-hidden rounded-panel border border-border bg-popover text-sm text-popover-foreground shadow-lg transition duration-200 ease-out data-behind:h-(--toast-front-height)',
+      'group/toast absolute inset-x-4 z-(--toast-z) translate-y-(--toast-offset) scale-(--toast-scale) transform-(--toast-swipe) touch-pinch-zoom overflow-hidden rounded-panel border border-border bg-popover text-sm text-popover-foreground shadow-lg transition duration-200 ease-out data-behind:h-(--toast-front-height) data-swiping:transition-none',
       'aria-hidden:opacity-0 entering:scale-95 entering:opacity-0 exiting:scale-95 exiting:opacity-0',
     ],
   },
@@ -55,6 +57,7 @@ const styles = tv({
 // A non-modal alertdialog for keyboard reach; announcing is the Toaster's
 // live regions' job, so none of its content is a live region.
 export function ToastItemView({
+  align,
   closeLabel,
   icons,
   item,
@@ -72,13 +75,14 @@ export function ToastItemView({
     isEntering,
     keyboardProps,
     ref,
+    swipeProps,
     titleRef,
-  } = useToastParts({ item, onAnnounce, onHeight, slot, store });
+  } = useToastParts({ align, item, onAnnounce, onHeight, side, slot, store });
   const s = styles({ side });
 
   return (
     <div
-      {...mergeProps(aria.toastProps, keyboardProps)}
+      {...mergeProps(aria.toastProps, keyboardProps, swipeProps)}
       {...labelling(item.content, aria.toastProps)}
       {...stateAttributes(item, slot, isEntering)}
       className={cn(s.toast())}
@@ -217,14 +221,16 @@ function useAnnouncement(
 }
 
 function useToastParts({
+  align,
   item,
   onAnnounce,
   onHeight,
+  side,
   slot,
   store,
 }: Pick<
   ToastItemProps,
-  'item' | 'onAnnounce' | 'onHeight' | 'slot' | 'store'
+  'align' | 'item' | 'onAnnounce' | 'onHeight' | 'side' | 'slot' | 'store'
 >) {
   const ref = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
@@ -234,6 +240,13 @@ function useToastParts({
   const { isEntering, keyboardProps } = useToastLifecycle(ref, item, store);
   useAnnouncement(item, onAnnounce, titleRef, descriptionRef);
   useStackSlot({ inner: innerRef, onHeight, outer: ref, slot });
+  const swipeProps = useToastSwipe({
+    align,
+    isDisabled: item.isExiting || slot.isHidden,
+    onSwipe: () => store.close(item.key),
+    ref,
+    side,
+  });
   return {
     aria,
     descriptionRef,
@@ -241,6 +254,7 @@ function useToastParts({
     isEntering,
     keyboardProps,
     ref,
+    swipeProps,
     titleRef,
   };
 }
