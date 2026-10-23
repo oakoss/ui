@@ -13,7 +13,7 @@ import {
 } from '#/components/ui/feedback/toast/toast-body';
 import { ToastClose } from '#/components/ui/feedback/toast/toast-buttons';
 import { useToastLifecycle } from '#/hooks/use-toast-lifecycle';
-import { useCssVars, useToastHeight } from '#/hooks/use-toast-stack';
+import { useStackSlot } from '#/hooks/use-toast-stack';
 import { cn } from '#/lib/cx';
 import { isEmptyNode } from '#/lib/empty-node';
 import { focusRing } from '#/lib/recipes';
@@ -233,12 +233,7 @@ function useToastParts({
   const aria = useToast({ toast: item }, store, ref);
   const { isEntering, keyboardProps } = useToastLifecycle(ref, item, store);
   useAnnouncement(item, onAnnounce, titleRef, descriptionRef);
-  useToastHeight(ref, innerRef, onHeight);
-  useCssVars(ref, {
-    '--toast-offset': `${String(slot.offset)}px`,
-    '--toast-scale': String(slot.scale),
-    '--toast-z': String(slot.z),
-  });
+  useStackSlot({ inner: innerRef, onHeight, outer: ref, slot });
   return {
     aria,
     descriptionRef,

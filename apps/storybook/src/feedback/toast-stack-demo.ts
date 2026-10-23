@@ -1,13 +1,10 @@
+import { toasterInset, toastPeek } from '@oakoss/ui/lib/toast/toast-stack';
 import { expect, waitFor } from 'storybook/test';
 
 import { part } from '#/helpers/parts';
 import { finished } from '#/overlays/overlay-test';
 
 import { demoStore } from './toast-demo';
-
-const peek = 12;
-// The room the region leaves above and below the stack.
-const inset = 32;
 
 export const forever = { duration: Infinity } as const;
 
@@ -34,7 +31,7 @@ export async function isCollapsed(toasts: HTMLElement[]) {
   await expect(innerOpacity(front)).toBe('1');
   // Collapsed, the region holds the front toast and the peeks.
   await expect(part('toast-viewport').offsetHeight).toBe(
-    (front?.offsetHeight ?? 0) + behind.length * peek + inset,
+    (front?.offsetHeight ?? 0) + behind.length * toastPeek + toasterInset,
   );
 }
 

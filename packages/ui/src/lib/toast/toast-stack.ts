@@ -12,7 +12,10 @@ export type ToastSlot = {
 };
 
 export const toastGap = 8;
-const peek = 12;
+export const toastPeek = 12;
+// Room above and below the stack: the toasts' bottom-4 or top-4 offset, and
+// as much on the far side.
+export const toasterInset = 32;
 const shrink = 0.05;
 
 // Positions each toast: newest at the edge; collapsed, the next ones peek
@@ -45,7 +48,7 @@ export function stackToasts({
       slot: {
         isBehind: !isExpanded && index > 0,
         isHidden,
-        offset: sign * (isExpanded ? offset : depth * peek),
+        offset: sign * (isExpanded ? offset : depth * toastPeek),
         scale: isExpanded ? 1 : 1 - depth * shrink,
         z: items.length - index,
       },
@@ -53,7 +56,7 @@ export function stackToasts({
     if (!isHidden) offset += (heights.get(item.instance) ?? 0) + toastGap;
   }
   const front = items[0] ? (heights.get(items[0].instance) ?? 0) : 0;
-  const peeking = Math.max(Math.min(items.length, shown) - 1, 0) * peek;
+  const peeking = Math.max(Math.min(items.length, shown) - 1, 0) * toastPeek;
   return {
     frontHeight: front,
     height: isExpanded ? Math.max(offset - toastGap, 0) : front + peeking,

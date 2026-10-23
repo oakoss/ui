@@ -88,12 +88,11 @@ export const TapExpands: Story = {
     const toasts = await showThree();
     await userEvent.pointer({ keys: '[TouchA]', target: toasts[0] });
     await isExpanded(toasts);
-    await expect(pause).toHaveBeenCalledWith('expanded');
-    // Mounting the region resumes it too, so only later calls count.
-    resume.mockClear();
+    await expect(pause).toHaveBeenCalledWith('tap');
+    await expect(resume).not.toHaveBeenCalled();
     await userEvent.pointer({ keys: '[TouchA]', target: document.body });
     await isCollapsed(toasts);
-    await expect(resume).toHaveBeenCalledWith('expanded');
+    await expect(resume).toHaveBeenCalledWith('tap');
   },
 };
 

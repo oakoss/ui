@@ -103,7 +103,7 @@ export const TapOnButton: Story = {
       name: 'Close',
     });
     await userEvent.pointer({ keys: '[TouchA]', target: close });
-    await expect(pause).not.toHaveBeenCalledWith('expanded');
+    await expect(pause).not.toHaveBeenCalledWith('tap');
   },
 };
 
@@ -126,7 +126,7 @@ export const TapOnPendingAction: Story = {
       await expect(undo).toHaveAttribute('data-pending', 'true');
     });
     await userEvent.pointer({ keys: '[TouchA]', target: undo });
-    await expect(pause).not.toHaveBeenCalledWith('expanded');
+    await expect(pause).not.toHaveBeenCalledWith('tap');
   },
 };
 
@@ -137,12 +137,11 @@ export const TapReleasedOnEmpty: Story = {
     const toasts = await showThree();
     await userEvent.pointer({ keys: '[TouchA]', target: toasts[0] });
     await isExpanded(toasts);
-    // Mounting the region resumes it too, so only later calls count.
-    resume.mockClear();
+    await expect(resume).not.toHaveBeenCalled();
     demoStore.dismiss();
     await waitFor(async () => {
       await expect(document.querySelector('[data-slot=toast]')).toBeNull();
     });
-    await expect(resume).toHaveBeenCalledWith('expanded');
+    await expect(resume).toHaveBeenCalledWith('tap');
   },
 };

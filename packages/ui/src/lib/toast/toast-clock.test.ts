@@ -40,7 +40,7 @@ test('a second disconnect from the same host does nothing', () => {
   expect(clock.isRunning).toBe(true);
 });
 
-test.each(['region', 'expanded'] as const)(
+test.each(['region', 'tap'] as const)(
   'the %s pause holds until the last host leaves',
   (source) => {
     const clock = new ToastClock(noTimers);

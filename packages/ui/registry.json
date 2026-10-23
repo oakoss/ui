@@ -3529,9 +3529,19 @@
           "target": "@lib/toast/toast-stack.ts"
         },
         {
+          "path": "src/lib/toast/toast-stack-open.ts",
+          "type": "registry:lib",
+          "target": "@lib/toast/toast-stack-open.ts"
+        },
+        {
           "path": "src/hooks/use-toast-lifecycle.ts",
           "type": "registry:hook",
           "target": "@hooks/use-toast-lifecycle.ts"
+        },
+        {
+          "path": "src/hooks/use-css-vars.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-css-vars.ts"
         },
         {
           "path": "src/hooks/use-toast-stack.ts",

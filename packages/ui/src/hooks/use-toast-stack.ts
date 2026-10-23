@@ -5,6 +5,7 @@ import {
   type RefObject,
   useEffect,
   useLayoutEffect,
+  useReducer,
   useState,
 } from 'react';
 import { mergeProps } from 'react-aria/mergeProps';
@@ -14,31 +15,28 @@ import { useInteractOutside } from 'react-aria/useInteractOutside';
 
 import type { ToastItem, ToastStore } from '#/lib/toast/toast-store';
 
+import { useCssVars } from '#/hooks/use-css-vars';
 import { useLatest } from '#/hooks/use-latest';
-import { stackToasts } from '#/lib/toast/toast-stack';
+import { stackToasts, type ToastSlot } from '#/lib/toast/toast-stack';
+import {
+  closedStack,
+  nextStackOpen,
+  stackOpenView,
+} from '#/lib/toast/toast-stack-open';
 
-// An undefined value removes the property.
-export function useCssVars(
-  ref: RefObject<HTMLElement | null>,
-  vars: Readonly<Record<`--${string}`, string | undefined>>,
-) {
-  useLayoutEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-    for (const [name, value] of Object.entries(vars)) {
-      if (value === undefined) element.style.removeProperty(name);
-      else element.style.setProperty(name, value);
-    }
-  });
-}
-
-// Reports a toast's natural height, measured from its inner part, which a
-// collapsed stack never clips.
-export function useToastHeight(
-  outer: RefObject<HTMLElement | null>,
-  inner: RefObject<HTMLElement | null>,
-  onHeight: (height: number) => void,
-) {
+// Places a toast in the stack and reports its natural height, measured from
+// its inner part, which a collapsed stack never clips.
+export function useStackSlot({
+  inner,
+  onHeight,
+  outer,
+  slot,
+}: {
+  inner: RefObject<HTMLElement | null>;
+  onHeight: (height: number) => void;
+  outer: RefObject<HTMLElement | null>;
+  slot: ToastSlot;
+}) {
   const onHeightRef = useLatest(onHeight);
   useLayoutEffect(() => {
     const report = () => {
@@ -55,6 +53,11 @@ export function useToastHeight(
       observer.disconnect();
     };
   }, [inner, onHeightRef, outer]);
+  useCssVars(outer, {
+    '--toast-offset': `${String(slot.offset)}px`,
+    '--toast-scale': String(slot.scale),
+    '--toast-z': String(slot.z),
+  });
 }
 
 export function useToastStack({
@@ -75,9 +78,8 @@ export function useToastStack({
   const [heights, setHeights] = useState<ReadonlyMap<number, number>>(
     () => new Map(),
   );
-  const pointer = useHoverOrFocus();
-  const tap = useTapOpen(ref, store);
-  const isOpen = isExpanded || pointer.isOpen || tap.isOpen;
+  const open = useStackOpen(ref, store);
+  const isOpen = isExpanded || open.isOpen;
   const onHeight = (instance: number, height: number) => {
     setHeights((current) => {
       if (current.get(instance) === height) return current;
@@ -86,85 +88,56 @@ export function useToastStack({
       return next.set(instance, height);
     });
   };
-  // While focus is inside, nothing hides out from under it.
-  const shownCount =
-    pointer.hasFocus && !pointer.isEscaped ? Infinity : visible;
   return {
     ...stackToasts({
       heights,
       isExpanded: isOpen,
       items,
       side,
-      visible: shownCount,
+      visible: open.showsAll ? Infinity : visible,
     }),
     isExpanded: isOpen,
     onHeight,
-    regionProps: mergeProps(pointer.props, tap.props),
+    regionProps: open.props,
   };
 }
 
-// Open while hovered or focused within, until Escape on the region (which F6
-// focuses) closes it; leaving or blurring clears the Escape.
-function useHoverOrFocus() {
-  const [isHovered, setIsHovered] = useState(false);
-  const [hasFocus, setHasFocus] = useState(false);
-  const [isEscaped, setIsEscaped] = useState(false);
+// Feeds the region's hover, focus, taps and Escape to the open state, and
+// pauses the timers while a tap holds the stack open.
+function useStackOpen(ref: RefObject<HTMLElement | null>, store: ToastStore) {
+  const [state, send] = useReducer(nextStackOpen, closedStack);
+  const view = stackOpenView(state);
   const { hoverProps } = useHover({
     onHoverChange: (isHovering) => {
-      setIsHovered(isHovering);
-      if (!isHovering) setIsEscaped(false);
+      send(isHovering ? 'hover' : 'unhover');
     },
   });
   const { focusWithinProps } = useFocusWithin({
     onFocusWithinChange: (isFocused) => {
-      setHasFocus(isFocused);
-      if (!isFocused) setIsEscaped(false);
+      send(isFocused ? 'focus' : 'blur');
     },
   });
-  const keyProps = {
-    // Moving into a toast after an Escape on the region opens it again.
-    onFocus: (event: FocusEvent) => {
-      if (event.target !== event.currentTarget) setIsEscaped(false);
-    },
-    onKeyDown: (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && event.target === event.currentTarget) {
-        setIsEscaped(true);
-      }
-    },
-  };
-  return {
-    hasFocus,
-    isEscaped,
-    isOpen: (isHovered || hasFocus) && !isEscaped,
-    props: mergeProps(hoverProps, focusWithinProps, keyProps),
-  };
-}
-
-// A tap opens the stack on touch screens, which have no hover, and pauses the
-// timers as hover does; a tap outside or Escape closes it.
-function useTapOpen(ref: RefObject<HTMLElement | null>, store: ToastStore) {
-  const [isTapped, setIsTapped] = useState(false);
   useInteractOutside({
-    isDisabled: !isTapped,
+    isDisabled: !state.isTapped,
     onInteractOutside: () => {
-      setIsTapped(false);
+      send('tapOutside');
     },
     ref,
   });
+  const { pausesTimers } = view;
   useEffect(() => {
-    if (isTapped) store.pause('expanded');
-    else store.resume('expanded');
-  }, [isTapped, store]);
-  useEffect(
-    () => () => {
-      store.resume('expanded');
-    },
-    [store],
-  );
+    if (pausesTimers) store.pause('tap');
+    return () => {
+      if (pausesTimers) store.resume('tap');
+    };
+  }, [pausesTimers, store]);
   const props = {
+    onFocus: (event: FocusEvent) => {
+      if (event.target !== event.currentTarget) send('focusToast');
+    },
     onKeyDown: (event: KeyboardEvent) => {
       if (event.key === 'Escape' && event.target === event.currentTarget) {
-        setIsTapped(false);
+        send('escape');
       }
     },
     // A tap on a control presses it without opening the stack; React Aria's
@@ -174,8 +147,8 @@ function useTapOpen(ref: RefObject<HTMLElement | null>, store: ToastStore) {
       const isOnControl =
         event.target instanceof Element &&
         event.target.closest('a, button, input, select, textarea') !== null;
-      if (!isOnControl) setIsTapped(true);
+      if (!isOnControl) send('tap');
     },
   };
-  return { isOpen: isTapped, props };
+  return { ...view, props: mergeProps(hoverProps, focusWithinProps, props) };
 }

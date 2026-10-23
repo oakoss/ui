@@ -11,7 +11,8 @@ import {
   type ToastAnnounce,
   ToastItemView,
 } from '#/components/ui/feedback/toast/toast-item';
-import { useCssVars, useToastStack } from '#/hooks/use-toast-stack';
+import { useCssVars } from '#/hooks/use-css-vars';
+import { useToastStack } from '#/hooks/use-toast-stack';
 import { cn } from '#/lib/cx';
 import { announce } from '#/lib/toast/toast-announcer';
 import { toastStore } from '#/lib/toast/toast-api';
@@ -20,6 +21,7 @@ import {
   defaultToastLimit,
   defaultToastVisible,
 } from '#/lib/toast/toast-content';
+import { toasterInset } from '#/lib/toast/toast-stack';
 
 export { toast } from '#/lib/toast/toast-api';
 
@@ -62,10 +64,6 @@ type ToastRegionProps = {
   store: ToastStore;
   visible: number;
 };
-
-// Room above and below the stack: the toasts' bottom-4 or top-4 offset, and
-// as much on the far side.
-const toasterInset = 32;
 
 const placements = {
   'bottom center': { align: 'center', side: 'bottom' },
