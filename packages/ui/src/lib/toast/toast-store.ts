@@ -14,7 +14,7 @@ import {
   type ToastShowOptions,
   type ToastTimer,
   toPromiseState,
-} from '#/lib/toast-content';
+} from '#/lib/toast/toast-content';
 
 // The region pauses while hovered or focused; the Toaster while the page is hidden.
 export type ToastPauseSource = 'hidden' | 'region';

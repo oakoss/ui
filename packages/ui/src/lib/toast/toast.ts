@@ -6,9 +6,9 @@ import type {
   ToastLoadingOptions,
   ToastOptions,
   ToastPromiseStates,
-} from '#/lib/toast-content';
+} from '#/lib/toast/toast-content';
 
-import { ToastStore } from '#/lib/toast-store';
+import { ToastStore } from '#/lib/toast/toast-store';
 
 type ShowToast = (title: ReactNode, options?: ToastOptions) => string;
 

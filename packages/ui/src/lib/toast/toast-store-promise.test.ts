@@ -3,8 +3,8 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import {
   defaultToastDuration,
   type ToastCloseReason,
-} from '#/lib/toast-content';
-import { ToastStore } from '#/lib/toast-store';
+} from '#/lib/toast/toast-content';
+import { ToastStore } from '#/lib/toast/toast-store';
 
 beforeEach(() => {
   vi.useFakeTimers();
