@@ -2,6 +2,8 @@ import type { ReactNode } from 'react';
 
 export type ToastAction = {
   label: string;
+  // Called when onPress throws or its promise rejects; reportError otherwise.
+  onError?: (error: unknown) => void;
   // A returned promise keeps the action pending until it settles.
   onPress: () => unknown;
 };
@@ -105,8 +107,9 @@ export function resolveContent(
   title: ReactNode,
   options: ToastShowOptions,
   intent: ToastIntent,
+  fallbackDuration = defaultToastDuration,
 ): ToastContent {
-  const { action, duration = defaultToastDuration } = options;
+  const { action, duration = fallbackDuration } = options;
   return {
     action,
     closeOnAction: options.closeOnAction ?? true,

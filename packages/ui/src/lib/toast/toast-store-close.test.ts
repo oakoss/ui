@@ -1,7 +1,9 @@
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
-import type { ToastCloseReason } from '#/lib/toast/toast-content';
-
+import {
+  defaultToastDuration,
+  type ToastCloseReason,
+} from '#/lib/toast/toast-content';
 import { ToastStore } from '#/lib/toast/toast-store';
 
 beforeEach(() => {
@@ -194,4 +196,57 @@ test('reset drops every toast without close callbacks', () => {
   store.reset();
   expect(store.visibleToasts).toHaveLength(0);
   expect(onClose).not.toHaveBeenCalled();
+});
+
+test('setDuration() sets the default for later toasts, never under the floor', () => {
+  const store = connected();
+  store.setDuration(8000);
+  const longer = store.show('Longer');
+  store.setDuration(1000);
+  const floored = store.show('Floored');
+  const own = store.show('Own', { duration: 6000 });
+  expect(itemOf(store, longer).content.duration).toBe(8000);
+  expect(itemOf(store, floored).content.duration).toBe(defaultToastDuration);
+  expect(itemOf(store, own).content.duration).toBe(6000);
+});
+
+test('reset restores the default duration and limit', () => {
+  const store = connected();
+  store.setDuration(8000);
+  store.setLimit(1);
+  store.reset();
+  const key = store.show('One');
+  store.show('Two');
+  store.show('Three');
+  expect(itemOf(store, key).content.duration).toBe(defaultToastDuration);
+  expect(open(store)).toEqual(['Three', 'Two', 'One']);
+});
+
+test('setDuration() ignores NaN', () => {
+  const store = connected();
+  store.setDuration(8000);
+  store.setDuration(NaN);
+  expect(itemOf(store, store.show('Saved')).content.duration).toBe(8000);
+});
+
+test('an update in place keeps the instance; a toast over an exiting one is new', () => {
+  const store = connected();
+  const key = store.show('Saving', { id: 'save' });
+  const { instance } = itemOf(store, key);
+  store.show('Saved', { id: 'save' });
+  expect(itemOf(store, key).instance).toBe(instance);
+  store.close(key);
+  store.show('Saved again', { id: 'save' });
+  expect(store.visibleToasts.filter((item) => item.key === key)).toHaveLength(
+    1,
+  );
+  expect(itemOf(store, key).instance).not.toBe(instance);
+});
+
+test('two stores never give out the same instance', () => {
+  const first = connected();
+  const second = connected();
+  const a = itemOf(first, first.show('A')).instance;
+  const b = itemOf(second, second.show('B')).instance;
+  expect(a).not.toBe(b);
 });

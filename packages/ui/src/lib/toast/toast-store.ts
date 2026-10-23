@@ -4,6 +4,7 @@ import type { QueuedToast, ToastState } from 'react-aria-components';
 import {
   callMessage,
   createTimer,
+  defaultToastDuration,
   resolveContent,
   type ToastBaseOptions,
   type ToastCloseReason,
@@ -19,6 +20,9 @@ import {
 // The store's bookkeeping beside what the caller passed.
 export type ToastItem = Readonly<
   {
+    // Identifies one toast's lifetime across every store: kept by an update in
+    // place, new for each new toast, even over an exiting one with its id.
+    instance: number;
     isExiting: boolean;
     // Changes whenever the content does, so the Toaster announces it again.
     version: number;
@@ -30,6 +34,7 @@ export type ToastPauseSource = 'hidden' | 'region';
 
 type Entry = {
   readonly content: ToastContent;
+  readonly instance: number;
   isExiting: boolean;
   readonly key: string;
   readonly onClose: ((reason: ToastCloseReason) => void) | undefined;
@@ -40,9 +45,11 @@ type Entry = {
 // Toasts newest first. Timers run only while a Toaster is connected and
 // nothing pauses them, so a toast sent before the Toaster mounts waits for it.
 export class ToastStore implements ToastState<ToastContent> {
+  static #version = 0;
   get visibleToasts() {
     return this.#visible;
   }
+  #duration = defaultToastDuration;
   #entries: Entry[] = [];
   #hosts = 0;
   #limit = 3;
@@ -50,7 +57,6 @@ export class ToastStore implements ToastState<ToastContent> {
   #nextId = 0;
   #pausedBy = new Set<ToastPauseSource>();
   #serverSnapshot: ToastItem[] = [];
-  #version = 0;
 
   #visible: ToastItem[] = [];
 
@@ -59,20 +65,9 @@ export class ToastStore implements ToastState<ToastContent> {
   }
 
   add(content: ToastContent) {
-    return this.show(
-      content.title,
-      {
-        ...(content.action
-          ? { action: content.action }
-          : { duration: content.duration }),
-        closeOnAction: content.closeOnAction,
-        custom: content.custom,
-        description: content.description,
-        icon: content.icon,
-        priority: content.priority,
-      },
-      content.intent,
-    );
+    const { action, duration, intent, title, ...rest } = content;
+    const timing = action ? { action } : { duration };
+    return this.show(title, { ...rest, ...timing }, intent);
   }
 
   // ToastState's close, used by the close button: the user closed it.
@@ -170,10 +165,12 @@ export class ToastStore implements ToastState<ToastContent> {
     this.#emit();
   }
 
-  // Drops every toast without close callbacks, for tests.
+  // Drops every toast without close callbacks and restores defaults, for tests.
   reset() {
     for (const entry of this.#entries) entry.timer?.pause();
+    this.#duration = defaultToastDuration;
     this.#entries = [];
+    this.#limit = 3;
     this.#pausedBy.clear();
     this.#emit();
   }
@@ -185,6 +182,11 @@ export class ToastStore implements ToastState<ToastContent> {
 
   resumeAll() {
     this.resume('region');
+  }
+
+  // The duration of toasts shown from now on that don't set their own.
+  setDuration(duration: number) {
+    if (!Number.isNaN(duration)) this.#duration = duration;
   }
 
   setLimit(limit: number) {
@@ -235,6 +237,7 @@ export class ToastStore implements ToastState<ToastContent> {
   #emit() {
     this.#visible = this.#entries.map((entry) => ({
       content: entry.content,
+      instance: entry.instance,
       isExiting: entry.isExiting,
       key: entry.key,
       version: entry.version,
@@ -254,12 +257,14 @@ export class ToastStore implements ToastState<ToastContent> {
   #show(title: ReactNode, options: ToastShowOptions, intent: ToastIntent) {
     const key = options.id ?? this.#createId();
     // The same id replaces an open toast in place, with the new call's
-    // options. A closing one finishes its exit, and the new toast is new.
+    // options. A closing one is dropped at once, and the new toast is new.
     const existing = this.#open(key);
     existing?.timer?.pause();
-    const content = resolveContent(title, options, intent);
+    const content = resolveContent(title, options, intent, this.#duration);
+    const version = (ToastStore.#version += 1);
     const entry: Entry = {
       content,
+      instance: existing?.instance ?? version,
       isExiting: false,
       key,
       onClose: options.onClose,
@@ -268,7 +273,7 @@ export class ToastStore implements ToastState<ToastContent> {
             this.#close(entry, 'timeout');
           }, content.duration)
         : undefined,
-      version: (this.#version += 1),
+      version,
     };
     this.#entries = existing
       ? this.#entries.map((other) => (other === existing ? entry : other))
