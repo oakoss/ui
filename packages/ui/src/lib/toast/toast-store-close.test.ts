@@ -222,11 +222,22 @@ test('reset restores the default duration and limit', () => {
   expect(open(store)).toEqual(['Three', 'Two', 'One']);
 });
 
-test('setDuration() ignores NaN', () => {
+test('a NaN default duration falls to the floor', () => {
   const store = connected();
-  store.setDuration(8000);
   store.setDuration(NaN);
-  expect(itemOf(store, store.show('Saved')).content.duration).toBe(8000);
+  const key = store.show('Saved');
+  expect(itemOf(store, key).content.duration).toBe(defaultToastDuration);
+});
+
+test('close() with a version closes only that version', () => {
+  const store = connected();
+  const key = store.show('Archiving', { duration: Infinity, id: 'a' });
+  const { version } = itemOf(store, key);
+  store.show('Archived', { duration: Infinity, id: 'a' });
+  store.close(key, version);
+  expect(open(store)).toEqual(['Archived']);
+  store.close(key, itemOf(store, key).version);
+  expect(open(store)).toEqual([]);
 });
 
 test('an update in place keeps the instance; a toast over an exiting one is new', () => {

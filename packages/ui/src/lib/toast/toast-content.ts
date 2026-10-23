@@ -73,6 +73,8 @@ export type ToastTimer = { pause: () => void; resume: () => void };
 
 export const defaultToastDuration = 5000;
 
+export const defaultToastLimit = 3;
+
 export function callMessage<T>(message: ToastPromiseMessage<T>, value: T) {
   return typeof message === 'function' ? message(value) : message;
 }

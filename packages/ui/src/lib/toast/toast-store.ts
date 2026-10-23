@@ -1,21 +1,21 @@
 import type { ReactNode } from 'react';
 import type { QueuedToast, ToastState } from 'react-aria-components';
 
+import { ToastClock, type ToastPauseSource } from '#/lib/toast/toast-clock';
 import {
-  callMessage,
   createTimer,
   defaultToastDuration,
+  defaultToastLimit,
   resolveContent,
   type ToastBaseOptions,
   type ToastCloseReason,
   type ToastContent,
   type ToastIntent,
-  type ToastPromiseState,
   type ToastPromiseStates,
   type ToastShowOptions,
   type ToastTimer,
-  toPromiseState,
 } from '#/lib/toast/toast-content';
+import { type ToastPromiseHost, trackPromise } from '#/lib/toast/toast-promise';
 
 // The store's bookkeeping beside what the caller passed.
 export type ToastItem = Readonly<
@@ -29,9 +29,6 @@ export type ToastItem = Readonly<
   } & QueuedToast<ToastContent>
 >;
 
-// The region pauses while hovered or focused; the Toaster while the page is hidden.
-export type ToastPauseSource = 'hidden' | 'region';
-
 type Entry = {
   readonly content: ToastContent;
   readonly instance: number;
@@ -42,27 +39,21 @@ type Entry = {
   readonly version: number;
 };
 
-// Toasts newest first. Timers run only while a Toaster is connected and
-// nothing pauses them, so a toast sent before the Toaster mounts waits for it.
+// Toasts newest first; ToastClock decides when their timers run.
 export class ToastStore implements ToastState<ToastContent> {
   static #version = 0;
   get visibleToasts() {
     return this.#visible;
   }
+  #clock = new ToastClock();
   #duration = defaultToastDuration;
   #entries: Entry[] = [];
-  #hosts = 0;
-  #limit = 3;
+  #limit = defaultToastLimit;
   #listeners = new Set<() => void>();
   #nextId = 0;
-  #pausedBy = new Set<ToastPauseSource>();
   #serverSnapshot: ToastItem[] = [];
 
   #visible: ToastItem[] = [];
-
-  get #isRunning() {
-    return this.#hosts > 0 && this.#pausedBy.size === 0;
-  }
 
   add(content: ToastContent) {
     const { action, duration, intent, title, ...rest } = content;
@@ -70,21 +61,21 @@ export class ToastStore implements ToastState<ToastContent> {
     return this.show(title, { ...rest, ...timing }, intent);
   }
 
-  // ToastState's close, used by the close button: the user closed it.
-  close(key: string) {
+  // ToastState's close: the user closed it. A version closes only that
+  // version, so a late action leaves its replacement open.
+  close(key: string, version?: number) {
     const entry = this.#open(key);
-    if (entry) this.#close(entry, 'user');
+    if (!entry || (version !== undefined && entry.version !== version)) return;
+    this.#close(entry, 'user');
   }
 
   // Called by a mounted Toaster; the returned function disconnects it.
   connect() {
-    this.#hosts += 1;
+    const disconnect = this.#clock.connect();
     this.#syncTimers();
     return () => {
-      this.#hosts -= 1;
-      if (this.#hosts === 0) {
-        // An unmounting region never resumes the toasts it paused.
-        this.#pausedBy.delete('region');
+      disconnect();
+      if (!this.#clock.hasHost) {
         this.#sweep();
         this.#emit();
       }
@@ -105,7 +96,7 @@ export class ToastStore implements ToastState<ToastContent> {
   getSnapshot = () => this.#visible;
 
   pause(source: ToastPauseSource) {
-    this.#pausedBy.add(source);
+    this.#clock.pause(source);
     this.#syncTimers();
   }
 
@@ -118,41 +109,15 @@ export class ToastStore implements ToastState<ToastContent> {
     states: ToastPromiseStates<T>,
     options: ToastBaseOptions = {},
   ) {
-    const promise = typeof input === 'function' ? input() : input;
-    const loading = toPromiseState(states.loading);
-    // Captured before an onClose run by this show can reuse the id.
-    const own = this.#show(
-      loading.title,
-      { ...options, ...loading.options },
-      'loading',
-    );
-    const { key } = own;
-    const settle = (message: ReactNode | ToastPromiseState, isOk: boolean) => {
-      const { options: stateOptions, title } = toPromiseState(message);
-      this.show(
-        title,
-        { ...options, ...stateOptions, id: key },
-        isOk ? 'success' : 'destructive',
-      );
-    };
-    const watch = async () => {
-      const [result] = await Promise.allSettled([promise]);
-      // A toast closed or replaced meanwhile stays that way.
-      if (this.#open(key) !== own) return;
-      try {
-        if (result.status === 'fulfilled') {
-          settle(callMessage(states.success, result.value), true);
-        } else {
-          settle(callMessage(states.error, result.reason), false);
-        }
-      } catch (error: unknown) {
-        // A message that throws mustn't leave the spinner up.
+    const host: ToastPromiseHost<Entry> = {
+      dismiss: (key) => {
         this.dismiss(key);
-        throw error;
-      }
+      },
+      isOpen: (entry) => this.#open(entry.key) === entry,
+      show: (title, showOptions, intent) =>
+        this.#show(title, showOptions, intent),
     };
-    void watch();
-    return promise;
+    return trackPromise(host, input, states, options);
   }
 
   // Takes a closed toast out once its exit has finished.
@@ -170,13 +135,13 @@ export class ToastStore implements ToastState<ToastContent> {
     for (const entry of this.#entries) entry.timer?.pause();
     this.#duration = defaultToastDuration;
     this.#entries = [];
-    this.#limit = 3;
-    this.#pausedBy.clear();
+    this.#limit = defaultToastLimit;
+    this.#clock.reset();
     this.#emit();
   }
 
   resume(source: ToastPauseSource) {
-    this.#pausedBy.delete(source);
+    this.#clock.resume(source);
     this.#syncTimers();
   }
 
@@ -184,9 +149,10 @@ export class ToastStore implements ToastState<ToastContent> {
     this.resume('region');
   }
 
-  // The duration of toasts shown from now on that don't set their own.
+  // The duration of toasts shown from now on that don't set their own;
+  // resolveContent floors it.
   setDuration(duration: number) {
-    if (!Number.isNaN(duration)) this.#duration = duration;
+    this.#duration = duration;
   }
 
   setLimit(limit: number) {
@@ -286,14 +252,14 @@ export class ToastStore implements ToastState<ToastContent> {
 
   // Closing toasts wait for a Toaster to play their exit; with none, they go.
   #sweep() {
-    if (this.#hosts > 0) return;
+    if (this.#clock.hasHost) return;
     this.#entries = this.#entries.filter((entry) => !entry.isExiting);
   }
 
   #syncTimers() {
     for (const entry of this.#entries) {
       if (entry.isExiting) continue;
-      if (this.#isRunning) entry.timer?.resume();
+      if (this.#clock.isRunning) entry.timer?.resume();
       else entry.timer?.pause();
     }
   }

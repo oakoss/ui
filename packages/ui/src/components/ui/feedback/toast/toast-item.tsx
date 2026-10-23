@@ -79,18 +79,17 @@ export function ToastItemView({
       ref={ref}
     >
       <ToastBody
-        content={content}
         descriptionProps={descriptionProps}
         descriptionRef={descriptionRef}
         icons={icons}
-        itemKey={key}
+        item={item}
         onActionDone={() => {
-          closeAfterAction(store, item);
+          // A late action leaves a toast that replaced its own alone.
+          if (content.closeOnAction) store.close(key, item.version);
         }}
         pendingLabel={pendingLabel}
         titleProps={titleProps}
         titleRef={titleRef}
-        version={item.version}
       />
       <ToastClose
         className={cn(styles().close())}
@@ -99,19 +98,6 @@ export function ToastItemView({
       />
     </div>
   );
-}
-
-// An action that settles after its toast was closed or replaced by id leaves
-// the toast now under that id alone.
-function closeAfterAction(
-  store: ToastStore,
-  { content, key, version }: ToastItem,
-) {
-  if (!content.closeOnAction) return;
-  const isCurrent = store.visibleToasts.some(
-    (other) => other.key === key && other.version === version,
-  );
-  if (isCurrent) store.close(key);
 }
 
 function isNamed(title: ReactNode): title is string {

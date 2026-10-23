@@ -4,6 +4,7 @@ import type { ToastAria } from 'react-aria/useToast';
 import { tv } from 'tailwind-variants/lite';
 
 import type { ToastContent, ToastIntent } from '#/lib/toast/toast-content';
+import type { ToastItem } from '#/lib/toast/toast-store';
 
 import * as Icon from '#/components/icons';
 import { Spinner } from '#/components/ui/feedback/spinner';
@@ -13,8 +14,7 @@ import { isEmptyNode } from '#/lib/empty-node';
 
 export type ToastIcons = Partial<Record<ToastIntent, ReactNode>>;
 
-type ToastTextProps = {
-  content: ToastContent;
+type ToastTextParts = {
   descriptionProps: ToastAria['descriptionProps'];
   descriptionRef: RefObject<HTMLDivElement | null>;
   titleProps: ToastAria['titleProps'];
@@ -54,21 +54,19 @@ const defaultIcons: Record<ToastIntent, ReactNode> = {
 // can't; otherwise the icon, the text and the action.
 export function ToastBody({
   icons,
-  itemKey,
+  item,
   onActionDone,
   pendingLabel,
-  version,
-  ...text
+  ...parts
 }: {
   icons: ToastIcons | undefined;
-  itemKey: string;
+  item: ToastItem;
   onActionDone: () => void;
   pendingLabel: string | undefined;
-  version: number;
-} & ToastTextProps) {
-  const { content } = text;
+} & ToastTextParts) {
+  const { content } = item;
   if (content.custom) {
-    return <ToastCustom itemKey={itemKey} render={content.custom} {...text} />;
+    return <ToastCustom item={item} render={content.custom} {...parts} />;
   }
   const s = styles({ intent: content.intent });
   const icon = iconFor(content, icons);
@@ -79,14 +77,14 @@ export function ToastBody({
           {icon}
         </span>
       )}
-      <ToastText {...text} />
+      <ToastText content={content} {...parts} />
       {content.action ? (
         <ToastAction
           action={content.action}
           className={cn(s.action())}
           onDone={onActionDone}
           pendingLabel={pendingLabel}
-          version={version}
+          version={item.version}
         />
       ) : null}
     </>
@@ -100,11 +98,11 @@ function iconFor(content: ToastContent, icons: ToastIcons | undefined) {
 }
 
 function ToastCustom({
-  itemKey,
+  item,
   render,
   titleProps,
   titleRef,
-}: { itemKey: string; render: (id: string) => ReactNode } & ToastTextProps) {
+}: { item: ToastItem; render: (id: string) => ReactNode } & ToastTextParts) {
   return (
     <div
       {...titleProps}
@@ -112,7 +110,7 @@ function ToastCustom({
       data-slot="toast-content"
       ref={titleRef}
     >
-      {render(itemKey)}
+      {render(item.key)}
     </div>
   );
 }
@@ -123,7 +121,7 @@ function ToastText({
   descriptionRef,
   titleProps,
   titleRef,
-}: ToastTextProps) {
+}: { content: ToastContent } & ToastTextParts) {
   const s = styles();
   return (
     <div className={cn(s.content())} data-slot="toast-content">

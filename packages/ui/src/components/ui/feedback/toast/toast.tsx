@@ -13,7 +13,10 @@ import {
 import { cn } from '#/lib/cx';
 import { toastStore } from '#/lib/toast/toast';
 import { announce } from '#/lib/toast/toast-announcer';
-import { defaultToastDuration } from '#/lib/toast/toast-content';
+import {
+  defaultToastDuration,
+  defaultToastLimit,
+} from '#/lib/toast/toast-content';
 
 export { toast } from '#/lib/toast/toast';
 
@@ -73,7 +76,7 @@ export function Toaster({
   className,
   duration = defaultToastDuration,
   icons,
-  limit = 3,
+  limit = defaultToastLimit,
   messages,
   placement = 'bottom end',
   store = toastStore,
