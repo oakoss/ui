@@ -261,3 +261,22 @@ test('two stores never give out the same instance', () => {
   const b = itemOf(second, second.show('B')).instance;
   expect(a).not.toBe(b);
 });
+
+test('actionDone closes only a toast that closes on action, at its version', () => {
+  const store = connected();
+  const keep = store.show('Kept', {
+    action: { label: 'Show', onPress: () => undefined },
+    closeOnAction: false,
+  });
+  store.actionDone(itemOf(store, keep));
+  const key = store.show('Archived', {
+    action: { label: 'Undo', onPress: () => undefined },
+    id: 'a',
+  });
+  const stale = itemOf(store, key);
+  store.show('Archived again', { duration: Infinity, id: 'a' });
+  store.actionDone(stale);
+  expect(open(store)).toEqual(['Archived again', 'Kept']);
+  store.actionDone(itemOf(store, key));
+  expect(open(store)).toEqual(['Kept']);
+});

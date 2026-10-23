@@ -39,13 +39,13 @@ type Entry = {
   readonly version: number;
 };
 
-// Toasts newest first; ToastClock decides when their timers run.
+// Toasts newest first; the ToastClock runs their timers.
 export class ToastStore implements ToastState<ToastContent> {
   static #version = 0;
   get visibleToasts() {
     return this.#visible;
   }
-  #clock = new ToastClock();
+  #clock = new ToastClock(() => this.#openTimers());
   #duration = defaultToastDuration;
   #entries: Entry[] = [];
   #limit = defaultToastLimit;
@@ -54,6 +54,14 @@ export class ToastStore implements ToastState<ToastContent> {
   #serverSnapshot: ToastItem[] = [];
 
   #visible: ToastItem[] = [];
+
+  // After an action's work: closes its toast, at that version, when the
+  // toast closes on action.
+  actionDone({ key, version }: ToastItem) {
+    const entry = this.#open(key);
+    if (entry?.version !== version || !entry.content.closeOnAction) return;
+    this.#close(entry, 'user');
+  }
 
   add(content: ToastContent) {
     const { action, duration, intent, title, ...rest } = content;
@@ -72,14 +80,14 @@ export class ToastStore implements ToastState<ToastContent> {
   // Called by a mounted Toaster; the returned function disconnects it.
   connect() {
     const disconnect = this.#clock.connect();
-    this.#syncTimers();
     return () => {
       disconnect();
-      if (!this.#clock.hasHost) {
-        this.#sweep();
-        this.#emit();
+      if (this.#clock.hasHost) {
+        return;
       }
-      this.#syncTimers();
+
+      this.#sweep();
+      this.#emit();
     };
   }
 
@@ -97,7 +105,6 @@ export class ToastStore implements ToastState<ToastContent> {
 
   pause(source: ToastPauseSource) {
     this.#clock.pause(source);
-    this.#syncTimers();
   }
 
   pauseAll() {
@@ -142,7 +149,6 @@ export class ToastStore implements ToastState<ToastContent> {
 
   resume(source: ToastPauseSource) {
     this.#clock.resume(source);
-    this.#syncTimers();
   }
 
   resumeAll() {
@@ -220,6 +226,12 @@ export class ToastStore implements ToastState<ToastContent> {
     return this.#entries.find((entry) => entry.key === key && !entry.isExiting);
   }
 
+  *#openTimers() {
+    for (const entry of this.#entries) {
+      if (!entry.isExiting && entry.timer) yield entry.timer;
+    }
+  }
+
   #show(title: ReactNode, options: ToastShowOptions, intent: ToastIntent) {
     const key = options.id ?? this.#createId();
     // The same id replaces an open toast in place, with the new call's
@@ -245,7 +257,7 @@ export class ToastStore implements ToastState<ToastContent> {
       ? this.#entries.map((other) => (other === existing ? entry : other))
       : [entry, ...this.#entries.filter((other) => other.key !== key)];
     this.#evict();
-    this.#syncTimers();
+    this.#clock.sync();
     this.#emit();
     return entry;
   }
@@ -254,13 +266,5 @@ export class ToastStore implements ToastState<ToastContent> {
   #sweep() {
     if (this.#clock.hasHost) return;
     this.#entries = this.#entries.filter((entry) => !entry.isExiting);
-  }
-
-  #syncTimers() {
-    for (const entry of this.#entries) {
-      if (entry.isExiting) continue;
-      if (this.#clock.isRunning) entry.timer?.resume();
-      else entry.timer?.pause();
-    }
   }
 }

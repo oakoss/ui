@@ -84,8 +84,7 @@ export function ToastItemView({
         icons={icons}
         item={item}
         onActionDone={() => {
-          // A late action leaves a toast that replaced its own alone.
-          if (content.closeOnAction) store.close(key, item.version);
+          store.actionDone(item);
         }}
         pendingLabel={pendingLabel}
         titleProps={titleProps}
