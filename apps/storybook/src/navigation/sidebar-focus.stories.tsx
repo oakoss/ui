@@ -139,6 +139,7 @@ export const PhoneWidthMovesFocus: Story = {
       await waitFor(async () => {
         await expect(sidebarTrigger()).toHaveFocus();
       });
+      sidebarTrigger().blur();
     });
   },
 };
