@@ -16,16 +16,15 @@ env:
   WRANGLER_SEND_METRICS: 'false'
 
 jobs:
-  deploy:
+  # Builds the PR's site without the Cloudflare token, since the build runs
+  # the PR's code and its dependencies.
+  build:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     # Fork PRs get no secrets, so they cannot deploy a preview.
     if: github.event.pull_request.head.repo.full_name == github.repository
     outputs:
-      preview-url: ${{ steps.preview.outputs.url }}
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      preview: ${{ steps.changes.outputs.preview }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -67,6 +66,8 @@ jobs:
           fi
           if [ "$preview" = false ]; then
             echo "::notice title=No docs preview::$reason"
+          elif ! git diff --quiet HEAD^1 HEAD -- apps/docs/wrangler.jsonc; then
+            echo "::warning title=Docs preview::the preview uploads with main's wrangler.jsonc, so this PR's changes to it aren't in it"
           fi
           echo "preview=$preview" >> "$GITHUB_OUTPUT"
 
@@ -74,11 +75,47 @@ jobs:
       - if: steps.changes.outputs.preview == 'true'
         run: pnpm turbo run build --filter=@oakoss/docs
 
+      - if: steps.changes.outputs.preview == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: docs-preview
+          path: apps/docs/dist/client
+          if-no-files-found: error
+          retention-days: 1
+
+  # Uploads the built site with main's wrangler and config: it checks out the
+  # PR's base, so the PR's packages and build scripts don't run beside the
+  # token. A PR that edits this workflow still can.
+  upload:
+    needs: build
+    if: needs.build.outputs.preview == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      preview-url: ${{ steps.preview.outputs.url }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.base.sha }}
+
+      # The PR's build job runs in this run's cache scope, so a store it saved
+      # could put the PR's packages here.
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-cache: 'false'
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: docs-preview
+          path: apps/docs/dist/client
+
       - name: Upload a preview version
         id: preview
-        if: steps.changes.outputs.preview == 'true'
         working-directory: apps/docs
         env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           WRANGLER_OUTPUT_FILE_PATH: ${{ runner.temp }}/wrangler-output.ndjson
         # wrangler exits 0 without a URL when previews are disabled, so read
@@ -95,12 +132,11 @@ jobs:
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
   # Posts the preview link as one comment from the oakoss App, like oakum's
-  # release plan, updated on each push. Its own job, since a deploy step's
-  # code can reach every later step in its job (BASH_ENV through GITHUB_ENV);
-  # this one runs no code from the PR.
+  # release plan, updated on each push. Its own job, so the App token stays
+  # out of the jobs that install packages.
   preview-comment:
-    needs: deploy
-    if: needs.deploy.outputs.preview-url != ''
+    needs: upload
+    if: needs.upload.outputs.preview-url != ''
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -122,16 +158,16 @@ jobs:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          PREVIEW_URL: ${{ needs.deploy.outputs.preview-url }}
+          PREVIEW_URL: ${{ needs.upload.outputs.preview-url }}
           # The worker in apps/docs/wrangler.jsonc, on the account's workers.dev subdomain.
           PREVIEW_HOST: oakoss-ui-docs.jbabin91.workers.dev
         run: |
           set -euo pipefail
-          # The deploy job ran the PR's code, so its output must be exactly
-          # the alias it uploads.
+          # The link must be this PR's alias on the docs worker, whatever
+          # wrangler reported.
           expected="https://pr-$PR_NUMBER-$PREVIEW_HOST"
           if [ "${PREVIEW_URL%/}" != "$expected" ]; then
-            echo "::error title=Docs preview comment::the deploy job's preview URL isn't $expected"
+            echo "::error title=Docs preview comment::the upload job's preview URL isn't $expected"
             exit 1
           fi
           marker='<!-- docs-preview -->'
@@ -148,4 +184,4 @@ jobs:
           fi
 
       - if: steps.app-token.outcome == 'failure' || steps.comment.outcome == 'failure'
-        run: echo "::warning title=Docs preview comment::the link didn't reach the PR; it's in the deploy job's summary"
+        run: echo "::warning title=Docs preview comment::the link didn't reach the PR; it's in the upload job's summary"
