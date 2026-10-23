@@ -11,6 +11,15 @@ test('a component demo responds after hydration', async ({ page }) => {
   await expect(demo).toHaveText('Pressed 2 times');
 });
 
+// The site's one Toaster renders a demo's toast, once.
+test('a toast demo shows its toast', async ({ page }) => {
+  await gotoHydrated(page, '/docs/components/toast');
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(
+    page.getByRole('alertdialog', { name: 'Changes saved' }),
+  ).toHaveCount(1);
+});
+
 // Calendar demos read the visitor's clock, so they render after hydration: a
 // visit months after the build hydrates without a mismatch.
 test('calendar demos render only on the client', async ({ page }) => {

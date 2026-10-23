@@ -1,3 +1,4 @@
+import { Toaster } from '@oakoss/ui/components/ui/feedback/toast/toast';
 import {
   createRootRoute,
   HeadContent,
@@ -43,6 +44,7 @@ function RootComponent() {
         <RootProvider search={{ SearchDialog: StaticSearchDialog }}>
           <IconProvider>
             <Outlet />
+            <Toaster />
           </IconProvider>
         </RootProvider>
         <Scripts />

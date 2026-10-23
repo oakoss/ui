@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "cn": "catalog:",
+    "react-aria": "catalog:",
     "react-aria-components": "catalog:",
     "tailwind-variants": "catalog:"
   },

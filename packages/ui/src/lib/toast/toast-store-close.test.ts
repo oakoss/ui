@@ -1,0 +1,263 @@
+import { afterEach, beforeEach, expect, test, vi } from 'vitest';
+
+import {
+  defaultToastDuration,
+  type ToastCloseReason,
+} from '#/lib/toast/toast-content';
+import { ToastStore } from '#/lib/toast/toast-store';
+
+beforeEach(() => {
+  vi.useFakeTimers();
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+
+function connected() {
+  const store = new ToastStore();
+  store.connect();
+  return store;
+}
+
+const open = (store: ToastStore) =>
+  store.visibleToasts
+    .filter((item) => !item.isExiting)
+    .map((item) => item.content.title);
+
+function itemOf(store: ToastStore, key: string) {
+  const item = store.visibleToasts.find((other) => other.key === key);
+  if (!item) throw new Error(`No toast ${key}`);
+  return item;
+}
+
+const renderCustom = () => 'Custom';
+
+test('add() keeps every field of content without an action', () => {
+  const store = connected();
+  const key = store.show(
+    'Template',
+    {
+      custom: renderCustom,
+      description: 'Details',
+      duration: 8000,
+      icon: 'icon',
+      priority: 'high',
+    },
+    'info',
+  );
+  const { content } = itemOf(store, key);
+  expect(itemOf(store, store.add(content)).content).toEqual(content);
+});
+
+test('a toast keeps its version while others come and go', () => {
+  const store = connected();
+  const first = store.show('First');
+  const { version } = itemOf(store, first);
+  const second = store.show('Second');
+  store.dismiss(second);
+  expect(itemOf(store, first).version).toBe(version);
+  expect(itemOf(store, second).version).not.toBe(version);
+});
+
+test('an id reused while its toast closes makes a new toast, which removal keeps', () => {
+  const store = connected();
+  const onClose = vi.fn<(reason: ToastCloseReason) => void>();
+  store.show('Old', { id: 'a' });
+  store.show('Newer');
+  store.dismiss('a');
+  store.show('New', { id: 'a', onClose });
+  expect(open(store)).toEqual(['New', 'Newer']);
+  expect(store.visibleToasts.map((item) => item.key)).toEqual(['a', 'toast-1']);
+  store.remove('a');
+  expect(open(store)).toEqual(['New', 'Newer']);
+  expect(onClose).not.toHaveBeenCalled();
+});
+
+test('an evicted id shown again is not evicted at once', () => {
+  const store = connected();
+  store.setLimit(1);
+  store.show('Old', { id: 'a' });
+  store.show('Newer');
+  store.show('New', { id: 'a' });
+  expect(open(store)).toEqual(['New']);
+});
+
+test('an upsert stops the replaced timer', () => {
+  const store = connected();
+  const onClose = vi.fn<(reason: ToastCloseReason) => void>();
+  store.show('Saving', { id: 's', onClose });
+  vi.advanceTimersByTime(4000);
+  store.show('Saved', { id: 's' });
+  vi.advanceTimersByTime(1500);
+  expect(onClose).not.toHaveBeenCalled();
+});
+
+test('a generated id never takes over a chosen one', () => {
+  const store = connected();
+  store.show('Chosen', { id: 'toast-1' });
+  store.show('Generated');
+  expect(open(store)).toEqual(['Generated', 'Chosen']);
+});
+
+test('eviction counts only open toasts', () => {
+  const store = connected();
+  store.show('One');
+  store.show('Two');
+  const three = store.show('Three');
+  store.dismiss(three);
+  store.show('Four');
+  expect(open(store)).toEqual(['Four', 'Two', 'One']);
+});
+
+test('setLimit keeps at least one toast and ignores NaN', () => {
+  const store = connected();
+  store.show('One');
+  store.show('Two');
+  store.setLimit(NaN);
+  expect(open(store)).toEqual(['Two', 'One']);
+  store.setLimit(0);
+  expect(open(store)).toEqual(['Two']);
+});
+
+test('the server snapshot stays empty and stable', () => {
+  const store = new ToastStore();
+  const other = new ToastStore();
+  store.show('Saved');
+  expect(other.visibleToasts).toHaveLength(0);
+  expect(store.getServerSnapshot()).toEqual([]);
+  expect(store.getServerSnapshot()).toBe(store.getServerSnapshot());
+});
+
+test('a closing toast stays while another Toaster is still connected', () => {
+  const store = new ToastStore();
+  store.connect();
+  const disconnect = store.connect();
+  store.dismiss(store.show('Saved'));
+  disconnect();
+  expect(store.visibleToasts).toHaveLength(1);
+});
+
+test('removing a toast that is not there changes nothing', () => {
+  const store = connected();
+  const listener = vi.fn<() => void>();
+  const key = store.show('Saved');
+  const snapshot = store.getSnapshot();
+  store.subscribe(listener);
+  store.remove('missing');
+  store.remove(key);
+  expect(listener).not.toHaveBeenCalled();
+  expect(store.getSnapshot()).toBe(snapshot);
+});
+
+test('a throwing onClose is reported and the rest still close', () => {
+  const store = connected();
+  const failure = new Error('onClose failed');
+  const reported = vi.fn<(error: unknown) => void>();
+  vi.spyOn(globalThis, 'queueMicrotask').mockImplementation((task) => {
+    try {
+      task();
+    } catch (error: unknown) {
+      reported(error);
+    }
+  });
+  const onClose = vi.fn<(reason: ToastCloseReason) => void>();
+  store.show('One', { onClose });
+  // Newest first, so the throwing toast closes before One.
+  store.show('Two', {
+    onClose: () => {
+      throw failure;
+    },
+  });
+  store.dismiss();
+  expect(open(store)).toEqual([]);
+  expect(onClose).toHaveBeenCalledExactlyOnceWith('programmatic');
+  expect(reported).toHaveBeenCalledExactlyOnceWith(failure);
+});
+
+test('a toast an onClose replaced mid-dismiss keeps the new one open', () => {
+  const store = connected();
+  const replacedOnClose = vi.fn<(reason: ToastCloseReason) => void>();
+  store.show('Old', { id: 'c', onClose: replacedOnClose });
+  store.show('Other', {
+    onClose: () => {
+      store.show('New', { id: 'c' });
+    },
+  });
+  store.dismiss();
+  expect(open(store)).toEqual(['New']);
+  expect(replacedOnClose).not.toHaveBeenCalled();
+});
+
+test('reset drops every toast without close callbacks', () => {
+  const store = connected();
+  const onClose = vi.fn<(reason: ToastCloseReason) => void>();
+  store.show('Saved', { onClose });
+  store.reset();
+  expect(store.visibleToasts).toHaveLength(0);
+  expect(onClose).not.toHaveBeenCalled();
+});
+
+test('setDuration() sets the default for later toasts, never under the floor', () => {
+  const store = connected();
+  store.setDuration(8000);
+  const longer = store.show('Longer');
+  store.setDuration(1000);
+  const floored = store.show('Floored');
+  const own = store.show('Own', { duration: 6000 });
+  expect(itemOf(store, longer).content.duration).toBe(8000);
+  expect(itemOf(store, floored).content.duration).toBe(defaultToastDuration);
+  expect(itemOf(store, own).content.duration).toBe(6000);
+});
+
+test('reset restores the default duration and limit', () => {
+  const store = connected();
+  store.setDuration(8000);
+  store.setLimit(1);
+  store.reset();
+  const key = store.show('One');
+  store.show('Two');
+  store.show('Three');
+  expect(itemOf(store, key).content.duration).toBe(defaultToastDuration);
+  expect(open(store)).toEqual(['Three', 'Two', 'One']);
+});
+
+test('a NaN default duration falls to the floor', () => {
+  const store = connected();
+  store.setDuration(NaN);
+  const key = store.show('Saved');
+  expect(itemOf(store, key).content.duration).toBe(defaultToastDuration);
+});
+
+test('close() with a version closes only that version', () => {
+  const store = connected();
+  const key = store.show('Archiving', { duration: Infinity, id: 'a' });
+  const { version } = itemOf(store, key);
+  store.show('Archived', { duration: Infinity, id: 'a' });
+  store.close(key, version);
+  expect(open(store)).toEqual(['Archived']);
+  store.close(key, itemOf(store, key).version);
+  expect(open(store)).toEqual([]);
+});
+
+test('an update in place keeps the instance; a toast over an exiting one is new', () => {
+  const store = connected();
+  const key = store.show('Saving', { id: 'save' });
+  const { instance } = itemOf(store, key);
+  store.show('Saved', { id: 'save' });
+  expect(itemOf(store, key).instance).toBe(instance);
+  store.close(key);
+  store.show('Saved again', { id: 'save' });
+  expect(store.visibleToasts.filter((item) => item.key === key)).toHaveLength(
+    1,
+  );
+  expect(itemOf(store, key).instance).not.toBe(instance);
+});
+
+test('two stores never give out the same instance', () => {
+  const first = connected();
+  const second = connected();
+  const a = itemOf(first, first.show('A')).instance;
+  const b = itemOf(second, second.show('B')).instance;
+  expect(a).not.toBe(b);
+});
