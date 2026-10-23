@@ -40,16 +40,28 @@ test('a second disconnect from the same host does nothing', () => {
   expect(clock.isRunning).toBe(true);
 });
 
-test('the region pause holds until the last host leaves', () => {
+test.each(['region', 'expanded'] as const)(
+  'the %s pause holds until the last host leaves',
+  (source) => {
+    const clock = new ToastClock(noTimers);
+    const first = clock.connect();
+    const second = clock.connect();
+    clock.pause(source);
+    first();
+    expect(clock.isRunning).toBe(false);
+    second();
+    clock.connect();
+    expect(clock.isRunning).toBe(true);
+  },
+);
+
+test('the hidden pause outlives the hosts', () => {
   const clock = new ToastClock(noTimers);
-  const first = clock.connect();
-  const second = clock.connect();
-  clock.pause('region');
-  first();
-  expect(clock.isRunning).toBe(false);
-  second();
+  const disconnect = clock.connect();
+  clock.pause('hidden');
+  disconnect();
   clock.connect();
-  expect(clock.isRunning).toBe(true);
+  expect(clock.isRunning).toBe(false);
 });
 
 test('reset clears every pause', () => {

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useSyncExternalStore } from 'react';
+import { mergeProps } from 'react-aria/mergeProps';
 import { useToastRegion } from 'react-aria/useToast';
 import { createPortal } from 'react-dom';
 import { tv } from 'tailwind-variants/lite';
@@ -10,12 +11,14 @@ import {
   type ToastAnnounce,
   ToastItemView,
 } from '#/components/ui/feedback/toast/toast-item';
+import { useCssVars, useToastStack } from '#/hooks/use-toast-stack';
 import { cn } from '#/lib/cx';
 import { announce } from '#/lib/toast/toast-announcer';
 import { toastStore } from '#/lib/toast/toast-api';
 import {
   defaultToastDuration,
   defaultToastLimit,
+  defaultToastVisible,
 } from '#/lib/toast/toast-content';
 
 export { toast } from '#/lib/toast/toast-api';
@@ -36,22 +39,33 @@ export type ToasterProps = {
   duration?: number;
   // Per intent, for toasts that don't set their own.
   icons?: ToastIcons;
-  // Toasts shown at once, at least 1; past it the oldest closes.
+  // Keeps the stack open, for toasts whose actions shouldn't hide behind
+  // another; timers still run.
+  isExpanded?: boolean;
+  // Toasts kept at once, at least 1; past it the oldest closes.
   limit?: number;
   messages?: ToasterMessages;
   placement?: ToasterPlacement;
   store?: ToastStore;
+  // Toasts the stack shows, at least 1; older ones wait behind it.
+  visible?: number;
 };
 
 type ToastRegionProps = {
   className: string;
   icons: ToastIcons | undefined;
+  isExpanded: boolean;
   items: readonly ToastItem[];
   messages: ToasterMessages | undefined;
   onAnnounce: ToastAnnounce;
   placement: ToasterPlacement;
   store: ToastStore;
+  visible: number;
 };
+
+// Room above and below the stack: the toasts' bottom-4 or top-4 offset, and
+// as much on the far side.
+const toasterInset = 32;
 
 const placements = {
   'bottom center': { align: 'center', side: 'bottom' },
@@ -63,10 +77,10 @@ const placements = {
 } as const;
 
 const styles = tv({
-  base: 'fixed z-(--z-toast) flex max-h-dvh w-full max-w-sm flex-col gap-2 overflow-hidden p-4 outline-hidden',
+  base: 'fixed z-(--z-toast) h-(--toaster-height) max-h-dvh w-full max-w-sm overflow-hidden outline-hidden',
   variants: {
     align: { center: 'inset-x-0 mx-auto', end: 'end-0', start: 'start-0' },
-    side: { bottom: 'bottom-0 flex-col-reverse', top: 'top-0' },
+    side: { bottom: 'bottom-0', top: 'top-0' },
   },
 });
 
@@ -76,17 +90,14 @@ export function Toaster({
   className,
   duration = defaultToastDuration,
   icons,
+  isExpanded = false,
   limit = defaultToastLimit,
   messages,
   placement = 'bottom end',
   store = toastStore,
+  visible = defaultToastVisible,
 }: ToasterProps) {
-  const isClient = useSyncExternalStore(subscribeNever, isTrue, isFalse);
-  const items = useSyncExternalStore(
-    store.subscribe,
-    store.getSnapshot,
-    store.getServerSnapshot,
-  );
+  const { isClient, items } = useStoreItems(store);
   const politeRef = useRef<HTMLDivElement>(null);
   const assertiveRef = useRef<HTMLDivElement>(null);
   useConnectedStore(store, limit, duration);
@@ -111,11 +122,13 @@ export function Toaster({
         <ToastRegion
           className={cn(styles(placements[placement]), className)}
           icons={icons}
+          isExpanded={isExpanded}
           items={items}
           messages={messages}
           onAnnounce={onAnnounce}
           placement={placement}
           store={store}
+          visible={visible}
         />
       ) : null}
     </div>,
@@ -141,41 +154,45 @@ function subscribeNever() {
 function ToastRegion({
   className,
   icons,
+  isExpanded,
   items,
   messages,
   onAnnounce,
   placement,
   store,
+  visible,
 }: ToastRegionProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const { regionProps } = useToastRegion(
-    { 'aria-label': messages?.region?.(items.length) },
+  const { side } = placements[placement];
+  const { ref, regionProps, stack } = useRegionParts({
+    isExpanded,
+    items,
+    label: messages?.region?.(items.length),
+    side,
     store,
-    ref,
-  );
-  // Unmounting while hovered or focused never ends React Aria's pause.
-  useEffect(
-    () => () => {
-      store.resumeAll();
-    },
-    [store],
-  );
+    visible,
+  });
   return (
     <div
       {...regionProps}
       className={cn(className)}
+      data-expanded={stack.isExpanded || undefined}
       data-placement={placement}
       data-slot="toast-viewport"
       ref={ref}
     >
-      {items.map((item) => (
+      {stack.placed.map(({ item, slot }) => (
         <ToastItemView
           closeLabel={messages?.close}
           icons={icons}
           item={item}
           key={item.instance}
           onAnnounce={onAnnounce}
+          onHeight={(height) => {
+            stack.onHeight(item.instance, height);
+          }}
           pendingLabel={messages?.pending}
+          side={side}
+          slot={slot}
           store={store}
         />
       ))}
@@ -207,4 +224,53 @@ function useConnectedStore(store: ToastStore, limit: number, duration: number) {
       store.resume('hidden');
     };
   }, [store]);
+}
+
+function useRegionParts({
+  isExpanded,
+  items,
+  label,
+  side,
+  store,
+  visible,
+}: {
+  isExpanded: boolean;
+  items: readonly ToastItem[];
+  label: string | undefined;
+  side: 'bottom' | 'top';
+  store: ToastStore;
+  visible: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const stack = useToastStack({ isExpanded, items, ref, side, store, visible });
+  const { regionProps } = useToastRegion({ 'aria-label': label }, store, ref);
+  // Unmounting while hovered or focused never ends React Aria's pause.
+  useEffect(
+    () => () => {
+      store.resumeAll();
+    },
+    [store],
+  );
+  useCssVars(ref, {
+    '--toast-front-height':
+      stack.frontHeight > 0 ? `${String(stack.frontHeight)}px` : undefined,
+    '--toaster-height': `${String(stack.height + toasterInset)}px`,
+  });
+  return {
+    ref,
+    regionProps: mergeProps(regionProps, stack.regionProps),
+    stack,
+  };
+}
+
+// isClient is false on the server and through hydration, so the toasts and
+// live regions mount only on the client.
+function useStoreItems(store: ToastStore) {
+  const isClient = useSyncExternalStore(subscribeNever, isTrue, isFalse);
+  const items = useSyncExternalStore(
+    store.subscribe,
+    store.getSnapshot,
+    store.getServerSnapshot,
+  );
+  return { isClient, items };
 }

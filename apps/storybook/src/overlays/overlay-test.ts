@@ -35,6 +35,17 @@ export async function expectSlide(element: HTMLElement, translate: string) {
   await expect(await inState(element, 'exiting', slideStyle)).toEqual(hidden);
 }
 
+// Jumps every finite animation on the page to its end rather than waiting
+// them out, so a trigger's or backdrop's own transition ends too. An infinite
+// one never ends, and finish() throws on it.
+export async function finished(element: HTMLElement) {
+  const animations = element.ownerDocument
+    .getAnimations()
+    .filter((a) => a.effect?.getComputedTiming().endTime !== Infinity);
+  for (const animation of animations) animation.finish();
+  await Promise.all(animations.map((a) => a.finished));
+}
+
 // Moves the pointer onto the element's center. userEvent.hover reports it at
 // (0,0), outside a warm-opened overlay's safe area, which closes the overlay.
 export async function hoverAt(element: HTMLElement) {
@@ -98,17 +109,6 @@ export function wait(ms: number) {
   return new Promise<void>((resolve) => {
     setTimeout(resolve, ms);
   });
-}
-
-// Jumps every finite animation on the page to its end rather than waiting
-// them out, so a trigger's or backdrop's own transition ends too. An infinite
-// one never ends, and finish() throws on it.
-async function finished(element: HTMLElement) {
-  const animations = element.ownerDocument
-    .getAnimations()
-    .filter((a) => a.effect?.getComputedTiming().endTime !== Infinity);
-  for (const animation of animations) animation.finish();
-  await Promise.all(animations.map((a) => a.finished));
 }
 
 function slideStyle(element: HTMLElement) {

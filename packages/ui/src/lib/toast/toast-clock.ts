@@ -1,7 +1,8 @@
 import type { ToastTimer } from '#/lib/toast/toast-content';
 
-// The region pauses while hovered or focused; the Toaster while the page is hidden.
-export type ToastPauseSource = 'hidden' | 'region';
+// The region pauses while hovered or focused, the stack while a tap holds it
+// open, and the Toaster while the page is hidden.
+export type ToastPauseSource = 'expanded' | 'hidden' | 'region';
 
 // Runs the open toasts' timers only while a Toaster is connected and nothing
 // pauses them, so a toast sent before the Toaster mounts waits for it. The
@@ -32,7 +33,10 @@ export class ToastClock {
       isConnected = false;
       this.#hosts -= 1;
       // An unmounting region never resumes the toasts it paused.
-      if (this.#hosts === 0) this.#pausedBy.delete('region');
+      if (this.#hosts === 0) {
+        this.#pausedBy.delete('region');
+        this.#pausedBy.delete('expanded');
+      }
       this.sync();
     };
   }

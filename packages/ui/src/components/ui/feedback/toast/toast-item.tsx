@@ -1,16 +1,10 @@
-import {
-  type ReactNode,
-  type RefObject,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { type ReactNode, type RefObject, useEffect, useRef } from 'react';
 import { mergeProps } from 'react-aria/mergeProps';
-import { useKeyboard } from 'react-aria/useKeyboard';
-import { useToast } from 'react-aria/useToast';
+import { type ToastAria, useToast } from 'react-aria/useToast';
 import { tv } from 'tailwind-variants/lite';
 
 import type { ToastContent, ToastPriority } from '#/lib/toast/toast-content';
+import type { ToastSlot } from '#/lib/toast/toast-stack';
 import type { ToastItem, ToastStore } from '#/lib/toast/toast-store';
 
 import {
@@ -18,6 +12,8 @@ import {
   type ToastIcons,
 } from '#/components/ui/feedback/toast/toast-body';
 import { ToastClose } from '#/components/ui/feedback/toast/toast-buttons';
+import { useToastLifecycle } from '#/hooks/use-toast-lifecycle';
+import { useCssVars, useToastHeight } from '#/hooks/use-toast-stack';
 import { cn } from '#/lib/cx';
 import { isEmptyNode } from '#/lib/empty-node';
 import { focusRing } from '#/lib/recipes';
@@ -30,21 +26,29 @@ export type ToastItemProps = {
   icons: ToastIcons | undefined;
   item: ToastItem;
   onAnnounce: ToastAnnounce;
+  onHeight: (height: number) => void;
   pendingLabel: string | undefined;
+  side: 'bottom' | 'top';
+  slot: ToastSlot;
   store: ToastStore;
 };
-
-// Long past any exit transition: a toast whose exit never settles still goes.
-const exitLimit = 1000;
 
 const styles = tv({
   slots: {
     close: '-me-1 -mt-1 shrink-0',
+    inner:
+      'flex w-full items-start gap-3 p-4 transition-opacity duration-200 group-data-behind/toast:opacity-0',
     toast: [
       focusRing,
-      'flex w-full items-start gap-3 rounded-panel border border-border bg-popover p-4 text-sm text-popover-foreground shadow-lg transition duration-200 ease-out',
-      'entering:scale-95 entering:opacity-0 exiting:scale-95 exiting:opacity-0',
+      'group/toast absolute inset-x-4 z-(--toast-z) translate-y-(--toast-offset) scale-(--toast-scale) overflow-hidden rounded-panel border border-border bg-popover text-sm text-popover-foreground shadow-lg transition duration-200 ease-out data-behind:h-(--toast-front-height)',
+      'aria-hidden:opacity-0 entering:scale-95 entering:opacity-0 exiting:scale-95 exiting:opacity-0',
     ],
+  },
+  variants: {
+    side: {
+      bottom: { toast: 'bottom-4 origin-bottom' },
+      top: { toast: 'top-4 origin-top' },
+    },
   },
 });
 
@@ -55,45 +59,42 @@ export function ToastItemView({
   icons,
   item,
   onAnnounce,
+  onHeight,
   pendingLabel,
+  side,
+  slot,
   store,
 }: ToastItemProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLDivElement>(null);
-  const descriptionRef = useRef<HTMLDivElement>(null);
-  const { closeButtonProps, descriptionProps, titleProps, toastProps } =
-    useToast({ toast: item }, store, ref);
-  const { content, isExiting, key } = item;
-  const { isEntering, keyboardProps } = useToastLifecycle(ref, item, store);
-  useAnnouncement(item, onAnnounce, titleRef, descriptionRef);
+  const {
+    aria,
+    descriptionRef,
+    innerRef,
+    isEntering,
+    keyboardProps,
+    ref,
+    titleRef,
+  } = useToastParts({ item, onAnnounce, onHeight, slot, store });
+  const s = styles({ side });
 
   return (
     <div
-      {...mergeProps(toastProps, keyboardProps)}
-      {...labelling(content, toastProps)}
-      className={cn(styles().toast())}
-      data-entering={isEntering || undefined}
-      data-exiting={isExiting || undefined}
-      data-intent={content.intent}
+      {...mergeProps(aria.toastProps, keyboardProps)}
+      {...labelling(item.content, aria.toastProps)}
+      {...stateAttributes(item, slot, isEntering)}
+      className={cn(s.toast())}
       data-slot="toast"
       ref={ref}
     >
-      <ToastBody
-        descriptionProps={descriptionProps}
+      <ToastInner
+        aria={aria}
+        closeLabel={closeLabel}
         descriptionRef={descriptionRef}
         icons={icons}
+        innerRef={innerRef}
         item={item}
-        onActionDone={() => {
-          store.actionDone(item);
-        }}
         pendingLabel={pendingLabel}
-        titleProps={titleProps}
+        store={store}
         titleRef={titleRef}
-      />
-      <ToastClose
-        className={cn(styles().close())}
-        label={labelOr(closeLabel, closeButtonProps['aria-label'])}
-        onPress={() => store.close(key)}
       />
     </div>
   );
@@ -131,6 +132,65 @@ function labelOr(message: string | undefined, fallback: string | undefined) {
   return fallback ?? '';
 }
 
+function stateAttributes(
+  item: ToastItem,
+  slot: ToastSlot,
+  isEntering: boolean,
+) {
+  return {
+    'aria-hidden': slot.isHidden || undefined,
+    'data-behind': slot.isBehind || undefined,
+    'data-entering': isEntering || undefined,
+    'data-exiting': item.isExiting || undefined,
+    'data-intent': item.content.intent,
+    inert: slot.isHidden,
+  };
+}
+
+// The part a collapsed stack never clips, so its height is the toast's own.
+function ToastInner({
+  aria,
+  closeLabel,
+  descriptionRef,
+  icons,
+  innerRef,
+  item,
+  pendingLabel,
+  store,
+  titleRef,
+}: {
+  aria: ToastAria;
+  descriptionRef: RefObject<HTMLDivElement | null>;
+  innerRef: RefObject<HTMLDivElement | null>;
+  titleRef: RefObject<HTMLDivElement | null>;
+} & Pick<
+  ToastItemProps,
+  'closeLabel' | 'icons' | 'item' | 'pendingLabel' | 'store'
+>) {
+  const s = styles();
+  return (
+    <div className={cn(s.inner())} data-slot="toast-inner" ref={innerRef}>
+      <ToastBody
+        descriptionProps={aria.descriptionProps}
+        descriptionRef={descriptionRef}
+        icons={icons}
+        item={item}
+        onActionDone={() => {
+          store.actionDone(item);
+        }}
+        pendingLabel={pendingLabel}
+        titleProps={aria.titleProps}
+        titleRef={titleRef}
+      />
+      <ToastClose
+        className={cn(s.close())}
+        label={labelOr(closeLabel, aria.closeButtonProps['aria-label'])}
+        onPress={() => store.close(item.key)}
+      />
+    </div>
+  );
+}
+
 // Announces a toast when it appears and whenever its text changes; an update
 // that only restarts its timer says nothing new.
 function useAnnouncement(
@@ -156,58 +216,36 @@ function useAnnouncement(
   });
 }
 
-// Entering styles hold for the first frame, so the transition has a start.
-function useEntering() {
-  const [isEntering, setIsEntering] = useState(true);
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      setIsEntering(false);
-    });
-    return () => {
-      cancelAnimationFrame(frame);
-    };
-  }, []);
-  return isEntering;
-}
-
-function useRemoveAfterExit(
-  ref: RefObject<HTMLElement | null>,
-  isExiting: boolean,
-  key: string,
-  store: ToastStore,
-) {
-  useEffect(() => {
-    let isCancelled = false;
-    let limit: ReturnType<typeof setTimeout> | undefined;
-    const finish = async (animations: Animation[]) => {
-      await Promise.race([
-        Promise.allSettled(animations.map((animation) => animation.finished)),
-        new Promise((resolve) => {
-          limit = setTimeout(resolve, exitLimit);
-        }),
-      ]);
-      if (!isCancelled) store.remove(key);
-    };
-    if (isExiting) void finish(ref.current?.getAnimations() ?? []);
-    return () => {
-      isCancelled = true;
-      clearTimeout(limit);
-    };
-  }, [isExiting, key, ref, store]);
-}
-
-function useToastLifecycle(
-  ref: RefObject<HTMLElement | null>,
-  { isExiting, key }: ToastItem,
-  store: ToastStore,
-) {
-  const isEntering = useEntering();
-  useRemoveAfterExit(ref, isExiting, key, store);
-  const { keyboardProps } = useKeyboard({
-    onKeyDown: (event) => {
-      if (event.key === 'Escape') store.close(key);
-      else event.continuePropagation();
-    },
+function useToastParts({
+  item,
+  onAnnounce,
+  onHeight,
+  slot,
+  store,
+}: Pick<
+  ToastItemProps,
+  'item' | 'onAnnounce' | 'onHeight' | 'slot' | 'store'
+>) {
+  const ref = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
+  const descriptionRef = useRef<HTMLDivElement>(null);
+  const aria = useToast({ toast: item }, store, ref);
+  const { isEntering, keyboardProps } = useToastLifecycle(ref, item, store);
+  useAnnouncement(item, onAnnounce, titleRef, descriptionRef);
+  useToastHeight(ref, innerRef, onHeight);
+  useCssVars(ref, {
+    '--toast-offset': `${String(slot.offset)}px`,
+    '--toast-scale': String(slot.scale),
+    '--toast-z': String(slot.z),
   });
-  return { isEntering, keyboardProps };
+  return {
+    aria,
+    descriptionRef,
+    innerRef,
+    isEntering,
+    keyboardProps,
+    ref,
+    titleRef,
+  };
 }

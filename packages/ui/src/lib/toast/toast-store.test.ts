@@ -2,6 +2,7 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
 import {
   defaultToastDuration,
+  defaultToastLimit,
   type ToastCloseReason,
 } from '#/lib/toast/toast-content';
 import { ToastStore } from '#/lib/toast/toast-store';
@@ -141,9 +142,7 @@ test('past the limit the oldest is evicted', () => {
   const store = connected();
   const onClose = vi.fn<(reason: ToastCloseReason) => void>();
   const oldest = store.show('One', { onClose });
-  store.show('Two');
-  store.show('Three');
-  store.show('Four');
+  for (let index = 0; index < defaultToastLimit; index += 1) store.show('More');
   expect(isOpen(store, oldest)).toBe(false);
   expect(onClose).toHaveBeenCalledExactlyOnceWith('evicted');
   store.setLimit(1);
