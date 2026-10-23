@@ -133,6 +133,10 @@ export const SheetShortcut: Story = {
       await userEvent.keyboard('{Escape}');
       await closed();
       await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+      await waitFor(async () => {
+        await expect(trigger).toHaveFocus();
+      });
+      trigger.blur();
     });
   },
 };
