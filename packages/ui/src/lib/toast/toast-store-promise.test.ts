@@ -22,7 +22,7 @@ function connected() {
 
 const open = (store: ToastStore) =>
   store.visibleToasts
-    .filter((item) => !item.content.isExiting)
+    .filter((item) => !item.isExiting)
     .map((item) => item.content.title);
 
 const loadingStates = { error: 'Failed', loading: 'Saving', success: 'Saved' };

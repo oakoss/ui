@@ -20,8 +20,43 @@ function connected() {
 
 const open = (store: ToastStore) =>
   store.visibleToasts
-    .filter((item) => !item.content.isExiting)
+    .filter((item) => !item.isExiting)
     .map((item) => item.content.title);
+
+function itemOf(store: ToastStore, key: string) {
+  const item = store.visibleToasts.find((other) => other.key === key);
+  if (!item) throw new Error(`No toast ${key}`);
+  return item;
+}
+
+const renderCustom = () => 'Custom';
+
+test('add() keeps every field of content without an action', () => {
+  const store = connected();
+  const key = store.show(
+    'Template',
+    {
+      custom: renderCustom,
+      description: 'Details',
+      duration: 8000,
+      icon: 'icon',
+      priority: 'high',
+    },
+    'info',
+  );
+  const { content } = itemOf(store, key);
+  expect(itemOf(store, store.add(content)).content).toEqual(content);
+});
+
+test('a toast keeps its version while others come and go', () => {
+  const store = connected();
+  const first = store.show('First');
+  const { version } = itemOf(store, first);
+  const second = store.show('Second');
+  store.dismiss(second);
+  expect(itemOf(store, first).version).toBe(version);
+  expect(itemOf(store, second).version).not.toBe(version);
+});
 
 test('an id reused while its toast closes makes a new toast, which removal keeps', () => {
   const store = connected();

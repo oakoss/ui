@@ -26,13 +26,11 @@ const titles = (store: ToastStore) =>
 function newest(store: ToastStore) {
   const [first] = store.visibleToasts;
   if (!first) throw new Error('No toast');
-  return first.content;
+  return first;
 }
 
 const isOpen = (store: ToastStore, key: string) =>
-  store.visibleToasts.some(
-    (item) => item.key === key && !item.content.isExiting,
-  );
+  store.visibleToasts.some((item) => item.key === key && !item.isExiting);
 
 test('a toast closes after the default duration, with reason timeout', () => {
   const store = connected();
@@ -81,7 +79,7 @@ test('a toast with an action takes no duration', () => {
   const action = { label: 'Undo', onPress: vi.fn() };
   // @ts-expect-error -- an action keeps the toast until it's closed
   store.show('Deleted', { action, duration: 8000 });
-  expect(newest(store).duration).toBe(Infinity);
+  expect(newest(store).content.duration).toBe(Infinity);
 });
 
 test('pausing keeps the remaining time', () => {
@@ -130,7 +128,7 @@ test('the same id replaces the toast in place and restarts its timer', () => {
   store.show('Saved', { description: 'All changes', id: 'save' }, 'success');
   expect(titles(store)).toEqual(['Saved', 'First']);
   const updated = newest(store);
-  expect(updated).toMatchObject({
+  expect(updated.content).toMatchObject({
     description: 'All changes',
     intent: 'success',
   });
@@ -149,9 +147,7 @@ test('past the limit the oldest is evicted', () => {
   expect(isOpen(store, oldest)).toBe(false);
   expect(onClose).toHaveBeenCalledExactlyOnceWith('evicted');
   store.setLimit(1);
-  expect(
-    store.visibleToasts.filter((item) => !item.content.isExiting),
-  ).toHaveLength(1);
+  expect(store.visibleToasts.filter((item) => !item.isExiting)).toHaveLength(1);
 });
 
 test('close reasons: the close button, dismiss and dismiss all', () => {
@@ -234,8 +230,8 @@ test('add() keeps the content it is given', () => {
   const store = connected();
   const action = { label: 'Undo', onPress: vi.fn() };
   store.show('Template', { action, closeOnAction: false }, 'warning');
-  store.add(newest(store));
-  expect(newest(store)).toMatchObject({
+  store.add(newest(store).content);
+  expect(newest(store).content).toMatchObject({
     action,
     closeOnAction: false,
     duration: Infinity,

@@ -12,7 +12,7 @@ const states = { error: 'Failed', loading: 'Saving', success: 'Saved' };
 
 const shown = () =>
   toastStore.visibleToasts
-    .filter(({ content }) => !content.isExiting)
+    .filter(({ isExiting }) => !isExiting)
     .map(({ content }) => [content.title, content.intent]);
 
 // Lets the store's promise handling run after the caller's await.

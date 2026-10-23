@@ -16,14 +16,25 @@ import {
   toPromiseState,
 } from '#/lib/toast/toast-content';
 
+// The store's bookkeeping beside what the caller passed.
+export type ToastItem = Readonly<
+  {
+    isExiting: boolean;
+    // Changes whenever the content does, so the Toaster announces it again.
+    version: number;
+  } & QueuedToast<ToastContent>
+>;
+
 // The region pauses while hovered or focused; the Toaster while the page is hidden.
 export type ToastPauseSource = 'hidden' | 'region';
 
 type Entry = {
-  content: ToastContent;
+  readonly content: ToastContent;
+  isExiting: boolean;
   readonly key: string;
   readonly onClose: ((reason: ToastCloseReason) => void) | undefined;
   readonly timer: ToastTimer | undefined;
+  readonly version: number;
 };
 
 // Toasts newest first. Timers run only while a Toaster is connected and
@@ -38,10 +49,10 @@ export class ToastStore implements ToastState<ToastContent> {
   #listeners = new Set<() => void>();
   #nextId = 0;
   #pausedBy = new Set<ToastPauseSource>();
-  #serverSnapshot: QueuedToast<ToastContent>[] = [];
+  #serverSnapshot: ToastItem[] = [];
   #version = 0;
 
-  #visible: QueuedToast<ToastContent>[] = [];
+  #visible: ToastItem[] = [];
 
   get #isRunning() {
     return this.#hosts > 0 && this.#pausedBy.size === 0;
@@ -79,9 +90,7 @@ export class ToastStore implements ToastState<ToastContent> {
       if (this.#hosts === 0) {
         // An unmounting region never resumes the toasts it paused.
         this.#pausedBy.delete('region');
-        this.#entries = this.#entries.filter(
-          (entry) => !entry.content.isExiting,
-        );
+        this.#sweep();
         this.#emit();
       }
       this.#syncTimers();
@@ -154,7 +163,7 @@ export class ToastStore implements ToastState<ToastContent> {
   // Takes a closed toast out once its exit has finished.
   remove(key: string) {
     const next = this.#entries.filter(
-      (entry) => entry.key !== key || !entry.content.isExiting,
+      (entry) => entry.key !== key || !entry.isExiting,
     );
     if (next.length === this.#entries.length) return;
     this.#entries = next;
@@ -201,13 +210,10 @@ export class ToastStore implements ToastState<ToastContent> {
 
   #close(entry: Entry, reason: ToastCloseReason) {
     // An onClose that replaced this toast mid-loop has already taken it out.
-    if (entry.content.isExiting || !this.#entries.includes(entry)) return;
+    if (entry.isExiting || !this.#entries.includes(entry)) return;
     entry.timer?.pause();
-    entry.content = { ...entry.content, isExiting: true };
-    // With no Toaster to play an exit, it goes at once.
-    if (this.#hosts === 0) {
-      this.#entries = this.#entries.filter((other) => other !== entry);
-    }
+    entry.isExiting = true;
+    this.#sweep();
     this.#emit();
     try {
       entry.onClose?.(reason);
@@ -229,20 +235,20 @@ export class ToastStore implements ToastState<ToastContent> {
   #emit() {
     this.#visible = this.#entries.map((entry) => ({
       content: entry.content,
+      isExiting: entry.isExiting,
       key: entry.key,
+      version: entry.version,
     }));
     for (const listener of this.#listeners) listener();
   }
 
   #evict() {
-    const open = this.#entries.filter((entry) => !entry.content.isExiting);
+    const open = this.#entries.filter((entry) => !entry.isExiting);
     for (const entry of open.slice(this.#limit)) this.#close(entry, 'evicted');
   }
 
   #open(key: string) {
-    return this.#entries.find(
-      (entry) => entry.key === key && !entry.content.isExiting,
-    );
+    return this.#entries.find((entry) => entry.key === key && !entry.isExiting);
   }
 
   #show(title: ReactNode, options: ToastShowOptions, intent: ToastIntent) {
@@ -251,14 +257,10 @@ export class ToastStore implements ToastState<ToastContent> {
     // options. A closing one finishes its exit, and the new toast is new.
     const existing = this.#open(key);
     existing?.timer?.pause();
-    const content = resolveContent(
-      title,
-      options,
-      intent,
-      (this.#version += 1),
-    );
+    const content = resolveContent(title, options, intent);
     const entry: Entry = {
       content,
+      isExiting: false,
       key,
       onClose: options.onClose,
       timer: Number.isFinite(content.duration)
@@ -266,6 +268,7 @@ export class ToastStore implements ToastState<ToastContent> {
             this.#close(entry, 'timeout');
           }, content.duration)
         : undefined,
+      version: (this.#version += 1),
     };
     this.#entries = existing
       ? this.#entries.map((other) => (other === existing ? entry : other))
@@ -276,9 +279,15 @@ export class ToastStore implements ToastState<ToastContent> {
     return entry;
   }
 
+  // Closing toasts wait for a Toaster to play their exit; with none, they go.
+  #sweep() {
+    if (this.#hosts > 0) return;
+    this.#entries = this.#entries.filter((entry) => !entry.isExiting);
+  }
+
   #syncTimers() {
     for (const entry of this.#entries) {
-      if (entry.content.isExiting) continue;
+      if (entry.isExiting) continue;
       if (this.#isRunning) entry.timer?.resume();
       else entry.timer?.pause();
     }

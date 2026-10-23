@@ -26,11 +26,8 @@ export type ToastContent = Readonly<{
   duration: number;
   icon: ReactNode;
   intent: ToastIntent;
-  isExiting: boolean;
   priority: ToastPriority;
   title: ReactNode;
-  // Changes whenever the content does, so the Toaster announces it again.
-  version: number;
 }>;
 
 export type ToastIntent =
@@ -108,7 +105,6 @@ export function resolveContent(
   title: ReactNode,
   options: ToastShowOptions,
   intent: ToastIntent,
-  version: number,
 ): ToastContent {
   const { action, duration = defaultToastDuration } = options;
   return {
@@ -122,11 +118,9 @@ export function resolveContent(
         : Math.max(Number.isNaN(duration) ? 0 : duration, defaultToastDuration),
     icon: options.icon,
     intent,
-    isExiting: false,
     priority:
       intent === 'destructive' ? 'high' : (options.priority ?? 'normal'),
     title,
-    version,
   };
 }
 
