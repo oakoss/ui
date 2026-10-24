@@ -60,6 +60,32 @@ export const OneLineWithAction: Story = {
   },
 };
 
+// The close button's X sits as far from the end edge as the icon does from
+// the start, in either reading direction.
+async function evenEdges() {
+  demoStore.show('Invite sent', { duration: Infinity }, 'success');
+  const toast = await findToast('Invite sent');
+  await finished(toast);
+  const box = toast.getBoundingClientRect();
+  const icon = toast.querySelector('[data-slot=toast-icon]');
+  const x = toast.querySelector(':scope [data-slot=toast-close] svg');
+  if (!icon || !x) throw new Error('No icon or close glyph in the toast');
+  const start = icon.getBoundingClientRect();
+  const end = x.getBoundingClientRect();
+  const isRtl = getComputedStyle(toast).direction === 'rtl';
+  const [iconGap, xGap] = isRtl
+    ? [box.right - start.right, end.left - box.left]
+    : [start.left - box.left, box.right - end.right];
+  await expect(xGap).toBeCloseTo(iconGap, 0);
+}
+
+export const EvenEdges: Story = { play: evenEdges };
+
+export const EvenEdgesRightToLeft: Story = {
+  globals: { locale: 'ar-EG' },
+  play: evenEdges,
+};
+
 // With a description, the icon and close button stay on the title's line.
 export const WithDescription: Story = {
   play: async () => {
