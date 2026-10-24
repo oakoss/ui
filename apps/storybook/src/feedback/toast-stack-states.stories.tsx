@@ -67,11 +67,28 @@ export const FocusedStaysShown: Story = {
   args: { visible: 2 },
   play: async () => {
     const toasts = await showThree();
+    // A key React Aria counts (it ignores Shift) puts it in keyboard mode,
+    // as Tab or F6 would, whatever an earlier story clicked.
+    await userEvent.click(document.body);
+    await userEvent.keyboard('{ArrowDown}');
     toasts[1]?.focus();
     demoStore.show('Arrived', forever);
     await waitFor(() => toastTitled('Arrived'));
     await expect(toasts[1]).not.toHaveAttribute('inert');
     await expect(toasts[1]).toHaveFocus();
+  },
+};
+
+// A click that focuses a toast, such as on its close button, can't reach a
+// hidden one, so those stay hidden.
+export const ClickKeepsHidden: Story = {
+  args: { visible: 2 },
+  play: async () => {
+    const toasts = await showThree();
+    await userEvent.click(toasts[1] ?? document.body);
+    await expect(toasts[1]).toHaveFocus();
+    await expect(toasts[2]).toHaveAttribute('aria-hidden', 'true');
+    await expect(toasts[2]).toHaveAttribute('inert');
   },
 };
 

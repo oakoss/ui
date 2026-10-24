@@ -9,6 +9,7 @@ import {
   useState,
 } from 'react';
 import { mergeProps } from 'react-aria/mergeProps';
+import { useFocusVisible } from 'react-aria/useFocusVisible';
 import { useFocusWithin } from 'react-aria/useFocusWithin';
 import { useHover } from 'react-aria/useHover';
 import { useInteractOutside } from 'react-aria/useInteractOutside';
@@ -108,6 +109,7 @@ export function useToastStack({
 function useStackOpen(ref: RefObject<HTMLElement | null>, store: ToastStore) {
   const [state, send] = useReducer(nextStackOpen, closedStack);
   const view = stackOpenView(state);
+  const { isFocusVisible } = useFocusVisible();
   const { hoverProps } = useHover({
     onHoverChange: (isHovering) => {
       send(isHovering ? 'hover' : 'unhover');
@@ -125,13 +127,7 @@ function useStackOpen(ref: RefObject<HTMLElement | null>, store: ToastStore) {
     },
     ref,
   });
-  const { pausesTimers } = view;
-  useEffect(() => {
-    if (pausesTimers) store.pause('tap');
-    return () => {
-      if (pausesTimers) store.resume('tap');
-    };
-  }, [pausesTimers, store]);
+  useTapPause(view.pausesTimers, store);
   const props = {
     onFocus: (event: FocusEvent) => {
       if (event.target !== event.currentTarget) send('focusToast');
@@ -148,5 +144,20 @@ function useStackOpen(ref: RefObject<HTMLElement | null>, store: ToastStore) {
       }
     },
   };
-  return { ...view, props: mergeProps(hoverProps, focusWithinProps, props) };
+  return {
+    ...view,
+    props: mergeProps(hoverProps, focusWithinProps, props),
+    // Keyboard and screen-reader focus can land on any toast, so the hidden
+    // ones show; a click on a toast's button can't reach them.
+    showsAll: view.showsAll && isFocusVisible,
+  };
+}
+
+function useTapPause(isPaused: boolean, store: ToastStore) {
+  useEffect(() => {
+    if (isPaused) store.pause('tap');
+    return () => {
+      if (isPaused) store.resume('tap');
+    };
+  }, [isPaused, store]);
 }
