@@ -20,6 +20,7 @@ export default defineConfig({
     },
   ],
   reporter: isCi ? 'github' : 'list',
+  retries: isCi ? 1 : 0,
   testDir: 'e2e',
   use: { baseURL: `http://localhost:${port}` },
   webServer: {
