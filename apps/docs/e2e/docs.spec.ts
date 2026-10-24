@@ -158,7 +158,9 @@ test('the package-manager choice carries to other pages', async ({ page }) => {
     'aria-selected',
     'true',
   );
-  await expect(next.getByText('pnpm dlx shadcn@latest add')).toBeVisible();
+  await expect(
+    next.getByText('pnpm dlx shadcn@latest add @oakoss/text-field'),
+  ).toBeVisible();
 });
 
 test('the Code tab shows the example source', async ({ page }) => {
@@ -195,7 +197,7 @@ test("a code block's button copies its code", async ({ page }) => {
   await block.first().getByRole('button', { name: 'Copy Text' }).click();
   await expect(page.locator('html')).toHaveAttribute(
     'data-copied',
-    'npx shadcn@latest init oakoss/ui/base',
+    'npx shadcn@latest init https://ui.oakoss.dev/r/base.json',
   );
 });
 

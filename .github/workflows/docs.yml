@@ -1,6 +1,7 @@
 name: Docs
 
-# Pull request previews; CI's deploy-docs ships main once its gate passes.
+# Pull request previews; CI's preview-docs uploads main's, and release-docs
+# deploys ui.oakoss.dev from each release tag.
 on:
   pull_request:
 
@@ -12,6 +13,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  # The worker in apps/docs/wrangler.jsonc, on the account's workers.dev subdomain.
+  PREVIEW_HOST: oakoss-ui-docs.jbabin91.workers.dev
   TURBO_TELEMETRY_DISABLED: '1'
   WRANGLER_SEND_METRICS: 'false'
 
@@ -29,6 +32,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 2
+          # The hosted registry builds a directory per release tag.
+          fetch-tags: true
           persist-credentials: false
 
       - uses: ./.github/actions/setup
@@ -71,9 +76,15 @@ jobs:
           fi
           echo "preview=$preview" >> "$GITHUB_OUTPUT"
 
-      # CI's Docs job tests the PR; a preview only needs the build.
+      # CI's Docs job tests the PR, with REGISTRY_URL unset. A preview's
+      # registry points at its own alias, so installs from it stay on the
+      # PR; only the registry tests here check that.
       - if: steps.changes.outputs.preview == 'true'
-        run: pnpm turbo run build --filter=@oakoss/docs
+        env:
+          REGISTRY_URL: https://pr-${{ github.event.pull_request.number }}-${{ env.PREVIEW_HOST }}
+        run: |
+          pnpm turbo run build-registry --filter=@oakoss/docs
+          pnpm --filter @oakoss/docs exec vitest run test/registry-release.test.ts
 
       - if: steps.changes.outputs.preview == 'true'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -159,8 +170,6 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           PREVIEW_URL: ${{ needs.upload.outputs.preview-url }}
-          # The worker in apps/docs/wrangler.jsonc, on the account's workers.dev subdomain.
-          PREVIEW_HOST: oakoss-ui-docs.jbabin91.workers.dev
         run: |
           set -euo pipefail
           # The link must be this PR's alias on the docs worker, whatever
@@ -171,7 +180,8 @@ jobs:
             exit 1
           fi
           marker='<!-- docs-preview -->'
-          body="$(printf '%s\nDocs preview: %s\n\nBuilt from %s.' "$marker" "$expected" "$HEAD_SHA")"
+          install="\`npx shadcn@latest add $expected/r/<item>.json\`"
+          body="$(printf '%s\nDocs preview: %s\n\nInstall from it: %s\n\nBuilt from %s.' "$marker" "$expected" "$install" "$HEAD_SHA")"
           id="$(gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" |
             jq -r --arg marker "$marker" 'add // [] | map(select(
               .performed_via_github_app.slug == "oakoss"

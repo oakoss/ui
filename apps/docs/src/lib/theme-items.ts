@@ -8,6 +8,7 @@ import {
   type ThemeItem,
 } from '@oakoss/tokens';
 
+import { registryOrigin, releaseItem } from './registry-release.ts';
 import { themeItemPath, type ThemeOptions } from './theme-state.ts';
 
 const style = styles[axes.style.default];
@@ -26,11 +27,12 @@ const choices = new Map(
 // Prerendered, since nothing links to them.
 export const themeItemPaths = choices.keys().toArray();
 
+// Reads REGISTRY_URL when called, at prerender, not when the module loads.
 export function themeItemAt(path: string): string | undefined {
   const choice = choices.get(path);
-  return choice === undefined
-    ? undefined
-    : JSON.stringify(themeItem(choice, style));
+  if (choice === undefined) return undefined;
+  const dir = `${registryOrigin(process.env.REGISTRY_URL)}/r`;
+  return JSON.stringify(releaseItem(themeItem(choice, style), dir));
 }
 
 // Each swatch is the primary's light-mode color, read from the item that

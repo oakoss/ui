@@ -1,0 +1,138 @@
+name: Release docs
+
+# ui.oakoss.dev serves the newest release's docs and registry, so it deploys
+# from the release tag oakum pushes. A manual run redeploys the newest release.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: The newest release tag, such as v0.5.0.
+        required: true
+
+permissions:
+  contents: read
+
+# A run waits for the one in progress, never cancelling a release mid-deploy.
+# The default queue keeps one pending run, so a later run could replace a
+# newer release's; max keeps every pending run.
+concurrency:
+  group: release-docs
+  cancel-in-progress: false
+  queue: max
+
+env:
+  TURBO_TELEMETRY_DISABLED: '1'
+  WRANGLER_SEND_METRICS: 'false'
+
+jobs:
+  # Builds and tests the tag's site without the Cloudflare token.
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # What ships builds only from the tag, never from a cache another run wrote.
+    cache-mode: none
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - name: Read the tag
+        id: tag
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then
+            tag="$INPUT_TAG"
+          else
+            tag="$GITHUB_REF_NAME"
+          fi
+          if ! [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error title=Release docs::'$tag' isn't a release tag"
+            exit 1
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The hosted registry builds a directory per release tag.
+          fetch-tags: true
+          persist-credentials: false
+          ref: refs/tags/${{ steps.tag.outputs.tag }}
+
+      # pnpm/setup without the setup action's caches. The docs pretest
+      # installs Chromium.
+      - uses: pnpm/setup@fbda4c85fc2e1e08721cd8763afea8f48d60f024 # v3.0.0
+        with:
+          require-lockfile: true
+
+      - run: pnpm turbo run test --filter=@oakoss/docs
+        env:
+          REQUIRE_RELEASE_TAG: '1'
+
+      # Fails a tag that predates the hosted registry, or whose version
+      # differs from packages/ui's, since neither builds its own folder.
+      - name: Check the site serves this release
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          set -euo pipefail
+          for file in r/base.json "$TAG/r/base.json"; do
+            if [ ! -f "apps/docs/dist/client/$file" ]; then
+              echo "::error title=Release docs::the built site has no $file"
+              exit 1
+            fi
+          done
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: docs-release
+          path: apps/docs/dist/client
+          if-no-files-found: error
+          retention-days: 7
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    cache-mode: none
+    steps:
+      # An older release on /r/ would undo the newest, so only the newest
+      # deploys; any other tag fails, so a stray tag can't pass unnoticed.
+      - name: Check this is the newest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.test.outputs.tag }}
+        run: |
+          set -euo pipefail
+          tags="$(gh api --paginate "repos/$GITHUB_REPOSITORY/git/matching-refs/tags/v" --jq '.[].ref')"
+          newest="$(printf '%s\n' "$tags" | sed 's|^refs/tags/||' | { grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' || true; } | sort -V | tail -n 1)"
+          if [ -z "$newest" ]; then
+            echo "::error title=Release docs::couldn't read the release tags"
+            exit 1
+          fi
+          if [ "$newest" != "$TAG" ]; then
+            echo "::error title=Release docs::$TAG isn't the newest release; $newest is"
+            exit 1
+          fi
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: refs/tags/${{ needs.test.outputs.tag }}
+
+      - uses: pnpm/setup@fbda4c85fc2e1e08721cd8763afea8f48d60f024 # v3.0.0
+        with:
+          require-lockfile: true
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: docs-release
+          path: apps/docs/dist/client
+
+      - name: Deploy to ui.oakoss.dev
+        working-directory: apps/docs
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: pnpm exec wrangler deploy

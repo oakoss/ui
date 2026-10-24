@@ -97,7 +97,7 @@ Where the pins live:
 - **B. Pins stay on `main`, docs move to the release.** Production docs deploy from the tag with `#v<version>` commands, so visitors only ever install a consistent release; `main` installs mix, as above, and are for development only. Pulls the docs split forward to the same time as pinning.
 - **C. A `latest` default branch** fast-forwarded on release. Unpinned installs become whole releases with no `registry.json` change, but tag pins still mix (`#v0.5.0` gets the latest release's dependencies) and every PR needs `--base main`.
 
-B with option 1 is the fallback: it serves the same goal, docs that match releases, with the smaller oakum change (write only) and no release-time commit.
+B with option 1 is the fallback: it serves the same goal, docs that match releases, with the smaller oakum change (write only) and no release-time commit. oakum tracks it as okm-vdx3, deferred until hosting falls through.
 
 ## Recommendation
 
