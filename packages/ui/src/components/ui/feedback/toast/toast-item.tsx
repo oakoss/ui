@@ -37,7 +37,9 @@ export type ToastItemProps = {
 
 const styles = tv({
   slots: {
-    close: '-me-1 -mt-1 shrink-0',
+    // A button reaches 6px into the padding above and below, so it centers
+    // on the title's line without making a one-line toast taller.
+    close: '-my-1.5 -me-1 shrink-0',
     inner:
       'flex w-full items-start gap-3 p-4 transition-opacity duration-200 group-data-behind/toast:opacity-0',
     toast: [
