@@ -17,11 +17,11 @@ import path from 'node:path';
 
 import {
   packageVersion,
+  registryOrigin,
   releasedVersions,
   releaseFile,
   releaseTags,
 } from '#/lib/registry-release';
-import { siteUrl } from '#/lib/site';
 
 const docs = path.join(import.meta.dirname, '..');
 const client = path.join(docs, 'dist/client');
@@ -32,6 +32,7 @@ const version = packageVersion(
   readFileSync(path.join(ui, 'package.json'), 'utf-8'),
 );
 const versionTag = `v${version}`;
+const origin = registryOrigin(process.env.REGISTRY_URL);
 
 // Every release the changelog records needs its tag. The current one may not
 // be pushed yet: a version PR's merge starts CI alongside oakum's release job,
@@ -85,7 +86,7 @@ function build(tree: string, dir: string) {
     );
     writeFileSync(
       path.join(out, file),
-      JSON.stringify(releaseFile(json, `${siteUrl}/${dir}`)),
+      JSON.stringify(releaseFile(json, `${origin}/${dir}`)),
     );
   }
 }

@@ -2,6 +2,9 @@
 // directory, so an install stays on one release whichever item it starts
 // from (shadcn resolves every dependency by its own address).
 
+import { siteUrl } from './site.ts';
+
+const origin = /^https:\/\/[a-z\d-]+(?:\.[a-z\d-]+)+$/u;
 const sameRepo = /^oakoss\/ui\/([\w-]+)(?:#.*)?$/u;
 const tagPattern = /^v(\d+)\.(\d+)\.(\d+)$/u;
 // shadcn's placeholder in a namespace URL, filled with the item's name.
@@ -25,6 +28,16 @@ export function packageVersion(text: string): string {
     throw new Error('package.json has no version');
   }
   return json.version;
+}
+
+// The origin a build's registry is served from, from REGISTRY_URL: a PR
+// preview's own address, so installs from it stay on the PR, or the site's.
+export function registryOrigin(value: string | undefined): string {
+  if (value === undefined || value === '') return siteUrl;
+  if (!origin.test(value)) {
+    throw new Error(`REGISTRY_URL "${value}" isn't an https origin`);
+  }
+  return value;
 }
 
 // The versions the changelog records as released, from its `## x.y.z`

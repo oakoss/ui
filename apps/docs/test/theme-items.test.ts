@@ -1,12 +1,26 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { expect, it } from 'vitest';
+import { afterEach, expect, it, vi } from 'vitest';
 
-import { themeOptions } from '#/lib/theme-items';
+import { themeItemAt, themeItemPaths, themeOptions } from '#/lib/theme-items';
 import { themeItemPath } from '#/lib/theme-state';
 
 const themes = path.join(import.meta.dirname, '../dist/client/r/themes');
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
+
+// CI builds with REGISTRY_URL unset, so only this exercises a preview's.
+it("points a theme item at REGISTRY_URL's origin when it's set", () => {
+  vi.stubEnv('REGISTRY_URL', 'https://pr-1.example.dev');
+  const [first = ''] = themeItemPaths;
+  const item = String(themeItemAt(first));
+  expect(JSON.parse(item)).toMatchObject({
+    registryDependencies: ['https://pr-1.example.dev/r/theme.json'],
+  });
+});
 
 // Built from the panel's choices rather than the prerender list, so an item
 // the build skips still fails.

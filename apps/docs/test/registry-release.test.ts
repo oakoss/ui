@@ -7,6 +7,7 @@ import {
   isItem,
   namespaceUrl,
   packageVersion,
+  registryOrigin,
   releasedVersions,
   releaseFile,
   releaseItem,
@@ -16,6 +17,31 @@ import { siteUrl } from '#/lib/site';
 
 const client = path.join(import.meta.dirname, '../dist/client');
 const dir = `${siteUrl}/v0.6.0/r`;
+// The origin the build under test wrote, from the same variable.
+const origin = registryOrigin(process.env.REGISTRY_URL);
+
+describe('registryOrigin', () => {
+  it('serves from the site unless a preview names its own origin', () => {
+    expect(registryOrigin(undefined)).toBe(siteUrl);
+    expect(registryOrigin('')).toBe(siteUrl);
+    expect(
+      registryOrigin('https://pr-127-oakoss-ui-docs.jbabin91.workers.dev'),
+    ).toBe('https://pr-127-oakoss-ui-docs.jbabin91.workers.dev');
+  });
+
+  it('rejects anything but an https origin', () => {
+    for (const value of [
+      'https://pr-1.example.dev'.replace('https:', 'http:'),
+      'xhttps://pr-1.example.dev',
+      'https://pr-1.example.dev/',
+      'https://pr-1.example.dev/r',
+      'https://localhost',
+      'pr-1.example.dev',
+    ]) {
+      expect(() => registryOrigin(value)).toThrow("isn't an https origin");
+    }
+  });
+});
 
 describe('releaseTags', () => {
   it('keeps release tags at or below the version, oldest first', () => {
@@ -193,13 +219,13 @@ describe('each hosted registry directory', () => {
       const expected = new Set(
         files(sub)
           .filter((file) => file !== 'registry.json')
-          .map((file) => `${siteUrl}/${sub}/${file}`),
+          .map((file) => `${origin}/${sub}/${file}`),
       );
       const deps = directoryDependencies(sub);
       expect(deps).not.toEqual([]);
       expect(deps.filter((dep) => !expected.has(String(dep)))).toEqual([]);
       expect(read(`${sub}/base.json`).config).toMatchObject({
-        registries: { '@oakoss': namespaceUrl(`${siteUrl}/${sub}`) },
+        registries: { '@oakoss': namespaceUrl(`${origin}/${sub}`) },
       });
     },
   );
@@ -222,6 +248,6 @@ describe('the hosted registry', () => {
           JSON.stringify(read(`r/themes/${file}`).registryDependencies),
         ),
       ),
-    ).toEqual(new Set([JSON.stringify([`${siteUrl}/r/theme.json`])]));
+    ).toEqual(new Set([JSON.stringify([`${origin}/r/theme.json`])]));
   });
 });
