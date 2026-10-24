@@ -1,6 +1,4 @@
 import { useEffect, useRef, useSyncExternalStore } from 'react';
-import { mergeProps } from 'react-aria/mergeProps';
-import { useToastRegion } from 'react-aria/useToast';
 import { createPortal } from 'react-dom';
 import { tv } from 'tailwind-variants/lite';
 
@@ -11,9 +9,9 @@ import {
   type ToastAnnounce,
   ToastItemView,
 } from '#/components/ui/feedback/toast/toast-item';
-import { useCssVars } from '#/hooks/use-css-vars';
-import { useToastStack } from '#/hooks/use-toast-stack';
+import { useToastRegionParts } from '#/hooks/use-toast-region';
 import { cn } from '#/lib/cx';
+import { focusRing } from '#/lib/recipes';
 import { announce } from '#/lib/toast/toast-announcer';
 import { toastStore } from '#/lib/toast/toast-api';
 import {
@@ -21,7 +19,6 @@ import {
   defaultToastLimit,
   defaultToastVisible,
 } from '#/lib/toast/toast-content';
-import { toasterInset } from '#/lib/toast/toast-stack';
 
 export { toast } from '#/lib/toast/toast-api';
 
@@ -74,11 +71,22 @@ const placements = {
   'top start': { align: 'start', side: 'top' },
 } as const;
 
+// Clear of a phone's notch, home bar and on-screen keyboard, and full width
+// on a phone.
 const styles = tv({
-  base: 'fixed z-(--z-toast) h-(--toaster-height) max-h-dvh w-full max-w-sm overflow-hidden outline-hidden',
+  base: [
+    focusRing,
+    'fixed z-(--z-toast) flex h-(--toaster-height) max-h-[calc(var(--toaster-viewport,100dvh)-env(safe-area-inset-top)-env(safe-area-inset-bottom))] w-full max-w-sm overflow-x-hidden overflow-y-auto overscroll-contain px-[max(env(safe-area-inset-left),env(safe-area-inset-right))] focus-visible:-outline-offset-3 max-sm:inset-x-0 max-sm:max-w-none',
+  ],
   variants: {
     align: { center: 'inset-x-0 mx-auto', end: 'end-0', start: 'start-0' },
-    side: { bottom: 'bottom-0', top: 'top-0' },
+    // The stack scrolls from its edge: column-reverse starts a bottom
+    // stack's scroll at the bottom.
+    side: {
+      bottom:
+        'bottom-[max(env(safe-area-inset-bottom),var(--toaster-bottom,0px))] flex-col-reverse',
+      top: 'top-[max(env(safe-area-inset-top),var(--toaster-top,0px))] flex-col',
+    },
   },
 });
 
@@ -161,7 +169,7 @@ function ToastRegion({
   visible,
 }: ToastRegionProps) {
   const { align, side } = placements[placement];
-  const { ref, regionProps, stack } = useRegionParts({
+  const { ref, regionProps, stack } = useToastRegionParts({
     isExpanded,
     items,
     label: messages?.region?.(items.length),
@@ -173,28 +181,29 @@ function ToastRegion({
     <div
       {...regionProps}
       className={cn(className)}
-      data-expanded={stack.isExpanded || undefined}
       data-placement={placement}
       data-slot="toast-viewport"
       ref={ref}
     >
-      {stack.placed.map(({ item, slot }) => (
-        <ToastItemView
-          align={align}
-          closeLabel={messages?.close}
-          icons={icons}
-          item={item}
-          key={item.instance}
-          onAnnounce={onAnnounce}
-          onHeight={(height) => {
-            stack.onHeight(item.instance, height);
-          }}
-          pendingLabel={messages?.pending}
-          side={side}
-          slot={slot}
-          store={store}
-        />
-      ))}
+      <div className="relative h-(--toaster-height) w-full shrink-0">
+        {stack.placed.map(({ item, slot }) => (
+          <ToastItemView
+            align={align}
+            closeLabel={messages?.close}
+            icons={icons}
+            item={item}
+            key={item.instance}
+            onAnnounce={onAnnounce}
+            onHeight={(height) => {
+              stack.onHeight(item.instance, height);
+            }}
+            pendingLabel={messages?.pending}
+            side={side}
+            slot={slot}
+            store={store}
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -223,43 +232,6 @@ function useConnectedStore(store: ToastStore, limit: number, duration: number) {
       store.resume('hidden');
     };
   }, [store]);
-}
-
-function useRegionParts({
-  isExpanded,
-  items,
-  label,
-  side,
-  store,
-  visible,
-}: {
-  isExpanded: boolean;
-  items: readonly ToastItem[];
-  label: string | undefined;
-  side: 'bottom' | 'top';
-  store: ToastStore;
-  visible: number;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const stack = useToastStack({ isExpanded, items, ref, side, store, visible });
-  const { regionProps } = useToastRegion({ 'aria-label': label }, store, ref);
-  // Unmounting while hovered or focused never ends React Aria's pause.
-  useEffect(
-    () => () => {
-      store.resumeAll();
-    },
-    [store],
-  );
-  useCssVars(ref, {
-    '--toast-front-height':
-      stack.frontHeight > 0 ? `${String(stack.frontHeight)}px` : undefined,
-    '--toaster-height': `${String(stack.height + toasterInset)}px`,
-  });
-  return {
-    ref,
-    regionProps: mergeProps(regionProps, stack.regionProps),
-    stack,
-  };
 }
 
 // isClient is false on the server and through hydration, so the toasts and

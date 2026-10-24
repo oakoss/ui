@@ -42,7 +42,7 @@ const styles = tv({
       'flex w-full items-start gap-3 p-4 transition-opacity duration-200 group-data-behind/toast:opacity-0',
     toast: [
       focusRing,
-      'group/toast absolute inset-x-4 z-(--toast-z) translate-y-(--toast-offset) scale-(--toast-scale) transform-(--toast-swipe) touch-pinch-zoom overflow-hidden rounded-panel border border-border bg-popover text-sm text-popover-foreground shadow-lg transition duration-200 ease-out data-behind:h-(--toast-front-height) data-swiping:transition-none',
+      'group/toast absolute inset-x-4 z-(--toast-z) translate-y-(--toast-offset) scale-(--toast-scale) transform-(--toast-swipe) touch-pinch-zoom overflow-hidden rounded-panel border border-border bg-popover text-sm text-popover-foreground shadow-lg transition duration-200 ease-out in-data-scrollable:touch-pan-y data-behind:h-(--toast-front-height) data-swiping:transition-none',
       'aria-hidden:opacity-0 entering:scale-95 entering:opacity-0 exiting:scale-95 exiting:opacity-0',
     ],
   },

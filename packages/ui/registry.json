@@ -3549,6 +3549,11 @@
           "target": "@hooks/use-css-vars.ts"
         },
         {
+          "path": "src/hooks/use-toast-region.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-toast-region.ts"
+        },
+        {
           "path": "src/hooks/use-toast-stack.ts",
           "type": "registry:hook",
           "target": "@hooks/use-toast-stack.ts"
