@@ -87,7 +87,8 @@ Timers pause while the stack is hovered, focused or tapped open.
 - `visible` (default 3) sets how many toasts the stack shows. Older ones sit
   behind it, hidden from sight and screen readers, and move up as the ones in
   front close. A toast's timer starts only once it's shown, so none times out
-  unseen. While focus is inside the stack, all of them show.
+  unseen. While keyboard or screen-reader focus is inside the stack, all of
+  them show.
 - `limit` (default 10) caps how many toasts are kept; past it the oldest
   closes, with the reason `'evicted'`.
 - `isExpanded` keeps the stack open, for toasts whose actions shouldn't hide
@@ -227,9 +228,10 @@ the number of toasts, so it doesn't take focus or trap it. Announcing is the
   inert, toasts included, so show the message inside such a dialog instead.
 - **The stack:** toasts waiting behind the stack, past `visible`, are inert
   and hidden from screen readers, but each is announced when it appears.
-  While focus is in the stack, every toast shows, so focus never lands on a
-  hidden one. A stack taller than the screen becomes a tab stop, so the arrow
-  keys scroll it, and Tab to a toast scrolls it into view.
+  While keyboard or screen-reader focus is in the stack, every toast shows,
+  so focus never lands on a hidden one; a click doesn't reveal them. A
+  stack taller than the screen becomes a tab stop, so the arrow keys
+  scroll it, and Tab to a toast scrolls it into view.
 - **Labels:** React Aria translates the close button's label and the
   region's name; `messages` replaces them.
 

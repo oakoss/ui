@@ -22,7 +22,9 @@ const shrink = 0.05;
 
 // Positions each toast: newest at the edge; collapsed, the next ones peek
 // behind it, a little smaller; expanded, they follow one another. Past
-// `visible` toasts, a toast waits hidden behind the stack.
+// `visible` toasts, a toast waits hidden behind the stack. A closing toast
+// keeps its place but takes no room: the ones behind it move up as it fades,
+// and the stack stays tall enough to show it.
 export function stackToasts({
   heights,
   isExpanded,
@@ -38,30 +40,35 @@ export function stackToasts({
 }) {
   const shown = visibleCount(visible);
   const sign = side === 'bottom' ? -1 : 1;
+  const heightOf = (item: ToastItem) => heights.get(item.instance) ?? 0;
+  const first = items.find((item) => !item.isExiting) ?? items[0];
+  const front = first ? heightOf(first) : 0;
   const placed: { item: ToastItem; slot: ToastSlot }[] = [];
+  let ahead = 0;
   let offset = 0;
+  let reach = 0;
   for (const [index, item] of items.entries()) {
-    // By position, exiting toasts included: a toast past the visible count
-    // moves up once the ones in front have gone, and stays hidden as it exits.
-    const isHidden = index >= shown;
-    const depth = Math.min(index, shown - 1);
+    // An open toast shows once fewer than `visible` open ones are ahead of
+    // it; a closing toast keeps where it stood, so a hidden one exits hidden.
+    const isHidden = (item.isExiting ? index : ahead) >= shown;
+    const depth = Math.min(ahead, shown - 1);
+    const isBehind = !isExpanded && ahead > 0;
+    const start = isExpanded ? offset : depth * toastPeek;
     placed.push({
       item,
       slot: {
-        isBehind: !isExpanded && index > 0,
+        isBehind,
         isHidden,
-        offset: sign * (isExpanded ? offset : depth * toastPeek),
+        offset: sign * start,
         scale: isExpanded ? 1 : 1 - depth * shrink,
         z: items.length - index,
       },
     });
-    if (!isHidden) offset += (heights.get(item.instance) ?? 0) + toastGap;
+    if (isHidden) continue;
+    reach = Math.max(reach, start + (isBehind ? front : heightOf(item)));
+    if (item.isExiting) continue;
+    ahead += 1;
+    offset += heightOf(item) + toastGap;
   }
-  const front = items[0] ? (heights.get(items[0].instance) ?? 0) : 0;
-  const peeking = Math.max(Math.min(items.length, shown) - 1, 0) * toastPeek;
-  return {
-    frontHeight: front,
-    height: isExpanded ? Math.max(offset - toastGap, 0) : front + peeking,
-    placed,
-  };
+  return { frontHeight: front, height: reach, placed };
 }
