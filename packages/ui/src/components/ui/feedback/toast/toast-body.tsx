@@ -23,7 +23,7 @@ type ToastTextParts = {
 
 const styles = tv({
   slots: {
-    action: 'shrink-0',
+    action: '-my-1.5 shrink-0',
     content: 'grid min-w-0 flex-1 gap-1',
     description: 'line-clamp-2 text-muted-foreground',
     icon: 'mt-0.5 flex size-4 shrink-0 items-center justify-center [&_svg]:size-4',
