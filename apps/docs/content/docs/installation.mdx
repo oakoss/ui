@@ -10,7 +10,8 @@ docs describe its latest release.
 ## Set up the project
 
 Run this once. The `base` item installs the theme, `color-scheme` and the
-reduced-motion styles, and in a new project sets Lucide as the icon library.
+reduced-motion styles and `lucide-react`, and in a new project sets Lucide as
+the icon library.
 
 <Tabs defaultValue="new">
   <TabsList>
@@ -43,13 +44,16 @@ npx shadcn@latest add @oakoss/base
 
 This leaves the rest of `components.json` as it is, so components use the icon
 library it already names: Lucide, Tabler, HugeIcons, Phosphor or Remix Icon.
+For a library other than Lucide, install its package if the project lacks it:
+`@tabler/icons-react`, `@hugeicons/react` with `@hugeicons/core-free-icons`,
+`@phosphor-icons/react` or `@remixicon/react`.
 
   </TabsContent>
 </Tabs>
 
 Icons that render as empty squares mean `components.json` names no icon
-library. Set `"iconLibrary": "lucide"` (or another of the five) and add the
-component again.
+library. Set `"iconLibrary": "lucide"` (or another of the five, with its
+package installed) and add the component again.
 
 Give your app's root element `isolation: isolate` (the `isolate` class). Dialogs
 and popovers render at the end of `<body>` on the `--z-*` scale, and the root's

@@ -113,11 +113,13 @@ test('the theme installs the React Aria Tailwind plugin', () => {
 });
 
 // Only init writes `config` (apply takes no GitHub registry address), and
-// without `extends: none` init also installs shadcn's own style.
+// without `extends: none` init also installs shadcn's own style. shadcn
+// rewrites icons to the library's imports but installs no package for it.
 test('the base item sets the icon library and installs the theme', () => {
   const base = ui.items.find(({ name }) => name === 'base');
   expect(base).toMatchObject({
     config: { iconLibrary: 'lucide' },
+    dependencies: ['lucide-react'],
     extends: 'none',
     registryDependencies: ['oakoss/ui/theme'],
     type: 'registry:base',
