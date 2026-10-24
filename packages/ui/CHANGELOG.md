@@ -1,5 +1,49 @@
 # Changelog
 
+## 0.6.0 (2026-10-24)
+
+### Added
+
+Add Sidebar: a composable app sidebar that collapses off-canvas or to icons, remembers its state in a cookie, toggles with Cmd or Ctrl+B and becomes a sheet on phones. A named sidebar is a navigation landmark with the current page marked.
+
+Add a Data Table on TanStack Table: sorting by one or several columns, page and range selection, pagination, a column menu, loading, empty and error states, live announcements, server mode with a query helper, and column presets.
+
+Add Data Table filters: a debounced search, faceted value filters with counts, and active filter chips with Reset; the no-results state offers Clear filters, and the table's controls take the neutral intent.
+
+Data Table can select every row a filter matches, with a sticky action bar for the count and bulk actions. The selection slice replaces rowSelection: pass state.selection and onSelectionChange, either { ids } or { all, except }. The pager no longer shows the selected count; add <DataTableActionBar /> between DataTableContent and DataTablePagination to keep it.
+
+Tabs: in the line look, the line slides to the selected tab and sizes to it, or jumps there under reduced motion. The line is now its own element, data-slot="tabs-indicator", rather than the tab's ::after; restyle it through that slot.
+
+Resizable: panels that share a space, with named window-splitter handles that resize them by pointer or keyboard, built on react-resizable-panels. Handles have a 24px drag area (44px on touch), scrolling panels are focusable only while they overflow, and persistKey keeps the layout in a cookie.
+
+Button takes a `ref` to its `<button>`.
+
+Add Carousel, on Embla: a named carousel region of slides named "n of m", slides out of view kept out of the tab order and the accessibility tree, an announcement of the slides on screen once it comes to rest, Previous and Next that hand focus over at the ends, steps that jump under reduced motion, and nested carousels that drag on their own.
+
+Add Input OTP, on input-otp and React Aria's TextField: one real input with the one-time-code hint behind slots hidden from assistive tech, labels, descriptions and errors, digit or letter codes (letters kept in capitals, with a text keyboard), pasted codes cleaned of spaces and dashes, slot placeholders, sizes and groups, a ref to the input, a CSP nonce, room for password managers' icons, and codes kept left to right in every language.
+
+Add Toast: call toast() from anywhere and a Toaster renders it, announced through a live region without taking focus. Toasts show at the top or bottom edge, placed by reading direction, pause while hovered, focused or hidden, stay at least 5 seconds, and update in place by id. Actions show a pending state, toast.promise follows a promise from loading to its result, and the Toaster stays reachable over an open Dialog.
+
+Toast: the Toaster stacks its toasts, newest in front with the next two peeking behind, and opens the stack on hover, focus or a tap. `visible` (default 3) sets how many it shows, `limit` (default 10) how many it keeps, and `isExpanded` keeps it open. Touch and pen swipe a toast away toward the stack's side or the edge it's aligned to. On phones the stack spans the screen, clears safe-area insets and the on-screen keyboard, and a stack taller than the screen scrolls.
+
+Install releases from ui.oakoss.dev, which now hosts the registry with the docs. `npx shadcn@latest init https://ui.oakoss.dev/r/base.json` sets up the `@oakoss` registry in a new project, and components install as `@oakoss/<name>`; an existing project adds the registry to `components.json`, as the installation page shows. `/r/` serves the latest release; point the registry at `/v<version>/r/` to stay on one, with every registry dependency from that release. `oakoss/ui/<name>` installs from `main`.
+
+### Fixed
+
+Yellow and lime primaries stay yellow in dark mode: they fill at step 500 with dark text, as shadcn's accent themes do, instead of a dark olive at step 700. Light mode is unchanged, since shadcn's light yellow fails 3:1 against white.
+
+Button stays full size while the dialog, popover or sheet it opens is open; it shrank to 97%, and a popover placed from it could land a pixel off.
+
+Data Table: a column outside every column group gets one header spanning the group rows instead of empty header cells, which failed axe. An app told a stale selection has ended hears it once, even when it applies the selection late or rebuilds it each render. A selection of every matching row stays when a filter value comes back with its keys in another order, such as a range restored from a URL.
+
+ScrollArea and DialogBody are tab stops only while their content overflows, and a named ScrollArea becomes a region on its own; both keep a ref passed to them. List, menu, popover and command popovers no longer scroll the page behind them when scrolled past their end.
+
+Toast: a one-line toast now has even padding, with its icon, action and close button centered on the title's line; the close button no longer made it taller and left its text high. The close button's X now sits as far from the toast's end edge as the icon does from its start.
+
+Toast: closing a toast in the stack now moves the ones behind it into its place as it fades, rather than after it's gone, and a collapsed stack brings the next toast to the front at once; a toast sliding into place is no longer cut off at the region's edge. A click into the stack, such as on a close button, no longer briefly shows the toasts waiting past `visible`; keyboard and screen-reader focus still show them.
+
+The base item installs lucide-react, so a new project's icons typecheck.
+
 ## 0.5.0 (2026-10-18)
 
 ### Added
