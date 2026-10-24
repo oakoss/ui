@@ -66,3 +66,50 @@ test('toasts with the same time left close newest first', () => {
   vi.advanceTimersByTime(defaultToastDuration);
   expect(closed).toEqual(['B', 'A']);
 });
+
+test('a toast past the visible count holds its time until it moves up', () => {
+  const store = connected();
+  for (const title of ['Oldest', 'B', 'C']) {
+    store.show(title, { duration: 5000 });
+  }
+  const newest = store.show('Newest', { duration: 5000 });
+  vi.advanceTimersByTime(4000);
+  store.close(newest);
+  vi.advanceTimersByTime(1000);
+  expect(open(store)).toEqual(['Oldest']);
+  vi.advanceTimersByTime(3999);
+  expect(open(store)).toEqual(['Oldest']);
+  vi.advanceTimersByTime(1);
+  expect(open(store)).toEqual([]);
+});
+
+test('setVisible runs the timers it reaches and holds the rest', () => {
+  const store = connected();
+  store.setVisible(1);
+  store.show('Older', { duration: 5000 });
+  store.show('Newer', { duration: Infinity });
+  vi.advanceTimersByTime(6000);
+  expect(open(store)).toEqual(['Newer', 'Older']);
+  store.setVisible(2);
+  vi.advanceTimersByTime(5000);
+  expect(open(store)).toEqual(['Newer']);
+});
+
+test('setVisible keeps at least one', () => {
+  const store = connected();
+  store.setVisible(0);
+  store.show('Older', { duration: 5000 });
+  store.show('Newer', { duration: 5000 });
+  vi.advanceTimersByTime(5000);
+  expect(open(store)).toEqual(['Older']);
+});
+
+test('a fractional count runs the timers of the toasts the stack shows', () => {
+  const store = connected();
+  store.setVisible(2.5);
+  for (const title of ['Oldest', 'Middle', 'Newest']) {
+    store.show(title, { duration: 5000 });
+  }
+  vi.advanceTimersByTime(5000);
+  expect(open(store)).toEqual(['Oldest']);
+});

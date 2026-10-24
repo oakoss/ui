@@ -80,9 +80,9 @@ a touch screen until a tap outside. `Escape` on the region closes it again.
 Timers pause while the stack is hovered, focused or tapped open.
 
 - `visible` (default 3) sets how many toasts the stack shows. Older ones sit
-  behind it, hidden from sight and screen readers with their timers running,
-  so one can time out unseen; they move up as the ones in front close. While
-  focus is inside the stack, all of them show.
+  behind it, hidden from sight and screen readers, and move up as the ones in
+  front close. A toast's timer starts only once it's shown, so none times out
+  unseen. While focus is inside the stack, all of them show.
 - `limit` (default 10) caps how many toasts are kept; past it the oldest
   closes, with the reason `'evicted'`.
 - `isExpanded` keeps the stack open, for toasts whose actions shouldn't hide

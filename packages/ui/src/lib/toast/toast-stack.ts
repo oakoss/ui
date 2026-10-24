@@ -1,5 +1,7 @@
 import type { ToastItem } from '#/lib/toast/toast-store';
 
+import { visibleCount } from '#/lib/toast/toast-content';
+
 export type ToastSlot = {
   // Behind the front toast in a collapsed stack: clipped to its height.
   isBehind: boolean;
@@ -34,7 +36,7 @@ export function stackToasts({
   side: 'bottom' | 'top';
   visible: number;
 }) {
-  const shown = Math.max(1, visible);
+  const shown = visibleCount(visible);
   const sign = side === 'bottom' ? -1 : 1;
   const placed: { item: ToastItem; slot: ToastSlot }[] = [];
   let offset = 0;

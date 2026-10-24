@@ -152,6 +152,7 @@ export const ScrollingStackPansVertically: Story = {
       await expect(newest && getComputedStyle(newest).touchAction).toBe(
         'pan-y pinch-zoom',
       );
+      await expect(getComputedStyle(region()).overflowY).toBe('auto');
       await userEvent.unhover(region());
       await waitFor(async () => {
         await expect(region()).not.toHaveAttribute('data-scrollable');
@@ -159,6 +160,9 @@ export const ScrollingStackPansVertically: Story = {
       await expect(newest && getComputedStyle(newest).touchAction).toBe(
         'pinch-zoom',
       );
+      // Only an overflowing stack scrolls, so a toast swiped out past the
+      // region's edge can't make it scrollable.
+      await expect(getComputedStyle(region()).overflowY).toBe('hidden');
     });
   },
 };

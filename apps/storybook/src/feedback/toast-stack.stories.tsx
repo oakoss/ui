@@ -107,11 +107,18 @@ export const AlwaysExpanded: Story = {
   },
 };
 
-// Past `visible`, a toast waits behind the stack, out of sight and reach, and
-// moves up when a toast in front closes.
+const spies: { visible?: ReturnType<typeof spyOn> } = {};
+
+// Past `visible`, a toast waits behind the stack, out of sight and reach,
+// its timer held, and moves up when a toast in front closes.
 export const VisibleCount: Story = {
   args: { visible: 2 },
+  // Spies before the Toaster mounts and hands the store its count.
+  beforeEach: () => {
+    spies.visible = spyOn(demoStore, 'setVisible');
+  },
   play: async () => {
+    await expect(spies.visible).toHaveBeenLastCalledWith(2);
     const toasts = await showThree();
     const [newest, middle, oldest] = toasts;
     await expect(newest).not.toHaveAttribute('aria-hidden');

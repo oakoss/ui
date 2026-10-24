@@ -24,6 +24,10 @@ const heights = new Map([
   [3, 60],
 ]);
 
+function hidden(visible: number) {
+  return layout({ visible }).placed.map(({ slot }) => slot.isHidden);
+}
+
 function layout(options: Partial<Parameters<typeof stackToasts>[0]> = {}) {
   return stackToasts({
     heights,
@@ -112,6 +116,11 @@ test('newer toasts sit above older ones', () => {
 test('a visible count under 1 still shows the front toast', () => {
   const { placed } = layout({ visible: 0 });
   expect(placed[0]?.slot.isHidden).toBe(false);
+});
+
+test('a fractional count rounds down, and NaN takes the default', () => {
+  expect(hidden(1.5)).toEqual([false, true, true, true]);
+  expect(hidden(NaN)).toEqual([false, false, false, true]);
 });
 
 test('a hidden toast stays hidden while it exits', () => {

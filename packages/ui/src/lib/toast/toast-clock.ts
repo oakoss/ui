@@ -4,7 +4,7 @@ import type { ToastTimer } from '#/lib/toast/toast-content';
 // open, and the Toaster while the page is hidden.
 export type ToastPauseSource = 'hidden' | 'region' | 'tap';
 
-// Runs the open toasts' timers only while a Toaster is connected and nothing
+// Runs the timers the store lists only while a Toaster is connected and nothing
 // pauses them, so a toast sent before the Toaster mounts waits for it. The
 // store lists the timers, newest first, so equal timers close in that order.
 export class ToastClock {
@@ -55,7 +55,7 @@ export class ToastClock {
     this.sync();
   }
 
-  // For the store, after the open toasts change.
+  // For the store, after the shown toasts change.
   sync() {
     for (const timer of this.#timers()) {
       if (this.isRunning) timer.resume();

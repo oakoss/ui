@@ -137,6 +137,13 @@ export function toPromiseState(message: ReactNode | ToastPromiseState) {
   return { options, title };
 }
 
+// The stack and the store's timers read the same count: whole, at least 1,
+// the default for NaN, and Infinity while focus shows every toast.
+export function visibleCount(visible: number) {
+  if (Number.isNaN(visible)) return defaultToastVisible;
+  return Math.max(1, Math.floor(visible));
+}
+
 function isPromiseState(value: unknown): value is ToastPromiseState {
   return typeof value === 'object' && value !== null && 'title' in value;
 }

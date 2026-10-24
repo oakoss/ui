@@ -46,7 +46,8 @@ export type ToasterProps = {
   messages?: ToasterMessages;
   placement?: ToasterPlacement;
   store?: ToastStore;
-  // Toasts the stack shows, at least 1; older ones wait behind it.
+  // Toasts the stack shows, at least 1; older ones wait behind it, their
+  // timers held until they move up.
   visible?: number;
 };
 
@@ -76,7 +77,7 @@ const placements = {
 const styles = tv({
   base: [
     focusRing,
-    'fixed z-(--z-toast) flex h-(--toaster-height) max-h-[calc(var(--toaster-viewport,100dvh)-env(safe-area-inset-top)-env(safe-area-inset-bottom))] w-full max-w-sm overflow-x-hidden overflow-y-auto overscroll-contain px-[max(env(safe-area-inset-left),env(safe-area-inset-right))] focus-visible:-outline-offset-3 max-sm:inset-x-0 max-sm:max-w-none',
+    'fixed z-(--z-toast) flex h-(--toaster-height) max-h-[calc(var(--toaster-viewport,100dvh)-env(safe-area-inset-top)-env(safe-area-inset-bottom))] w-full max-w-sm overflow-x-hidden overflow-y-hidden overscroll-contain px-[max(env(safe-area-inset-left),env(safe-area-inset-right))] focus-visible:-outline-offset-3 data-scrollable:overflow-y-auto max-sm:inset-x-0 max-sm:max-w-none',
   ],
   variants: {
     align: { center: 'inset-x-0 mx-auto', end: 'end-0', start: 'start-0' },
@@ -106,7 +107,7 @@ export function Toaster({
   const { isClient, items } = useStoreItems(store);
   const politeRef = useRef<HTMLDivElement>(null);
   const assertiveRef = useRef<HTMLDivElement>(null);
-  useConnectedStore(store, limit, duration);
+  useConnectedStore(store, { duration, limit, visible });
 
   if (!isClient) return null;
   const onAnnounce: ToastAnnounce = (message, priority) => {
@@ -209,7 +210,14 @@ function ToastRegion({
 }
 
 // Timers run while the Toaster is mounted, and pause while the page is hidden.
-function useConnectedStore(store: ToastStore, limit: number, duration: number) {
+function useConnectedStore(
+  store: ToastStore,
+  {
+    duration,
+    limit,
+    visible,
+  }: { duration: number; limit: number; visible: number },
+) {
   useEffect(() => store.connect(), [store]);
 
   useEffect(() => {
@@ -219,6 +227,10 @@ function useConnectedStore(store: ToastStore, limit: number, duration: number) {
   useEffect(() => {
     store.setDuration(duration);
   }, [duration, store]);
+
+  useEffect(() => {
+    store.setVisible(visible);
+  }, [store, visible]);
 
   useEffect(() => {
     const sync = () => {
