@@ -43,6 +43,41 @@ test('the placement demo shows its toast at the placement', async ({
   );
 });
 
+// The stack demo's switch opens and closes its own stack, not the site's.
+test('the stack demo keeps its stack open', async ({ page }) => {
+  await gotoHydrated(page, '/docs/components/toast');
+  const add = page.getByRole('button', { name: 'Add a toast' });
+  await add.click();
+  await add.click();
+  const region = page.getByRole('region', {
+    exact: true,
+    name: 'Stack example, 2 toasts',
+  });
+  const behind = region.locator('[data-behind]');
+  await expect(behind).toHaveCount(1);
+  const label = page.getByText('Keep the stack open');
+  await label.click();
+  await expect(
+    page.getByRole('switch', { name: 'Keep the stack open' }),
+  ).toBeChecked();
+  await expect(region.getByRole('alertdialog')).toHaveCount(2);
+  await expect(behind).toHaveCount(0);
+  await label.click();
+  await expect(behind).toHaveCount(1);
+});
+
+// A custom toast is named by its title rather than its drawn text.
+test('the custom demo names its toast by its title', async ({ page }) => {
+  await gotoHydrated(page, '/docs/components/toast');
+  await page.getByRole('button', { name: 'Share a file' }).click();
+  await expect(
+    page.getByRole('alertdialog', {
+      exact: true,
+      name: 'Ana shared Q3 roadmap.pdf',
+    }),
+  ).toContainText('Ana shared a file');
+});
+
 // Calendar demos read the visitor's clock, so they render after hydration: a
 // visit months after the build hydrates without a mismatch.
 test('calendar demos render only on the client', async ({ page }) => {

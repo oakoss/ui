@@ -6,10 +6,12 @@ reactAria: https://react-aria.adobe.com/Toast
 ---
 
 import { ToastAction } from '#/components/demos/toast-action';
+import { ToastCustom } from '#/components/demos/toast-custom';
 import { ToastDemo } from '#/components/demos/toast-demo';
 import { ToastIntents } from '#/components/demos/toast-intents';
 import { ToastPlacement } from '#/components/demos/toast-placement';
 import { ToastPromise } from '#/components/demos/toast-promise';
+import { ToastStack } from '#/components/demos/toast-stack';
 
 <ComponentPreview name="toast-demo">
   <ToastDemo />
@@ -170,6 +172,25 @@ object of title and options:
 
 <ComponentPreview name="toast-promise">
   <ToastPromise />
+</ComponentPreview>
+
+### Custom content
+
+`toast.custom` draws the whole toast beside its close button. Its `title`
+names the toast and is what screen readers announce, so it should say what
+the content shows:
+
+<ComponentPreview name="toast-custom">
+  <ToastCustom />
+</ComponentPreview>
+
+### Stack
+
+Add a few toasts to see the stack: hover, focus or tap it to open it.
+`isExpanded` keeps it open:
+
+<ComponentPreview name="toast-stack">
+  <ToastStack />
 </ComponentPreview>
 
 ### Placement
