@@ -1,6 +1,7 @@
 name: Docs
 
-# Pull request previews; CI's deploy-docs ships main once its gate passes.
+# Pull request previews; CI's preview-docs uploads main's, and release-docs
+# deploys ui.oakoss.dev from each release tag.
 on:
   pull_request:
 

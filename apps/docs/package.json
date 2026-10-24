@@ -11,7 +11,6 @@
   "scripts": {
     "build": "vite build",
     "build-registry": "node src/build-registry.ts",
-    "deploy": "wrangler deploy",
     "dev": "vite dev",
     "pretest": "playwright install chromium",
     "preview": "vite preview",
