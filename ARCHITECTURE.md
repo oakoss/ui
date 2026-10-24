@@ -1,6 +1,6 @@
 # Architecture
 
-oakoss/ui is a shadcn registry read straight from GitHub. Consumers copy each component's source into their project with the shadcn CLI and own it from then on, so nothing here is built or published as a JavaScript package. The source in `packages/ui` is the product; everything else exists to test, document or generate it.
+oakoss/ui is a shadcn registry: [ui.oakoss.dev](https://ui.oakoss.dev) serves each release's, and GitHub serves `main`'s. Consumers copy each component's source into their project with the shadcn CLI and own it from then on, so nothing here is built or published as a JavaScript package. The source in `packages/ui` is the product; everything else exists to test, document or generate it.
 
 ## Layout
 
@@ -20,9 +20,9 @@ Inside `packages/ui`, code imports through the `#/components/*`, `#/hooks/*` and
 
 1. A component lives in `packages/ui/src`, with its stories in `apps/storybook` and its page in `apps/docs`.
 2. Its item in `packages/ui/registry.json` names its files and their targets, its npm dependencies and the other items it needs (`registryDependencies`). The root `registry.json` includes that file.
-3. `npx shadcn@latest add oakoss/ui/<item>` reads the registry from this repository's default branch; `#v<version>` pins a release for the named item only.
+3. `npx shadcn@latest add @oakoss/<item>` installs the latest release from `ui.oakoss.dev/r/`, or a pinned one from `/v<version>/r/`. The docs build (`apps/docs/src/build-registry.ts`) runs `shadcn build` on the working tree and on every release tag, and rewrites each item's dependencies to URLs in the same folder, so an install stays on one release. `npx shadcn@latest add oakoss/ui/<item>` reads the registry from this repository's default branch instead.
 4. At install, shadcn replaces each `IconPlaceholder` element in `icons.tsx` with the project's icon library, which is why every icon is a literal element.
-5. [oakum](https://github.com/oakoss/oakum) versions `@oakoss/ui` from the bump files in `.changeset` and tags `v<version>`, the ref consumers pin. Releasing is CI's job; see [AGENTS.md](AGENTS.md#releasing).
+5. [oakum](https://github.com/oakoss/oakum) versions `@oakoss/ui` from the bump files in `.changeset` and tags `v<version>`, and each tag deploys the docs site with its registry. Releasing is CI's job; see [AGENTS.md](AGENTS.md#releasing).
 
 ## Theming
 
@@ -32,7 +32,7 @@ Themes are data in `packages/tokens`, not hand-written CSS. `pnpm --filter @oako
 
 - `pnpm check`: typecheck, lint, format, registry validation, generated-file freshness and the workspace layout (every package has lint configs and a test script).
 - `pnpm test`: the packages' tests through turbo, which typechecks dependencies first and builds the docs site before its tests: unit tests for logic (`*.test.ts`), the Storybook stories, and the docs site's unit and end-to-end tests.
-- CI (`.github/workflows/ci.yml`) runs those plus the Storybook build, commitlint, the bump-file check and workflow linting, and gates merges on one CI Summary job; a release-only PR skips the test suites and builds. CI deploys the site it tested from `main` once that gate passes (`gh workflow run ci.yml` re-tests and redeploys it), and `docs.yml` previews pull requests that change it; `visual.yml` reports screenshot changes without blocking.
+- CI (`.github/workflows/ci.yml`) runs those plus the Storybook build, commitlint, the bump-file check and workflow linting, and gates merges on one CI Summary job; a release-only PR skips the test suites and builds. Once that gate passes on `main`, CI uploads the site it tested as `main`'s preview (`gh workflow run ci.yml` re-tests and re-uploads it). `release-docs.yml` deploys ui.oakoss.dev from each release tag, and `docs.yml` previews pull requests that change the site; `visual.yml` reports screenshot changes without blocking.
 
 ## Decisions
 

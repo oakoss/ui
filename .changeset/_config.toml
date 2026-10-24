@@ -4,6 +4,7 @@ change-files = true
 conventional-commits = true
 versioning = "zero-major"
 private-packages = { version = true, tag = true }
-# The registry is the one release; consumers pin its tag as `#v0.1.0`.
+# The registry is the one release; each `v<version>` tag deploys the docs
+# site with that release's registry.
 include = ["@oakoss/ui"]
 tag-format = "v{{ version }}"
