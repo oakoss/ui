@@ -46,6 +46,8 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
     steps:
       - name: Mint the oakoss App token
         id: app-token
@@ -74,6 +76,36 @@ jobs:
           git config user.name "${SLUG}[bot]"
           git config user.email "${id}+${SLUG}[bot]@users.noreply.github.com"
 
-      - run: pnpm exec oakum release
+      # oakum prints `<package> <version> <tag>` for each release it completes,
+      # a resumed one included, whose tag stays on an earlier commit than HEAD.
+      # A re-run after the GitHub release exists prints none, so the tag on
+      # HEAD stands in.
+      - name: Release, and read its tag
+        id: tag
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          set -euo pipefail
+          pnpm exec oakum release | tee "$RUNNER_TEMP/oakum-release.txt"
+          tags="$(awk '$1 == "@oakoss/ui" { print $3 }' "$RUNNER_TEMP/oakum-release.txt")"
+          if [ -z "$tags" ]; then
+            git fetch --quiet --tags origin
+            tags="$(git tag --points-at HEAD --list 'v*')"
+          fi
+          if [ "$(printf '%s' "$tags" | grep -c .)" -gt 1 ]; then
+            echo "::error title=Release::more than one @oakoss/ui release in one run: ${tags//$'\n'/ }"
+            exit 1
+          fi
+          echo "tag=$tags" >> "$GITHUB_OUTPUT"
+
+  # Deploys the release's docs and registry within this run, so a failure is
+  # the merger's to see.
+  docs:
+    needs: release
+    if: needs.release.outputs.tag != ''
+    uses: ./.github/workflows/release-docs.yml
+    with:
+      tag: ${{ needs.release.outputs.tag }}
+    secrets:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
