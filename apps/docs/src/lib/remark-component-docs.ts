@@ -165,7 +165,7 @@ function install(name: string): Node {
   return tabs([
     [
       'CLI',
-      [commandTabs(({ dlx }) => `${dlx} shadcn@latest add oakoss/ui/${name}`)],
+      [commandTabs(({ dlx }) => `${dlx} shadcn@latest add @oakoss/${name}`)],
     ],
     ['Manual', [manualSteps(closure(name))]],
   ]);

@@ -3,8 +3,9 @@ title: Installation
 description: Set up a project for oakoss/ui components.
 ---
 
-oakoss/ui installs with the [shadcn CLI](https://ui.shadcn.com/docs/cli) from
-this GitHub repository, into a React project with Tailwind CSS v4.
+oakoss/ui installs with the [shadcn CLI](https://ui.shadcn.com/docs/cli) into a
+React project with Tailwind CSS v4. This site hosts the registry, and these
+docs describe its latest release.
 
 ## Set up the project
 
@@ -19,20 +20,29 @@ reduced-motion styles, and in a new project sets Lucide as the icon library.
   <TabsContent value="new">
 
 ```npm
-npx shadcn@latest init oakoss/ui/base
+npx shadcn@latest init https://ui.oakoss.dev/r/base.json
 ```
 
-This creates `components.json`.
+This creates `components.json` with the `@oakoss` registry the other commands
+use.
 
   </TabsContent>
   <TabsContent value="existing">
 
-```npm
-npx shadcn@latest add oakoss/ui/base
+Add the registry to `components.json`:
+
+```json title="components.json"
+{ "registries": { "@oakoss": "https://ui.oakoss.dev/r/{name}.json" } }
 ```
 
-This leaves `components.json` as it is, so components use the icon library it
-already names: Lucide, Tabler, HugeIcons, Phosphor or Remix Icon.
+Then add the base item:
+
+```npm
+npx shadcn@latest add @oakoss/base
+```
+
+This leaves the rest of `components.json` as it is, so components use the icon
+library it already names: Lucide, Tabler, HugeIcons, Phosphor or Remix Icon.
 
   </TabsContent>
 </Tabs>
@@ -50,7 +60,7 @@ own stacking context keeps z-indexes inside the app from competing with them.
 The theme starts on Zinc. To use another family, add its item after `base`:
 
 ```npm
-npx shadcn@latest add oakoss/ui/theme-mauve
+npx shadcn@latest add @oakoss/theme-mauve
 ```
 
 The families are `zinc`, `neutral`, `stone`, `mauve`, `olive`, `mist`,
@@ -78,7 +88,7 @@ add it without `base`: it keeps that theme's values and adds only the tokens
 the theme lacks.
 
 ```npm
-npx shadcn@latest add oakoss/ui/themes
+npx shadcn@latest add @oakoss/themes
 ```
 
 It installs `styles/themes.css` (177 KB, 15 KB gzipped) in `src/`, or at the
@@ -106,8 +116,32 @@ alongside the `dark` class:
 ## Add components
 
 ```npm
-npx shadcn@latest add oakoss/ui/button
+npx shadcn@latest add @oakoss/button
 ```
 
 Each page lists its own command. The files land in your project, so you can
 edit them freely.
+
+## Pin a release
+
+`/r/` always serves the latest release. To stay on one, point the registry at
+its folder, `/v<version>/r/`, such as v0.5.0's:
+
+```json title="components.json"
+{ "registries": { "@oakoss": "https://ui.oakoss.dev/v0.5.0/r/{name}.json" } }
+```
+
+Every item and its dependencies then come from that release, until you change
+the version. The [changelog](https://github.com/oakoss/ui/blob/main/packages/ui/CHANGELOG.md)
+lists what each release changed.
+
+To try a component before it's released, add it from the repository's `main`
+branch:
+
+```npm
+npx shadcn@latest add oakoss/ui/button
+```
+
+Its dependencies come from `main` too. The CLI asks before replacing shared
+files your release installed, such as `lib/cx.ts`, and a component from `main`
+may need the newer ones; pass `--overwrite` to take them all.
