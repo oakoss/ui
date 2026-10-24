@@ -6,13 +6,13 @@ Documentation: [ui.oakoss.dev](https://ui.oakoss.dev), which also hosts the regi
 
 ## Install
 
-Set up the project once. In a new project, `init` creates `components.json` with the `@oakoss` registry, sets Lucide as the icon library, and installs the theme, `color-scheme` and the reduced-motion styles:
+Set up the project once. In a new project, `init` creates `components.json` with the `@oakoss` registry, sets Lucide as the icon library, and installs `lucide-react`, the theme, `color-scheme` and the reduced-motion styles:
 
 ```sh
 npx shadcn@latest init https://ui.oakoss.dev/r/base.json
 ```
 
-In an existing project, add the registry to `components.json`, then the base item, which keeps the icon library your `components.json` already names:
+In an existing project, add the registry to `components.json`, then the base item, which keeps the icon library your `components.json` already names (install that library's package if the project lacks it):
 
 ```json
 { "registries": { "@oakoss": "https://ui.oakoss.dev/r/{name}.json" } }
@@ -28,7 +28,7 @@ Then add components:
 npx shadcn@latest add @oakoss/button
 ```
 
-Each component's page lists its command. Icons that render as empty squares mean `components.json` names no icon library; set `"iconLibrary"` and add the component again.
+Each component's page lists its command. Icons that render as empty squares mean `components.json` names no icon library; set `"iconLibrary"`, install that library's package, and add the component again.
 
 ## Pinning a release
 
