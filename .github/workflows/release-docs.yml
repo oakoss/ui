@@ -136,3 +136,23 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: pnpm exec wrangler deploy
+
+      # wrangler's exit code alone doesn't show the site changed: the live
+      # registry indexes must match this build's, allowing a minute to settle.
+      - name: Check ui.oakoss.dev serves this release
+        working-directory: apps/docs/dist/client
+        env:
+          TAG: ${{ needs.test.outputs.tag }}
+        run: |
+          set -euo pipefail
+          for file in r/registry.json "$TAG/r/registry.json"; do
+            for attempt in $(seq 1 12); do
+              if curl -fsS --max-time 10 "https://ui.oakoss.dev/$file" | cmp -s - "$file"; then
+                continue 2
+              fi
+              echo "attempt $attempt: $file doesn't match yet"
+              sleep 5
+            done
+            echo "::error title=Release docs::ui.oakoss.dev doesn't serve this build's $file"
+            exit 1
+          done
