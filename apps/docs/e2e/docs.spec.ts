@@ -20,6 +20,64 @@ test('a toast demo shows its toast', async ({ page }) => {
   ).toHaveCount(1);
 });
 
+// The placement demo's own Toaster shows its toast where asked, once, while
+// the site's Toaster stays out of it.
+test('the placement demo shows its toast at the placement', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/docs/components/toast');
+  await page.getByRole('button', { name: 'top start' }).click();
+  const toast = page.getByRole('alertdialog', { name: 'Shown at top start' });
+  await expect(toast).toHaveCount(1);
+  await expect(
+    page.getByRole('region', {
+      exact: true,
+      name: 'Placement example, 1 toast',
+    }),
+  ).toBeVisible();
+  const box = await toast.boundingBox();
+  expect(box?.x).toBeLessThan(100);
+  expect(box?.y).toBeLessThan(100);
+  await expect(page.getByRole('region', { name: /notification/u })).toHaveCount(
+    0,
+  );
+});
+
+// The stack demo's switch opens and closes its own stack, not the site's.
+test('the stack demo keeps its stack open', async ({ page }) => {
+  await gotoHydrated(page, '/docs/components/toast');
+  const add = page.getByRole('button', { name: 'Add a toast' });
+  await add.click();
+  await add.click();
+  const region = page.getByRole('region', {
+    exact: true,
+    name: 'Stack example, 2 toasts',
+  });
+  const behind = region.locator('[data-behind]');
+  await expect(behind).toHaveCount(1);
+  const label = page.getByText('Keep the stack open');
+  await label.click();
+  await expect(
+    page.getByRole('switch', { name: 'Keep the stack open' }),
+  ).toBeChecked();
+  await expect(region.getByRole('alertdialog')).toHaveCount(2);
+  await expect(behind).toHaveCount(0);
+  await label.click();
+  await expect(behind).toHaveCount(1);
+});
+
+// A custom toast is named by its title rather than its drawn text.
+test('the custom demo names its toast by its title', async ({ page }) => {
+  await gotoHydrated(page, '/docs/components/toast');
+  await page.getByRole('button', { name: 'Share a file' }).click();
+  await expect(
+    page.getByRole('alertdialog', {
+      exact: true,
+      name: 'Ana shared Q3 roadmap.pdf',
+    }),
+  ).toContainText('Ana shared a file');
+});
+
 // Calendar demos read the visitor's clock, so they render after hydration: a
 // visit months after the build hydrates without a mismatch.
 test('calendar demos render only on the client', async ({ page }) => {
