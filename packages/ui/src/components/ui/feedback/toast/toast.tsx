@@ -73,11 +73,12 @@ const placements = {
 } as const;
 
 // Clear of a phone's notch, home bar and on-screen keyboard, and full width
-// on a phone.
+// on a phone. It clips its height only while it scrolls, so a toast sliding
+// into place past its edge isn't cut off.
 const styles = tv({
   base: [
     focusRing,
-    'fixed z-(--z-toast) flex h-(--toaster-height) max-h-[calc(var(--toaster-viewport,100dvh)-env(safe-area-inset-top)-env(safe-area-inset-bottom))] w-full max-w-sm overflow-x-hidden overflow-y-hidden overscroll-contain px-[max(env(safe-area-inset-left),env(safe-area-inset-right))] focus-visible:-outline-offset-3 data-scrollable:overflow-y-auto max-sm:inset-x-0 max-sm:max-w-none',
+    'fixed z-(--z-toast) flex h-(--toaster-height) max-h-[calc(var(--toaster-viewport,100dvh)-env(safe-area-inset-top)-env(safe-area-inset-bottom))] w-full max-w-sm overflow-x-clip overscroll-contain px-[max(env(safe-area-inset-left),env(safe-area-inset-right))] focus-visible:-outline-offset-3 data-scrollable:overflow-x-hidden data-scrollable:overflow-y-auto max-sm:inset-x-0 max-sm:max-w-none',
   ],
   variants: {
     align: { center: 'inset-x-0 mx-auto', end: 'end-0', start: 'start-0' },
