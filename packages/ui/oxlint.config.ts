@@ -132,6 +132,13 @@ const arbitraryValues: Record<string, string[]> = {
     ...colorVariables('progress'),
     ...valueFill,
   ],
+  // The stack clears a notched phone's insets and its on-screen keyboard.
+  'src/components/ui/feedback/toast/toast.tsx': [
+    'max-h-[calc(var(--toaster-viewport,100dvh)-env(safe-area-inset-top)-env(safe-area-inset-bottom))]',
+    'px-[max(env(safe-area-inset-left),env(safe-area-inset-right))]',
+    'bottom-[max(env(safe-area-inset-bottom),var(--toaster-bottom,0px))]',
+    'top-[max(env(safe-area-inset-top),var(--toaster-top,0px))]',
+  ],
   'src/components/ui/inputs/button.tsx': [
     ...colorVariables('btn', [
       'background',

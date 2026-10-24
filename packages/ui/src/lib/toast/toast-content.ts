@@ -73,7 +73,9 @@ export type ToastTimer = { pause: () => void; resume: () => void };
 
 export const defaultToastDuration = 5000;
 
-export const defaultToastLimit = 3;
+export const defaultToastLimit = 10;
+
+export const defaultToastVisible = 3;
 
 export function callMessage<T>(message: ToastPromiseMessage<T>, value: T) {
   return typeof message === 'function' ? message(value) : message;
@@ -133,6 +135,13 @@ export function toPromiseState(message: ReactNode | ToastPromiseState) {
   if (!isPromiseState(message)) return { options: {}, title: message };
   const { title, ...options } = message;
   return { options, title };
+}
+
+// The stack and the store's timers read the same count: whole, at least 1,
+// the default for NaN, and Infinity while focus shows every toast.
+export function visibleCount(visible: number) {
+  if (Number.isNaN(visible)) return defaultToastVisible;
+  return Math.max(1, Math.floor(visible));
 }
 
 function isPromiseState(value: unknown): value is ToastPromiseState {

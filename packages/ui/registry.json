@@ -3524,6 +3524,51 @@
           "target": "@lib/toast/toast-announcer.ts"
         },
         {
+          "path": "src/lib/toast/toast-stack.ts",
+          "type": "registry:lib",
+          "target": "@lib/toast/toast-stack.ts"
+        },
+        {
+          "path": "src/lib/toast/toast-stack-open.ts",
+          "type": "registry:lib",
+          "target": "@lib/toast/toast-stack-open.ts"
+        },
+        {
+          "path": "src/lib/toast/toast-swipe.ts",
+          "type": "registry:lib",
+          "target": "@lib/toast/toast-swipe.ts"
+        },
+        {
+          "path": "src/hooks/use-toast-lifecycle.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-toast-lifecycle.ts"
+        },
+        {
+          "path": "src/hooks/use-css-vars.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-css-vars.ts"
+        },
+        {
+          "path": "src/hooks/use-toast-region.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-toast-region.ts"
+        },
+        {
+          "path": "src/hooks/use-toast-stack.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-toast-stack.ts"
+        },
+        {
+          "path": "src/hooks/use-toast-swipe.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-toast-swipe.ts"
+        },
+        {
+          "path": "src/hooks/use-latest.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-latest.ts"
+        },
+        {
           "path": "src/lib/empty-node.ts",
           "type": "registry:lib",
           "target": "@lib/empty-node.ts"

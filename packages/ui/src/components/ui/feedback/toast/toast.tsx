@@ -1,5 +1,4 @@
 import { useEffect, useRef, useSyncExternalStore } from 'react';
-import { useToastRegion } from 'react-aria/useToast';
 import { createPortal } from 'react-dom';
 import { tv } from 'tailwind-variants/lite';
 
@@ -10,12 +9,15 @@ import {
   type ToastAnnounce,
   ToastItemView,
 } from '#/components/ui/feedback/toast/toast-item';
+import { useToastRegionParts } from '#/hooks/use-toast-region';
 import { cn } from '#/lib/cx';
+import { focusRing } from '#/lib/recipes';
 import { announce } from '#/lib/toast/toast-announcer';
 import { toastStore } from '#/lib/toast/toast-api';
 import {
   defaultToastDuration,
   defaultToastLimit,
+  defaultToastVisible,
 } from '#/lib/toast/toast-content';
 
 export { toast } from '#/lib/toast/toast-api';
@@ -36,21 +38,29 @@ export type ToasterProps = {
   duration?: number;
   // Per intent, for toasts that don't set their own.
   icons?: ToastIcons;
-  // Toasts shown at once, at least 1; past it the oldest closes.
+  // Keeps the stack open, for toasts whose actions shouldn't hide behind
+  // another; timers still run.
+  isExpanded?: boolean;
+  // Toasts kept at once, at least 1; past it the oldest closes.
   limit?: number;
   messages?: ToasterMessages;
   placement?: ToasterPlacement;
   store?: ToastStore;
+  // Toasts the stack shows, at least 1; older ones wait behind it, their
+  // timers held until they move up.
+  visible?: number;
 };
 
 type ToastRegionProps = {
   className: string;
   icons: ToastIcons | undefined;
+  isExpanded: boolean;
   items: readonly ToastItem[];
   messages: ToasterMessages | undefined;
   onAnnounce: ToastAnnounce;
   placement: ToasterPlacement;
   store: ToastStore;
+  visible: number;
 };
 
 const placements = {
@@ -62,11 +72,22 @@ const placements = {
   'top start': { align: 'start', side: 'top' },
 } as const;
 
+// Clear of a phone's notch, home bar and on-screen keyboard, and full width
+// on a phone.
 const styles = tv({
-  base: 'fixed z-(--z-toast) flex max-h-dvh w-full max-w-sm flex-col gap-2 overflow-hidden p-4 outline-hidden',
+  base: [
+    focusRing,
+    'fixed z-(--z-toast) flex h-(--toaster-height) max-h-[calc(var(--toaster-viewport,100dvh)-env(safe-area-inset-top)-env(safe-area-inset-bottom))] w-full max-w-sm overflow-x-hidden overflow-y-hidden overscroll-contain px-[max(env(safe-area-inset-left),env(safe-area-inset-right))] focus-visible:-outline-offset-3 data-scrollable:overflow-y-auto max-sm:inset-x-0 max-sm:max-w-none',
+  ],
   variants: {
     align: { center: 'inset-x-0 mx-auto', end: 'end-0', start: 'start-0' },
-    side: { bottom: 'bottom-0 flex-col-reverse', top: 'top-0' },
+    // The stack scrolls from its edge: column-reverse starts a bottom
+    // stack's scroll at the bottom.
+    side: {
+      bottom:
+        'bottom-[max(env(safe-area-inset-bottom),var(--toaster-bottom,0px))] flex-col-reverse',
+      top: 'top-[max(env(safe-area-inset-top),var(--toaster-top,0px))] flex-col',
+    },
   },
 });
 
@@ -76,20 +97,17 @@ export function Toaster({
   className,
   duration = defaultToastDuration,
   icons,
+  isExpanded = false,
   limit = defaultToastLimit,
   messages,
   placement = 'bottom end',
   store = toastStore,
+  visible = defaultToastVisible,
 }: ToasterProps) {
-  const isClient = useSyncExternalStore(subscribeNever, isTrue, isFalse);
-  const items = useSyncExternalStore(
-    store.subscribe,
-    store.getSnapshot,
-    store.getServerSnapshot,
-  );
+  const { isClient, items } = useStoreItems(store);
   const politeRef = useRef<HTMLDivElement>(null);
   const assertiveRef = useRef<HTMLDivElement>(null);
-  useConnectedStore(store, limit, duration);
+  useConnectedStore(store, { duration, limit, visible });
 
   if (!isClient) return null;
   const onAnnounce: ToastAnnounce = (message, priority) => {
@@ -111,11 +129,13 @@ export function Toaster({
         <ToastRegion
           className={cn(styles(placements[placement]), className)}
           icons={icons}
+          isExpanded={isExpanded}
           items={items}
           messages={messages}
           onAnnounce={onAnnounce}
           placement={placement}
           store={store}
+          visible={visible}
         />
       ) : null}
     </div>,
@@ -141,25 +161,23 @@ function subscribeNever() {
 function ToastRegion({
   className,
   icons,
+  isExpanded,
   items,
   messages,
   onAnnounce,
   placement,
   store,
+  visible,
 }: ToastRegionProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const { regionProps } = useToastRegion(
-    { 'aria-label': messages?.region?.(items.length) },
+  const { align, side } = placements[placement];
+  const { ref, regionProps, stack } = useToastRegionParts({
+    isExpanded,
+    items,
+    label: messages?.region?.(items.length),
+    side,
     store,
-    ref,
-  );
-  // Unmounting while hovered or focused never ends React Aria's pause.
-  useEffect(
-    () => () => {
-      store.resumeAll();
-    },
-    [store],
-  );
+    visible,
+  });
   return (
     <div
       {...regionProps}
@@ -168,23 +186,38 @@ function ToastRegion({
       data-slot="toast-viewport"
       ref={ref}
     >
-      {items.map((item) => (
-        <ToastItemView
-          closeLabel={messages?.close}
-          icons={icons}
-          item={item}
-          key={item.instance}
-          onAnnounce={onAnnounce}
-          pendingLabel={messages?.pending}
-          store={store}
-        />
-      ))}
+      <div className="relative h-(--toaster-height) w-full shrink-0">
+        {stack.placed.map(({ item, slot }) => (
+          <ToastItemView
+            align={align}
+            closeLabel={messages?.close}
+            icons={icons}
+            item={item}
+            key={item.instance}
+            onAnnounce={onAnnounce}
+            onHeight={(height) => {
+              stack.onHeight(item.instance, height);
+            }}
+            pendingLabel={messages?.pending}
+            side={side}
+            slot={slot}
+            store={store}
+          />
+        ))}
+      </div>
     </div>
   );
 }
 
 // Timers run while the Toaster is mounted, and pause while the page is hidden.
-function useConnectedStore(store: ToastStore, limit: number, duration: number) {
+function useConnectedStore(
+  store: ToastStore,
+  {
+    duration,
+    limit,
+    visible,
+  }: { duration: number; limit: number; visible: number },
+) {
   useEffect(() => store.connect(), [store]);
 
   useEffect(() => {
@@ -194,6 +227,10 @@ function useConnectedStore(store: ToastStore, limit: number, duration: number) {
   useEffect(() => {
     store.setDuration(duration);
   }, [duration, store]);
+
+  useEffect(() => {
+    store.setVisible(visible);
+  }, [store, visible]);
 
   useEffect(() => {
     const sync = () => {
@@ -207,4 +244,16 @@ function useConnectedStore(store: ToastStore, limit: number, duration: number) {
       store.resume('hidden');
     };
   }, [store]);
+}
+
+// isClient is false on the server and through hydration, so the toasts and
+// live regions mount only on the client.
+function useStoreItems(store: ToastStore) {
+  const isClient = useSyncExternalStore(subscribeNever, isTrue, isFalse);
+  const items = useSyncExternalStore(
+    store.subscribe,
+    store.getSnapshot,
+    store.getServerSnapshot,
+  );
+  return { isClient, items };
 }
