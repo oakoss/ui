@@ -443,6 +443,9 @@ importers:
       oxlint:
         specifier: 'catalog:'
         version: 1.87.0(oxlint-tsgolint@7.0.2004)
+      shadcn:
+        specifier: 'catalog:'
+        version: 4.21.4(supports-color@7.2.0)
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.3

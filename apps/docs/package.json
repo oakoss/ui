@@ -10,6 +10,7 @@
   },
   "scripts": {
     "build": "vite build",
+    "build-registry": "node src/build-registry.ts",
     "deploy": "wrangler deploy",
     "dev": "vite dev",
     "pretest": "playwright install chromium",
@@ -59,6 +60,7 @@
     "mdast-util-mdx": "^3.0.0",
     "mdast-util-to-markdown": "^2.2.0",
     "oxlint": "catalog:",
+    "shadcn": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite": "^8.3.2",

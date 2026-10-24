@@ -8,6 +8,8 @@ import {
   type ThemeItem,
 } from '@oakoss/tokens';
 
+import { releaseItem } from './registry-release.ts';
+import { siteUrl } from './site.ts';
 import { themeItemPath, type ThemeOptions } from './theme-state.ts';
 
 const style = styles[axes.style.default];
@@ -30,7 +32,7 @@ export function themeItemAt(path: string): string | undefined {
   const choice = choices.get(path);
   return choice === undefined
     ? undefined
-    : JSON.stringify(themeItem(choice, style));
+    : JSON.stringify(releaseItem(themeItem(choice, style), `${siteUrl}/r`));
 }
 
 // Each swatch is the primary's light-mode color, read from the item that

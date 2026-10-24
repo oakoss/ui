@@ -1,5 +1,12 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "extends": ["//"],
-  "tasks": { "test": { "dependsOn": ["build"] } }
+  "tasks": {
+    "build-registry": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "env": ["REQUIRE_RELEASE_TAG"]
+    },
+    "test": { "dependsOn": ["build", "build-registry"] }
+  }
 }
