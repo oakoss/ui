@@ -20,6 +20,29 @@ test('a toast demo shows its toast', async ({ page }) => {
   ).toHaveCount(1);
 });
 
+// The placement demo's own Toaster shows its toast where asked, once, while
+// the site's Toaster stays out of it.
+test('the placement demo shows its toast at the placement', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/docs/components/toast');
+  await page.getByRole('button', { name: 'top start' }).click();
+  const toast = page.getByRole('alertdialog', { name: 'Shown at top start' });
+  await expect(toast).toHaveCount(1);
+  await expect(
+    page.getByRole('region', {
+      exact: true,
+      name: 'Placement example, 1 toast',
+    }),
+  ).toBeVisible();
+  const box = await toast.boundingBox();
+  expect(box?.x).toBeLessThan(100);
+  expect(box?.y).toBeLessThan(100);
+  await expect(page.getByRole('region', { name: /notification/u })).toHaveCount(
+    0,
+  );
+});
+
 // Calendar demos read the visitor's clock, so they render after hydration: a
 // visit months after the build hydrates without a mismatch.
 test('calendar demos render only on the client', async ({ page }) => {

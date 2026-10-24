@@ -8,6 +8,7 @@ reactAria: https://react-aria.adobe.com/Toast
 import { ToastAction } from '#/components/demos/toast-action';
 import { ToastDemo } from '#/components/demos/toast-demo';
 import { ToastIntents } from '#/components/demos/toast-intents';
+import { ToastPlacement } from '#/components/demos/toast-placement';
 import { ToastPromise } from '#/components/demos/toast-promise';
 
 <ComponentPreview name="toast-demo">
@@ -47,8 +48,10 @@ toast.success('Changes saved', { description: 'All files are up to date.' });
 
 `toast()` returns the toast's id. Showing a toast again with the same `id`
 updates it in place and restarts its timer, and `toast.dismiss(id)` closes
-it. One `Toaster` per app: a second one renders every toast twice, and
-`limit` and `duration` apply to the whole app.
+it. One `Toaster` per store: a second one on the same store renders every
+toast twice, and `limit`, `duration` and `visible` apply to the whole store.
+`toast()` uses the app's store; a `Toaster` with its own `ToastStore`, as in
+the placement example, keeps its toasts apart.
 
 ### When to use a toast
 
@@ -167,6 +170,16 @@ object of title and options:
 
 <ComponentPreview name="toast-promise">
   <ToastPromise />
+</ComponentPreview>
+
+### Placement
+
+`placement` puts the stack at a corner or the middle of the top or bottom
+edge, following the reading direction. Swipes go toward the side and the
+edge the stack is aligned to:
+
+<ComponentPreview name="toast-placement">
+  <ToastPlacement />
 </ComponentPreview>
 
 ## Accessibility
