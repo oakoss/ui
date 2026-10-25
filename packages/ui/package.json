@@ -37,6 +37,7 @@
     "@phosphor-icons/react": "catalog:",
     "@remixicon/react": "catalog:",
     "@tabler/icons-react": "catalog:",
+    "@tanstack/charts": "catalog:",
     "@tanstack/react-table": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",

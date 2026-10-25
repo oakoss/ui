@@ -1,0 +1,192 @@
+---
+title: Chart
+description: Bar, line, area and other charts on TanStack Charts, with a visible title and description.
+item: chart
+---
+
+import { ChartAxes } from '#/components/demos/chart-axes';
+import { ChartDemo } from '#/components/demos/chart-demo';
+import { ChartLine } from '#/components/demos/chart-line';
+import { ChartTooltip } from '#/components/demos/chart-tooltip';
+
+<ComponentPreview name="chart-demo">
+  <ChartDemo />
+</ComponentPreview>
+
+## Installation
+
+<ComponentInstall item="chart" />
+
+## Usage
+
+```tsx
+import { barY, defineChart } from '@tanstack/charts';
+import { scaleBand } from '@tanstack/charts/scales/band';
+import { scaleLinear } from '@tanstack/charts/scales/linear';
+import { tooltip } from '@tanstack/charts/tooltip';
+
+import { type ChartConfig, ChartContainer } from '#/components/ui/data/chart';
+
+const config = {
+  desktop: { color: 'var(--color-chart-1)', label: 'Desktop' },
+} satisfies ChartConfig;
+
+const definition = defineChart({
+  marks: [
+    barY(visitors, {
+      fill: config.desktop.color,
+      id: 'desktop',
+      x: 'month',
+      y: 'desktop',
+    }),
+  ],
+  scales: {
+    x: { scale: scaleBand },
+    y: { grid: true, nice: true, scale: scaleLinear },
+  },
+  tooltip,
+});
+
+<ChartContainer
+  config={config}
+  definition={definition}
+  description="Desktop visitors from January to June."
+  title="Visitors by month"
+/>;
+```
+
+The chart itself is a [TanStack Charts](https://tanstack.com/charts)
+definition: marks, scales, focus and the tooltip all live in it, and
+`ChartContainer` renders it in a figure with your title and description as
+its caption. Build the definition outside the component, or memoize it on
+the values it captures: a new definition rebuilds the chart.
+
+`config` names each series, keyed by its `z` value, or by the mark's `id`
+for a mark without one; the tooltip reads the labels from it. Paint marks
+with `config`'s colors, or leave them out and the chart takes the theme's
+`--color-chart-1` to `--color-chart-5` in turn; a sixth series takes
+TanStack's own color.
+
+Charts with several series take one row per value with the series in `z`,
+so focus can group a month's values into one tooltip:
+
+```tsx
+const rows = [
+  { device: 'desktop', month: 'January', visitors: 186 },
+  { device: 'mobile', month: 'January', visitors: 80 },
+];
+```
+
+## Examples
+
+### Line and crosshair
+
+`focus: 'group-x'` shows every series at the focused x value in one tooltip,
+and the `crosshair` mark draws a rule there. `maxFocusDistance: Infinity`
+snaps to the nearest month wherever the pointer is.
+
+<ComponentPreview name="chart-line">
+  <ChartLine />
+</ComponentPreview>
+
+### Tooltip
+
+The tooltip is `ChartTooltipContent`, rendered through `renderTooltipBody`.
+Render it yourself to change `indicator` (`dot`, `line` or `dashed`), hide
+the heading or indicators, or format the heading and values. The definition
+still needs TanStack's `tooltip`, which decides when it shows.
+
+The heading is the value the focused points share, usually the x value, and
+each row shows the other axis; a bar or area reports its length, and a range
+its two ends. A pie slice's point carries its angle and radius, so pass
+`labelFormatter` and `valueFormatter` that read the slice's data from
+`point.datum`.
+
+<ComponentPreview name="chart-tooltip">
+  <ChartTooltip />
+</ComponentPreview>
+
+### Axes and formatting
+
+Axis titles are the axis `label`, and `ticks.values` picks which ticks show,
+here only the first and last month. The tooltip formats numbers and dates in
+the app's locale, from React Aria's
+[I18nProvider](https://react-aria.adobe.com/I18nProvider);
+`useChartFormatter` gives axis ticks the same formatting; without it,
+numeric ticks take TanStack's default format.
+
+<ComponentPreview name="chart-axes">
+  <ChartAxes />
+</ComponentPreview>
+
+## Accessibility
+
+The chart is a `figure` named by its title and described by its
+description, both visible in its caption, so the comparison it shows reads
+before the graphic. Inside, TanStack renders an SVG with role `img`, the same
+name and the description as its `desc`. Put the conclusion a reader should
+draw, or the values that matter, in the description.
+
+TanStack makes the chart one tab stop and moves a virtual focus between its
+points, showing the tooltip for the focused one. The tooltip is a polite
+live region. Charts don't offer a table of their values, so give one
+beside the chart when readers need exact numbers.
+
+| Key                | Action                                |
+| ------------------ | ------------------------------------- |
+| `Tab`              | Focuses the chart, on its first point |
+| `Arrow` keys       | Move to the next or previous point    |
+| `Home` / `End`     | Move to the first or last point       |
+| `Enter` or `Space` | Pins the tooltip open                 |
+| `Escape`           | Closes a pinned tooltip               |
+
+The tooltip's indicators keep their series colors in forced colors.
+
+## API
+
+### ChartContainer
+
+A `figure` with a caption and TanStack's
+[Chart](https://tanstack.com/charts/latest/docs/framework/react/adapter).
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/chart.tsx"
+  name="ChartContainerProps"
+/>
+
+Also accepts TanStack Chart's props, except `ariaLabel`, `ariaDescription`
+and `style`. `aspectRatio` defaults to 16:9.
+
+#### Data attributes
+
+| Attribute   | Present when                                                                               |
+| ----------- | ------------------------------------------------------------------------------------------ |
+| `data-slot` | Always: `chart`, and `chart-caption`, `chart-title` and `chart-description` in its caption |
+
+### ChartTooltipContent
+
+The tooltip body, a `div` of one row per focused point.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/chart.tsx"
+  name="ChartTooltipContentProps"
+/>
+
+Also takes the context `renderTooltipBody` passes.
+
+#### Data attributes
+
+| Attribute   | Present when                                                                                       |
+| ----------- | -------------------------------------------------------------------------------------------------- |
+| `data-slot` | Always: `chart-tooltip`, `chart-tooltip-label`, `chart-tooltip-item` and `chart-tooltip-indicator` |
+
+### useChartFormatter
+
+Returns a function that formats a number or date in the app's locale, with
+optional `number` and `date` format options. Dates format in UTC by default.
+Keep the options outside the component or memoized, so the function, and a
+definition built on it, stays the same between renders.

@@ -16,6 +16,7 @@
   "dependencies": {
     "@internationalized/date": "catalog:",
     "@oakoss/ui": "workspace:*",
+    "@tanstack/charts": "catalog:",
     "@tanstack/react-table": "catalog:",
     "embla-carousel-react": "catalog:",
     "input-otp": "catalog:",
