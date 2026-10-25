@@ -11,6 +11,7 @@ Research notes that inform ideas, specs, and decisions. Each note captures what 
 
 <!-- Add newest first: - [NNNN — Title](./NNNN-kebab-title.md) — one-line hook -->
 
+- [0009 — Charts](./0009-charts.md) — TanStack Charts re-checked, eleven chart libraries, accessibility guidance and the community's top asks behind the Chart port, with the candidates beyond shadcn's chart.
 - [0008 — Pinning Registry Installs to a Release](./0008-registry-version-pinning.md) — a GitHub tag pins only the item named; serving each release's `shadcn build` output from the docs site, with dependencies as versioned URLs, pins whole releases with no oakum change.
 - [0007 — Toasts](./0007-toasts.md) — 17 libraries, 12 design systems and the community's top asks behind the Toast spec: our own store on React Aria's toast hooks, Sonner's call signature, a neutral card stack.
 - [0006 — Intent UI v4](./0006-intent-ui-v4.md) — what v4 changed, the picks worth taking per component (each a bead), and where Intent is behind us on accessibility.
