@@ -2,6 +2,7 @@ import type { ChartConfig } from '@oakoss/ui/hooks/use-chart';
 
 import { ChartContainer, ChartPlot } from '@oakoss/ui/components/ui/data/chart';
 import { ChartTooltipContent } from '@oakoss/ui/components/ui/data/chart-tooltip-content';
+import { chartColor } from '@oakoss/ui/lib/chart-series';
 import { areaY, defineChart } from '@tanstack/charts';
 import { scaleLinear } from '@tanstack/charts/scales/linear';
 import { scalePoint } from '@tanstack/charts/scales/point';
@@ -27,14 +28,14 @@ const visitors = [
 
 // Areas stack by device.
 const definition = defineChart({
+  color: chartColor(config),
   focus: 'group-x',
   marks: [
     areaY(visitors, {
-      fill: (row) => config[row.device].color,
+      color: 'device',
       fillOpacity: 0.4,
       x: 'month',
       y: 'visitors',
-      z: 'device',
     }),
   ],
   maxFocusDistance: Infinity,

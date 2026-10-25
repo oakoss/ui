@@ -27,20 +27,16 @@ import { tooltip } from '@tanstack/charts/tooltip';
 
 import { ChartContainer, ChartPlot } from '#/components/ui/data/chart';
 import type { ChartConfig } from '#/hooks/use-chart';
+import { chartColor } from '#/lib/chart-series';
 
 const config = {
   desktop: { color: 'var(--color-chart-1)', label: 'Desktop' },
+  mobile: { color: 'var(--color-chart-2)', label: 'Mobile' },
 } satisfies ChartConfig;
 
 const definition = defineChart({
-  marks: [
-    barY(visitors, {
-      fill: config.desktop.color,
-      id: 'desktop',
-      x: 'month',
-      y: 'desktop',
-    }),
-  ],
+  color: chartColor(config),
+  marks: [barY(visitors, { color: 'device', x: 'month', y: 'visitors' })],
   scales: {
     x: { scale: scaleBand },
     y: { grid: true, nice: true, scale: scaleLinear },
@@ -50,7 +46,7 @@ const definition = defineChart({
 
 <ChartContainer
   config={config}
-  description="Desktop visitors from January to June."
+  description="Desktop and mobile visitors from January to June."
   title="Visitors by month"
 >
   <ChartPlot definition={definition} />
@@ -65,23 +61,60 @@ caption. Content you place in the container, such as a summary, sits in the
 figure with the chart. Build the definition outside the component, or
 memoize it on the values it captures: a new definition rebuilds the chart.
 
-`config` names each series, keyed by its `z` value, or by the mark's `id`
-for a mark without one; the tooltip reads the labels from it. Paint marks
-with `config`'s colors, or leave them out and the chart takes the theme's
-`--color-chart-1` to `--color-chart-5` in turn; a sixth series takes
-TanStack's own color.
-
-Charts with several series take one row per value with the series in `z`,
-so focus can group a month's values into one tooltip:
+`config` names each series and category, and an entry with a color is a
+series. Marks name a row's series with their `color` channel, and
+`chartColor(config)` turns the config into TanStack's color scale, so the
+marks, tooltip and legend share one mapping. Charts with several series take
+one row per value, so focus can group a month's values into one tooltip:
 
 ```tsx
-const rows = [
+const visitors = [
   { device: 'desktop', month: 'January', visitors: 186 },
   { device: 'mobile', month: 'January', visitors: 80 },
 ];
 ```
 
+A mark with no series takes the theme's `--color-chart-1` to
+`--color-chart-5` in turn, and a sixth takes TanStack's own color. When color
+means something else, such as a status, the series comes from `z` instead:
+the legend can then highlight it but not hide it.
+
 ## Examples
+
+### Legend
+
+`ChartLegend` lists the config's series. Given `hidden` and `onHiddenChange`,
+each item toggles its series: pass the same set to `chartColor` and rebuild
+the definition, and TanStack removes the series without moving the axes.
+Hovering or focusing an item dims the other series; give each mark
+`chartSeriesStates` for that. Without those props, the legend is a plain list.
+
+```tsx
+const [hidden, setHidden] = useState(() => new Set<string>());
+const definition = useMemo(
+  () =>
+    defineChart({
+      color: chartColor(config, hidden),
+      marks: [
+        barY(visitors, {
+          color: 'device',
+          states: chartSeriesStates,
+          x: 'month',
+          y: 'visitors',
+        }),
+      ],
+      // …
+    }),
+  [hidden],
+);
+
+<ChartContainer config={config} description="…" title="Visitors by month">
+  <ChartPlot definition={definition} />
+  <ChartLegend hidden={hidden} onHiddenChange={setHidden} />
+</ChartContainer>;
+```
+
+The chart at the top of this page has one.
 
 ### Line and crosshair
 
@@ -144,7 +177,23 @@ beside the chart when readers need exact numbers.
 | `Enter` or `Space` | Pins the tooltip open                 |
 | `Escape`           | Closes a pinned tooltip               |
 
-The tooltip's indicators keep their series colors in forced colors.
+An interactive legend is a
+[toolbar](https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/) named by its
+`label` ("Series"), one tab stop with arrow keys between its items. Each
+item is a toggle button named by its series alone, with `aria-pressed` set
+while the series shows; the
+[WAI-ARIA button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/button/)
+keeps a toggle's name the same in both states. Focus highlights a series as
+hover does, and a hidden series doesn't highlight. A hidden item's swatch is
+hollow and its label struck through, so the state doesn't rest on color.
+Swatches keep their series colors in forced colors, as the tooltip's
+indicators do.
+
+| Key                    | Action                                      |
+| ---------------------- | ------------------------------------------- |
+| `Tab`                  | Moves into the legend, or on past it        |
+| `Arrow Left` / `Right` | In the legend, moves between items          |
+| `Enter` or `Space`     | On a legend item, shows or hides its series |
 
 ## API
 
@@ -196,6 +245,34 @@ Also takes the context `renderTooltipBody` passes.
 | Attribute   | Present when                                                                                       |
 | ----------- | -------------------------------------------------------------------------------------------------- |
 | `data-slot` | Always: `chart-tooltip`, `chart-tooltip-label`, `chart-tooltip-item` and `chart-tooltip-indicator` |
+
+### ChartLegend
+
+The config's series: a React Aria
+[ToggleButtonGroup](https://react-aria.adobe.com/ToggleButtonGroup) of toggle
+buttons given `hidden` and `onHiddenChange`, otherwise a `ul`.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/chart-legend.tsx"
+  name="ChartLegendProps"
+/>
+
+#### Data attributes
+
+| Attribute       | Present when                                                                                  |
+| --------------- | --------------------------------------------------------------------------------------------- |
+| `data-slot`     | Always: `chart-legend`, `chart-legend-item` on a toggle, `chart-legend-swatch` on each swatch |
+| `data-selected` | On a toggle whose series shows                                                                |
+
+### chartColor and chartSeriesStates
+
+`chartColor(config, hidden)` returns a definition's `color` option: the
+config's series as the color domain, their colors as the range, and a legend
+that draws nothing and removes the `hidden` series after the scales resolve.
+`chartSeriesStates` goes in a mark's `states` and dims its series while the
+legend highlights another.
 
 ### useChartFormatter
 
