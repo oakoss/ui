@@ -5368,6 +5368,56 @@
           "target": "@ui/data/data-table-search.tsx"
         }
       ]
+    },
+    {
+      "name": "chart",
+      "type": "registry:ui",
+      "title": "Chart",
+      "description": "TanStack Charts in a figure with a visible title and description, theme colors for series, axes and tooltip, and shadcn's tooltip indicators with values formatted in the app's locale.",
+      "registryDependencies": ["oakoss/ui/theme"],
+      "dependencies": [
+        "@tanstack/charts@^1",
+        "cn",
+        "react-aria",
+        "react-aria-components"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/data/chart.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/chart.tsx"
+        },
+        {
+          "path": "src/components/ui/data/chart-tooltip-content.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/chart-tooltip-content.tsx"
+        },
+        {
+          "path": "src/hooks/use-chart.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-chart.ts"
+        },
+        {
+          "path": "src/hooks/use-chart-formatter.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-chart-formatter.ts"
+        },
+        {
+          "path": "src/lib/chart-tooltip.ts",
+          "type": "registry:lib",
+          "target": "@lib/chart-tooltip.ts"
+        },
+        {
+          "path": "src/lib/cx.ts",
+          "type": "registry:lib",
+          "target": "@lib/cx.ts"
+        },
+        {
+          "path": "src/lib/cn-config.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn-config.ts"
+        }
+      ]
     }
   ]
 }
