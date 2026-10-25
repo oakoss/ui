@@ -1,8 +1,7 @@
-import {
-  type ChartConfig,
-  ChartContainer,
-  ChartTooltipContent,
-} from '@oakoss/ui/components/ui/data/chart';
+import type { ChartConfig } from '@oakoss/ui/hooks/use-chart';
+
+import { ChartContainer, ChartPlot } from '@oakoss/ui/components/ui/data/chart';
+import { ChartTooltipContent } from '@oakoss/ui/components/ui/data/chart-tooltip-content';
 import { useChartFormatter } from '@oakoss/ui/hooks/use-chart-formatter';
 import { defineChart, lineY } from '@tanstack/charts';
 import { scaleLinear } from '@tanstack/charts/scales/linear';
@@ -40,16 +39,19 @@ export function ChartAxes() {
     <ChartContainer
       className="w-full max-w-xl"
       config={config}
-      definition={definition}
       description="Monthly revenue from January to June, rising from $42,000 to $97,000."
-      renderTooltipBody={(context) => (
-        <ChartTooltipContent
-          {...context}
-          valueFormatter={(value) => format(value)}
-        />
-      )}
       title="Revenue"
-    />
+    >
+      <ChartPlot
+        definition={definition}
+        renderTooltipBody={(context) => (
+          <ChartTooltipContent
+            {...context}
+            valueFormatter={(value) => format(value)}
+          />
+        )}
+      />
+    </ChartContainer>
   );
 }
 

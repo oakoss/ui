@@ -1,4 +1,4 @@
-import type { ChartConfig } from '@oakoss/ui/components/ui/data/chart';
+import type { ChartConfig } from '@oakoss/ui/hooks/use-chart';
 
 import { barX, barY, defineChart, lineY, rect } from '@tanstack/charts';
 import { crosshair } from '@tanstack/charts/crosshair';

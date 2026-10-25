@@ -5388,6 +5388,16 @@
           "target": "@ui/data/chart.tsx"
         },
         {
+          "path": "src/components/ui/data/chart-tooltip-content.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/chart-tooltip-content.tsx"
+        },
+        {
+          "path": "src/hooks/use-chart.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-chart.ts"
+        },
+        {
           "path": "src/hooks/use-chart-formatter.ts",
           "type": "registry:hook",
           "target": "@hooks/use-chart-formatter.ts"

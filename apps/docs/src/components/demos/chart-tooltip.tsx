@@ -1,8 +1,7 @@
-import {
-  type ChartConfig,
-  ChartContainer,
-  ChartTooltipContent,
-} from '@oakoss/ui/components/ui/data/chart';
+import type { ChartConfig } from '@oakoss/ui/hooks/use-chart';
+
+import { ChartContainer, ChartPlot } from '@oakoss/ui/components/ui/data/chart';
+import { ChartTooltipContent } from '@oakoss/ui/components/ui/data/chart-tooltip-content';
 import { areaY, defineChart } from '@tanstack/charts';
 import { scaleLinear } from '@tanstack/charts/scales/linear';
 import { scalePoint } from '@tanstack/charts/scales/point';
@@ -57,16 +56,19 @@ export function ChartTooltip() {
     <ChartContainer
       className="w-full max-w-xl"
       config={config}
-      definition={definition}
       description="Desktop and mobile visitors from January to June, stacked."
-      renderTooltipBody={(context) => (
-        <ChartTooltipContent
-          {...context}
-          indicator="line"
-          valueFormatter={(value) => `${String(value)} visitors`}
-        />
-      )}
       title="Total visitors"
-    />
+    >
+      <ChartPlot
+        definition={definition}
+        renderTooltipBody={(context) => (
+          <ChartTooltipContent
+            {...context}
+            indicator="line"
+            valueFormatter={(value) => `${String(value)} visitors`}
+          />
+        )}
+      />
+    </ChartContainer>
   );
 }

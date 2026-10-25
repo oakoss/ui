@@ -90,12 +90,12 @@ const arbitraryValues: Record<string, string[]> = {
     neutralHover('badge'),
     ...disabledGray,
   ],
-  // TanStack's chart reads its default series colors from --ts-chart-*; the
-  // dashed tooltip indicator matches shadcn's.
-  'src/components/ui/data/chart.tsx': [
-    ...[1, 2, 3, 4, 5].map((n) => `[--ts-chart-${n}:var(--color-chart-${n})]`),
-    'border-[1.5px]',
-  ],
+  // The dashed tooltip indicator matches shadcn's.
+  'src/components/ui/data/chart-tooltip-content.tsx': ['border-[1.5px]'],
+  // TanStack's chart reads its default series colors from --ts-chart-*.
+  'src/components/ui/data/chart.tsx': [1, 2, 3, 4, 5].map(
+    (n) => `[--ts-chart-${n}:var(--color-chart-${n})]`,
+  ),
   // Forced colors repaint a transparent border, so the default look takes
   // the page color to stay borderless.
   'src/components/ui/data/item.tsx': ['forced-colors:border-[Canvas]'],

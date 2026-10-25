@@ -1,7 +1,6 @@
-import {
-  type ChartConfig,
-  ChartContainer,
-} from '@oakoss/ui/components/ui/data/chart';
+import type { ChartConfig } from '@oakoss/ui/hooks/use-chart';
+
+import { ChartContainer, ChartPlot } from '@oakoss/ui/components/ui/data/chart';
 import { barY, defineChart, group } from '@tanstack/charts';
 import { scaleBand } from '@tanstack/charts/scales/band';
 import { scaleLinear } from '@tanstack/charts/scales/linear';
@@ -55,9 +54,10 @@ export function ChartDemo() {
     <ChartContainer
       className="w-full max-w-xl"
       config={config}
-      definition={definition}
       description="Desktop and mobile visitors from January to June."
       title="Visitors by month"
-    />
+    >
+      <ChartPlot definition={definition} />
+    </ChartContainer>
   );
 }

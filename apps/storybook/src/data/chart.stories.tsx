@@ -1,9 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import {
-  ChartContainer,
-  ChartTooltipContent,
-} from '@oakoss/ui/components/ui/data/chart';
+import { ChartContainer, ChartPlot } from '@oakoss/ui/components/ui/data/chart';
+import { ChartTooltipContent } from '@oakoss/ui/components/ui/data/chart-tooltip-content';
 import { expect, userEvent, waitFor } from 'storybook/test';
 
 import { flatBackground } from '#/helpers/color';
@@ -25,8 +23,8 @@ function DesktopIcon() {
 
 const meta = {
   args: {
+    children: <ChartPlot definition={visitorsChart} />,
     config: visitorsConfig,
-    definition: visitorsChart,
     description: 'Desktop and mobile visitors from January to June.',
     title: 'Visitors by month',
   },
@@ -48,6 +46,14 @@ async function focusTooltip() {
 // The figure is named and described by its visible caption, and the chart
 // inside carries the same name and description.
 export const Default: Story = {
+  args: {
+    children: (
+      <>
+        <ChartPlot definition={visitorsChart} />
+        <p>Desktop leads in every month but April.</p>
+      </>
+    ),
+  },
   play: async ({ canvas }) => {
     const figure = canvas.getByRole('figure');
     await expect(figure).toHaveAccessibleName('Visitors by month');
@@ -89,7 +95,7 @@ export const Locale: Story = {
 // A horizontal bar is headed by its category, the y value, and reports its
 // length, the x value.
 export const Horizontal: Story = {
-  args: { definition: horizontalVisitorsChart },
+  args: { children: <ChartPlot definition={horizontalVisitorsChart} /> },
   play: async () => {
     // Keyboard focus starts at the shortest bar.
     const tooltip = await focusTooltip();
@@ -104,7 +110,10 @@ export const Horizontal: Story = {
 
 // A category named in the config heads the tooltip with its label.
 export const ConfigLabel: Story = {
-  args: { config: browsersConfig, definition: browsersChart },
+  args: {
+    children: <ChartPlot definition={browsersChart} />,
+    config: browsersConfig,
+  },
   play: async () => {
     const tooltip = await focusTooltip();
     await expect(part('chart-tooltip-label').textContent).toBe('Chrome');
@@ -115,7 +124,7 @@ export const ConfigLabel: Story = {
 // A histogram bin is headed by its range, and its bar by the count, as
 // TanStack's own tooltip reports a rect.
 export const Range: Story = {
-  args: { config: {}, definition: histogramChart },
+  args: { children: <ChartPlot definition={histogramChart} />, config: {} },
   play: async () => {
     await focusTooltip();
     await expect(part('chart-tooltip-label').textContent).toBe('0–10');
@@ -136,12 +145,14 @@ export const HiddenParts: Story = {
     await expect(tooltip).toHaveTextContent('Desktop186');
   },
   render: (args) => (
-    <ChartContainer
-      {...args}
-      renderTooltipBody={(context) => (
-        <ChartTooltipContent {...context} hideIndicator hideLabel />
-      )}
-    />
+    <ChartContainer {...args}>
+      <ChartPlot
+        definition={visitorsChart}
+        renderTooltipBody={(context) => (
+          <ChartTooltipContent {...context} hideIndicator hideLabel />
+        )}
+      />
+    </ChartContainer>
   ),
 };
 
@@ -183,18 +194,19 @@ export const LineIndicator: Story = {
     await expect(part('chart-tooltip-label').parentElement).toBe(tooltip);
   },
   render: (args) => (
-    <ChartContainer
-      {...args}
-      renderTooltipBody={(context) => (
-        <ChartTooltipContent {...context} indicator="line" />
-      )}
-    />
+    <ChartContainer {...args}>
+      <ChartPlot
+        definition={visitorsChart}
+        renderTooltipBody={(context) => (
+          <ChartTooltipContent {...context} indicator="line" />
+        )}
+      />
+    </ChartContainer>
   ),
 };
 
 // One series nests its heading beside the dashed indicator.
 export const DashedIndicator: Story = {
-  args: { definition: horizontalVisitorsChart },
   play: async () => {
     await focusTooltip();
     const indicator = part('chart-tooltip-indicator');
@@ -204,12 +216,14 @@ export const DashedIndicator: Story = {
     ).toBe(true);
   },
   render: (args) => (
-    <ChartContainer
-      {...args}
-      renderTooltipBody={(context) => (
-        <ChartTooltipContent {...context} indicator="dashed" />
-      )}
-    />
+    <ChartContainer {...args}>
+      <ChartPlot
+        definition={horizontalVisitorsChart}
+        renderTooltipBody={(context) => (
+          <ChartTooltipContent {...context} indicator="dashed" />
+        )}
+      />
+    </ChartContainer>
   ),
 };
 
@@ -221,16 +235,18 @@ export const Formatters: Story = {
     await expect(tooltip).toHaveTextContent('Desktop186 visits');
   },
   render: (args) => (
-    <ChartContainer
-      {...args}
-      renderTooltipBody={(context) => (
-        <ChartTooltipContent
-          {...context}
-          labelFormatter={(month) => String(month).slice(0, 3)}
-          valueFormatter={(value) => `${String(value)} visits`}
-        />
-      )}
-    />
+    <ChartContainer {...args}>
+      <ChartPlot
+        definition={visitorsChart}
+        renderTooltipBody={(context) => (
+          <ChartTooltipContent
+            {...context}
+            labelFormatter={(month) => String(month).slice(0, 3)}
+            valueFormatter={(value) => `${String(value)} visits`}
+          />
+        )}
+      />
+    </ChartContainer>
   ),
 };
 

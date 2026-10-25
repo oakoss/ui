@@ -25,7 +25,8 @@ import { scaleBand } from '@tanstack/charts/scales/band';
 import { scaleLinear } from '@tanstack/charts/scales/linear';
 import { tooltip } from '@tanstack/charts/tooltip';
 
-import { type ChartConfig, ChartContainer } from '#/components/ui/data/chart';
+import { ChartContainer, ChartPlot } from '#/components/ui/data/chart';
+import type { ChartConfig } from '#/hooks/use-chart';
 
 const config = {
   desktop: { color: 'var(--color-chart-1)', label: 'Desktop' },
@@ -49,17 +50,20 @@ const definition = defineChart({
 
 <ChartContainer
   config={config}
-  definition={definition}
   description="Desktop visitors from January to June."
   title="Visitors by month"
-/>;
+>
+  <ChartPlot definition={definition} />
+</ChartContainer>;
 ```
 
 The chart itself is a [TanStack Charts](https://tanstack.com/charts)
-definition: marks, scales, focus and the tooltip all live in it, and
-`ChartContainer` renders it in a figure with your title and description as
-its caption. Build the definition outside the component, or memoize it on
-the values it captures: a new definition rebuilds the chart.
+definition: marks, scales, focus and the tooltip all live in it.
+`ChartContainer` is the figure, with your title and description as its
+caption, and `ChartPlot` renders the definition inside it, named by that
+caption. Content you place in the container, such as a summary, sits in the
+figure with the chart. Build the definition outside the component, or
+memoize it on the values it captures: a new definition rebuilds the chart.
 
 `config` names each series, keyed by its `z` value, or by the mark's `id`
 for a mark without one; the tooltip reads the labels from it. Paint marks
@@ -91,8 +95,8 @@ snaps to the nearest month wherever the pointer is.
 
 ### Tooltip
 
-The tooltip is `ChartTooltipContent`, rendered through `renderTooltipBody`.
-Render it yourself to change `indicator` (`dot`, `line` or `dashed`), hide
+The tooltip is `ChartTooltipContent`, rendered through `ChartPlot`'s
+`renderTooltipBody`. Render it yourself to change `indicator` (`dot`, `line` or `dashed`), hide
 the heading or indicators, or format the heading and values. The definition
 still needs TanStack's `tooltip`, which decides when it shows.
 
@@ -146,8 +150,8 @@ The tooltip's indicators keep their series colors in forced colors.
 
 ### ChartContainer
 
-A `figure` with a caption and TanStack's
-[Chart](https://tanstack.com/charts/latest/docs/framework/react/adapter).
+A `figure` with a caption, which hands `config`, `title` and `description`
+to the parts inside it.
 
 #### Props
 
@@ -156,14 +160,23 @@ A `figure` with a caption and TanStack's
   name="ChartContainerProps"
 />
 
-Also accepts TanStack Chart's props, except `ariaLabel`, `ariaDescription`
-and `style`. `aspectRatio` defaults to 16:9.
+Also accepts `figure` props, except the ARIA naming ones: the caption names
+the figure.
 
 #### Data attributes
 
 | Attribute   | Present when                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------ |
 | `data-slot` | Always: `chart`, and `chart-caption`, `chart-title` and `chart-description` in its caption |
+
+### ChartPlot
+
+TanStack's
+[Chart](https://tanstack.com/charts/latest/docs/framework/react/adapter),
+named and described by the container's caption, with `ChartTooltipContent`
+as its tooltip body. It accepts TanStack Chart's props, except `ariaLabel`,
+`ariaDescription` and `style`; `aspectRatio` defaults to 16:9. Outside a
+`ChartContainer` it throws.
 
 ### ChartTooltipContent
 
@@ -172,7 +185,7 @@ The tooltip body, a `div` of one row per focused point.
 #### Props
 
 <auto-type-table
-  path="../../../../../packages/ui/src/components/ui/data/chart.tsx"
+  path="../../../../../packages/ui/src/components/ui/data/chart-tooltip-content.tsx"
   name="ChartTooltipContentProps"
 />
 
