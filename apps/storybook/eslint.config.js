@@ -28,6 +28,7 @@ export default defineConfig(
     // helpers that use it import it on call and story files still open in
     // plain Storybook.
     files: [
+      'src/helpers/keyboard.ts',
       'src/helpers/motion.ts',
       'src/helpers/paint.ts',
       'src/helpers/pointer.ts',

@@ -1,10 +1,13 @@
 import type { ChartConfig } from '@oakoss/ui/hooks/use-chart';
 
 import { ChartContainer, ChartPlot } from '@oakoss/ui/components/ui/data/chart';
+import { ChartLegend } from '@oakoss/ui/components/ui/data/chart-legend';
+import { chartColor, chartSeriesStates } from '@oakoss/ui/lib/chart-series';
 import { barY, defineChart, group } from '@tanstack/charts';
 import { scaleBand } from '@tanstack/charts/scales/band';
 import { scaleLinear } from '@tanstack/charts/scales/linear';
 import { tooltip } from '@tanstack/charts/tooltip';
+import { useMemo, useState } from 'react';
 
 const config = {
   desktop: { color: 'var(--color-chart-1)', label: 'Desktop' },
@@ -24,32 +27,9 @@ const visitors = [
   devices.map((device) => ({ device, month, visitors: counts[device] })),
 );
 
-const definition = defineChart({
-  focus: 'group-x',
-  marks: [
-    barY(visitors, {
-      fill: (row) => config[row.device].color,
-      layout: group({ padding: 0.1 }),
-      radius: 4,
-      x: 'month',
-      y: 'visitors',
-      z: 'device',
-    }),
-  ],
-  scales: {
-    x: {
-      axis: {
-        line: false,
-        ticks: { format: (month: string) => month.slice(0, 3), size: 0 },
-      },
-      scale: scaleBand,
-    },
-    y: { axis: false, grid: true, nice: true, scale: scaleLinear },
-  },
-  tooltip,
-});
-
 export function ChartDemo() {
+  const [hidden, setHidden] = useState(() => new Set<string>());
+  const definition = useMemo(() => visitorsBars(hidden), [hidden]);
   return (
     <ChartContainer
       className="w-full max-w-xl"
@@ -58,6 +38,36 @@ export function ChartDemo() {
       title="Visitors by month"
     >
       <ChartPlot definition={definition} />
+      <ChartLegend hidden={hidden} onHiddenChange={setHidden} />
     </ChartContainer>
   );
+}
+
+// The color channel names each bar's series, which the legend can hide.
+function visitorsBars(hidden: Set<string>) {
+  return defineChart({
+    color: chartColor(config, hidden),
+    focus: 'group-x',
+    marks: [
+      barY(visitors, {
+        color: 'device',
+        layout: group({ padding: 0.1 }),
+        radius: 4,
+        states: chartSeriesStates,
+        x: 'month',
+        y: 'visitors',
+      }),
+    ],
+    scales: {
+      x: {
+        axis: {
+          line: false,
+          ticks: { format: (month: string) => month.slice(0, 3), size: 0 },
+        },
+        scale: scaleBand,
+      },
+      y: { axis: false, grid: true, nice: true, scale: scaleLinear },
+    },
+    tooltip,
+  });
 }

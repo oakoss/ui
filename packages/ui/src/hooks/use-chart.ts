@@ -1,5 +1,8 @@
 import { type ComponentType, createContext, type ReactNode, use } from 'react';
 
+import type { ChartHighlighter } from '#/lib/chart-series';
+
+// Each key names a series or category; an entry with a color is a series.
 export type ChartConfig = Record<
   string,
   { color?: string; icon?: ComponentType; label?: ReactNode }
@@ -8,6 +11,7 @@ export type ChartConfig = Record<
 export type ChartContextValue = {
   config: ChartConfig;
   description: string;
+  highlighter: ChartHighlighter;
   title: string;
 };
 

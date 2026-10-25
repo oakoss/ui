@@ -5373,7 +5373,7 @@
       "name": "chart",
       "type": "registry:ui",
       "title": "Chart",
-      "description": "TanStack Charts in a figure with a visible title and description, theme colors for series, axes and tooltip, and shadcn's tooltip indicators with values formatted in the app's locale.",
+      "description": "TanStack Charts in a figure with a visible title and description, theme colors for series, axes and tooltip, shadcn's tooltip indicators with values formatted in the app's locale, and a legend that hides series without moving the axes and highlights one on hover or focus.",
       "registryDependencies": ["oakoss/ui/theme"],
       "dependencies": [
         "@tanstack/charts@^1",
@@ -5391,6 +5391,21 @@
           "path": "src/components/ui/data/chart-tooltip-content.tsx",
           "type": "registry:ui",
           "target": "@ui/data/chart-tooltip-content.tsx"
+        },
+        {
+          "path": "src/components/ui/data/chart-legend.tsx",
+          "type": "registry:ui",
+          "target": "@ui/data/chart-legend.tsx"
+        },
+        {
+          "path": "src/lib/chart-series.ts",
+          "type": "registry:lib",
+          "target": "@lib/chart-series.ts"
+        },
+        {
+          "path": "src/lib/recipes.ts",
+          "type": "registry:lib",
+          "target": "@lib/recipes.ts"
         },
         {
           "path": "src/hooks/use-chart.ts",

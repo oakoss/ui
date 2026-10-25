@@ -1,5 +1,6 @@
 import type { ChartConfig } from '@oakoss/ui/hooks/use-chart';
 
+import { chartColor, chartSeriesStates } from '@oakoss/ui/lib/chart-series';
 import { barX, barY, defineChart, lineY, rect } from '@tanstack/charts';
 import { crosshair } from '@tanstack/charts/crosshair';
 import { scaleBand } from '@tanstack/charts/scales/band';
@@ -29,25 +30,31 @@ export const visitors = months.flatMap(({ month, ...counts }) =>
   devices.map((device) => ({ device, month, visitors: counts[device] })),
 );
 
-export const visitorsChart = defineChart({
-  focus: 'group-x',
-  marks: [
-    lineY(visitors, {
-      stroke: (row) => visitorsConfig[row.device].color,
-      strokeWidth: 2,
-      x: 'month',
-      y: 'visitors',
-      z: 'device',
-    }),
-    crosshair({ x: true, y: false }),
-  ],
-  maxFocusDistance: Infinity,
-  scales: {
-    x: { scale: () => scalePoint().padding(0.2) },
-    y: { grid: true, nice: true, scale: scaleLinear },
-  },
-  tooltip,
-});
+// The color channel names each row's series, which the legend can hide.
+export function visitorsLines(hidden: Iterable<string> = []) {
+  return defineChart({
+    color: chartColor(visitorsConfig, hidden),
+    focus: 'group-x',
+    marks: [
+      lineY(visitors, {
+        color: 'device',
+        states: chartSeriesStates,
+        strokeWidth: 2,
+        x: 'month',
+        y: 'visitors',
+      }),
+      crosshair({ x: true, y: false }),
+    ],
+    maxFocusDistance: Infinity,
+    scales: {
+      x: { scale: () => scalePoint().padding(0.2) },
+      y: { grid: true, nice: true, scale: scaleLinear },
+    },
+    tooltip,
+  });
+}
+
+export const visitorsChart = visitorsLines();
 
 export const browsersConfig = {
   chrome: { color: 'var(--color-chart-1)', label: 'Chrome' },

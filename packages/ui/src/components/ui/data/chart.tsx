@@ -9,6 +9,7 @@ import { type ComponentProps, useId, useMemo } from 'react';
 
 import { ChartTooltipContent } from '#/components/ui/data/chart-tooltip-content';
 import { type ChartConfig, ChartContext, useChart } from '#/hooks/use-chart';
+import { createChartHighlighter } from '#/lib/chart-series';
 import { cn } from '#/lib/cx';
 
 export type ChartContainerProps = {
@@ -40,9 +41,10 @@ export function ChartContainer({
   ...props
 }: ChartContainerProps) {
   const id = useId();
+  const highlighter = useMemo(() => createChartHighlighter(), []);
   const value = useMemo(
-    () => ({ config, description, title }),
-    [config, description, title],
+    () => ({ config, description, highlighter, title }),
+    [config, description, highlighter, title],
   );
   return (
     <ChartContext value={value}>
@@ -83,10 +85,21 @@ export function ChartPlot<
 >({
   aspectRatio = 16 / 9,
   className,
+  definition,
   renderTooltipBody = defaultTooltipBody,
   ...props
 }: ChartPlotProps<TDatum, TXValue, TYValue>) {
-  const { description, title } = useChart();
+  const { description, highlighter, title } = useChart();
+  // The legend highlights a series through this control. Spread as
+  // defineChart(definition, options) does, whose overloads can't take a
+  // definition that may be static or responsive.
+  const highlightable = useMemo(
+    () => ({
+      ...definition,
+      controls: [...(definition.controls ?? []), highlighter.control],
+    }),
+    [definition, highlighter],
+  );
   return (
     <ChartPrimitive
       {...props}
@@ -97,6 +110,7 @@ export function ChartPlot<
         'text-xs text-muted-foreground [--ts-chart-1:var(--color-chart-1)] [--ts-chart-2:var(--color-chart-2)] [--ts-chart-3:var(--color-chart-3)] [--ts-chart-4:var(--color-chart-4)] [--ts-chart-5:var(--color-chart-5)]',
         className,
       )}
+      definition={highlightable}
       renderTooltipBody={renderTooltipBody}
     />
   );
