@@ -4,7 +4,7 @@ import type { Family } from '#/family';
 import type { AuthoredScale, Scale } from '#/scale';
 
 import { tailwindScales } from '#/families/tailwind-scales';
-import { base, untyped, withScale } from '#/testing';
+import { base, primaryRamp, untyped, withScale } from '#/testing';
 import { validateFamily } from '#/validate';
 
 // Each case breaks a type on purpose, as untyped data (such as JSON) can.
@@ -16,8 +16,9 @@ describe('validateFamily: untyped steps', () => {
       ...red.steps,
       500: undefined,
     });
-    // Orange is a primary choice, and the primary ramp chart reads step 500.
-    expect(validateFamily(withScale('orange', { ...red, steps }))).toEqual([
+    // Orange is a primary choice, and a primary ramp chart reads step 500.
+    const family = withScale('orange', { ...red, steps });
+    expect(validateFamily({ ...family, charts: primaryRamp })).toEqual([
       `scale "orange" is missing steps 500`,
       `chart step 500 is missing from scale "orange"`,
     ]);
@@ -56,6 +57,32 @@ describe('validateFamily: untyped steps', () => {
   });
 });
 
+describe('validateFamily: untyped chart series', () => {
+  const series = { hue: 'red', steps: { dark: 400, light: 600 } };
+
+  it('reports a series with a polarity step left out', () => {
+    const lopsided = { hue: 'red', steps: { dark: 400 } };
+    const charts = untyped<Family['charts']>({
+      kind: 'categorical',
+      series: [series, series, lopsided, series, series],
+    });
+    expect(validateFamily({ ...base, charts })).toEqual([
+      `chart series 3 has no light step`,
+    ]);
+  });
+
+  it('reports a hole in the series', () => {
+    const charts = untyped<Family['charts']>({
+      kind: 'categorical',
+      // oxlint-disable-next-line no-sparse-arrays -- the hole is the case
+      series: [series, series, , series, series],
+    });
+    expect(validateFamily({ ...base, charts })).toEqual([
+      `chart series 3 is missing`,
+    ]);
+  });
+});
+
 describe('validateFamily: untyped intents, neutrals and scales', () => {
   it('reports a missing intent', () => {
     const { info: _missing, ...rest } = base.intents;
@@ -70,7 +97,7 @@ describe('validateFamily: untyped intents, neutrals and scales', () => {
       ...base.intents,
       primary: undefined,
     });
-    expect(validateFamily({ ...base, intents })).toEqual([
+    expect(validateFamily({ ...base, charts: primaryRamp, intents })).toEqual([
       `intent "primary" is missing`,
       `chart intent "primary" doesn't exist`,
     ]);

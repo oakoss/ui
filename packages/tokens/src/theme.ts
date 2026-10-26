@@ -50,7 +50,7 @@ type Built = {
   tokens: Record<string, Color>;
 };
 
-type ChartScale = { hue: string; scale: AnyScale; steps: readonly Step[] };
+type ChartStep = { hue: string; scale: AnyScale; step: Step };
 
 type DerivedSource = { readonly role: IntentRole };
 
@@ -98,11 +98,11 @@ export function resolveTheme(
     tokens[role] = tokenOf(tokens, target);
     sources[role] = { role: target };
   }
-  const charts = chartScale(family, resolved.palette, hueOf);
+  const charts = chartSteps(family, resolved.palette, resolved.polarity, hueOf);
   if (typeof charts === 'string') return [at(charts)];
   for (const [index, role] of chartRoles.entries()) {
-    const step = charts.steps[index];
-    if (step !== undefined) addStep(built, role, charts, step);
+    const chart = charts[index];
+    if (chart !== undefined) addStep(built, role, chart, chart.step);
   }
   return { polarity: resolved.polarity, sources, tokens };
 }
@@ -144,23 +144,30 @@ function addStep(
   sources[name] = { ref: `color.${hue}.${step}` };
 }
 
-// A ramp reads fixed steps of one scale.
-function chartScale(
+function chartSteps(
   family: Family,
   palette: AnyPalette,
+  polarity: Polarity,
   hueOf: (intent: Intent) => string,
-): ChartScale | string {
+): ChartStep[] | string {
   const { charts } = family;
-  if (charts.kind === 'categorical') {
-    return 'categorical charts are not generated yet';
+  const series =
+    charts.kind === 'categorical'
+      ? charts.series.map(({ hue, steps }) => ({ hue, step: steps[polarity] }))
+      : charts.steps.map((step) => ({
+          hue:
+            charts.source.intent === undefined
+              ? charts.source.hue
+              : hueOf(charts.source.intent),
+          step,
+        }));
+  const resolvedSteps: ChartStep[] = [];
+  for (const { hue, step } of series) {
+    const scale = scaleOf(palette, hue);
+    if (scale === undefined) return `chart hue "${hue}" has no scale`;
+    resolvedSteps.push({ hue, scale, step });
   }
-  const hue =
-    charts.source.intent === undefined
-      ? charts.source.hue
-      : hueOf(charts.source.intent);
-  const scale = scaleOf(palette, hue);
-  if (scale === undefined) return `chart hue "${hue}" has no scale`;
-  return { hue, scale, steps: charts.steps };
+  return resolvedSteps;
 }
 
 // A returned theme owns its colors, so writing to one can't reach the family.

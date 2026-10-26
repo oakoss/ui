@@ -31,6 +31,17 @@ const accentHues = [
   'rose',
 ] as const;
 
+// Each reaches 3:1 on every gray's surfaces, and the five stay apart under
+// simulated color blindness, since lightness varies as well as hue; blue and
+// yellow lead, the pair furthest apart (docs/research/0012-chart-palette.md).
+const chartSeries = [
+  { hue: 'blue', steps: { dark: 500, light: 600 } },
+  { hue: 'yellow', steps: { dark: 300, light: 700 } },
+  { hue: 'red', steps: { dark: 400, light: 600 } },
+  { hue: 'teal', steps: { dark: 500, light: 600 } },
+  { hue: 'fuchsia', steps: { dark: 300, light: 800 } },
+] as const;
+
 const darkBorder = { alpha: 0.1, ref: 'color.white' } as const;
 
 /**
@@ -41,11 +52,7 @@ scales, and the derived roles follow primary rather than shadcn's grays.
 */
 function baseColor(gray: Gray, name: string) {
   return defineFamily({
-    charts: {
-      kind: 'ramp',
-      source: { intent: 'primary' },
-      steps: [300, 500, 600, 700, 800],
-    },
+    charts: { kind: 'categorical', series: chartSeries },
     defaults: { dark: 'dark', light: 'light' },
     flavors: {
       dark: { name: 'Dark', polarity: 'dark', roles: darkRoles(gray) },

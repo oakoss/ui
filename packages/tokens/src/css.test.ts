@@ -11,6 +11,7 @@ import {
 import { tailwindScales } from '#/families/tailwind-scales';
 import { families, styles, typographies } from '#/index';
 import { familyCssVars, registryCssVars } from '#/registry';
+import { primaryRamp } from '#/testing';
 
 const { vega } = styles;
 
@@ -242,7 +243,9 @@ describe('bundleCss primary blocks', () => {
 
 describe('primaryTokenNames', () => {
   it('includes the scale, roles, derived roles and ramp charts', () => {
-    expect(primaryTokenNames(families.zinc)).toEqual(
+    expect(
+      primaryTokenNames({ ...families.zinc, charts: primaryRamp }),
+    ).toEqual(
       expect.arrayContaining([
         'primary-500',
         'primary-hover',
@@ -250,6 +253,10 @@ describe('primaryTokenNames', () => {
         'chart-1',
       ]),
     );
+  });
+
+  it("leaves categorical charts out, since they don't follow the primary", () => {
+    expect(primaryTokenNames(families.zinc)).not.toContain('chart-1');
   });
 });
 

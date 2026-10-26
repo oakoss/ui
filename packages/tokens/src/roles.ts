@@ -195,6 +195,10 @@ export const contrastPairs: readonly ContrastPair[] = [
 // Hover and press only help if people see the change.
 export const distinctMinimum = 2;
 
+// Chart series stay this far apart (colorBlindDifference) in every theme.
+// shadcn-style Tailwind 500s fall to about 1–3; the default palette holds 15.
+export const chartDistinctMinimum = 10;
+
 export type DistinctPair = readonly [from: Role, to: Role];
 
 // A solid fill swaps to its hover color.

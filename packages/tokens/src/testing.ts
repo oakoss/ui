@@ -6,6 +6,13 @@ import type { Scale } from '#/scale';
 import { neutral } from '#/families/base-colors';
 
 export const base: Family = neutral;
+
+// Charts following the primary, as shadcn's themes ramp them.
+export const primaryRamp: Family['charts'] = {
+  kind: 'ramp',
+  source: { intent: 'primary' },
+  steps: [300, 500, 600, 700, 800],
+};
 export const light: Flavor<string, string> = neutral.flavors.light;
 export const dark: Flavor<string, string> = neutral.flavors.dark;
 

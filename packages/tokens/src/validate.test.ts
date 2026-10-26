@@ -19,6 +19,8 @@ import { defaultTypography } from '#/typographies/default';
 import { validateFamily } from '#/validate';
 import { validateStyle, validateTypography } from '#/validate-axes';
 
+const { blue } = tailwindScales;
+
 describe('validateFamily: role references', () => {
   it('reports an unmapped role', () => {
     const { muted: _muted, ...roles } = light.roles;
@@ -157,7 +159,16 @@ describe('validateFamily: intents and charts', () => {
   });
 
   it.each([
-    { hues: ['red', 'red', 'red', 'red', 'azure'], kind: 'categorical' },
+    {
+      kind: 'categorical',
+      series: [
+        { hue: 'red', steps: { dark: 400, light: 600 } },
+        { hue: 'red', steps: { dark: 400, light: 600 } },
+        { hue: 'red', steps: { dark: 400, light: 600 } },
+        { hue: 'red', steps: { dark: 400, light: 600 } },
+        { hue: 'azure', steps: { dark: 400, light: 600 } },
+      ],
+    },
     {
       kind: 'ramp',
       source: { hue: 'azure' },
@@ -167,6 +178,56 @@ describe('validateFamily: intents and charts', () => {
     expect(validateFamily({ ...base, charts })).toEqual([
       `chart hue "azure" has no scale`,
     ]);
+  });
+});
+
+describe('validateFamily: categorical charts', () => {
+  const blue1000 = {
+    ...blue,
+    steps: { ...blue.steps, 1000: oklch(20, 0.1, 265) },
+  };
+  const deep = { hue: 'blue', steps: { dark: 500, light: 1000 } } as const;
+  const charts = {
+    kind: 'categorical',
+    series: [deep, deep, deep, deep, deep],
+  } as const;
+
+  it('reports a dark step the scale lacks', () => {
+    const series = { hue: 'red', steps: { dark: 1000, light: 600 } } as const;
+    expect(
+      validateFamily({
+        ...base,
+        charts: {
+          kind: 'categorical',
+          series: [series, series, series, series, series],
+        },
+      }),
+    ).toHaveLength(5);
+  });
+
+  it('reports a step a flavor drops when it replaces the scale', () => {
+    const family = withScale('blue', blue1000);
+    expect(validateFamily({ ...family, charts })).toEqual([]);
+    const replaced = withFlavors({
+      light: { ...light, palette: { scales: { blue } } },
+    });
+    expect(
+      validateFamily({ ...replaced, charts, palette: family.palette }),
+    ).toContain(`flavor "light": chart step 1000 is missing from scale "blue"`);
+  });
+
+  it('reports a chart step the scale lacks', () => {
+    const series = { hue: 'red', steps: { dark: 400, light: 1000 } } as const;
+    const charts = {
+      kind: 'categorical',
+      series: [series, series, series, series, series],
+    } as const;
+    expect(validateFamily({ ...base, charts })).toEqual(
+      Array.from(
+        { length: 5 },
+        () => `chart step 1000 is missing from scale "red"`,
+      ),
+    );
   });
 });
 

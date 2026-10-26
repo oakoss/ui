@@ -4,7 +4,7 @@ import { ChartContainer, ChartPlot } from '@oakoss/ui/components/ui/data/chart';
 import { ChartTooltipContent } from '@oakoss/ui/components/ui/data/chart-tooltip-content';
 import { expect, userEvent, waitFor } from 'storybook/test';
 
-import { flatBackground } from '#/helpers/color';
+import { computedColor, flatBackground } from '#/helpers/color';
 import { paintedColor } from '#/helpers/paint';
 import { part } from '#/helpers/parts';
 
@@ -65,6 +65,25 @@ export const Default: Story = {
     const chart = canvas.getByRole('img', { name: 'Visitors by month' });
     await expect(chart.querySelector(':scope > desc')).toHaveTextContent(
       'Desktop and mobile visitors from January to June.',
+    );
+  },
+};
+
+// TanStack's five default series colors are the theme's chart colors, and its
+// sixth is the muted gray.
+export const SeriesColors: Story = {
+  play: async () => {
+    const host = document.querySelector('.ts-chart-host');
+    if (!host) throw new Error('No chart');
+    // The fallback keeps an unset variable from matching the inherited text
+    // color, which is the same gray.
+    for (const n of [1, 2, 3, 4, 5]) {
+      await expect(
+        computedColor(`var(--ts-chart-${n}, transparent)`, host),
+      ).toBe(computedColor(`var(--color-chart-${n})`));
+    }
+    await expect(computedColor('var(--ts-chart-6, transparent)', host)).toBe(
+      computedColor('var(--color-muted-foreground)'),
     );
   },
 };

@@ -6,7 +6,14 @@ import type { AuthoredScale } from '#/scale';
 import { oklch } from '#/color';
 import { tailwindScales } from '#/families/tailwind-scales';
 import { resolveFlavor } from '#/resolve';
-import { base, dark, untyped, withFlavors, withScale } from '#/testing';
+import {
+  base,
+  dark,
+  primaryRamp,
+  untyped,
+  withFlavors,
+  withScale,
+} from '#/testing';
 import { validateFamily } from '#/validate';
 
 const { red, yellow } = tailwindScales;
@@ -200,8 +207,9 @@ describe('validateFamily: authored scales', () => {
   it('reports missing core steps from untyped data', () => {
     const { 500: _missing, ...partial } = red.steps;
     const steps = untyped<AuthoredScale['steps']>(partial);
-    // Red is a primary choice, and the primary ramp chart reads step 500 too.
-    expect(validateFamily(withScale('red', { ...red, steps }))).toEqual([
+    // Red is a primary choice, and a primary ramp chart reads step 500 too.
+    const family = withScale('red', { ...red, steps });
+    expect(validateFamily({ ...family, charts: primaryRamp })).toEqual([
       `scale "red" is missing steps 500`,
       `chart step 500 is missing from scale "red"`,
     ]);

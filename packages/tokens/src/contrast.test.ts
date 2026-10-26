@@ -3,10 +3,16 @@ import { describe, expect, it } from 'vitest';
 import type { Family } from '#/family';
 
 import { oklch } from '#/color';
-import { colorDifference, contrastRatio, isOpaque, overlay } from '#/contrast';
+import {
+  colorBlindDifference,
+  colorDifference,
+  contrastRatio,
+  isOpaque,
+  overlay,
+} from '#/contrast';
 import { tailwindScales } from '#/families/tailwind-scales';
 import { families, styles } from '#/index';
-import { contrastMinimum, contrastPairs } from '#/roles';
+import { chartDistinctMinimum, contrastMinimum, contrastPairs } from '#/roles';
 import { withScale } from '#/testing';
 import { resolveTheme } from '#/theme';
 
@@ -140,6 +146,26 @@ function fieldFailures(
     });
   });
 }
+
+// Each pair is far apart to typical vision and collapses under one
+// deficiency alone (measured with culori), so each filter has to run.
+describe('colorBlindDifference', () => {
+  const { amber, green, red, rose, teal } = tailwindScales;
+  it.each([
+    ['deuteranopia', green.steps[600], red.steps[500]],
+    ['protanopia', rose.steps[400], teal.steps[600]],
+    ['tritanopia', amber.steps[600], rose.steps[500]],
+  ] as const)('sees the pair %s collapses as close', (_, a, b) => {
+    expect(colorDifference(a, b)).toBeGreaterThan(chartDistinctMinimum);
+    expect(colorBlindDifference(a, b)).toBeLessThan(chartDistinctMinimum);
+  });
+
+  it('needs opaque colors', () => {
+    expect(() =>
+      colorBlindDifference(oklch(50, 0.1, 30, 0.5), oklch(50, 0.1, 200)),
+    ).toThrow('color difference needs opaque colors');
+  });
+});
 
 describe('control border against the field fill', () => {
   it.each(themes)('%s %s with a %s primary', (familyId, flavor, primary) => {
