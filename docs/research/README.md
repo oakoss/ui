@@ -11,6 +11,7 @@ Research notes that inform ideas, specs, and decisions. Each note captures what 
 
 <!-- Add newest first: - [NNNN — Title](./NNNN-kebab-title.md) — one-line hook -->
 
+- [0012 — Chart Palette](./0012-chart-palette.md) — every theme's chart ramp failed 3:1; seven systems' categorical palettes, and the choice of five Tailwind hues with a step per mode, checked for contrast and color blindness.
 - [0011 — Chart Focus Marking](./0011-chart-focus.md) — TanStack's focus marker measured, eight libraries' focused-mark styles, and the decision: a two-tone ring on line points and an outline on bars, in the page's colors.
 - [0010 — Chart Legend](./0010-chart-legend.md) — TanStack's hide and highlight run without its buttons, so the legend is our own React Aria part on them, with series named by the `color` channel; nine libraries' legends compared.
 - [0009 — Charts](./0009-charts.md) — TanStack Charts re-checked, eleven chart libraries, accessibility guidance and the community's top asks behind the Chart port, with the candidates beyond shadcn's chart.
