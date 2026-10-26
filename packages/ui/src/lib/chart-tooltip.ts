@@ -47,6 +47,20 @@ export function axisValue<
   return axis === 'x' ? point.xValue : point.yValue;
 }
 
+// A point's category along an axis as text: a category named in the config
+// reads as its label.
+export function categoryText(
+  point: ChartPoint,
+  axis: ChartAxis,
+  config: ChartConfig,
+  format: (value: ChartValue) => string,
+): string {
+  const value = axisValue(point, axis);
+  return typeof value === 'string'
+    ? configText(config, value, value)
+    : axisText(point, axis, format);
+}
+
 // The focused points as text, labeled from the config as the tooltip is: what
 // TanStack's status region announces, and a chart without a tooltip too.
 export function chartTooltipText(
@@ -57,23 +71,15 @@ export function chartTooltipText(
   const [first] = points;
   if (!first) return { rows: [] };
   const heading = headingAxis(points);
-  const category =
-    heading === undefined ? undefined : axisValue(first, heading);
-  const title =
-    heading === undefined
-      ? undefined
-      : typeof category === 'string'
-        ? configText(config, category, category)
-        : axisText(first, heading, format);
   return {
-    rows: points.map((point) => {
-      const key = String(point.group ?? point.markId);
-      return {
-        label: configText(config, key, point.groupLabel || key),
-        value: rowText(point, heading, format),
-      };
-    }),
-    title,
+    rows: points.map((point) => ({
+      label: seriesText(point, config),
+      value: rowText(point, heading, format),
+    })),
+    title:
+      heading === undefined
+        ? undefined
+        : categoryText(first, heading, config, format),
   };
 }
 
@@ -97,11 +103,7 @@ export function headingAxis(
 ): ChartAxis | undefined {
   const [first, ...rest] = points;
   if (!first) return undefined;
-  if (rest.length === 0) {
-    return first.xInterval === 'difference' && first.yInterval === undefined
-      ? 'y'
-      : 'x';
-  }
+  if (rest.length === 0) return isMeasuredAlongX(first) ? 'y' : 'x';
   if (rest.every((point) => isSameValue(point.xValue, first.xValue))) {
     return 'x';
   }
@@ -109,6 +111,11 @@ export function headingAxis(
     return 'y';
   }
   return undefined;
+}
+
+// A bar measured along x, whose category is its y value.
+export function isMeasuredAlongX(point: ChartPoint) {
+  return point.xInterval === 'difference' && point.yInterval === undefined;
 }
 
 export function isSameValue(a: ChartValue, b: ChartValue) {
@@ -128,4 +135,10 @@ export function rowText(
     return `${axisText(point, 'x', format)} · ${axisText(point, 'y', format)}`;
   }
   return axisText(point, heading === 'x' ? 'y' : 'x', format);
+}
+
+// A point's series as text, named from the config.
+export function seriesText(point: ChartPoint, config: ChartConfig): string {
+  const key = String(point.group ?? point.markId);
+  return configText(config, key, point.groupLabel || key);
 }

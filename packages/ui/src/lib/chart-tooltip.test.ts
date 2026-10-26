@@ -5,6 +5,7 @@ import { expect, test } from 'vitest';
 
 import {
   axisText,
+  categoryText,
   chartTooltipText,
   configText,
   headingAxis,
@@ -117,6 +118,21 @@ test('spoken text heads with the shared value and labels rows from the config', 
     title: 'January',
   });
   expect(chartTooltipText([], config, format)).toEqual({ rows: [] });
+});
+
+test('a category reads as its config label, or its formatted value', () => {
+  const config = { jan: { label: 'January' } };
+  expect(categoryText(point({ xValue: 'jan' }), 'x', config, format)).toBe(
+    'January',
+  );
+  expect(categoryText(point({ xValue: 'feb' }), 'x', config, format)).toBe(
+    'feb',
+  );
+  const dated = point({ xValue: new Date(0) });
+  expect(categoryText(dated, 'x', config, dateAsD)).toBe('D');
+  expect(
+    categoryText(point({ xValue: 4, yValue: 'jan' }), 'y', config, format),
+  ).toBe('January');
 });
 
 test('a config label that is not text gives way to the fallback', () => {

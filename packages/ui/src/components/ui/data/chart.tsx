@@ -101,10 +101,13 @@ export function ChartPlot<
   TYValue extends ChartValue = ChartValue,
 >({
   aspectRatio = 16 / 9,
+  emptyLabel,
   errorLabel,
   fallback,
+  height,
   loadingLabel,
   status,
+  width,
   ...props
 }: ChartPlotProps<TDatum, TXValue, TYValue>) {
   if (status) {
@@ -112,17 +115,25 @@ export function ChartPlot<
       <ChartPlotState
         aspectRatio={aspectRatio}
         className={cn(props.className)}
-        emptyLabel={props.emptyLabel}
+        emptyLabel={emptyLabel}
         errorLabel={errorLabel}
         fallback={fallback}
-        height={props.height}
+        height={height}
         loadingLabel={loadingLabel}
         status={status}
-        width={props.width}
+        width={width}
       />
     );
   }
-  return <ChartPlotSurface {...props} aspectRatio={aspectRatio} />;
+  return (
+    <ChartPlotSurface
+      {...props}
+      aspectRatio={aspectRatio}
+      emptyLabel={emptyLabel}
+      height={height}
+      width={width}
+    />
+  );
 }
 
 // Speaks the focused points when the chart has no tooltip to.

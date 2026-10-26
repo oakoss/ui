@@ -1,6 +1,10 @@
 import type { ChartKey, ChartPoint } from '@tanstack/charts';
 
-import { type ChartAxis, isSameValue } from '#/lib/chart-tooltip';
+import {
+  type ChartAxis,
+  isMeasuredAlongX,
+  isSameValue,
+} from '#/lib/chart-tooltip';
 
 export type ChartTableModel =
   | {
@@ -25,11 +29,7 @@ export type ChartTableRow = {
 // The axis a chart's categories run along: y for bars measured along x,
 // otherwise x.
 export function categoryAxis(points: readonly ChartPoint[]): ChartAxis {
-  return points.length > 0 &&
-    points.every(
-      (point) =>
-        point.xInterval === 'difference' && point.yInterval === undefined,
-    )
+  return points.length > 0 && points.every((point) => isMeasuredAlongX(point))
     ? 'y'
     : 'x';
 }

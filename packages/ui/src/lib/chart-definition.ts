@@ -27,21 +27,27 @@ export function withChartDefaults<
   control: ChartControl,
   content: NonNullable<ChartTooltipOptions['content']>,
 ): DomChartDefinition<TDatum, TXValue, TYValue> {
-  const { tooltip } = definition;
   return {
     ...definition,
     controls: [...(definition.controls ?? []), control],
     focusRing: definition.focusRing ?? chartFocusRing,
-    tooltip:
-      tooltip === undefined || tooltip === false
-        ? tooltip
-        : 'use' in tooltip
-          ? tooltip.content ||
-            tooltip.format ||
-            tooltip.formatGroup ||
-            tooltip.items
-            ? tooltip
-            : { ...tooltip, content }
-          : { content, use: tooltip },
+    tooltip: withTooltipContent(definition.tooltip, content),
   };
+}
+
+// The tooltip with the given content, unless it has none or already sets its
+// own text.
+export function withTooltipContent<
+  TDatum,
+  TXValue extends ChartValue,
+  TYValue extends ChartValue,
+>(
+  tooltip: DomChartDefinition<TDatum, TXValue, TYValue>['tooltip'],
+  content: NonNullable<ChartTooltipOptions['content']>,
+): DomChartDefinition<TDatum, TXValue, TYValue>['tooltip'] {
+  if (tooltip === undefined || tooltip === false) return tooltip;
+  if (!('use' in tooltip)) return { content, use: tooltip };
+  const { content: own, format, formatGroup, items } = tooltip;
+  if (own || format || formatGroup || items) return tooltip;
+  return { ...tooltip, content };
 }

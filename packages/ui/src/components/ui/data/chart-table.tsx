@@ -1,4 +1,4 @@
-import type { ChartPoint, ChartValue } from '@tanstack/charts';
+import type { ChartPoint } from '@tanstack/charts';
 
 import * as Icon from '#/components/icons';
 import {
@@ -16,10 +16,15 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '#/components/ui/layout/collapsible';
-import { type ChartConfig, useChart } from '#/hooks/use-chart';
+import { useChart } from '#/hooks/use-chart';
 import { useChartFormatter } from '#/hooks/use-chart-formatter';
 import { type ChartTableModel, chartTableModel } from '#/lib/chart-table-model';
-import { axisText, configText } from '#/lib/chart-tooltip';
+import {
+  axisText,
+  categoryText,
+  configText,
+  seriesText,
+} from '#/lib/chart-tooltip';
 import { cn } from '#/lib/cx';
 
 export type ChartTableProps = {
@@ -93,19 +98,6 @@ export function ChartTable({
   );
 }
 
-// A category named in the config reads as its label, as in the tooltip.
-function categoryText(
-  point: ChartPoint,
-  model: ChartTableModel,
-  config: ChartConfig,
-  format: (value: ChartValue) => string,
-) {
-  const value = model.axis === 'x' ? point.xValue : point.yValue;
-  return typeof value === 'string'
-    ? configText(config, value, value)
-    : axisText(point, model.axis, format);
-}
-
 function ChartSceneTable({
   categoryLabel,
   points,
@@ -117,12 +109,9 @@ function ChartSceneTable({
   const model = chartTableModel(points);
   const isSeriesColumn = model.kind === 'points' && model.hasSeries;
   const text: ChartTableText = {
-    category: (point) => categoryText(point, model, config, format),
+    category: (point) => categoryText(point, model.axis, config, format),
     cell: (point) => axisText(point, model.axis === 'x' ? 'y' : 'x', format),
-    series: (point) => {
-      const key = String(point.group ?? point.markId);
-      return configText(config, key, point.groupLabel || key);
-    },
+    series: (point) => seriesText(point, config),
   };
   return (
     <Table size="sm">
