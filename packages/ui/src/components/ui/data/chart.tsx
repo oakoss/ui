@@ -184,7 +184,7 @@ function ChartPlotSurface<
         ariaDescription={description}
         ariaLabel={title}
         className={cn(
-          'text-xs text-muted-foreground [--chart-focus-fill:var(--color-background)] [--chart-focus:var(--color-foreground)] [--ts-chart-1:var(--color-chart-1)] [--ts-chart-2:var(--color-chart-2)] [--ts-chart-3:var(--color-chart-3)] [--ts-chart-4:var(--color-chart-4)] [--ts-chart-5:var(--color-chart-5)] forced-colors:[--chart-focus-fill:Canvas] forced-colors:[--chart-focus:CanvasText] in-data-tooltip-dismissed:[&_.ts-chart-tooltip]:hidden',
+          'text-xs text-muted-foreground [--chart-focus-fill:var(--color-background)] [--chart-focus:var(--color-foreground)] [--ts-chart-1:var(--color-chart-1)] [--ts-chart-2:var(--color-chart-2)] [--ts-chart-3:var(--color-chart-3)] [--ts-chart-4:var(--color-chart-4)] [--ts-chart-5:var(--color-chart-5)] [--ts-chart-6:var(--color-muted-foreground)] forced-colors:[--chart-focus-fill:Canvas] forced-colors:[--chart-focus:CanvasText] in-data-tooltip-dismissed:[&_.ts-chart-tooltip]:hidden',
           className,
         )}
         renderTooltipBody={renderTooltipBody}

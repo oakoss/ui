@@ -3,19 +3,17 @@ import type { ColorRef, Family, Palette } from '#/family';
 import { type Color, isUnitInterval, isValidColor } from '#/color';
 import { parseColorPath } from '#/color-path';
 import { resolveFlavor } from '#/resolve';
-import {
-  allRoles,
-  chartRoles,
-  type Intent,
-  intents,
-  neutralRoles,
-} from '#/roles';
+import { allRoles, intents, neutralRoles } from '#/roles';
 import { hasScaleStep, isStep, type Scale } from '#/scale';
+import {
+  chartErrors,
+  chartStepErrors,
+  type ScaleError,
+} from '#/validate-charts';
+import { declaredIntent, hasScale } from '#/validate-lookup';
 import { scaleErrors } from '#/validate-scale';
 
 type AnyScale = Scale<string, string>;
-
-type ScaleError = [scale: string, error: string];
 
 // Intents are included, since each intent is also its fill role.
 const reservedNames = new Set<string>(allRoles);
@@ -30,41 +28,6 @@ export function validateFamily(family: Family): string[] {
     ...intentErrors(family),
     ...chartErrors(family),
   ];
-}
-
-function chartErrors(family: Family): string[] {
-  const { charts } = family;
-  // The tuple type fixes the count; untyped data doesn't.
-  const count: number =
-    charts.kind === 'ramp' ? charts.steps.length : charts.hues.length;
-  if (count !== chartRoles.length) {
-    return [`charts need ${chartRoles.length} entries, not ${count}`];
-  }
-  if (charts.kind === 'ramp' && charts.source.intent !== undefined) {
-    return declaredIntent(family, charts.source.intent) === undefined
-      ? [`chart intent "${charts.source.intent}" doesn't exist`]
-      : [];
-  }
-  const hues =
-    charts.kind === 'categorical'
-      ? charts.hues
-      : charts.source.hue === undefined
-        ? []
-        : [charts.source.hue];
-  return hues
-    .filter((hue) => !hasScale(family.palette, hue))
-    .map((hue) => `chart hue "${hue}" has no scale`);
-}
-
-// Untyped data can leave an intent out, set it to `undefined` or name an
-// inherited key.
-function declaredIntent(
-  family: Family,
-  intent: string,
-): Family['intents'][Intent] | undefined {
-  const declared: Partial<Record<string, Family['intents'][Intent]>> =
-    family.intents;
-  return Object.hasOwn(declared, intent) ? declared[intent] : undefined;
 }
 
 function defaultsErrors(family: Family): string[] {
@@ -125,12 +88,6 @@ function foregroundErrorOf(
   return isValidColor(foreground) ? undefined : 'invalid color';
 }
 
-// Untyped data can set a scale to `undefined`.
-function hasScale(palette: Palette<string, string>, name: string): boolean {
-  const scales: Partial<Record<string, AnyScale>> = palette.scales;
-  return Object.hasOwn(scales, name) && scales[name] !== undefined;
-}
-
 function intentErrors(family: Family): string[] {
   const errors: string[] = [];
   for (const intent of intents) {
@@ -187,32 +144,6 @@ function paletteErrors(palette: {
   return errors;
 }
 
-// Steps a ramp chart reads must exist in every scale it can come from.
-function rampErrors(
-  family: Family,
-  palette: Palette<string, string>,
-): ScaleError[] {
-  const { charts } = family;
-  if (charts.kind !== 'ramp') return [];
-  const { source } = charts;
-  const hues =
-    source.intent === undefined
-      ? [source.hue]
-      : (declaredIntent(family, source.intent)?.choices ?? []);
-  return hues.flatMap((hue) => {
-    const scale = Object.hasOwn(palette.scales, hue)
-      ? palette.scales[hue]
-      : undefined;
-    if (scale === undefined) return [];
-    return charts.steps
-      .filter((step) => !hasScaleStep(scale, step))
-      .map((step): ScaleError => [
-        hue,
-        `chart step ${step} is missing from scale "${hue}"`,
-      ]);
-  });
-}
-
 // References can break when a flavor replaces the scale they point at, so
 // they're checked against each resolved palette.
 function referenceErrors(
@@ -229,7 +160,7 @@ function referenceErrors(
       errors.push([name, `scale "${name}" foreground: ${error}`]);
     }
   }
-  return [...errors, ...rampErrors(family, palette)];
+  return [...errors, ...chartStepErrors(family, palette)];
 }
 
 function refError(

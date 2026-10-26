@@ -15,6 +15,7 @@ export { primaryHues } from '#/bundle';
 export type { Color } from '#/color';
 export { fieldColor, formatColor } from '#/css';
 export type {
+  ChartSeries,
   ColorPath,
   ColorRef,
   Family,

@@ -38,7 +38,7 @@ describe('theming pages', () => {
     );
     expect(markdown).toMatch(/\| `--primary` +\| `--background` +\| 3:1 +\|/u);
     expect(markdown).toMatch(
-      /\| `--chart-1` +\|[^\n]+\| Step 300 of the primary scale +\|/u,
+      /\| `--chart-1` +\|[^\n]+\| blue 600 \(light\), 500 \(dark\) +\|/u,
     );
     expect(markdown).toMatch(
       /\| `--muted` +\|[^\n]+\| `zinc-100` +\| `zinc-800` +\|/u,

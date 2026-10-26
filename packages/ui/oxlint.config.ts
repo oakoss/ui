@@ -97,6 +97,7 @@ const arbitraryValues: Record<string, string[]> = {
   'src/components/ui/data/chart.tsx': [
     'not-has-data-[slot=chart-empty]:[&_svg]:outline-none',
     ...[1, 2, 3, 4, 5].map((n) => `[--ts-chart-${n}:var(--color-chart-${n})]`),
+    '[--ts-chart-6:var(--color-muted-foreground)]',
     '[--chart-focus-fill:var(--color-background)]',
     '[--chart-focus:var(--color-foreground)]',
     'forced-colors:[--chart-focus-fill:Canvas]',

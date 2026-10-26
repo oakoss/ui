@@ -124,10 +124,17 @@ function roles(polarity: 'dark' | 'light'): Record<NeutralRole, Ref> {
 }
 
 export const catppuccin = defineFamily({
+  // The default palette's hues in Catppuccin's own colors, with lightness
+  // spread so they stay apart under simulated color blindness.
   charts: {
-    kind: 'ramp',
-    source: { intent: 'primary' },
-    steps: [300, 500, 600, 700, 800],
+    kind: 'categorical',
+    series: [
+      { hue: 'blue', steps: { dark: 200, light: 600 } },
+      { hue: 'yellow', steps: { dark: 200, light: 600 } },
+      { hue: 'red', steps: { dark: 500, light: 600 } },
+      { hue: 'teal', steps: { dark: 400, light: 600 } },
+      { hue: 'mauve', steps: { dark: 400, light: 800 } },
+    ],
   },
   credit: 'Copyright (c) 2021 Catppuccin, MIT License',
   defaults: { dark: 'mocha', light: 'latte' },

@@ -3,12 +3,26 @@ import type { Intent, NeutralRole } from '#/roles';
 import type { Scale, Step } from '#/scale';
 
 export type Charts<Hue extends string> =
-  | { hues: readonly [Hue, Hue, Hue, Hue, Hue]; kind: 'categorical' }
+  | {
+      kind: 'categorical';
+      series: readonly [
+        ChartSeries<Hue>,
+        ChartSeries<Hue>,
+        ChartSeries<Hue>,
+        ChartSeries<Hue>,
+        ChartSeries<Hue>,
+      ];
+    }
   | {
       kind: 'ramp';
       source: { hue: Hue; intent?: never } | { hue?: never; intent: Intent };
       steps: FiveSteps;
     };
+
+export type ChartSeries<Hue extends string> = {
+  hue: Hue;
+  steps: Readonly<Record<Polarity, Step>>;
+};
 
 export type ColorPath<Hue extends string, Neutral extends string> =
   | `color.${Hue}.${Step}`

@@ -1,7 +1,11 @@
 import {
   differenceCiede2000,
+  filterDeficiencyDeuter,
+  filterDeficiencyProt,
+  filterDeficiencyTrit,
   type Oklch,
   oklch,
+  type Rgb,
   rgb,
   toGamut,
   wcagContrast,
@@ -11,6 +15,23 @@ import type { Color } from '#/color';
 
 const toSrgb = toGamut('rgb', 'oklch');
 const ciede2000 = differenceCiede2000();
+const visions = [
+  (color: Rgb) => color,
+  filterDeficiencyDeuter(1),
+  filterDeficiencyProt(1),
+  filterDeficiencyTrit(1),
+];
+
+// The smallest CIEDE2000 difference as seen with typical vision and with full
+// deuteranopia, protanopia and tritanopia (Machado 2009, culori's filters).
+export function colorBlindDifference(a: Color, b: Color): number {
+  if (!isOpaque(a) || !isOpaque(b)) {
+    throw new Error('color difference needs opaque colors');
+  }
+  const shownA = rgb(toSrgb(toCulori(a)));
+  const shownB = rgb(toSrgb(toCulori(b)));
+  return Math.min(...visions.map((see) => ciede2000(see(shownA), see(shownB))));
+}
 
 // CIEDE2000, measured as displayed (sRGB); 1 is about the smallest
 // difference people notice.

@@ -191,14 +191,4 @@ describe("shadcn's accent themes", () => {
   it('matches the dark fill for yellow and lime', () => {
     expect(agreeingHues('dark')).toEqual([...brightHues]);
   });
-
-  it('ramps charts over the primary at the steps shadcn uses', () => {
-    for (const family of baseColors) {
-      expect(family.charts).toEqual({
-        kind: 'ramp',
-        source: { intent: 'primary' },
-        steps: [300, 500, 600, 700, 800],
-      });
-    }
-  });
 });

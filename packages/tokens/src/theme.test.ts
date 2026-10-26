@@ -12,7 +12,7 @@ import { expandSeeded } from '#/seeded';
 import { withLightRole, withScale } from '#/testing';
 import { resolveTheme, type Theme } from '#/theme';
 
-const { blue, red, zinc } = tailwindScales;
+const { blue, fuchsia, red, zinc } = tailwindScales;
 const seeded = { kind: 'seeded', seed: oklch(60, 0.2, 250) } as const;
 
 function errorsOf(result: string[] | Theme): string[] {
@@ -68,8 +68,8 @@ describe('resolveTheme', () => {
     expect(polarity).toBe('light');
     expect(tokens).toMatchObject({
       background: { components: [1, 0, null] },
-      'chart-1': zinc.steps[300],
-      'chart-5': zinc.steps[800],
+      'chart-1': blue.steps[600],
+      'chart-5': fuchsia.steps[800],
       destructive: red.steps[700],
       primary: zinc.steps[900],
       'primary-500': zinc.steps[500],
@@ -82,7 +82,6 @@ describe('resolveTheme', () => {
   it('swaps the primary scale and everything that follows it', () => {
     const { tokens } = theme(resolveTheme(families.zinc, 'dark', 'blue'));
     expect(tokens).toMatchObject({
-      'chart-1': blue.steps[300],
       destructive: red.steps[700],
       primary: blue.steps[600],
       'primary-hover': blue.steps[700],
@@ -90,6 +89,14 @@ describe('resolveTheme', () => {
       ring: blue.steps[400],
       'sidebar-primary-foreground': blue.steps[50],
     });
+  });
+
+  it('reads categorical charts at the polarity step, whatever the primary', () => {
+    const light = theme(resolveTheme(families.zinc, 'light', 'red'));
+    const dark = theme(resolveTheme(families.zinc, 'dark', 'red'));
+    expect(light.tokens['chart-1']).toEqual(blue.steps[600]);
+    expect(dark.tokens['chart-1']).toEqual(blue.steps[500]);
+    expect(dark.tokens['chart-5']).toEqual(fuchsia.steps[300]);
   });
 
   it('keeps alpha from a role reference', () => {
@@ -124,7 +131,7 @@ describe('resolveTheme sources', () => {
     const { sources } = theme(resolveTheme(families.zinc, 'light'));
     expect(sources).toMatchObject({
       background: { ref: 'color.white' },
-      'chart-1': { ref: 'color.zinc.300' },
+      'chart-1': { ref: 'color.blue.600' },
       primary: { ref: 'color.zinc.900' },
       'primary-500': { ref: 'color.zinc.500' },
       'primary-foreground': { ref: 'color.zinc.50' },
@@ -137,7 +144,6 @@ describe('resolveTheme sources', () => {
     const { sources } = theme(resolveTheme(families.zinc, 'dark', 'blue'));
     expect(sources).toMatchObject({
       border: { alpha: 0.1, ref: 'color.white' },
-      'chart-1': { ref: 'color.blue.300' },
       primary: { ref: 'color.blue.600' },
       'primary-hover': { ref: 'color.blue.700' },
       'primary-text': { ref: 'color.blue.400' },

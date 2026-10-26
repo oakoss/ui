@@ -1,6 +1,7 @@
 import {
   axes,
   chartRoleMeta,
+  type ChartSeries,
   contrastMinimum,
   contrastPairs,
   derivedRoleMeta,
@@ -72,7 +73,7 @@ function chartRows(): Cell[][] {
       described(meta),
       charts.kind === 'ramp'
         ? `Step ${charts.steps[index] ?? ''} of the ${charts.source.intent ?? charts.source.hue} scale`
-        : (charts.hues[index] ?? ''),
+        : seriesText(charts.series[index]),
     ]),
   ];
 }
@@ -189,6 +190,12 @@ function searchable(node: Node, rows: Cell[][]): Node {
     .slice(1)
     .map((row) => ({ content: row.map((cell) => cellText(cell)).join(' ') }));
   return { ...node, data: { structuredData: { contents } } };
+}
+
+function seriesText(series: ChartSeries<string> | undefined): string {
+  if (series === undefined) return '';
+  const { hue, steps } = series;
+  return `${hue} ${steps.light} (light), ${steps.dark} (dark)`;
 }
 
 function step(light: number, dark: number): string {

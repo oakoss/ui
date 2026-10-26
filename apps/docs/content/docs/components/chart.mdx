@@ -76,9 +76,13 @@ const visitors = [
 ```
 
 A mark with no series takes the theme's `--color-chart-1` to
-`--color-chart-5` in turn, and a sixth takes TanStack's own color. When color
-means something else, such as a status, the series comes from `z` instead:
-the legend can then highlight it but not hide it.
+`--color-chart-5` in turn, five hues apart from the primary color that reach
+3:1 on the page and stay distinct with color blindness. A sixth takes the
+muted foreground gray, which suits an "Other" series but can match a hue
+under color blindness, so label it. Past five, tell series apart with
+dashes, markers or direct labels rather than more colors. When
+color means something else, such as a status, the series comes from `z`
+instead: the legend can then highlight it but not hide it.
 
 ## Examples
 
