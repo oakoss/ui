@@ -1,6 +1,10 @@
 import type { ChartConfig } from '@oakoss/ui/hooks/use-chart';
 
-import { chartColor, chartSeriesStates } from '@oakoss/ui/lib/chart-series';
+import {
+  chartBarStates,
+  chartColor,
+  chartSeriesStates,
+} from '@oakoss/ui/lib/chart-series';
 import { barX, barY, defineChart, lineY, rect } from '@tanstack/charts';
 import { crosshair } from '@tanstack/charts/crosshair';
 import { scaleBand } from '@tanstack/charts/scales/band';
@@ -55,6 +59,70 @@ export function visitorsLines(hidden: Iterable<string> = []) {
 }
 
 export const visitorsChart = visitorsLines();
+
+// Stacked bars by month, outlined on focus in place of the focus ring's dot.
+export function visitorsBars(hidden: Iterable<string> = []) {
+  return defineChart({
+    color: chartColor(visitorsConfig, hidden),
+    focus: 'group-x',
+    focusRing: false,
+    marks: [
+      barY(visitors, {
+        color: 'device',
+        states: chartBarStates,
+        x: 'month',
+        y: 'visitors',
+      }),
+    ],
+    scales: {
+      x: { scale: scaleBand },
+      y: { grid: true, nice: true, scale: scaleLinear },
+    },
+    tooltip,
+  });
+}
+
+// Bars and a line over one series, so each month has two values for it.
+export const overlaidVisitorsChart = defineChart({
+  color: chartColor(visitorsConfig),
+  marks: [
+    barY(visitors.slice(0, 2), {
+      color: 'device',
+      id: 'bars',
+      x: 'month',
+      y: 'visitors',
+    }),
+    lineY(visitors.slice(0, 2), {
+      color: 'device',
+      id: 'line',
+      x: 'month',
+      y: 'visitors',
+    }),
+  ],
+  scales: {
+    x: { scale: scaleBand },
+    y: { grid: true, nice: true, scale: scaleLinear },
+  },
+  tooltip,
+});
+
+// The visitors chart with no rows yet.
+export const emptyVisitorsChart = defineChart({
+  marks: [
+    lineY(visitors.slice(0, 0), { color: 'device', x: 'month', y: 'visitors' }),
+  ],
+  scales: {
+    x: { scale: () => scalePoint().padding(0.2) },
+    y: { grid: true, nice: true, scale: scaleLinear },
+  },
+  tooltip,
+});
+
+// Lines without a tooltip: the chart announces focus itself.
+export const silentVisitorsChart = defineChart({
+  ...visitorsLines(),
+  tooltip: false,
+});
 
 export const browsersConfig = {
   chrome: { color: 'var(--color-chart-1)', label: 'Chrome' },

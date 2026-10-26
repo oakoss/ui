@@ -2,7 +2,8 @@ import type { ChartConfig } from '@oakoss/ui/hooks/use-chart';
 
 import { ChartContainer, ChartPlot } from '@oakoss/ui/components/ui/data/chart';
 import { ChartLegend } from '@oakoss/ui/components/ui/data/chart-legend';
-import { chartColor, chartSeriesStates } from '@oakoss/ui/lib/chart-series';
+import { ChartTable } from '@oakoss/ui/components/ui/data/chart-table';
+import { chartBarStates, chartColor } from '@oakoss/ui/lib/chart-series';
 import { barY, defineChart, group } from '@tanstack/charts';
 import { scaleBand } from '@tanstack/charts/scales/band';
 import { scaleLinear } from '@tanstack/charts/scales/linear';
@@ -39,21 +40,24 @@ export function ChartDemo() {
     >
       <ChartPlot definition={definition} />
       <ChartLegend hidden={hidden} onHiddenChange={setHidden} />
+      <ChartTable categoryLabel="Month" />
     </ChartContainer>
   );
 }
 
-// The color channel names each bar's series, which the legend can hide.
+// The color channel names each bar's series, which the legend can hide. An
+// outline marks the focused bar, in place of the focus ring's dot.
 function visitorsBars(hidden: Set<string>) {
   return defineChart({
     color: chartColor(config, hidden),
     focus: 'group-x',
+    focusRing: false,
     marks: [
       barY(visitors, {
         color: 'device',
         layout: group({ padding: 0.1 }),
         radius: 4,
-        states: chartSeriesStates,
+        states: chartBarStates,
         x: 'month',
         y: 'visitors',
       }),

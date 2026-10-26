@@ -1,4 +1,10 @@
-import type { ChartPoint, ChartValue } from '@tanstack/charts';
+import type {
+  ChartPoint,
+  ChartTooltipContent,
+  ChartValue,
+} from '@tanstack/charts';
+
+import type { ChartConfig } from '#/hooks/use-chart';
 
 export type ChartAxis = 'x' | 'y';
 
@@ -41,6 +47,48 @@ export function axisValue<
   return axis === 'x' ? point.xValue : point.yValue;
 }
 
+// The focused points as text, labeled from the config as the tooltip is: what
+// TanStack's status region announces, and a chart without a tooltip too.
+export function chartTooltipText(
+  points: readonly ChartPoint[],
+  config: ChartConfig,
+  format: (value: ChartValue) => string,
+): ChartTooltipContent {
+  const [first] = points;
+  if (!first) return { rows: [] };
+  const heading = headingAxis(points);
+  const category =
+    heading === undefined ? undefined : axisValue(first, heading);
+  const title =
+    heading === undefined
+      ? undefined
+      : typeof category === 'string'
+        ? configText(config, category, category)
+        : axisText(first, heading, format);
+  return {
+    rows: points.map((point) => {
+      const key = String(point.group ?? point.markId);
+      return {
+        label: configText(config, key, point.groupLabel || key),
+        value: rowText(point, heading, format),
+      };
+    }),
+    title,
+  };
+}
+
+// A config label as text; a label that isn't text gives way to the fallback.
+export function configText(
+  config: ChartConfig,
+  key: string,
+  fallback: string,
+): string {
+  const label = config[key]?.label;
+  return typeof label === 'string' || typeof label === 'number'
+    ? String(label)
+    : fallback;
+}
+
 // The axis the tooltip's heading reads, as TanStack's own tooltip picks it:
 // the one every focused point shares, none when a group shares neither, or
 // y for a lone bar measured along x.
@@ -63,6 +111,12 @@ export function headingAxis(
   return undefined;
 }
 
+export function isSameValue(a: ChartValue, b: ChartValue) {
+  return a instanceof Date && b instanceof Date
+    ? Object.is(a.getTime(), b.getTime())
+    : Object.is(a, b);
+}
+
 // A row's text: the axis the heading doesn't read, or both axes when there's
 // no heading.
 export function rowText(
@@ -74,10 +128,4 @@ export function rowText(
     return `${axisText(point, 'x', format)} · ${axisText(point, 'y', format)}`;
   }
   return axisText(point, heading === 'x' ? 'y' : 'x', format);
-}
-
-function isSameValue(a: ChartValue, b: ChartValue) {
-  return a instanceof Date && b instanceof Date
-    ? Object.is(a.getTime(), b.getTime())
-    : Object.is(a, b);
 }

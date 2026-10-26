@@ -1,3 +1,5 @@
+import type { ChartScene } from '@tanstack/charts';
+
 import { type ComponentType, createContext, type ReactNode, use } from 'react';
 
 import type { ChartHighlighter } from '#/lib/chart-series';
@@ -11,7 +13,13 @@ export type ChartConfig = Record<
 export type ChartContextValue = {
   config: ChartConfig;
   description: string;
+  // The series the legend hides.
+  hidden: ReadonlySet<string>;
   highlighter: ChartHighlighter;
+  // Each plot's last drawn scene, by plot id, in the order they first drew.
+  scenes: ReadonlyMap<string, ChartScene>;
+  setHidden: (hidden: ReadonlySet<string>) => void;
+  setScene: (id: string, scene: ChartScene | null) => void;
   title: string;
 };
 
