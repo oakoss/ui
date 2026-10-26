@@ -1,14 +1,28 @@
-import type { ChartValue } from '@tanstack/charts';
+import type { ChartScene, ChartValue } from '@tanstack/charts';
 
 import {
   Chart as ChartPrimitive,
   type ChartProps as ChartPrimitiveProps,
   type ChartTooltipBodyRenderContext,
 } from '@tanstack/charts/react/tooltip';
-import { type ComponentProps, useId, useMemo } from 'react';
+import {
+  type ComponentProps,
+  type ReactNode,
+  useCallback,
+  useId,
+  useMemo,
+  useState,
+} from 'react';
 
+import {
+  ChartPlotEmpty,
+  type ChartPlotLabels,
+  ChartPlotState,
+  type ChartPlotStatus,
+} from '#/components/ui/data/chart-plot-state';
 import { ChartTooltipContent } from '#/components/ui/data/chart-tooltip-content';
 import { type ChartConfig, ChartContext, useChart } from '#/hooks/use-chart';
+import { useChartPlot } from '#/hooks/use-chart-plot';
 import { createChartHighlighter } from '#/lib/chart-series';
 import { cn } from '#/lib/cx';
 
@@ -25,10 +39,17 @@ export type ChartPlotProps<
   TDatum,
   TXValue extends ChartValue,
   TYValue extends ChartValue,
-> = Omit<
-  ChartPrimitiveProps<TDatum, TXValue, TYValue>,
-  'ariaDescription' | 'ariaLabel' | 'style'
->;
+> = {
+  // Replaces the message or skeleton shown for the status.
+  fallback?: ReactNode;
+  status?: ChartPlotStatus;
+} & ChartPlotLabels &
+  Omit<
+    ChartPrimitiveProps<TDatum, TXValue, TYValue>,
+    'ariaDescription' | 'ariaLabel' | 'style'
+  >;
+
+const noneHidden: ReadonlySet<string> = new Set();
 
 // The figure: its visible caption names and describes the chart, and its
 // parts read the config and caption from context.
@@ -41,11 +62,7 @@ export function ChartContainer({
   ...props
 }: ChartContainerProps) {
   const id = useId();
-  const highlighter = useMemo(() => createChartHighlighter(), []);
-  const value = useMemo(
-    () => ({ config, description, highlighter, title }),
-    [config, description, highlighter, title],
-  );
+  const value = useChartContextValue(config, description, title);
   return (
     <ChartContext value={value}>
       <figure
@@ -84,35 +101,101 @@ export function ChartPlot<
   TYValue extends ChartValue = ChartValue,
 >({
   aspectRatio = 16 / 9,
-  className,
-  definition,
-  renderTooltipBody = defaultTooltipBody,
+  emptyLabel,
+  errorLabel,
+  fallback,
+  height,
+  loadingLabel,
+  status,
+  width,
   ...props
 }: ChartPlotProps<TDatum, TXValue, TYValue>) {
-  const { description, highlighter, title } = useChart();
-  // The legend highlights a series through this control. Spread as
-  // defineChart(definition, options) does, whose overloads can't take a
-  // definition that may be static or responsive.
-  const highlightable = useMemo(
-    () => ({
-      ...definition,
-      controls: [...(definition.controls ?? []), highlighter.control],
-    }),
-    [definition, highlighter],
-  );
+  if (status) {
+    return (
+      <ChartPlotState
+        aspectRatio={aspectRatio}
+        className={cn(props.className)}
+        emptyLabel={emptyLabel}
+        errorLabel={errorLabel}
+        fallback={fallback}
+        height={height}
+        loadingLabel={loadingLabel}
+        status={status}
+        width={width}
+      />
+    );
+  }
   return (
-    <ChartPrimitive
+    <ChartPlotSurface
       {...props}
-      ariaDescription={description}
-      ariaLabel={title}
       aspectRatio={aspectRatio}
-      className={cn(
-        'text-xs text-muted-foreground [--ts-chart-1:var(--color-chart-1)] [--ts-chart-2:var(--color-chart-2)] [--ts-chart-3:var(--color-chart-3)] [--ts-chart-4:var(--color-chart-4)] [--ts-chart-5:var(--color-chart-5)]',
-        className,
-      )}
-      definition={highlightable}
-      renderTooltipBody={renderTooltipBody}
+      emptyLabel={emptyLabel}
+      height={height}
+      width={width}
     />
+  );
+}
+
+// Speaks the focused points when the chart has no tooltip to.
+function ChartPlotAnnouncement({
+  announcement,
+}: {
+  announcement: null | string;
+}) {
+  if (announcement === null) return null;
+  return (
+    <div className="sr-only" role="status">
+      {announcement}
+    </div>
+  );
+}
+
+function ChartPlotSurface<
+  TDatum,
+  TXValue extends ChartValue,
+  TYValue extends ChartValue,
+>({
+  className,
+  definition,
+  emptyLabel,
+  hiddenLabel,
+  onFocusGroupChange,
+  onRender,
+  renderTooltipBody = defaultTooltipBody,
+  ...props
+}: Omit<
+  ChartPlotProps<TDatum, TXValue, TYValue>,
+  'errorLabel' | 'fallback' | 'loadingLabel' | 'status'
+>) {
+  const { description, title } = useChart();
+  const { announcement, chartProps, id, isTooltipDismissed, surfaceRef } =
+    useChartPlot({ definition, onFocusGroupChange, onRender });
+  return (
+    <div
+      // With no points there's no marker, so the chart keeps its outline.
+      className="relative not-has-data-[slot=chart-empty]:[&_svg]:outline-none"
+      data-slot="chart-plot"
+      data-tooltip-dismissed={isTooltipDismissed || undefined}
+      ref={surfaceRef}
+    >
+      <ChartPrimitive
+        {...props}
+        {...chartProps}
+        ariaDescription={description}
+        ariaLabel={title}
+        className={cn(
+          'text-xs text-muted-foreground [--chart-focus-fill:var(--color-background)] [--chart-focus:var(--color-foreground)] [--ts-chart-1:var(--color-chart-1)] [--ts-chart-2:var(--color-chart-2)] [--ts-chart-3:var(--color-chart-3)] [--ts-chart-4:var(--color-chart-4)] [--ts-chart-5:var(--color-chart-5)] forced-colors:[--chart-focus-fill:Canvas] forced-colors:[--chart-focus:CanvasText] in-data-tooltip-dismissed:[&_.ts-chart-tooltip]:hidden',
+          className,
+        )}
+        renderTooltipBody={renderTooltipBody}
+      />
+      <ChartPlotEmpty
+        emptyLabel={emptyLabel}
+        hiddenLabel={hiddenLabel}
+        id={id}
+      />
+      <ChartPlotAnnouncement announcement={announcement} />
+    </div>
   );
 }
 
@@ -122,4 +205,38 @@ function defaultTooltipBody<
   TYValue extends ChartValue,
 >(context: ChartTooltipBodyRenderContext<TDatum, TXValue, TYValue>) {
   return <ChartTooltipContent points={context.points} />;
+}
+
+function useChartContextValue(
+  config: ChartConfig,
+  description: string,
+  title: string,
+) {
+  const highlighter = useMemo(() => createChartHighlighter(), []);
+  const [hidden, setHidden] = useState(noneHidden);
+  const [scenes, setScenes] = useState<ReadonlyMap<string, ChartScene>>(
+    () => new Map(),
+  );
+  const setScene = useCallback((id: string, scene: ChartScene | null) => {
+    setScenes((current) => {
+      if ((current.get(id) ?? null) === scene) return current;
+      const next = new Map(current);
+      if (scene) next.set(id, scene);
+      else next.delete(id);
+      return next;
+    });
+  }, []);
+  return useMemo(
+    () => ({
+      config,
+      description,
+      hidden,
+      highlighter,
+      scenes,
+      setHidden,
+      setScene,
+      title,
+    }),
+    [config, description, hidden, highlighter, scenes, setScene, title],
+  );
 }

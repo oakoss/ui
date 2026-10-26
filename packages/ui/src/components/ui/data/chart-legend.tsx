@@ -28,8 +28,15 @@ export function ChartLegend({
   label = 'Series',
   onHiddenChange,
 }: ChartLegendProps) {
-  const { config } = useChart();
+  const { config, setHidden } = useChart();
   const series = chartSeriesKeys(config);
+  const hiddenKeys = new Set(hidden);
+  const hiddenList = [...hiddenKeys].join('\n');
+  // The plots read it to tell no data from every series hidden.
+  useEffect(() => {
+    setHidden(new Set(hiddenList ? hiddenList.split('\n') : []));
+    return () => setHidden(new Set());
+  }, [hiddenList, setHidden]);
   if (!onHiddenChange) {
     return (
       <ul className={cn(legendStyles, className)} data-slot="chart-legend">
@@ -42,7 +49,6 @@ export function ChartLegend({
       </ul>
     );
   }
-  const hiddenKeys = new Set(hidden);
   return (
     <ToggleButtonGroup
       aria-label={label}

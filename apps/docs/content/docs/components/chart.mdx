@@ -7,6 +7,7 @@ item: chart
 import { ChartAxes } from '#/components/demos/chart-axes';
 import { ChartDemo } from '#/components/demos/chart-demo';
 import { ChartLine } from '#/components/demos/chart-line';
+import { ChartStates } from '#/components/demos/chart-states';
 import { ChartTooltip } from '#/components/demos/chart-tooltip';
 
 <ComponentPreview name="chart-demo">
@@ -116,6 +117,56 @@ const definition = useMemo(
 
 The chart at the top of this page has one.
 
+### Data table
+
+`ChartTable` shows the values each plot drew behind a "View as table"
+button: a row per category, headed by `categoryLabel`, and a column per
+series from the config. A series the legend hides leaves the table too. A
+chart without series, such as one bar per browser, takes a row per point
+and a `valueLabel` column; so does one where two marks draw the same series,
+with a `seriesLabel` column, so no value is dropped. The chart at the top of
+this page has one.
+
+```tsx
+<ChartContainer config={config} description="…" title="Visitors by month">
+  <ChartPlot definition={definition} />
+  <ChartTable categoryLabel="Month" />
+</ChartContainer>
+```
+
+The table is built from what the chart drew, so it appears once the chart
+renders in the browser. A pie slice's point carries its angle, not its
+value, so give a pie chart a table of your own.
+
+### Focus on bars
+
+Focus marks a line's point with a ring. On bars, an outline marks the
+focused bar instead: give each bar mark `chartBarStates`, which also carries
+the legend's highlight, and set `focusRing: false` so the ring's dot doesn't
+sit on the bar's edge.
+
+```tsx
+defineChart({
+  focusRing: false,
+  marks: [barY(visitors, { color: 'device', states: chartBarStates /* … */ })],
+  // …
+});
+```
+
+### Loading, error and empty
+
+`status` replaces the plot with a skeleton of its size (`'loading'`), an
+alert (`'error'`) or a "No data" message (`'empty'`), so the layout holds
+when the data comes. `fallback` replaces what a status shows, for example with a
+retry button. A plot that draws no points keeps its axes and says "No data"
+over them, or "All series are hidden" when the legend hides every one.
+`loadingLabel`, `errorLabel`, `emptyLabel` and `hiddenLabel` change the
+text.
+
+<ComponentPreview name="chart-states">
+  <ChartStates />
+</ComponentPreview>
+
 ### Line and crosshair
 
 `focus: 'group-x'` shows every series at the focused x value in one tooltip,
@@ -166,16 +217,24 @@ draw, or the values that matter, in the description.
 
 TanStack makes the chart one tab stop and moves a virtual focus between its
 points, showing the tooltip for the focused one. The tooltip is a polite
-live region. Charts don't offer a table of their values, so give one
-beside the chart when readers need exact numbers.
+live region, and it speaks what it shows: the series named from the config,
+values in the app's locale. A chart without a tooltip announces the focused
+points through a status region of its own. `ChartTable` gives the exact
+values as a real table, for readers who need numbers rather than a picture.
 
-| Key                | Action                                |
-| ------------------ | ------------------------------------- |
-| `Tab`              | Focuses the chart, on its first point |
-| `Arrow` keys       | Move to the next or previous point    |
-| `Home` / `End`     | Move to the first or last point       |
-| `Enter` or `Space` | Pins the tooltip open                 |
-| `Escape`           | Closes a pinned tooltip               |
+Focus is marked on the point, not around the chart: a ring with the page's
+background inside and its foreground outside, or an outline on a bar, so it
+holds 3:1 on any series color. Hovering marks a point the same way. A chart
+with no points to mark keeps its outline. In forced colors the marker takes
+system colors, since SVG strokes keep their own colors there.
+
+| Key                | Action                                                      |
+| ------------------ | ----------------------------------------------------------- |
+| `Tab`              | Focuses the chart, on its first point                       |
+| `Arrow` keys       | Move to the next or previous point                          |
+| `Home` / `End`     | Move to the first or last point                             |
+| `Enter` or `Space` | Pins the tooltip open                                       |
+| `Escape`           | Hides the tooltip until focus moves, or closes a pinned one |
 
 An interactive legend is a
 [toolbar](https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/) named by its
@@ -227,6 +286,42 @@ as its tooltip body. It accepts TanStack Chart's props, except `ariaLabel`,
 `ariaDescription` and `style`; `aspectRatio` defaults to 16:9. Outside a
 `ChartContainer` it throws.
 
+It sets the focus ring and the tooltip's spoken text unless the definition
+sets its own (`focusRing`, or the tooltip's `content`, `format`,
+`formatGroup` or `items`), and adds the legend's highlight control.
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/chart.tsx"
+  name="ChartPlotProps"
+/>
+
+#### Data attributes
+
+| Attribute     | Present when                                                              |
+| ------------- | ------------------------------------------------------------------------- |
+| `data-slot`   | Always: `chart-plot`, and `chart-empty` on the message over an empty plot |
+| `data-status` | Given `status`: `loading`, `error` or `empty`                             |
+
+### ChartTable
+
+The plotted values in a [Table](/docs/components/table), behind a
+[Collapsible](/docs/components/collapsible).
+
+#### Props
+
+<auto-type-table
+  path="../../../../../packages/ui/src/components/ui/data/chart-table.tsx"
+  name="ChartTableProps"
+/>
+
+#### Data attributes
+
+| Attribute   | Present when          |
+| ----------- | --------------------- |
+| `data-slot` | Always: `chart-table` |
+
 ### ChartTooltipContent
 
 The tooltip body, a `div` of one row per focused point.
@@ -266,13 +361,14 @@ buttons given `hidden` and `onHiddenChange`, otherwise a `ul`.
 | `data-slot`     | Always: `chart-legend`, `chart-legend-item` on a toggle, `chart-legend-swatch` on each swatch |
 | `data-selected` | On a toggle whose series shows                                                                |
 
-### chartColor and chartSeriesStates
+### chartColor, chartSeriesStates and chartBarStates
 
 `chartColor(config, hidden)` returns a definition's `color` option: the
 config's series as the color domain, their colors as the range, and a legend
 that draws nothing and removes the `hidden` series after the scales resolve.
 `chartSeriesStates` goes in a mark's `states` and dims its series while the
-legend highlights another.
+legend highlights another. `chartBarStates` adds an outline on the focused
+or hovered bar; use it on bar marks with `focusRing: false`.
 
 ### useChartFormatter
 

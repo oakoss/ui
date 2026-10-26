@@ -37,6 +37,16 @@ export const chartSeriesStates = [
   { style: { opacity: 0.25 }, when: { focus: 'unmatched', source: 'legend' } },
 ] as const;
 
+// chartSeriesStates, and an outline on the focused bar in place of the focus
+// ring's dot; set the definition's `focusRing: false` with it.
+export const chartBarStates = [
+  ...chartSeriesStates,
+  {
+    style: { stroke: 'var(--chart-focus)', strokeWidth: 3 },
+    when: { focus: 'primary', source: ['keyboard', 'pointer', 'restored'] },
+  },
+] as const;
+
 // TanStack's color scale for the config's series. Its legend draws nothing and
 // removes hidden series after the scales resolve, so the axes keep their
 // domain; TanStack hides only series a mark's `color` channel names.

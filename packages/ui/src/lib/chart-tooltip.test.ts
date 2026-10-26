@@ -1,8 +1,16 @@
 import type { ChartPoint, ChartValue } from '@tanstack/charts';
 
+import { createElement } from 'react';
 import { expect, test } from 'vitest';
 
-import { axisText, headingAxis, rowText } from '#/lib/chart-tooltip';
+import {
+  axisText,
+  categoryText,
+  chartTooltipText,
+  configText,
+  headingAxis,
+  rowText,
+} from '#/lib/chart-tooltip';
 
 function point(fields: Partial<ChartPoint>): ChartPoint {
   return {
@@ -84,6 +92,54 @@ test('a baseline interval reports its length', () => {
       format,
     ),
   ).toBe('60');
+});
+
+test('spoken text heads with the shared value and labels rows from the config', () => {
+  const config = { desktop: { label: 'Desktop' }, jan: { label: 'January' } };
+  expect(
+    chartTooltipText(
+      [
+        point({ group: 'desktop', xValue: 'jan', yValue: 186 }),
+        point({
+          group: 'mobile',
+          groupLabel: 'mobile',
+          xValue: 'jan',
+          yValue: 80,
+        }),
+      ],
+      config,
+      format,
+    ),
+  ).toEqual({
+    rows: [
+      { label: 'Desktop', value: '186' },
+      { label: 'mobile', value: '80' },
+    ],
+    title: 'January',
+  });
+  expect(chartTooltipText([], config, format)).toEqual({ rows: [] });
+});
+
+test('a category reads as its config label, or its formatted value', () => {
+  const config = { jan: { label: 'January' } };
+  expect(categoryText(point({ xValue: 'jan' }), 'x', config, format)).toBe(
+    'January',
+  );
+  expect(categoryText(point({ xValue: 'feb' }), 'x', config, format)).toBe(
+    'feb',
+  );
+  const dated = point({ xValue: new Date(0) });
+  expect(categoryText(dated, 'x', config, dateAsD)).toBe('D');
+  expect(
+    categoryText(point({ xValue: 4, yValue: 'jan' }), 'y', config, format),
+  ).toBe('January');
+});
+
+test('a config label that is not text gives way to the fallback', () => {
+  expect(
+    configText({ a: { label: createElement('b') } }, 'a', 'fallback'),
+  ).toBe('fallback');
+  expect(configText({ a: { label: 'A' } }, 'a', 'fallback')).toBe('A');
 });
 
 test('a range reports both ends, and a point range its value', () => {
