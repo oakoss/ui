@@ -36,7 +36,7 @@
     },
     {
       "automerge": false,
-      "description": "oakum's tool-version must match its pin, so each bump needs `pnpm exec oakum upgrade` on its branch.",
+      "description": "A bump can leave `.changeset/_schema.json` stale or deprecated config keys behind, so each one needs `pnpm exec oakum upgrade` on its branch.",
       "groupName": "oakum",
       "matchPackageNames": ["@oakoss/oakum"]
     },
