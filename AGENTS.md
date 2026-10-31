@@ -71,7 +71,7 @@ When deferring, briefly state which criterion above applies.
 - **A PR that changes `packages/ui` adds a bump file:** `pnpm exec oakum add --packages '@oakoss/ui:<patch|minor|major>' --message "…"`, or `--packages '@oakoss/ui:none'` when nothing ships (tests, internal refactors). CI's `oakum` job fails without one. `pnpm exec oakum generate` drafts one from the branch's commits; trim the `chore` and `test` entries it counts as patches, and any line for `oakoss-ui`, which `check --strict` rejects.
 - **A docs fix that should go live adds a patch bump file too.** ui.oakoss.dev deploys only from release tags, so a docs-only merge with no bump file waits for the next release.
 - **Releases are CI's job.** Each merge to `main` opens or updates the version PR (`oakum/version-packages`) from its bump files, and `gh workflow run oakum` does the same by hand; merging the version PR tags the version and creates the GitHub release, and the same oakum run deploys the docs through `release-docs.yml`, so a failed deploy turns the merger's run red. `gh workflow run release-docs.yml -f tag=v<version>` redeploys the newest release by hand. Don't run `oakum version` or `oakum release` locally, and don't push to, update, or close and reopen the version PR: CI checks any run a person triggers there and fails it until `gh workflow run oakum` rewrites the branch.
-- **Upgrading oakum:** bump the exact `@oakoss/oakum` pin in `package.json` and run `pnpm exec oakum upgrade` in the same PR, since `tool-version` must match.
+- **Upgrading oakum:** bump the exact `@oakoss/oakum` pin in `package.json` and run `pnpm exec oakum upgrade` in the same PR, which regenerates `.changeset/_schema.json` and removes deprecated config keys.
 
 # Task tracking
 
