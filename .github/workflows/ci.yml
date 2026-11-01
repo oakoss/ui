@@ -206,6 +206,7 @@ jobs:
           name: oakum-comment
           path: ${{ runner.temp }}/oakum-comment
           if-no-files-found: error
+          overwrite: true
           retention-days: 1
 
       # A step that failed must not read as one that reported.
