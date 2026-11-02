@@ -21,7 +21,7 @@ import {
   DropdownMenuDemo,
   type DropdownMenuDemoProps,
 } from './dropdown-menu-demo';
-import { menuClosed, openMenu } from './menu-test';
+import { menuClosed, openedMenu, openMenu } from './menu-test';
 
 const onAction = fn<(key: unknown) => void>();
 
@@ -141,9 +141,10 @@ export const Shortcuts: Story = {
         </DropdownMenuItem>
       </>
     ),
+    defaultOpen: true,
   },
   play: async () => {
-    const { menu } = await openMenu();
+    const { menu } = await openedMenu();
     const copy = within(menu).getByRole('menuitem', { name: 'Copy' });
     await expect(copy).toHaveAccessibleDescription('⌘C');
     await expect(
@@ -172,9 +173,10 @@ export const Descriptions: Story = {
         <DropdownMenuItem id="rename">Rename</DropdownMenuItem>
       </>
     ),
+    defaultOpen: true,
   },
   play: async () => {
-    const { menu } = await openMenu();
+    const { menu } = await openedMenu();
     const share = within(menu).getByRole('menuitem', { name: 'Share' });
     await expect(share).toHaveAccessibleDescription('Visible to your team');
   },
@@ -182,9 +184,9 @@ export const Descriptions: Story = {
 
 // A menu with nothing in it says so.
 export const Empty: Story = {
-  args: { children: [], emptyLabel: 'No actions available' },
+  args: { children: [], defaultOpen: true, emptyLabel: 'No actions available' },
   play: async () => {
-    const { menu } = await openMenu();
+    const { menu } = await openedMenu();
     const empty = within(menu).getByText('No actions available');
     await expect(empty).toBeVisible();
     await expect(getComputedStyle(empty).paddingInline).toBe('8px');
@@ -194,9 +196,9 @@ export const Empty: Story = {
 
 // A blank empty label shows nothing, rather than an unnamed row.
 export const BlankEmptyLabel: Story = {
-  args: { children: [], emptyLabel: ' ' },
+  args: { children: [], defaultOpen: true, emptyLabel: ' ' },
   play: async () => {
-    const { menu } = await openMenu();
+    const { menu } = await openedMenu();
     await expect(within(menu).queryByRole('menuitem')).toBeNull();
     await expect(menu).toBeEmptyDOMElement();
   },
@@ -204,8 +206,9 @@ export const BlankEmptyLabel: Story = {
 
 // A passed placement wins, and an undefined offset keeps the 4px default.
 export const Placement: Story = {
+  args: { defaultOpen: true },
   play: async () => {
-    const { panel } = await openMenu();
+    const { panel } = await openedMenu();
     const box = panel.getBoundingClientRect();
     const anchor = screen
       .getByRole('button', { name: 'Options' })
@@ -226,10 +229,11 @@ export const Width: Story = {
         A noticeably longer action than the trigger
       </DropdownMenuItem>
     ),
+    defaultOpen: true,
     triggerLabel: 'Go',
   },
   play: async () => {
-    const { menu, panel } = await openMenu('Go');
+    const { menu, panel } = await openedMenu();
     const item = within(menu).getByRole('menuitem');
     await expect(item.scrollWidth).toBeLessThanOrEqual(item.clientWidth);
     await expect(panel.getBoundingClientRect().width).toBeGreaterThan(
@@ -239,23 +243,15 @@ export const Width: Story = {
   },
 };
 
-// A breadcrumb's collapsed crumbs open from a menu inside a crumb, and its
-// items are links.
-export const InBreadcrumb: Story = {
-  play: async () => {
-    const { menu } = await openMenu('Show more');
-    const docs = within(menu).getByRole('menuitem', { name: 'Documentation' });
-    await expect(docs.tagName).toBe('A');
-    await expect(screen.getByRole('navigation').contains(menu)).toBe(false);
-  },
-  render: () => (
+function BreadcrumbDemo({ defaultOpen }: { defaultOpen?: boolean }) {
+  return (
     <Breadcrumb aria-label="Breadcrumbs">
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink>Home</BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbItem>
-          <DropdownMenuTrigger>
+          <DropdownMenuTrigger defaultOpen={defaultOpen}>
             <Button aria-label="Show more" size="icon-sm" variant="ghost">
               <BreadcrumbEllipsis />
             </Button>
@@ -274,5 +270,28 @@ export const InBreadcrumb: Story = {
         </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>
-  ),
+  );
+}
+
+// A breadcrumb's collapsed crumbs sit in a menu outside the navigation, and
+// its items are links.
+export const InBreadcrumb: Story = {
+  play: async () => {
+    const { menu } = await openedMenu();
+    const docs = within(menu).getByRole('menuitem', { name: 'Documentation' });
+    await expect(docs.tagName).toBe('A');
+    await expect(screen.getByRole('navigation').contains(menu)).toBe(false);
+  },
+  render: () => <BreadcrumbDemo defaultOpen />,
+};
+
+// The menu button inside a crumb still opens on press.
+export const InBreadcrumbOpens: Story = {
+  play: async () => {
+    const { menu } = await openMenu('Show more');
+    await expect(
+      within(menu).getByRole('menuitem', { name: 'Documentation' }),
+    ).toBeVisible();
+  },
+  render: () => <BreadcrumbDemo />,
 };

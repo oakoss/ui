@@ -123,7 +123,7 @@ export const DialogClose: Story = {
 
 const onFix = fn<() => void>();
 
-// A Button in the error message keeps its own handler.
+// The error message renders a Button among its text.
 export const ErrorButton: Story = {
   args: {
     errorMessage: (
@@ -133,6 +133,19 @@ export const ErrorButton: Story = {
     ),
     isInvalid: true,
   },
+  play: async ({ canvasElement }) => {
+    const error = canvasElement.querySelector('[data-slot=calendar-error]');
+    if (!(error instanceof HTMLElement)) throw new Error('No error');
+    await expect(error).toHaveTextContent(/^Pick a weekday\./u);
+    await expect(
+      within(error).getByRole('button', { name: 'Next weekday' }),
+    ).toBeVisible();
+  },
+};
+
+// A Button in the error message keeps its own handler.
+export const ErrorButtonPress: Story = {
+  args: ErrorButton.args,
   play: async ({ canvasElement }) => {
     await userEvent.click(
       within(canvasElement).getByRole('button', { name: 'Next weekday' }),

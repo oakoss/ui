@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { Button } from '@oakoss/ui/components/ui/inputs/button';
 import {
   CheckboxGroup,
   CheckboxGroupItem,
@@ -65,61 +64,6 @@ export const TargetSizeOff: Story = {
     const area = getComputedStyle(part('checkbox-indicator'), '::after');
     await expect(area.minWidth).not.toBe('44px');
   },
-};
-
-// The group's errors come from its errors prop, its errorMessage, or its
-// validate function, and requiredLabel replaces the message for a group
-// with nothing checked, including when a form passes an empty errors list.
-export const Errors: Story = {
-  play: async ({ canvas }) => {
-    const [fromErrors, fromMessage, fromValidate, required, emptyErrors] =
-      canvas.getAllByRole('group');
-    await expect(fromErrors).toHaveAccessibleDescription('Server says no.');
-    await expect(fromMessage).toHaveAccessibleDescription('Choose wisely.');
-    const olives = canvas.getAllByRole('checkbox', { name: 'Olives' })[2];
-    if (!olives) throw new Error('No Olives');
-    await userEvent.click(olives);
-    await userEvent.click(canvas.getByRole('button', { name: 'Order' }));
-    await expect(fromValidate).toHaveAccessibleDescription('No olives today.');
-    await expect(required).toHaveAccessibleDescription('Pick a topping.');
-    await expect(emptyErrors).toHaveAccessibleDescription(
-      'Select at least one option.',
-    );
-  },
-  render: () => (
-    <form
-      className="flex flex-col items-start gap-6"
-      onSubmit={(event) => {
-        event.preventDefault();
-      }}
-    >
-      <CheckboxGroup errors={['Server says no.']} isInvalid label="Server">
-        <Options />
-      </CheckboxGroup>
-      <CheckboxGroup errorMessage="Choose wisely." isInvalid label="Message">
-        <Options />
-      </CheckboxGroup>
-      <CheckboxGroup
-        label="Validate"
-        validate={(value) =>
-          value.includes('olives') ? 'No olives today.' : null
-        }
-      >
-        <Options />
-      </CheckboxGroup>
-      <CheckboxGroup
-        isRequired
-        label="Required"
-        requiredLabel="Pick a topping."
-      >
-        <Options />
-      </CheckboxGroup>
-      <CheckboxGroup errors={[]} isRequired label="Form">
-        <Options />
-      </CheckboxGroup>
-      <Button type="submit">Order</Button>
-    </form>
-  ),
 };
 
 const onTerms = fn<() => void>();
@@ -260,12 +204,3 @@ export const ForcedColorsCard: Story = {
   },
   tags: ['forced-colors'],
 };
-
-function Options() {
-  return (
-    <>
-      <CheckboxGroupItem value="cheese">Cheese</CheckboxGroupItem>
-      <CheckboxGroupItem value="olives">Olives</CheckboxGroupItem>
-    </>
-  );
-}

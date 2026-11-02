@@ -19,10 +19,10 @@ const onAction = fn<(key: unknown) => void>();
 
 // The target is focusable inside Pressable, so the keyboard can open the
 // menu too.
-function ContextMenuDemo() {
+function ContextMenuDemo({ defaultOpen }: { defaultOpen?: boolean }) {
   return (
     <div className="grid min-h-96 place-items-center">
-      <ContextMenuTrigger>
+      <ContextMenuTrigger defaultOpen={defaultOpen}>
         <Pressable>
           <div
             aria-label="report.pdf"
@@ -49,7 +49,7 @@ function ContextMenuDemo() {
 function EmptyMenuDemo({ emptyLabel }: { emptyLabel: string }) {
   return (
     <div className="grid min-h-96 place-items-center">
-      <ContextMenuTrigger>
+      <ContextMenuTrigger defaultOpen>
         <Pressable>
           <div
             aria-label="report.pdf"
@@ -142,11 +142,22 @@ export const Keyboard: Story = {
   },
 };
 
+// The open menu's items, with a destructive one past a separator. Opened
+// without a pointer, it anchors to the target's corner, not a pointer.
+export const Open: Story = {
+  args: { defaultOpen: true },
+  play: async () => {
+    const { menu } = await settledMenu();
+    await expect(within(menu).getAllByRole('menuitem')).toHaveLength(3);
+    await expect(
+      menu.querySelector('[data-slot=context-menu-separator]'),
+    ).toHaveAttribute('role', 'separator');
+  },
+};
+
 // emptyLabel shows when the menu has no items; a blank one mounts nothing.
 export const Empty: Story = {
-  play: async ({ canvas }) => {
-    const target = canvas.getByRole('button', { name: 'report.pdf' });
-    await userEvent.pointer({ keys: '[MouseRight]', target });
+  play: async () => {
     const { menu } = await settledMenu();
     const empty = within(menu).getByText('No actions available');
     await expect(empty).toBeVisible();
@@ -157,9 +168,7 @@ export const Empty: Story = {
 };
 
 export const BlankEmptyLabel: Story = {
-  play: async ({ canvas }) => {
-    const target = canvas.getByRole('button', { name: 'report.pdf' });
-    await userEvent.pointer({ keys: '[MouseRight]', target });
+  play: async () => {
     const { menu } = await settledMenu();
     await expect(menu).toBeEmptyDOMElement();
   },

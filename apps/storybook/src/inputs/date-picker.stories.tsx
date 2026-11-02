@@ -77,9 +77,9 @@ export const Keyboard: Story = {
 // The popover sits under the whole field, from its start edge, not under
 // the trigger.
 export const Placement: Story = {
+  args: { defaultOpen: true },
   play: async ({ canvas }) => {
     const group = canvas.getByRole('group', { name: 'Due date' });
-    await userEvent.click(canvas.getByRole('button', { name: /^Calendar/u }));
     const dialog = await screen.findByRole('dialog');
     await settled(dialog);
     const panel = dialog.closest('[data-slot=popover-content]');
@@ -95,34 +95,49 @@ export const Placement: Story = {
   ),
 };
 
-// A date and time value adds a time field under the calendar, named by
-// timeLabel, which edits the picker's time.
-export const WithTime: Story = {
-  play: async ({ canvas }) => {
-    const group = canvas.getByRole('group', { name: 'Meeting' });
-    await userEvent.click(canvas.getByRole('button', { name: /^Calendar/u }));
-    const dialog = await screen.findByRole('dialog');
-    await settled(dialog);
-    const hour = screen.getByRole('spinbutton', { name: /^hour, Starts/u });
-    await userEvent.click(hour);
-    await userEvent.keyboard('{ArrowUp}');
-    await expect(group).toHaveTextContent(/10:30/u);
-  },
-  render: () => (
+function MeetingPicker() {
+  return (
     <DatePicker<CalendarDateTime>
       className="w-72"
+      defaultOpen
       defaultValue={parseDateTime('2026-03-14T09:30')}
       granularity="minute"
       label="Meeting"
       timeLabel="Starts"
     />
-  ),
+  );
+}
+
+// A date and time value adds a time field under the calendar, named by
+// timeLabel.
+export const WithTime: Story = {
+  play: async () => {
+    const dialog = await screen.findByRole('dialog');
+    await settled(dialog);
+    await expect(
+      within(dialog).getByRole('group', { name: 'Starts' }),
+    ).toHaveTextContent(/9:30/u);
+  },
+  render: () => <MeetingPicker />,
+};
+
+// The time field edits the picker's time.
+export const WithTimeEdits: Story = {
+  play: async ({ canvas }) => {
+    const group = canvas.getByRole('group', { name: 'Meeting' });
+    await settled(await screen.findByRole('dialog'));
+    const hour = screen.getByRole('spinbutton', { name: /^hour, Starts/u });
+    await userEvent.click(hour);
+    await userEvent.keyboard('{ArrowUp}');
+    await expect(group).toHaveTextContent(/10:30/u);
+  },
+  render: () => <MeetingPicker />,
 };
 
 // A date alone gets no time field.
 export const DateOnly: Story = {
-  play: async ({ canvas }) => {
-    await userEvent.click(canvas.getByRole('button', { name: /^Calendar/u }));
+  args: { defaultOpen: true },
+  play: async () => {
     const dialog = await screen.findByRole('dialog');
     await settled(dialog);
     await expect(
@@ -131,23 +146,31 @@ export const DateOnly: Story = {
   },
 };
 
-// The popover grows to fit two months side by side. A footer Button doesn't
-// toggle it, since React Aria clears the trigger's button context inside.
+// The popover grows to fit two months side by side.
 export const CalendarProps: Story = {
   args: {
     calendarProps: {
       footer: <Button onPress={() => onChange(null)}>Clear</Button>,
       visibleMonths: 2,
     },
+    defaultOpen: true,
   },
-  play: async ({ canvas }) => {
-    await userEvent.click(canvas.getByRole('button', { name: /^Calendar/u }));
-    const dialog = await screen.findByRole('dialog');
-    await settled(dialog);
+  play: async () => {
+    await settled(await screen.findByRole('dialog'));
     const [first, second] = screen
       .getAllByRole('grid')
       .map((grid) => grid.getBoundingClientRect().top);
     await expect(second).toBe(first);
+  },
+};
+
+// A footer Button doesn't toggle the popover, since React Aria clears the
+// trigger's button context inside.
+export const CalendarPropsFooter: Story = {
+  args: CalendarProps.args,
+  play: async () => {
+    const dialog = await screen.findByRole('dialog');
+    await settled(dialog);
     await userEvent.click(screen.getByRole('button', { name: 'Clear' }));
     await expect(onChange).toHaveBeenCalledWith(null);
     await wait(300);
@@ -155,12 +178,28 @@ export const CalendarProps: Story = {
   },
 };
 
-// The month and year dropdowns work inside the popover: picking a year
-// keeps the popover open and returns focus to the dropdown.
+// The month and year dropdowns sit in the popover's heading.
 export const MonthYearSelect: Story = {
-  args: { calendarProps: { heading: <CalendarMonthYearSelect /> } },
-  play: async ({ canvas }) => {
-    await userEvent.click(canvas.getByRole('button', { name: /^Calendar/u }));
+  args: {
+    calendarProps: { heading: <CalendarMonthYearSelect /> },
+    defaultOpen: true,
+  },
+  play: async () => {
+    const dialog = await screen.findByRole('dialog');
+    await settled(dialog);
+    await expect(
+      within(dialog).getByRole('button', { name: /month/u }),
+    ).toHaveTextContent('Mar');
+    await expect(
+      within(dialog).getByRole('button', { name: /year/u }),
+    ).toHaveTextContent('2026');
+  },
+};
+
+// Picking a year keeps the popover open and returns focus to the dropdown.
+export const MonthYearSelectPicks: Story = {
+  args: MonthYearSelect.args,
+  play: async () => {
     const dialog = await screen.findByRole('dialog');
     await settled(dialog);
     const year = screen.getByRole('button', { name: /year/u });

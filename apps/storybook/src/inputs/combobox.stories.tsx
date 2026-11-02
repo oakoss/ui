@@ -9,6 +9,8 @@ import { expect, fn, screen, userEvent, waitFor, within } from 'storybook/test';
 
 import { whilePressed } from '#/helpers/press';
 
+import { openedList, OpenList } from './combobox-test';
+
 const FruitCombobox = Combobox<object>;
 
 const onChange = fn<(value: unknown) => void>();
@@ -135,10 +137,13 @@ export const ClearSelection: Story = {
 
 // With nothing matching, the list says so instead of closing.
 export const Empty: Story = {
-  args: { emptyLabel: 'No fruit found' },
-  play: async ({ canvas }) => {
-    await userEvent.type(canvas.getByRole('combobox', { name: 'Fruit' }), 'zz');
-    const list = await screen.findByRole('listbox');
+  args: {
+    defaultInputValue: 'zz',
+    emptyLabel: 'No fruit found',
+    end: <OpenList trigger="input" />,
+  },
+  play: async () => {
+    const { list } = await openedList();
     // React Aria gives the empty state the option role.
     await expect(within(list).getByRole('option')).toHaveTextContent(
       'No fruit found',
@@ -249,17 +254,14 @@ export const ButtonDecorationsKeyboard: Story = {
 // A full-width field's list stays inside React Aria's 12px viewport padding,
 // or scrolling an option into view scrolls the page and closes the list.
 export const FullWidthList: Story = {
+  args: { end: <OpenList /> },
   play: async ({ canvas }) => {
     const input = canvas.getByRole('combobox', { name: 'Fruit' });
     const viewport = document.documentElement.clientWidth;
     await expect(
       input.closest('[data-slot=input-group]')?.getBoundingClientRect().width,
     ).toBe(viewport);
-    await userEvent.type(input, 'ap');
-    const list = await screen.findByRole('listbox');
-    const popover = list.closest<HTMLElement>('[data-slot=combobox-content]');
-    if (!popover) throw new Error('No popover');
-    for (const animation of popover.getAnimations()) animation.finish();
+    const { popover } = await openedList();
     await expect(popover.getBoundingClientRect().right).toBeLessThanOrEqual(
       viewport - 12,
     );
@@ -269,18 +271,13 @@ export const FullWidthList: Story = {
 // className sizes the field, and the list is at least as wide as the input
 // and buttons together.
 export const ListWidth: Story = {
-  args: { className: 'w-96' },
+  args: { className: 'w-96', end: <OpenList /> },
   play: async ({ canvas }) => {
     const input = canvas.getByRole('combobox', { name: 'Fruit' });
-    await userEvent.click(
-      canvas.getByRole('button', { name: /Show suggestions/u }),
-    );
-    const list = await screen.findByRole('listbox');
-    const popover = list.closest<HTMLElement>('[data-slot=combobox-content]');
     const group = input.closest<HTMLElement>('[data-slot=input-group]');
-    if (!popover || !group) throw new Error('No popover or group');
+    if (!group) throw new Error('No group');
     await expect(group.getBoundingClientRect().width).toBe(384);
-    for (const animation of popover.getAnimations()) animation.finish();
+    const { popover } = await openedList();
     await expect(popover.getBoundingClientRect().width).toBeGreaterThanOrEqual(
       group.getBoundingClientRect().width,
     );

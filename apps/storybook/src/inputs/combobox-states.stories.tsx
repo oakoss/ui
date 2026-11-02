@@ -9,6 +9,8 @@ import { useState } from 'react';
 import { ComboBoxContext, type Key } from 'react-aria-components';
 import { expect, fn, screen, userEvent, waitFor, within } from 'storybook/test';
 
+import { openedList, OpenList } from './combobox-test';
+
 const FruitCombobox = Combobox<Fruit>;
 
 type Fruit = { id: string; name: string };
@@ -37,11 +39,11 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-// defaultItems with a function child still filters as you type.
+// defaultItems with a function child still filters by the input's text.
 export const DefaultItems: Story = {
-  play: async ({ canvas }) => {
-    await userEvent.type(canvas.getByRole('combobox', { name: 'Fruit' }), 'pe');
-    const list = await screen.findByRole('listbox');
+  args: { defaultInputValue: 'pe', end: <OpenList trigger="input" /> },
+  play: async () => {
+    const { list } = await openedList();
     await expect(within(list).getAllByRole('option')).toHaveLength(1);
     await expect(within(list).getByRole('option')).toHaveTextContent('Pear');
   },
@@ -185,9 +187,9 @@ export const ItemText: Story = {
 
 // With nothing matching and no emptyLabel, the list says "No results".
 export const EmptyDefault: Story = {
-  play: async ({ canvas }) => {
-    await userEvent.type(canvas.getByRole('combobox', { name: 'Fruit' }), 'zz');
-    const list = await screen.findByRole('listbox');
+  args: { defaultInputValue: 'zz', end: <OpenList trigger="input" /> },
+  play: async () => {
+    const { list } = await openedList();
     await expect(within(list).getByRole('option')).toHaveTextContent(
       'No results',
     );
@@ -196,10 +198,13 @@ export const EmptyDefault: Story = {
 
 // A blank emptyLabel shows nothing, rather than an unnamed option.
 export const BlankEmptyLabel: Story = {
-  args: { emptyLabel: ' ' },
-  play: async ({ canvas }) => {
-    await userEvent.type(canvas.getByRole('combobox', { name: 'Fruit' }), 'zz');
-    const list = await screen.findByRole('listbox');
+  args: {
+    defaultInputValue: 'zz',
+    emptyLabel: ' ',
+    end: <OpenList trigger="input" />,
+  },
+  play: async () => {
+    const { list } = await openedList();
     await expect(within(list).queryByRole('option')).toBeNull();
     await expect(list).toBeEmptyDOMElement();
   },
@@ -249,21 +254,16 @@ export const Dependencies: Story = {
 export const LoadMore: Story = {
   args: {
     defaultItems: undefined,
+    end: <OpenList />,
     items: fruits,
     loadingState: 'loadingMore',
     onLoadMore,
   },
-  play: async ({ canvas }) => {
-    await userEvent.click(
-      canvas.getByRole('button', { name: /Show suggestions/u }),
-    );
-    const list = await screen.findByRole('listbox');
+  play: async () => {
+    const { list } = await openedList();
     await expect(
       list.querySelectorAll('[data-slot=combobox-item]'),
     ).toHaveLength(2);
-    const popover = list.closest<HTMLElement>('[data-slot=combobox-content]');
-    if (!popover) throw new Error('No popover');
-    for (const animation of popover.getAnimations()) animation.finish();
     await expect(
       within(list).getByRole('progressbar', { name: 'Loading' }),
     ).toBeVisible();
@@ -274,10 +274,13 @@ export const LoadMore: Story = {
 
 // With defaultItems, the options beside the load-more row still filter.
 export const LoadMoreDefaultItems: Story = {
-  args: { onLoadMore },
-  play: async ({ canvas }) => {
-    await userEvent.type(canvas.getByRole('combobox', { name: 'Fruit' }), 'pe');
-    const list = await screen.findByRole('listbox');
+  args: {
+    defaultInputValue: 'pe',
+    end: <OpenList trigger="input" />,
+    onLoadMore,
+  },
+  play: async () => {
+    const { list } = await openedList();
     const options = list.querySelectorAll('[data-slot=combobox-item]');
     await expect(options).toHaveLength(1);
     await expect(options[0]).toHaveTextContent('Pear');

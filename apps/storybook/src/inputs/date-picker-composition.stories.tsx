@@ -21,7 +21,7 @@ import {
   Group,
   useLocale,
 } from 'react-aria-components';
-import { expect, screen, userEvent, waitFor } from 'storybook/test';
+import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
 
 import { freezeDate } from '#/helpers/date';
 import { settled } from '#/overlays/overlay-test';
@@ -84,6 +84,28 @@ function PresetButtons() {
     </div>
   );
 }
+
+// The open popover shows the presets in the calendar's footer.
+export const PresetsOpen: Story = {
+  play: async () => {
+    const dialog = await screen.findByRole('dialog');
+    await settled(dialog);
+    await expect(
+      within(dialog).getByRole('button', { name: 'Today' }),
+    ).toBeVisible();
+    await expect(
+      within(dialog).getByRole('button', { name: 'In a week' }),
+    ).toBeVisible();
+  },
+  render: () => (
+    <SingleDatePicker
+      calendarProps={{ footer: <PresetButtons /> }}
+      className="w-64"
+      defaultOpen
+      label="Due date"
+    />
+  ),
+};
 
 // Presets in the calendar's footer set the value from today, read when
 // pressed, and close the popover as picking a day does.
