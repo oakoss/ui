@@ -1,7 +1,9 @@
 import type { ChartValue } from '@tanstack/charts';
 
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { useDateFormatter, useNumberFormatter } from 'react-aria';
+
+import { useStableValue } from '#/hooks/use-stable-value';
 
 export type ChartFormatOptions = {
   date?: Intl.DateTimeFormatOptions;
@@ -22,12 +24,10 @@ const defaultDate: Intl.DateTimeFormatOptions = {
 export function useChartFormatter(
   options: ChartFormatOptions = {},
 ): ChartFormatter {
-  const numberFormatter = useNumberFormatter(
-    useStableValue(options.number ?? defaultNumber),
-  );
-  const dateFormatter = useDateFormatter(
-    useStableValue(options.date ?? defaultDate),
-  );
+  const number = options.number ?? defaultNumber;
+  const date = options.date ?? defaultDate;
+  const numberFormatter = useNumberFormatter(useStableValue(number));
+  const dateFormatter = useDateFormatter(useStableValue(date));
   return useCallback(
     (value: ChartValue) => {
       if (typeof value === 'number') return numberFormatter.format(value);
@@ -51,13 +51,4 @@ export function withTickPrecision(
     return options;
   }
   return { ...options, maximumFractionDigits: 20 };
-}
-
-// The first of a run of equal values, so an inline options object keeps the
-// formatter React Aria memoized for it.
-function useStableValue<T>(value: T): T {
-  const key = JSON.stringify(value);
-  const [stable, setStable] = useState({ key, value });
-  if (stable.key !== key) setStable({ key, value });
-  return stable.key === key ? stable.value : value;
 }

@@ -37,17 +37,24 @@ function FormatProbe() {
 
 function RerenderedChart() {
   const [renders, setRenders] = useState(0);
+  const [isCurrency, setIsCurrency] = useState(false);
+  const currency: Intl.NumberFormatOptions = isCurrency
+    ? { currency: 'USD', style: 'currency' }
+    : {};
   return (
     <ChartContainer
       config={visitorsConfig}
       description="Desktop and mobile visitors from January to June."
-      format={{ number: { maximumFractionDigits: 0 } }}
+      format={{ number: { maximumFractionDigits: 0, ...currency } }}
       title="Visitors by month"
     >
       <ChartPlot definition={visitorsChart} />
       <FormatProbe />
       <Button onPress={() => setRenders(renders + 1)} variant="outline">
         Render again
+      </Button>
+      <Button onPress={() => setIsCurrency(true)} variant="outline">
+        Show dollars
       </Button>
     </ChartContainer>
   );
@@ -134,6 +141,9 @@ export const InlineFormat: Story = {
     await userEvent.click(button);
     await userEvent.click(button);
     await expect(seenFormats.size).toBe(1);
+    await userEvent.click(canvas.getByRole('button', { name: 'Show dollars' }));
+    await waitFor(() => expect(tickLabels()).toContain('$300'));
+    await expect(seenFormats.size).toBe(2);
   },
   render: () => <RerenderedChart />,
 };

@@ -9,6 +9,7 @@ import {
   useChartFormatter,
   withTickPrecision,
 } from '#/hooks/use-chart-formatter';
+import { useStableValue } from '#/hooks/use-stable-value';
 import { createChartHighlighter } from '#/lib/chart-series';
 
 export type ChartContainerOptions = {
@@ -88,8 +89,12 @@ export function useChartContainer<TProps extends ChartContainerOptions>({
   return { figureProps, value };
 }
 
-function isSameSet(set: ReadonlySet<string>, values: readonly string[]) {
-  return set.size === values.length && values.every((value) => set.has(value));
+// Code-unit order, not the locale's, so two strings a collator ranks equal
+// can't reorder the key.
+function setKey(members: ReadonlySet<string>): string {
+  return JSON.stringify(
+    [...members].toSorted((a, b) => Number(a > b) - Number(a < b)),
+  );
 }
 
 function useHiddenSeries({
@@ -132,8 +137,5 @@ function useScenes() {
 // The same set while its members don't change, so plots rebuild their
 // definitions only when the hidden series do.
 function useStableSet(values: ChartSeriesKeys): ReadonlySet<string> {
-  const members = [...new Set(values)];
-  const [stable, setStable] = useState(() => new Set(members));
-  if (!isSameSet(stable, members)) setStable(new Set(members));
-  return isSameSet(stable, members) ? stable : new Set(members);
+  return useStableValue(new Set(values), setKey);
 }

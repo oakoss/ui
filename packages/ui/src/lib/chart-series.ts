@@ -53,8 +53,9 @@ export const chartBarStates = [
 export function chartColor(
   config: ChartConfig,
   hidden: Iterable<string> = [],
-): ChartColorOptions {
+): ChartColorOptions | undefined {
   const keys = chartSeriesKeys(config);
+  if (keys.length === 0) return undefined;
   const hiddenKeys = new Set(hidden);
   const visible: readonly string[] = keys.filter((key) => !hiddenKeys.has(key));
   // Only the visibility test is borrowed; its buttons, which would propose
