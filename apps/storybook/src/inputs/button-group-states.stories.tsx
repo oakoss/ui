@@ -111,11 +111,10 @@ export const FocusRaise: Story = {
   },
 };
 
-// A popover opened from the group keeps Button's own defaults: the group
+// A popover open from the group keeps Button's own defaults: the group
 // styles its Buttons, not an overlay's.
 export const OverlayInside: Story = {
-  play: async ({ canvas }) => {
-    await userEvent.click(canvas.getByRole('button', { name: 'More' }));
+  play: async () => {
     const inside = await screen.findByRole('button', { name: 'Delete' });
     await expect(inside).toHaveAttribute('data-variant', 'solid');
     await expect(inside).toHaveAttribute('data-size', 'md');
@@ -123,7 +122,7 @@ export const OverlayInside: Story = {
   render: (args) => (
     <ButtonGroup {...args} size="sm">
       <Button>Save</Button>
-      <PopoverTrigger>
+      <PopoverTrigger defaultOpen>
         <Button>More</Button>
         <Popover aria-label="More actions">
           <Button>Delete</Button>
@@ -134,8 +133,7 @@ export const OverlayInside: Story = {
 };
 
 export const DialogInside: Story = {
-  play: async ({ canvas }) => {
-    await userEvent.click(canvas.getByRole('button', { name: 'Share' }));
+  play: async () => {
     const inside = await screen.findByRole('button', { name: 'Copy link' });
     await expect(inside).toHaveAttribute('data-variant', 'solid');
     await expect(inside).toHaveAttribute('data-size', 'md');
@@ -146,7 +144,7 @@ export const DialogInside: Story = {
   render: (args) => (
     <ButtonGroup {...args} size="sm">
       <Button>Save</Button>
-      <DialogTrigger>
+      <DialogTrigger defaultOpen>
         <Button>Share</Button>
         <Dialog aria-label="Share">
           <Button>Copy link</Button>

@@ -6,6 +6,7 @@ import {
   RangeCalendar,
 } from '@oakoss/ui/components/ui/inputs/calendar';
 import { CalendarMonthYearSelect } from '@oakoss/ui/components/ui/inputs/calendar-month-year-select';
+import { SelectContext } from 'react-aria-components';
 import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
 
 import { freezeDate } from '#/helpers/date';
@@ -75,6 +76,53 @@ export const YearChoice: Story = {
     );
     await expect(
       canvas.getByRole('button', { name: /month/iu }),
+    ).toHaveTextContent('Jan');
+  },
+};
+
+// A slotted SelectContext disables the month picker alone.
+export const MonthPickerDisabled: Story = {
+  args: {
+    heading: (
+      <SelectContext
+        value={{ slots: { month: { isDisabled: true }, year: {} } }}
+      >
+        <CalendarMonthYearSelect />
+      </SelectContext>
+    ),
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole('button', { name: /month/iu }),
+    ).toBeDisabled();
+    await expect(canvas.getByRole('button', { name: /year/iu })).toBeEnabled();
+  },
+};
+
+// The year list opens alone, up to maxValue's year, beside the closed month.
+export const YearListOpen: Story = {
+  args: {
+    heading: (
+      <SelectContext
+        value={{ slots: { month: {}, year: { defaultOpen: true } } }}
+      >
+        <CalendarMonthYearSelect />
+      </SelectContext>
+    ),
+    maxValue: new CalendarDate(2027, 12, 31),
+  },
+  play: async ({ canvasElement }) => {
+    const [list, ...others] = await screen.findAllByRole('listbox');
+    if (!list) throw new Error('No list');
+    await expect(others).toHaveLength(0);
+    await expect(list).toHaveAccessibleName(/year/iu);
+    const options = within(list).getAllByRole('option');
+    await expect(options.at(-1)).toHaveTextContent('2027');
+    await expect(
+      within(list).getByRole('option', { name: '2026' }),
+    ).toHaveAttribute('aria-selected', 'true');
+    await expect(
+      within(canvasElement).getByRole('button', { name: /month/iu }),
     ).toHaveTextContent('Jan');
   },
 };

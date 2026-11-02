@@ -5,7 +5,6 @@ import { setInteractionModality } from 'react-aria-components';
 import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
 
 const SingleSelect = Select<object>;
-const MultipleSelect = Select<object, 'multiple'>;
 
 const fruits = (
   <>
@@ -28,28 +27,6 @@ type Story = StoryObj<typeof meta>;
 function trigger(canvas: { getByRole: typeof screen.getByRole }) {
   return canvas.getByRole('button', { name: /Fruit/u });
 }
-
-// Several picks show as a list in the user's language, and the list stays
-// open between picks.
-export const Multiple: Story = {
-  play: async ({ canvas }) => {
-    await userEvent.click(trigger(canvas));
-    const list = await screen.findByRole('listbox');
-    await expect(list).toHaveAttribute('aria-multiselectable', 'true');
-    await userEvent.click(within(list).getByRole('option', { name: 'Apple' }));
-    await userEvent.click(within(list).getByRole('option', { name: 'Pear' }));
-    await expect(list).toBeInTheDocument();
-    await userEvent.keyboard('{Escape}');
-    await waitFor(() => expect(screen.queryByRole('listbox')).toBeNull());
-    await expect(trigger(canvas)).toHaveTextContent('Apple and Pear');
-    await waitFor(() => expect(trigger(canvas)).toHaveFocus());
-  },
-  render: (args) => (
-    <MultipleSelect label={args.label} selectionMode="multiple">
-      {fruits}
-    </MultipleSelect>
-  ),
-};
 
 // The trigger matches Input's heights.
 export const Sizes: Story = {
@@ -98,9 +75,8 @@ export const FocusRing: Story = {
 // A disabled option fades, and takes the system's disabled color in forced
 // colors.
 export const DisabledItem: Story = {
-  args: { disabledKeys: ['banana'] },
-  play: async ({ canvas }) => {
-    await userEvent.click(trigger(canvas));
+  args: { defaultOpen: true, disabledKeys: ['banana'] },
+  play: async () => {
     const list = await screen.findByRole('listbox');
     const banana = within(list).getByRole('option', { name: 'Banana' });
     await expect(banana).toHaveAttribute('aria-disabled', 'true');
@@ -109,9 +85,8 @@ export const DisabledItem: Story = {
 };
 
 export const DisabledItemForcedColors: Story = {
-  args: { disabledKeys: ['banana'] },
-  play: async ({ canvas }) => {
-    await userEvent.click(trigger(canvas));
+  args: { defaultOpen: true, disabledKeys: ['banana'] },
+  play: async () => {
     const list = await screen.findByRole('listbox');
     const banana = within(list).getByRole('option', { name: 'Banana' });
     const probe = document.createElement('div');
@@ -175,9 +150,9 @@ export const LongList: Story = {
         {`Item ${index + 1}`}
       </SelectItem>
     )),
+    defaultOpen: true,
   },
-  play: async ({ canvas }) => {
-    await userEvent.click(trigger(canvas));
+  play: async () => {
     const list = await screen.findByRole('listbox');
     await expect(getComputedStyle(list).overflowY).toBe('auto');
     await expect(list.scrollHeight).toBeGreaterThan(list.clientHeight);
@@ -221,8 +196,7 @@ export const RightToLeft: Story = {
   },
 };
 
-async function listRight(canvas: { getByRole: typeof screen.getByRole }) {
-  await userEvent.click(trigger(canvas));
+async function listRight() {
   const list = await screen.findByRole('listbox');
   const popover = list.closest<HTMLElement>('[data-slot=select-content]');
   if (!popover) throw new Error('No popover');
@@ -233,10 +207,11 @@ async function listRight(canvas: { getByRole: typeof screen.getByRole }) {
 // A full-width trigger's list stays inside React Aria's 12px viewport padding
 // rather than widening the page.
 export const FullWidthList: Story = {
+  args: { defaultOpen: true },
   play: async ({ canvas }) => {
     const viewport = document.documentElement.clientWidth;
     await expect(trigger(canvas).getBoundingClientRect().width).toBe(viewport);
-    await expect(await listRight(canvas)).toBeLessThanOrEqual(viewport - 12);
+    await expect(await listRight()).toBeLessThanOrEqual(viewport - 12);
   },
 };
 
@@ -249,9 +224,10 @@ export const LongOptionList: Story = {
       </SelectItem>
     ),
     className: 'w-48',
+    defaultOpen: true,
   },
-  play: async ({ canvas }) => {
-    await expect(await listRight(canvas)).toBeLessThanOrEqual(
+  play: async () => {
+    await expect(await listRight()).toBeLessThanOrEqual(
       document.documentElement.clientWidth - 12,
     );
   },

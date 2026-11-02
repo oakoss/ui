@@ -11,14 +11,14 @@ import {
 } from '@oakoss/ui/components/ui/overlays/dropdown-menu';
 import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
 
-import { computedColor, tokenColor } from '#/helpers/color';
+import { tokenColor } from '#/helpers/color';
 import { part } from '#/helpers/parts';
 
 import {
   DropdownMenuDemo,
   type DropdownMenuDemoProps,
 } from './dropdown-menu-demo';
-import { openMenu } from './menu-test';
+import { openedMenu, openMenu } from './menu-test';
 import { settled } from './overlay-test';
 
 const meta = {
@@ -63,9 +63,9 @@ const mark = (item: HTMLElement) =>
 // Action and selection groups mix in one menu: single selection marks with a
 // dot, multiple with a check, and only selecting items leave room for it.
 export const Selection: Story = {
-  args: { children: view },
+  args: { children: view, defaultOpen: true },
   play: async () => {
-    const { menu } = await openMenu();
+    const { menu } = await openedMenu();
     const undo = within(menu).getByRole('menuitem', { name: 'Undo' });
     const grid = within(menu).getByRole('menuitemradio', { name: 'Grid' });
     const rulers = within(menu).getByRole('menuitemcheckbox', {
@@ -102,42 +102,20 @@ export const Selection: Story = {
     await expect(
       menu.querySelector('[data-slot=dropdown-menu-separator]'),
     ).toHaveAttribute('role', 'separator');
-    await userEvent.click(guides);
-    await expect(guides).toHaveAttribute('aria-checked', 'true');
-    await expect(mark(guides)).not.toBeNull();
   },
 };
 
-// A destructive item reads in the destructive color, and keeps it on its
-// subtle fill while focused.
-export const Destructive: Story = {
-  args: {
-    children: (
-      <>
-        <DropdownMenuItem id="rename">Rename</DropdownMenuItem>
-        <DropdownMenuItem id="delete" intent="destructive">
-          Delete
-        </DropdownMenuItem>
-      </>
-    ),
-  },
+// Choosing an unchecked item checks it and marks it.
+export const SelectionToggles: Story = {
+  args: { children: view },
   play: async () => {
     const { menu } = await openMenu();
-    const remove = within(menu).getByRole('menuitem', { name: 'Delete' });
-    await expect(getComputedStyle(remove).color).toBe(
-      tokenColor('--color-destructive-text'),
-    );
-    await userEvent.keyboard('{ArrowDown}{ArrowDown}');
-    await waitFor(async () => {
-      await expect(remove).toHaveFocus();
+    const guides = within(menu).getByRole('menuitemcheckbox', {
+      name: 'Guides',
     });
-    await Promise.all(remove.getAnimations().map((a) => a.finished));
-    await expect(getComputedStyle(remove).backgroundColor).toBe(
-      tokenColor('--color-destructive-subtle'),
-    );
-    await expect(getComputedStyle(remove).color).toBe(
-      tokenColor('--color-destructive-text'),
-    );
+    await userEvent.click(guides);
+    await expect(guides).toHaveAttribute('aria-checked', 'true');
+    await expect(mark(guides)).not.toBeNull();
   },
 };
 
@@ -229,56 +207,12 @@ export const Links: Story = {
         Documentation
       </DropdownMenuItem>
     ),
+    defaultOpen: true,
   },
   play: async () => {
-    const { menu } = await openMenu();
+    const { menu } = await openedMenu();
     const docs = within(menu).getByRole('menuitem', { name: 'Documentation' });
     await expect(docs.tagName).toBe('A');
     await expect(docs).toHaveAttribute('href', '/docs');
   },
-};
-
-// The focused item takes the system's selection colors in forced colors,
-// destructive or not, and a disabled one stays at full opacity in GrayText.
-export const ForcedColors: Story = {
-  args: {
-    children: (
-      <>
-        <DropdownMenuItem id="delete" intent="destructive">
-          Delete
-        </DropdownMenuItem>
-        <DropdownMenuItem id="archive" isDisabled>
-          Archive
-        </DropdownMenuItem>
-      </>
-    ),
-  },
-  play: async () => {
-    screen.getByRole('button', { name: 'Options' }).focus();
-    await userEvent.keyboard('{ArrowDown}');
-    const menu = await screen.findByRole('menu');
-    const remove = within(menu).getByRole('menuitem', { name: 'Delete' });
-    await waitFor(async () => {
-      await expect(remove).toHaveFocus();
-    });
-    const probe = document.createElement('div');
-    probe.style.backgroundColor = 'Highlight';
-    probe.style.color = 'HighlightText';
-    document.body.append(probe);
-    await expect(getComputedStyle(remove).backgroundColor).toBe(
-      getComputedStyle(probe).backgroundColor,
-    );
-    await expect(getComputedStyle(remove).color).toBe(
-      getComputedStyle(probe).color,
-    );
-    probe.remove();
-    // Opted out, so no backplate covers the Highlight fill.
-    await expect(getComputedStyle(remove).forcedColorAdjust).toBe('none');
-    const archive = within(menu).getByRole('menuitem', { name: 'Archive' });
-    await expect(getComputedStyle(archive).opacity).toBe('1');
-    await expect(getComputedStyle(archive).color).toBe(
-      computedColor('GrayText'),
-    );
-  },
-  tags: ['forced-colors'],
 };

@@ -84,9 +84,8 @@ export const Typing: Story = {
 
 // Two months sit side by side in a popover that grows to fit them.
 export const TwoMonths: Story = {
-  args: { calendarProps: { visibleMonths: 2 } },
-  play: async ({ canvas }) => {
-    await userEvent.click(canvas.getByRole('button', { name: /^Calendar/u }));
+  args: { calendarProps: { visibleMonths: 2 }, defaultOpen: true },
+  play: async () => {
     await settled(await screen.findByRole('dialog'));
     const [first, second] = screen
       .getAllByRole('grid')

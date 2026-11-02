@@ -42,7 +42,7 @@ export function CalendarMonthYearSelect({
   return (
     <div className="flex items-center gap-1" data-slot="calendar-month-year">
       <CalendarMonthPicker format={monthFormat}>
-        {(picker) => <PickerSelect picker={picker} />}
+        {(picker) => <PickerSelect picker={picker} slot="month" />}
       </CalendarMonthPicker>
       <CalendarYearPicker
         format={yearFormat}
@@ -54,15 +54,23 @@ export function CalendarMonthYearSelect({
   );
 }
 
-// React Aria leaves the calendar's disabled state out of the picker props.
-function PickerSelect({ picker }: { picker: Picker }) {
+// React Aria leaves the calendar's disabled state out of the picker props. The
+// slot lets a SelectContext with slots reach one picker.
+function PickerSelect({
+  picker,
+  slot,
+}: {
+  picker: Picker;
+  slot: 'month' | 'year';
+}) {
   const state = useCalendarState();
   return (
     <Select<PickerItem>
       {...picker}
       className="min-w-0"
-      isDisabled={state?.isDisabled}
+      isDisabled={state?.isDisabled === true ? true : undefined}
       size="sm"
+      slot={slot}
     >
       {(item: PickerItem) => (
         <SelectItem id={item.id}>{item.formatted}</SelectItem>
@@ -101,6 +109,7 @@ function YearSelect({ picker }: { picker: YearPicker }) {
           );
         },
       }}
+      slot="year"
     />
   );
 }

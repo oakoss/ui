@@ -72,6 +72,7 @@ async function settledPanel() {
 // A ghost icon button named "Help" opens a popover named by its title, below
 // and aligned to the button's start edge.
 export const Default: Story = {
+  args: { defaultOpen: true },
   play: async () => {
     const button = screen.getByRole('button', { name: 'Help' });
     await expect(button).toHaveAttribute(
@@ -81,7 +82,6 @@ export const Default: Story = {
     await expect(lucideIcon(button)).toContain('circle-question-mark');
     // The small icon size, so it fits beside a label.
     await expect(button.getBoundingClientRect().height).toBe(32);
-    await userEvent.click(button);
     const { box, dialog, panel } = await settledPanel();
     await expect(dialog).toHaveAccessibleName('What’s a workspace ID?');
     const buttonBox = button.getBoundingClientRect();
@@ -122,12 +122,12 @@ export const EscapeRestoresFocus: Story = {
 
 // In a right-to-left locale, start is the right edge.
 export const RightToLeft: Story = {
+  args: { defaultOpen: true },
   globals: { locale: 'ar-EG' },
   play: async () => {
     const button = screen.getByRole('button', { name: 'Help' });
     // Arabic writes its question mark mirrored (؟), so the icon follows.
     await expect(iconScale(button)).toBe('-1 1');
-    await userEvent.click(button);
     const { box } = await settledPanel();
     await expect(
       Math.abs(box.right - button.getBoundingClientRect().right),
@@ -137,10 +137,9 @@ export const RightToLeft: Story = {
 
 // A consumer's crossOffset reaches the popover.
 export const CrossOffset: Story = {
-  args: { crossOffset: 20 },
+  args: { crossOffset: 20, defaultOpen: true },
   play: async () => {
     const button = screen.getByRole('button', { name: 'Help' });
-    await userEvent.click(button);
     const { box } = await settledPanel();
     await expect(
       Math.abs(box.left - button.getBoundingClientRect().left - 20),
