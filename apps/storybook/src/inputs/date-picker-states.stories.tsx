@@ -57,15 +57,14 @@ export const Disabled: Story = {
   },
 };
 
-// isDateUnavailable strikes days through in the popover and marks a typed
-// one invalid.
+// isDateUnavailable strikes days through in the popover.
 export const UnavailableDates: Story = {
   args: {
+    defaultOpen: true,
     isDateUnavailable: (date) => date.day === 20,
     validationBehavior: 'aria',
   },
-  play: async ({ canvas }) => {
-    await userEvent.click(canvas.getByRole('button', { name: /^Calendar/u }));
+  play: async () => {
     await settled(await screen.findByRole('dialog'));
     await expect(
       screen.getByRole('button', { name: /March 20,/u }),
@@ -107,9 +106,9 @@ export const StartButton: Story = {
 // React Aria keeps the trigger pressed while the calendar is open, which
 // mustn't hold the ghost button's pressed tint.
 export const TriggerWhileOpen: Story = {
+  args: { defaultOpen: true },
   play: async ({ canvas }) => {
     const trigger = canvas.getByRole('button', { name: /^Calendar/u });
-    await userEvent.click(trigger);
     await settled(await screen.findByRole('dialog'));
     trigger.dataset.pressed = 'true';
     for (const animation of trigger.getAnimations()) animation.finish();
@@ -124,9 +123,11 @@ export const TriggerWhileOpen: Story = {
 
 // calendarProps reach the calendar beyond the heading and footer.
 export const CalendarLoading: Story = {
-  args: { calendarProps: { isLoading: true, loadingLabel: 'Fetching' } },
-  play: async ({ canvas }) => {
-    await userEvent.click(canvas.getByRole('button', { name: /^Calendar/u }));
+  args: {
+    calendarProps: { isLoading: true, loadingLabel: 'Fetching' },
+    defaultOpen: true,
+  },
+  play: async () => {
     const dialog = await screen.findByRole('dialog');
     await settled(dialog);
     await expect(dialog.querySelector('[aria-busy=true]')).not.toBeNull();

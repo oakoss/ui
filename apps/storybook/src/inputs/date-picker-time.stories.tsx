@@ -20,6 +20,7 @@ const onChange = fn<(value: CalendarDateTime | null | ZonedDateTime) => void>();
 const meta = {
   args: {
     className: 'w-80',
+    defaultOpen: true,
     granularity: 'minute',
     label: 'Meeting',
     onChange,
@@ -36,8 +37,7 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-async function openTime(canvas: ReturnType<typeof within>) {
-  await userEvent.click(canvas.getByRole('button', { name: /^Calendar/u }));
+async function openedTime() {
   const dialog = await screen.findByRole('dialog');
   await settled(dialog);
   return { dialog, time: within(dialog).getByRole('group', { name: 'Time' }) };
@@ -52,8 +52,8 @@ export const TimeProps: Story = {
     hideTimeZone: true,
     hourCycle: 24,
   },
-  play: async ({ canvas }) => {
-    const { time } = await openTime(canvas);
+  play: async () => {
+    const { time } = await openedTime();
     const segments = within(time);
     await expect(
       segments.getByRole('spinbutton', { name: /^second/u }),
@@ -70,8 +70,8 @@ export const TimeProps: Story = {
 // the field returns to the picker's time.
 export const ClearTime: Story = {
   args: { defaultValue: parseDateTime('2026-03-14T09:30') },
-  play: async ({ canvas }) => {
-    const { time } = await openTime(canvas);
+  play: async () => {
+    const { time } = await openedTime();
     for (const [unit, keys] of [
       ['hour', '{Backspace}{Backspace}'],
       ['minute', '{Backspace}{Backspace}'],
@@ -94,8 +94,8 @@ export const ZonedPlaceholder: Story = {
   args: {
     placeholderValue: parseZonedDateTime('2026-03-14T09:00[America/New_York]'),
   },
-  play: async ({ canvas }) => {
-    const { time } = await openTime(canvas);
+  play: async () => {
+    const { time } = await openedTime();
     await userEvent.click(
       within(time).getByRole('spinbutton', { name: /^hour/u }),
     );
@@ -117,6 +117,7 @@ function Lockable() {
         footer: <Button onPress={() => setLocked(true)}>Lock</Button>,
       }}
       className="w-80"
+      defaultOpen
       defaultValue={parseDateTime('2026-03-14T09:30')}
       granularity="minute"
       isReadOnly={locked}
@@ -127,8 +128,8 @@ function Lockable() {
 
 // The time field follows the picker's read-only state while open.
 export const ReadOnlyWhileOpen: Story = {
-  play: async ({ canvas }) => {
-    const { time } = await openTime(canvas);
+  play: async () => {
+    const { time } = await openedTime();
     const hour = within(time).getByRole('spinbutton', { name: /^hour/u });
     await expect(hour).not.toHaveAttribute('aria-readonly');
     await userEvent.click(screen.getByRole('button', { name: 'Lock' }));

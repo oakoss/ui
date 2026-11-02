@@ -22,6 +22,7 @@ const onChange = fn<(value: { end: Value; start: Value } | null) => void>();
 const meta = {
   args: {
     className: 'w-96',
+    defaultOpen: true,
     defaultValue: {
       end: parseDateTime('2026-03-16T10:00'),
       start: parseDateTime('2026-03-14T09:30'),
@@ -42,8 +43,7 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-async function openTimes(canvas: ReturnType<typeof within>, names?: string[]) {
-  await userEvent.click(canvas.getByRole('button', { name: /^Calendar/u }));
+async function openedTimes(names?: string[]) {
   const dialog = await screen.findByRole('dialog');
   await settled(dialog);
   const [startName = 'Start time', endName = 'End time'] = names ?? [];
@@ -54,13 +54,19 @@ async function openTimes(canvas: ReturnType<typeof within>, names?: string[]) {
   };
 }
 
-// A date and time range adds start and end time fields under the calendar,
-// each editing its own end of the range.
+// A date and time range adds start and end time fields under the calendar.
 export const Times: Story = {
-  play: async ({ canvas }) => {
-    const { end, start } = await openTimes(canvas);
+  play: async () => {
+    const { end, start } = await openedTimes();
     await expect(start).toHaveTextContent(/9:30/u);
     await expect(end).toHaveTextContent(/10:00/u);
+  },
+};
+
+// Each time field edits its own end of the range.
+export const TimesEdit: Story = {
+  play: async () => {
+    const { end, start } = await openedTimes();
     await userEvent.click(
       within(start).getByRole('spinbutton', { name: /^hour/u }),
     );
@@ -94,8 +100,8 @@ export const TimeProps: Story = {
     hourCycle: 24,
     startTimeLabel: 'Check in',
   },
-  play: async ({ canvas }) => {
-    const { end, start } = await openTimes(canvas, ['Check in', 'Check out']);
+  play: async () => {
+    const { end, start } = await openedTimes(['Check in', 'Check out']);
     await expect(
       within(start).getByRole('spinbutton', { name: /^second/u }),
     ).toBeVisible();
@@ -125,8 +131,8 @@ async function clearTime(group: HTMLElement) {
 // Emptying a time changes nothing: a date and time value always has one, so
 // the field returns to the range's time.
 export const ClearTime: Story = {
-  play: async ({ canvas }) => {
-    const { start } = await openTimes(canvas);
+  play: async () => {
+    const { start } = await openedTimes();
     await clearTime(start);
     await waitFor(() => expect(start).toHaveTextContent(/9:30/u));
     await expect(onChange).not.toHaveBeenCalled();
@@ -136,8 +142,8 @@ export const ClearTime: Story = {
 // Times typed before the dates survive being emptied, as in Date Picker.
 export const ClearPendingTime: Story = {
   args: { defaultValue: undefined },
-  play: async ({ canvas }) => {
-    const times = await openTimes(canvas);
+  play: async () => {
+    const times = await openedTimes();
     for (const group of [times.start, times.end]) {
       await userEvent.click(
         within(group).getByRole('spinbutton', { name: /^hour/u }),
@@ -152,8 +158,7 @@ export const ClearPendingTime: Story = {
 // A date alone gets no time fields.
 export const DateOnly: Story = {
   args: { defaultValue: undefined, granularity: undefined },
-  play: async ({ canvas }) => {
-    await userEvent.click(canvas.getByRole('button', { name: /^Calendar/u }));
+  play: async () => {
     const dialog = await screen.findByRole('dialog');
     await settled(dialog);
     await expect(
@@ -168,8 +173,8 @@ export const ZonedPlaceholder: Story = {
     defaultValue: undefined,
     placeholderValue: parseZonedDateTime('2026-03-14T09:00[America/New_York]'),
   },
-  play: async ({ canvas }) => {
-    const { start } = await openTimes(canvas);
+  play: async () => {
+    const { start } = await openedTimes();
     await userEvent.click(
       within(start).getByRole('spinbutton', { name: /^hour/u }),
     );
@@ -185,11 +190,8 @@ export const ZonedPlaceholder: Story = {
   },
 };
 
-async function expectLocks(
-  canvas: ReturnType<typeof within>,
-  attribute: 'aria-disabled' | 'aria-readonly',
-) {
-  const { end, start } = await openTimes(canvas);
+async function expectLocks(attribute: 'aria-disabled' | 'aria-readonly') {
+  const { end, start } = await openedTimes();
   const hours = [start, end].map((group) =>
     within(group).getByRole('spinbutton', { name: /^hour/u }),
   );
@@ -210,6 +212,7 @@ function Lockable({ prop }: { prop: 'isDisabled' | 'isReadOnly' }) {
         footer: <Button onPress={() => setLocked(true)}>Lock</Button>,
       }}
       className="w-96"
+      defaultOpen
       defaultValue={{
         end: parseDateTime('2026-03-16T10:00'),
         start: parseDateTime('2026-03-14T09:30'),
@@ -223,12 +226,12 @@ function Lockable({ prop }: { prop: 'isDisabled' | 'isReadOnly' }) {
 
 // Both time fields follow the picker's read-only state while open.
 export const ReadOnlyWhileOpen: Story = {
-  play: ({ canvas }) => expectLocks(canvas, 'aria-readonly'),
+  play: () => expectLocks('aria-readonly'),
   render: () => <Lockable prop="isReadOnly" />,
 };
 
 // Both time fields follow the picker's disabled state while open.
 export const DisabledWhileOpen: Story = {
-  play: ({ canvas }) => expectLocks(canvas, 'aria-disabled'),
+  play: () => expectLocks('aria-disabled'),
   render: () => <Lockable prop="isDisabled" />,
 };
