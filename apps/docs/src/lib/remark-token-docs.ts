@@ -9,7 +9,7 @@ import {
   families,
   intentRoleKinds,
   intentRoleMeta,
-  intentStepRules,
+  intentStepRuleText,
 } from '@oakoss/tokens';
 
 import {
@@ -25,6 +25,11 @@ type Cell = Node | string;
 
 const family = families[axes.family.default];
 
+type TokenElement = {
+  attribute: string;
+  expand: (file: File, node: Node, value: string) => Node;
+};
+
 /**
 Writes `<TokenTable group>` into the `.md` output as a Markdown table of the
 default family's light and dark values, while the page keeps the live
@@ -33,21 +38,43 @@ output alike. Both give search one record per table row.
 */
 export function remarkTokenDocs() {
   return (tree: Node, file: File) => {
-    transform(tree, (node) => {
-      const name = node.name === 'TokenTable' ? 'group' : 'set';
-      const value = attribute(node, name);
-      if (value === undefined)
-        throw new Error(`<${node.name}> needs a ${name}`);
-      if (node.name === 'TokenTable') {
-        const rows = tokenValues(value);
-        recordMarkdown(file, node, markdownTable(rows));
-        return searchable(node, rows);
+    transform(tree, (node, element) => {
+      const value = attribute(node, element.attribute);
+      if (value === undefined) {
+        throw new Error(`<${node.name}> needs a ${element.attribute}`);
       }
-      const rows = tokenRules(value);
-      return searchable(recordExpansion(file, node, table(rows)), rows);
+      return element.expand(file, node, value);
     });
   };
 }
+
+const elements: Record<string, TokenElement> = {
+  TokenRules: {
+    attribute: 'set',
+    expand: (file, node, set) => {
+      const rules = own(ruleSets, set);
+      if (rules === undefined) throw new Error(`no token rules "${set}"`);
+      const rows = rules();
+      return searchable(recordExpansion(file, node, table(rows)), rows);
+    },
+  },
+  TokenTable: {
+    attribute: 'group',
+    expand: (file, node, group) => {
+      const rows = tokenValues(group);
+      recordMarkdown(file, node, markdownTable(rows));
+      return searchable(node, rows);
+    },
+  },
+};
+
+const ruleSets: Record<string, () => Cell[][]> = {
+  charts: chartRows,
+  contrast: contrastRows,
+  derived: derivedRows,
+  intent: intentRows,
+  neutral: neutralRows,
+};
 
 function attribute(node: Node, name: string): string | undefined {
   const value = node.attributes?.find((entry) => entry.name === name)?.value;
@@ -139,22 +166,12 @@ function inline(text: string): Node[] {
 
 function intentRows(): Cell[][] {
   const intentName = '{intent}';
-  const { border, subtle, textStart } = intentStepRules;
-  const text = contrastMinimum.text;
-  const rules: Record<keyof typeof intentRoleMeta, string> = {
-    border: step(border.light, border.dark),
-    fill: `The step nearest the scale's anchor whose foreground passes ${text}:1 and which passes ${contrastMinimum['non-text']}:1 on the page`,
-    foreground: 'Step 50 or 950, whichever contrasts more with the fill',
-    hover: `The fill's neighbor away from the foreground, else its other neighbor: the first that passes ${text}:1 with the foreground`,
-    subtle: step(subtle.light, subtle.dark),
-    text: `From ${step(textStart.light, textStart.dark)}, the first step away from the page that passes ${text}:1 on the page and on subtle, pressed too`,
-  };
   return [
     ['Token', 'Description', 'Step'],
     ...intentRoleKinds.map((kind) => [
       code(kind === 'fill' ? `--${intentName}` : `--${intentName}-${kind}`),
       described(intentRoleMeta[kind]),
-      rules[kind],
+      intentStepRuleText[kind],
     ]),
   ];
 }
@@ -184,6 +201,11 @@ function neutralRows(): Cell[][] {
   ];
 }
 
+// A table's own entry, so a name like `toString` isn't read off the prototype.
+function own<T>(table: Record<string, T>, key: string): T | undefined {
+  return Object.hasOwn(table, key) ? table[key] : undefined;
+}
+
 // Search indexes paragraphs, and a table has none, so each row becomes one.
 function searchable(node: Node, rows: Cell[][]): Node {
   const contents = rows
@@ -196,10 +218,6 @@ function seriesText(series: ChartSeries<string> | undefined): string {
   if (series === undefined) return '';
   const { hue, steps } = series;
   return `${hue} ${steps.light} (light), ${steps.dark} (dark)`;
-}
-
-function step(light: number, dark: number): string {
-  return `${light} in light, ${dark} in dark`;
 }
 
 function table(rows: Cell[][]): Node {
@@ -215,15 +233,6 @@ function table(rows: Cell[][]): Node {
   };
 }
 
-function tokenRules(set: string): Cell[][] {
-  if (set === 'neutral') return neutralRows();
-  if (set === 'intent') return intentRows();
-  if (set === 'derived') return derivedRows();
-  if (set === 'charts') return chartRows();
-  if (set === 'contrast') return contrastRows();
-  throw new Error(`no token rules "${set}"`);
-}
-
 function tokenValues(groupId: string): Cell[][] {
   const { dark, light } = defaultFamilyTokens(groupId);
   return [
@@ -237,13 +246,15 @@ function tokenValues(groupId: string): Cell[][] {
   ];
 }
 
-function transform(node: Node, expand: (node: Node) => Node): Node {
-  if (
-    node.type === 'mdxJsxFlowElement' &&
-    (node.name === 'TokenTable' || node.name === 'TokenRules')
-  ) {
-    return expand(node);
-  }
+function transform(
+  node: Node,
+  expand: (node: Node, element: TokenElement) => Node,
+): Node {
+  const element =
+    node.type === 'mdxJsxFlowElement' && node.name !== undefined
+      ? own(elements, node.name)
+      : undefined;
+  if (element !== undefined) return expand(node, element);
   if (node.children) {
     node.children = node.children.map((child) => transform(child, expand));
   }

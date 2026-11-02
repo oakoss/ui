@@ -13,6 +13,7 @@ import { defaultTypography } from '#/typographies/default';
 
 export { primaryHues } from '#/bundle';
 export type { Color } from '#/color';
+export { colorPathLabel } from '#/color-path';
 export { fieldColor, formatColor } from '#/css';
 export type {
   ChartSeries,
@@ -39,7 +40,7 @@ export {
   themeItem,
 } from '#/registry-items';
 export { type ResolvedFlavor, resolveFlavor } from '#/resolve';
-export { intentStepRules } from '#/role-steps';
+export { intentStepRules, intentStepRuleText } from '#/role-steps';
 export type {
   ContrastKind,
   ContrastPair,

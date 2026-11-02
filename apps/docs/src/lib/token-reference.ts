@@ -1,6 +1,7 @@
 import {
   axes,
   chartRoleMeta,
+  colorPathLabel,
   derivedRoleMeta,
   families,
   fieldColor,
@@ -26,6 +27,8 @@ import type {
 } from './token-reference-types.ts';
 
 type Meta = { description: string; usage?: string };
+
+type ThemeRowsByName = ReadonlyMap<string, { source: string; value: string }>;
 
 const style = styles[axes.style.default];
 
@@ -82,30 +85,23 @@ function buildReference(): TokenReference {
   const sources = new Strings();
   const primaryRows =
     tokenGroups.find(({ id }) => id === 'primary')?.rows ?? [];
-  const entries = (theme: Theme, rows: TokenRow[]) => {
-    const byName = new Map(
-      themeRows(theme).map(([name, source, value]) => [
-        name,
-        { source, value },
-      ]),
-    );
-    return rows.map(({ name }): TokenEntry => {
+  const entries = (byName: ThemeRowsByName, rows: TokenRow[]) =>
+    rows.map(({ name }): TokenEntry => {
       const row = byName.get(name);
       if (row === undefined) throw new Error(`no token ${name}`);
       return [sources.index(row.source), colors.index(row.value)];
     });
-  };
   const themes: TokenReference['themes'] = {};
   const primaryThemes: TokenReference['primaryThemes'] = {};
   for (const family of Object.values(families)) {
     for (const flavor of Object.keys(family.flavors)) {
-      const theme = resolved(family, flavor);
+      const byName = themeRowsByName(resolved(family, flavor));
       themes[`${family.id}/${flavor}`] = Object.fromEntries(
-        tokenGroups.map(({ id, rows }) => [id, entries(theme, rows)]),
+        tokenGroups.map(({ id, rows }) => [id, entries(byName, rows)]),
       );
       for (const primary of family.intents.primary.choices) {
         primaryThemes[`${family.id}/${flavor}/${primary}`] = entries(
-          resolved(family, flavor, primary),
+          themeRowsByName(resolved(family, flavor, primary)),
           primaryRows,
         );
       }
@@ -177,17 +173,11 @@ function rows(meta: Record<string, Meta>): TokenRow[] {
   return Object.entries(meta).map(([name, entry]) => row(name, entry));
 }
 
-/**
-A token's source as the reference shows it: a palette color as Tailwind
-names it (`zinc-950`, `white / 10%`), or the variable a derived role
-follows (`--primary-text`).
-*/
+// A palette color as Tailwind names it (`white / 10%`), or the variable a
+// derived role follows (`--primary-text`).
 function sourceLabel(source: TokenSource): string {
   if ('role' in source) return `--${source.role}`;
-  return alphaLabel(
-    source.ref.replace(/^color\./u, '').replace('.', '-'),
-    source.alpha,
-  );
+  return alphaLabel(colorPathLabel(source.ref), source.alpha);
 }
 
 // Each token's name, source and CSS value, with the style's field color.
@@ -208,4 +198,10 @@ function themeRows(theme: Theme): [string, string, string][] {
     ...tokens,
     ['field', fieldSource, fieldColor(style, theme.polarity, theme.tokens)],
   ];
+}
+
+function themeRowsByName(theme: Theme): ThemeRowsByName {
+  return new Map(
+    themeRows(theme).map(([name, source, value]) => [name, { source, value }]),
+  );
 }

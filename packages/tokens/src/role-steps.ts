@@ -24,6 +24,23 @@ export const intentStepRules = {
 
 const { border: borderStep, subtle: subtleStep, textStart } = intentStepRules;
 
+const textMinimum = contrastMinimum.text;
+
+function byPolarity({ dark, light }: Record<Polarity, Step>): string {
+  return `${light} in light, ${dark} in dark`;
+}
+
+// How pickIntentSteps chooses each role's step, in the words the token
+// reference shows, so a change to the picker is reviewed beside its text.
+export const intentStepRuleText: Readonly<Record<IntentRoleKind, string>> = {
+  border: byPolarity(borderStep),
+  fill: `The step nearest the scale's anchor whose foreground passes ${textMinimum}:1 and which passes ${contrastMinimum['non-text']}:1 on the page`,
+  foreground: 'Step 50 or 950, whichever contrasts more with the fill',
+  hover: `The fill's neighbor away from the foreground, else its other neighbor: the first that passes ${textMinimum}:1 with the foreground`,
+  subtle: byPolarity(subtleStep),
+  text: `From ${byPolarity(textStart)}, the first step away from the page that passes ${textMinimum}:1 on the page and on subtle, pressed too`,
+};
+
 /**
 Picks each intent role's step for one scale on one page (note 0004). The
 fill is the nearest step to the anchor whose text passes 4.5:1 and which

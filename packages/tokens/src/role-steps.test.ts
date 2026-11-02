@@ -3,7 +3,11 @@ import { describe, expect, it } from 'vitest';
 import { type Color, oklch } from '#/color';
 import { contrastRatio } from '#/contrast';
 import { tailwindScales } from '#/families/tailwind-scales';
-import { pickIntentSteps } from '#/role-steps';
+import {
+  intentStepRules,
+  intentStepRuleText,
+  pickIntentSteps,
+} from '#/role-steps';
 import {
   authored,
   type AuthoredScale,
@@ -138,4 +142,19 @@ describe('pickIntentSteps: ties', () => {
       expect(pickIntentSteps(tie, polarity, page)).toMatchObject({ fill });
     },
   );
+});
+
+describe('intentStepRuleText', () => {
+  it('states the steps the picker uses for each fixed role', () => {
+    const { border, subtle, textStart } = intentStepRules;
+    expect(intentStepRuleText.border).toBe(
+      `${border.light} in light, ${border.dark} in dark`,
+    );
+    expect(intentStepRuleText.subtle).toBe(
+      `${subtle.light} in light, ${subtle.dark} in dark`,
+    );
+    expect(intentStepRuleText.text).toContain(
+      `From ${textStart.light} in light, ${textStart.dark} in dark,`,
+    );
+  });
 });

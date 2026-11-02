@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import type { Family } from '#/family';
 
 import { type Color, oklch } from '#/color';
+import { parseColorPath } from '#/color-path';
 import { tailwindScales } from '#/families/tailwind-scales';
 import { families } from '#/index';
 import { type ResolvedFlavor, resolveFlavor } from '#/resolve';
@@ -35,7 +36,9 @@ function referenced(
   { palette }: ResolvedFlavor,
   path: string,
 ): Color | undefined {
-  const [, name = '', step] = path.split('.', 3);
+  const parsed = parseColorPath(path);
+  if (parsed === undefined) return undefined;
+  const { name, step } = parsed;
   if (step === undefined) return palette.neutrals[name];
   const number = Number(step);
   return isStep(number) ? palette.scales[name]?.steps[number] : undefined;
