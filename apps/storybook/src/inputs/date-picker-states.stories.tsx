@@ -72,6 +72,21 @@ export const UnavailableDates: Story = {
   },
 };
 
+// A typed date isDateUnavailable rejects marks the field invalid.
+export const UnavailableTyped: Story = {
+  args: {
+    isDateUnavailable: (date) => date.day === 20,
+    validationBehavior: 'aria',
+  },
+  play: async ({ canvas }) => {
+    const group = canvas.getByRole('group', { name: 'Due date' });
+    await expect(group).not.toHaveAttribute('data-invalid');
+    await userEvent.click(canvas.getByRole('spinbutton', { name: /^day/u }));
+    await userEvent.keyboard('20');
+    await expect(group).toHaveAttribute('data-invalid', 'true');
+  },
+};
+
 // The trigger sits at the end edge in a right-to-left locale.
 export const RightToLeft: Story = {
   globals: { locale: 'ar-EG' },
