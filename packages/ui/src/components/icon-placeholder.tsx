@@ -1,10 +1,4 @@
-import {
-  createContext,
-  type ReactNode,
-  type SVGProps,
-  use,
-  useEffect,
-} from 'react';
+import { createContext, type ReactNode, type SVGProps, use } from 'react';
 
 export type IconLibrary =
   | 'hugeicons'
@@ -26,8 +20,6 @@ export const IconResolverContext = createContext<IconResolver | undefined>(
   undefined,
 );
 
-const warning = { hasShown: false };
-
 /**
 `shadcn add` replaces each `<IconPlaceholder>` with the icon for the
 project's `iconLibrary`, so this only renders when that didn't happen.
@@ -45,18 +37,7 @@ export function IconPlaceholder({
     { hugeicons, lucide, phosphor, remixicon, tabler },
     props,
   );
-  const isResolved = icon !== undefined && icon !== null;
-
-  useEffect(() => {
-    if (isResolved || warning.hasShown) return;
-    warning.hasShown = true;
-    // oxlint-disable-next-line no-console -- tells the consumer how to fix their setup
-    console.warn(
-      'IconPlaceholder rendered without an icon library. Set "iconLibrary" in components.json, then re-add the component so shadcn swaps in your icons.',
-    );
-  }, [isResolved]);
-
-  if (isResolved) return icon;
+  if (icon !== undefined && icon !== null) return icon;
   return (
     <svg aria-hidden height="1em" viewBox="0 0 24 24" width="1em" {...props}>
       <rect

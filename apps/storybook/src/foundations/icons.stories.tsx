@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { IconResolverContext } from '@oakoss/ui/components/icon-placeholder';
 import * as icons from '@oakoss/ui/components/icons';
-import { expect, spyOn } from 'storybook/test';
+import { expect } from 'storybook/test';
 
 function IconGallery() {
   return (
@@ -28,11 +28,7 @@ type Story = StoryObj<typeof meta>;
 
 // The preview's resolver renders Lucide, keeping each icon's props.
 export const Gallery: Story = {
-  beforeEach: () => {
-    spyOn(console, 'warn');
-  },
   play: async ({ canvasElement }) => {
-    await expect(console.warn).not.toHaveBeenCalled();
     const items = [...canvasElement.querySelectorAll('li')];
     await expect(items).toHaveLength(Object.keys(icons).length);
     const unresolved = items.filter(
@@ -43,13 +39,8 @@ export const Gallery: Story = {
   },
 };
 
-// What an install sees if shadcn didn't swap the icons: a hidden square
-// and one warning, however many icons render.
+// What an install sees if shadcn didn't swap the icons: a hidden square.
 export const Fallback: Story = {
-  // Spied per story: Storybook restores spies between stories.
-  beforeEach: () => {
-    spyOn(console, 'warn');
-  },
   decorators: [
     (Story) => (
       <IconResolverContext value={undefined}>
@@ -67,6 +58,5 @@ export const Fallback: Story = {
         svg.classList.contains('lucide'),
     );
     await expect(wrong).toEqual([]);
-    await expect(console.warn).toHaveBeenCalledTimes(1);
   },
 };

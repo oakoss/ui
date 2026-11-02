@@ -184,8 +184,6 @@ const arbitraryValues: Record<string, string[]> = {
     'forced-colors:focus:text-[HighlightText]',
     '[scrollbar-width:none]',
   ],
-  // A range's two inputs scroll together without a scrollbar.
-  'src/components/ui/inputs/date-range-picker.tsx': ['[scrollbar-width:none]'],
   // A disabled field's addons gray like its native disabled input.
   'src/components/ui/inputs/input-group.tsx': [
     'forced-colors:has-[>:disabled,>[data-slot=date-range-input]>:disabled]:[&>[data-slot=input-group-addon]]:text-[GrayText]',
@@ -293,6 +291,12 @@ const componentVariables = defineConfig({
       // shadcn swaps only literal IconPlaceholder elements, one per icon.
       files: ['src/components/icons.tsx'],
       rules: { 'max-lines': 'off' },
+    },
+    {
+      // React Aria addresses a thumb by its index, and thumbs never reorder;
+      // a value key would remount the thumb on every drag step.
+      files: ['src/components/ui/inputs/slider.tsx'],
+      rules: { 'react/no-array-index-key': 'off' },
     },
   ],
 });

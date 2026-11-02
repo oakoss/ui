@@ -36,8 +36,8 @@ heights) set up the field around the trigger, as on
 `aria-hidden` icon inside the trigger, and text is added to its description.
 They sit inside the trigger's button, which takes its name from the label and
 value, so a named element there isn't announced, and a link or button there is
-invalid HTML that assistive tech may flatten into the trigger. A Select warns in
-the console when its trigger holds a focusable element.
+invalid HTML that assistive tech may flatten into the trigger; axe reports it
+as `nested-interactive`. Keep only text and `aria-hidden` icons there.
 
 ## Examples
 
