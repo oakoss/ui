@@ -50,6 +50,15 @@ export const SideEnd: Story = {
   },
 };
 
+export const SideEndCollapsed: Story = {
+  args: { defaultOpen: false, side: 'end' },
+  play: async () => {
+    await expect(sidebarContainer().getBoundingClientRect().left).toBe(
+      innerWidth,
+    );
+  },
+};
+
 // Start and end follow the text direction.
 export const RightToLeft: Story = {
   globals: { locale: 'ar-EG' },
@@ -59,6 +68,16 @@ export const RightToLeft: Story = {
     );
     await userEvent.click(sidebarTrigger());
     await settle();
+    await expect(sidebarContainer().getBoundingClientRect().left).toBe(
+      innerWidth,
+    );
+  },
+};
+
+export const RightToLeftCollapsed: Story = {
+  args: { defaultOpen: false },
+  globals: { locale: 'ar-EG' },
+  play: async () => {
     await expect(sidebarContainer().getBoundingClientRect().left).toBe(
       innerWidth,
     );
@@ -82,6 +101,13 @@ export const Floating: Story = {
   },
 };
 
+export const FloatingCollapsed: Story = {
+  args: { collapsible: 'icon', defaultOpen: false, variant: 'floating' },
+  play: async () => {
+    await expect(sidebarContainer().getBoundingClientRect().width).toBe(66);
+  },
+};
+
 // An inset sidebar's page content is a card beside it, flush on the sidebar's
 // side until it collapses.
 export const Inset: Story = {
@@ -93,6 +119,13 @@ export const Inset: Story = {
     await expect(style.borderTopLeftRadius).not.toBe('0px');
     await userEvent.click(sidebarTrigger());
     await settle();
+    await expect(getComputedStyle(inset()).marginLeft).toBe('8px');
+  },
+};
+
+export const InsetCollapsed: Story = {
+  args: { defaultOpen: false, variant: 'inset' },
+  play: async () => {
     await expect(getComputedStyle(inset()).marginLeft).toBe('8px');
   },
 };

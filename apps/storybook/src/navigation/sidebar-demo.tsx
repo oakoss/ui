@@ -31,16 +31,19 @@ import {
 import {
   SidebarProvider,
   type SidebarProviderProps,
+  useSidebar,
 } from '@oakoss/ui/components/ui/navigation/sidebar-provider';
 import {
   SidebarRail,
   SidebarTrigger,
 } from '@oakoss/ui/components/ui/navigation/sidebar-trigger';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, RouterProvider } from 'react-aria-components';
 import { screen } from 'storybook/test';
 
 export type SidebarDemoProps = {
+  // Opens the phone sheet without input; the provider has no prop for it.
+  isMobileOpen?: boolean;
   onRailPress?: () => void;
   // Projects listed, so the content can overflow.
   projects?: number;
@@ -83,6 +86,7 @@ export function sidebarContainer() {
 // current page is the one the router last went to.
 export function SidebarDemo({
   defaultOpen,
+  isMobileOpen = false,
   isOpen,
   keyboardShortcut,
   onOpenChange,
@@ -121,6 +125,7 @@ export function SidebarDemo({
           {withRail ? <SidebarRail onPress={onRailPress} /> : null}
         </Sidebar>
         <Page path={path} />
+        {isMobileOpen ? <OpenMobileSheet /> : null}
       </SidebarProvider>
     </RouterProvider>
   );
@@ -183,6 +188,15 @@ function MainGroup({ path }: { path: string }) {
       </SidebarGroupContent>
     </SidebarGroup>
   );
+}
+
+// The sheet renders only once the provider reports a phone width.
+function OpenMobileSheet() {
+  const { isMobile, setOpenMobile } = useSidebar();
+  useEffect(() => {
+    if (isMobile) setOpenMobile(true);
+  }, [isMobile, setOpenMobile]);
+  return null;
 }
 
 function Page({ path }: { path: string }) {

@@ -133,3 +133,57 @@ export const SelectionSurvivesSort: Story = {
     await expect(rowBox(canvas, 'PAY-006')).not.toBeChecked();
   },
 };
+
+const firstPage = Array.from(
+  { length: 10 },
+  (_, index) => `PAY-${String(index + 1).padStart(3, '0')}`,
+);
+
+export const RowSelected: Story = {
+  args: { defaultState: { selection: { ids: ['PAY-002'] } } },
+  play: async ({ canvas }) => {
+    await expect(selectedIds(canvas)).toEqual(['PAY-002']);
+    await expect(canvas.getByText('1 selected')).toBeVisible();
+  },
+};
+
+export const PageSelected: Story = {
+  args: { defaultState: { selection: { ids: firstPage } } },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole('checkbox', { name: 'Select all on this page' }),
+    ).toBeChecked();
+    await expect(
+      canvas.getByRole('button', { name: 'Select all 25 matching' }),
+    ).toBeVisible();
+  },
+};
+
+// Every matching row but one, seen from the page holding the exception.
+export const AllMatchingExceptOne: Story = {
+  args: {
+    defaultState: {
+      pagination: { pageIndex: 1, pageSize: 10 },
+      selection: { all: {}, except: ['PAY-012'] },
+    },
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText('24 selected')).toBeVisible();
+    await expect(
+      canvas.getByRole('checkbox', { name: 'Select all on this page' }),
+    ).toBePartiallyChecked();
+  },
+};
+
+export const HiddenByFilter: Story = {
+  args: {
+    defaultState: {
+      columnFilters: [{ id: 'status', value: ['pending'] }],
+      selection: { ids: ['PAY-001', 'PAY-002', 'PAY-004'] },
+    },
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText('3 selected')).toBeVisible();
+    await expect(canvas.getByText('(2 hidden by filter)')).toBeVisible();
+  },
+};

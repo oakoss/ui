@@ -4,7 +4,10 @@ import {
   DataTableToolbar,
 } from '@oakoss/ui/components/ui/data/data-table';
 import { DataTableActionBar } from '@oakoss/ui/components/ui/data/data-table-action-bar';
-import { DataTableFacetedFilter } from '@oakoss/ui/components/ui/data/data-table-faceted-filter';
+import {
+  DataTableFacetedFilter,
+  type DataTableFacetedFilterProps,
+} from '@oakoss/ui/components/ui/data/data-table-faceted-filter';
 import { DataTableFilterChips } from '@oakoss/ui/components/ui/data/data-table-filter-chips';
 import { DataTablePagination } from '@oakoss/ui/components/ui/data/data-table-pagination';
 import { DataTableSearch } from '@oakoss/ui/components/ui/data/data-table-search';
@@ -17,6 +20,7 @@ import {
   useDataTableContext,
 } from '@oakoss/ui/hooks/use-data-table';
 import { useMemo, useState } from 'react';
+import { SelectContext } from 'react-aria-components';
 import { screen, userEvent, within } from 'storybook/test';
 
 import { type Payment, paymentColumns, payments } from './data-table-demo';
@@ -30,6 +34,8 @@ export type FiltersTableProps = {
   data?: Payment[];
   defaultState?: Partial<DataTableState>;
   extraFacet?: string;
+  // The facet whose list starts open, by column id.
+  openedFacet?: string;
   searchColumn?: string;
   statusCounts?: Record<string, number>;
 };
@@ -53,6 +59,7 @@ export function FiltersTable({
   data = payments,
   defaultState,
   extraFacet,
+  openedFacet,
   searchColumn,
   statusCounts,
 }: FiltersTableProps) {
@@ -74,10 +81,10 @@ export function FiltersTable({
     <DataTable className="w-4xl max-w-full" table={table}>
       <DataTableToolbar>
         <DataTableSearch aria-label="Search payments" column={searchColumn} />
-        <DataTableFacetedFilter column="status" counts={statusCounts} />
-        <DataTableFacetedFilter column="email" title="Customer" />
+        <Facet column="status" counts={statusCounts} opened={openedFacet} />
+        <Facet column="email" opened={openedFacet} title="Customer" />
         {extraFacet === undefined ? null : (
-          <DataTableFacetedFilter column={extraFacet} />
+          <Facet column={extraFacet} opened={openedFacet} />
         )}
         <DataTableViewOptions />
         <AppControls
@@ -94,9 +101,13 @@ export function FiltersTable({
   );
 }
 
+export async function openedFacet() {
+  return within(await screen.findByRole('listbox'));
+}
+
 export async function openFacet(name: string) {
   await userEvent.click(facetTrigger(name));
-  return within(await screen.findByRole('listbox'));
+  return openedFacet();
 }
 
 // Changes the app makes to the search from outside the table.
@@ -111,6 +122,20 @@ function AppControls({ onSearch }: { onSearch: (() => void) | undefined }) {
         <Button onPress={onSearch}>App search</Button>
       )}
     </>
+  );
+}
+
+// The facet takes no open prop, so its Select opens from the context.
+function Facet({
+  opened,
+  ...props
+}: { opened: string | undefined } & DataTableFacetedFilterProps) {
+  return opened === props.column ? (
+    <SelectContext value={{ defaultOpen: true }}>
+      <DataTableFacetedFilter {...props} />
+    </SelectContext>
+  ) : (
+    <DataTableFacetedFilter {...props} />
   );
 }
 

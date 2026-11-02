@@ -108,14 +108,22 @@ export const MobileLabel: Story = {
   },
 };
 
-// Ends with the sheet open at a phone's width, so the Visual run captures
-// the phone layout.
+// The phone layout, open and closed, for the Visual run.
 export const PhoneOpen: Story = {
+  args: { isMobileOpen: true },
   beforeEach: phoneWidth,
   play: async () => {
     await phoneLayout();
-    await userEvent.click(sidebarTrigger());
     await settled(await screen.findByRole('dialog', { name: 'Main' }));
+  },
+};
+
+export const PhoneClosed: Story = {
+  beforeEach: phoneWidth,
+  play: async () => {
+    await phoneLayout();
+    await expect(sidebarTrigger()).toHaveAttribute('aria-expanded', 'false');
+    await expect(screen.queryByRole('dialog')).toBeNull();
   },
 };
 
