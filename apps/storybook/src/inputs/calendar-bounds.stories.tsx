@@ -80,6 +80,25 @@ export const YearChoice: Story = {
   },
 };
 
+// A slotted SelectContext disables the month picker alone.
+export const MonthPickerDisabled: Story = {
+  args: {
+    heading: (
+      <SelectContext
+        value={{ slots: { month: { isDisabled: true }, year: {} } }}
+      >
+        <CalendarMonthYearSelect />
+      </SelectContext>
+    ),
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole('button', { name: /month/iu }),
+    ).toBeDisabled();
+    await expect(canvas.getByRole('button', { name: /year/iu })).toBeEnabled();
+  },
+};
+
 // The year list opens alone, up to maxValue's year, beside the closed month.
 export const YearListOpen: Story = {
   args: {

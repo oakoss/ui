@@ -68,7 +68,7 @@ function PickerSelect({
     <Select<PickerItem>
       {...picker}
       className="min-w-0"
-      isDisabled={state?.isDisabled}
+      isDisabled={state?.isDisabled === true ? true : undefined}
       size="sm"
       slot={slot}
     >
