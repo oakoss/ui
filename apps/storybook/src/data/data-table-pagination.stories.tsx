@@ -1,6 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { expect, screen, userEvent, type within } from 'storybook/test';
+import {
+  expect,
+  screen,
+  userEvent,
+  waitFor,
+  type within,
+} from 'storybook/test';
 
 import { phoneWidth } from '#/helpers/viewport';
 
@@ -68,7 +74,9 @@ export const LargerPageSize: Story = {
 export const LinkedRowOnLaterPage: Story = {
   args: { linkedRowId: 'PAY-015' },
   play: async ({ canvas }) => {
-    await expect(pageLabel(canvas)).toHaveTextContent('Page 2 of 3');
+    await waitFor(() =>
+      expect(pageLabel(canvas)).toHaveTextContent('Page 2 of 3'),
+    );
     const linked = bodyRows(canvas).find((row) =>
       row.textContent.includes('PAY-015'),
     );
