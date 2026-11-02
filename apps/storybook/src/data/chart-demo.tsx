@@ -1,10 +1,6 @@
 import type { ChartConfig } from '@oakoss/ui/hooks/use-chart';
 
-import {
-  chartBarStates,
-  chartColor,
-  chartSeriesStates,
-} from '@oakoss/ui/lib/chart-series';
+import { chartBarStates } from '@oakoss/ui/lib/chart-series';
 import { barX, barY, defineChart, lineY, rect } from '@tanstack/charts';
 import { crosshair } from '@tanstack/charts/crosshair';
 import { scaleBand } from '@tanstack/charts/scales/band';
@@ -34,57 +30,48 @@ export const visitors = months.flatMap(({ month, ...counts }) =>
   devices.map((device) => ({ device, month, visitors: counts[device] })),
 );
 
-// The color channel names each row's series, which the legend can hide.
-export function visitorsLines(hidden: Iterable<string> = []) {
-  return defineChart({
-    color: chartColor(visitorsConfig, hidden),
-    focus: 'group-x',
-    marks: [
-      lineY(visitors, {
-        color: 'device',
-        states: chartSeriesStates,
-        strokeWidth: 2,
-        x: 'month',
-        y: 'visitors',
-      }),
-      crosshair({ x: true, y: false }),
-    ],
-    maxFocusDistance: Infinity,
-    scales: {
-      x: { scale: () => scalePoint().padding(0.2) },
-      y: { grid: true, nice: true, scale: scaleLinear },
-    },
-    tooltip,
-  });
-}
-
-export const visitorsChart = visitorsLines();
+// The color channel names each row's series, which the legend can hide;
+// ChartPlot adds the colors and the legend's highlight.
+export const visitorsChart = defineChart({
+  focus: 'group-x',
+  marks: [
+    lineY(visitors, {
+      color: 'device',
+      strokeWidth: 2,
+      x: 'month',
+      y: 'visitors',
+    }),
+    crosshair({ x: true, y: false }),
+  ],
+  maxFocusDistance: Infinity,
+  scales: {
+    x: { scale: () => scalePoint().padding(0.2) },
+    y: { grid: true, nice: true, scale: scaleLinear },
+  },
+  tooltip,
+});
 
 // Stacked bars by month, outlined on focus in place of the focus ring's dot.
-export function visitorsBars(hidden: Iterable<string> = []) {
-  return defineChart({
-    color: chartColor(visitorsConfig, hidden),
-    focus: 'group-x',
-    focusRing: false,
-    marks: [
-      barY(visitors, {
-        color: 'device',
-        states: chartBarStates,
-        x: 'month',
-        y: 'visitors',
-      }),
-    ],
-    scales: {
-      x: { scale: scaleBand },
-      y: { grid: true, nice: true, scale: scaleLinear },
-    },
-    tooltip,
-  });
-}
+export const visitorsBarsChart = defineChart({
+  focus: 'group-x',
+  focusRing: false,
+  marks: [
+    barY(visitors, {
+      color: 'device',
+      states: chartBarStates,
+      x: 'month',
+      y: 'visitors',
+    }),
+  ],
+  scales: {
+    x: { scale: scaleBand },
+    y: { grid: true, nice: true, scale: scaleLinear },
+  },
+  tooltip,
+});
 
 // Bars and a line over one series, so each month has two values for it.
 export const overlaidVisitorsChart = defineChart({
-  color: chartColor(visitorsConfig),
   marks: [
     barY(visitors.slice(0, 2), {
       color: 'device',
@@ -120,7 +107,7 @@ export const emptyVisitorsChart = defineChart({
 
 // Lines without a tooltip: the chart announces focus itself.
 export const silentVisitorsChart = defineChart({
-  ...visitorsLines(),
+  ...visitorsChart,
   tooltip: false,
 });
 

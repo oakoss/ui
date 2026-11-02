@@ -10,22 +10,20 @@ import { hoverReal } from '#/helpers/pointer';
 
 import {
   silentVisitorsChart,
-  visitorsBars,
+  visitorsBarsChart,
   visitorsChart,
   visitorsConfig,
 } from './chart-demo';
 
 function HideableBars() {
-  const [hidden, setHidden] = useState(() => new Set<string>());
-  const definition = useMemo(() => visitorsBars(hidden), [hidden]);
   return (
     <ChartContainer
       config={visitorsConfig}
       description="Desktop and mobile visitors from January to June."
       title="Visitors by month"
     >
-      <ChartPlot definition={definition} />
-      <ChartLegend hidden={hidden} onHiddenChange={setHidden} />
+      <ChartPlot definition={visitorsBarsChart} />
+      <ChartLegend />
     </ChartContainer>
   );
 }
@@ -37,7 +35,10 @@ const redrawn: { draw?: () => void; renders: number } = { renders: 0 };
 function RedrawnBars() {
   const [drawn, setDrawn] = useState(0);
   // A new definition each time draw runs, with the same bars.
-  const definition = useMemo(() => visitorsBars([`redraw-${drawn}`]), [drawn]);
+  const definition = useMemo(
+    () => ({ ...visitorsBarsChart, maxFocusDistance: drawn + 1e9 }),
+    [drawn],
+  );
   useEffect(() => {
     redrawn.draw = () => setDrawn((count) => count + 1);
     return () => {
@@ -111,7 +112,7 @@ export const LineRing: Story = {
 
 // A bar takes an outline in place of the dot, for keyboard focus and hover.
 export const BarOutline: Story = {
-  args: { children: <ChartPlot definition={visitorsBars()} /> },
+  args: { children: <ChartPlot definition={visitorsBarsChart} /> },
   play: async ({ canvas }) => {
     await focusChart();
     await expect(focusDot()).toBeNull();
@@ -178,7 +179,7 @@ export const AnnouncedWithoutTooltip: Story = {
 
 // The tooltip sits beside the focused mark, never over it.
 export const TooltipClear: Story = {
-  args: { children: <ChartPlot definition={visitorsBars()} /> },
+  args: { children: <ChartPlot definition={visitorsBarsChart} /> },
   play: async () => {
     await focusChart();
     for (let index = 0; index < 12; index++) {
@@ -230,7 +231,7 @@ export const OutlineAfterRedraw: Story = {
 // SVG strokes keep their colors in forced colors, so the marker takes
 // system colors there and shows on the page color.
 export const ForcedColors: Story = {
-  args: { children: <ChartPlot definition={visitorsBars()} /> },
+  args: { children: <ChartPlot definition={visitorsBarsChart} /> },
   parameters: {
     a11y: { config: { rules: [{ enabled: false, id: 'color-contrast' }] } },
   },

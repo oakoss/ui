@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ChartContainer, ChartPlot } from '@oakoss/ui/components/ui/data/chart';
 import { ChartLegend } from '@oakoss/ui/components/ui/data/chart-legend';
 import { Button } from '@oakoss/ui/components/ui/inputs/button';
-import { useMemo, useState } from 'react';
 import { expect, userEvent, waitFor } from 'storybook/test';
 
 import { tabReal } from '#/helpers/keyboard';
@@ -11,22 +10,23 @@ import { part } from '#/helpers/parts';
 
 import {
   emptyVisitorsChart,
-  visitorsBars,
+  visitorsBarsChart,
   visitorsChart,
   visitorsConfig,
 } from './chart-demo';
 
 function HideAll() {
-  const [hidden, setHidden] = useState(() => new Set<string>());
-  const definition = useMemo(() => visitorsBars(hidden), [hidden]);
   return (
     <ChartContainer
       config={visitorsConfig}
       description="Desktop and mobile visitors from January to June."
       title="Visitors by month"
     >
-      <ChartPlot definition={definition} hiddenLabel="Every device is hidden" />
-      <ChartLegend hidden={hidden} onHiddenChange={setHidden} />
+      <ChartPlot
+        definition={visitorsBarsChart}
+        hiddenLabel="Every device is hidden"
+      />
+      <ChartLegend />
     </ChartContainer>
   );
 }

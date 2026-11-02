@@ -15,8 +15,8 @@ import {
 } from 'react';
 
 import { useChart } from '#/hooks/use-chart';
-import { useChartFormatter } from '#/hooks/use-chart-formatter';
 import { withChartDefaults } from '#/lib/chart-definition';
+import { chartColor, chartSeriesKeys } from '#/lib/chart-series';
 import { chartTooltipText } from '#/lib/chart-tooltip';
 
 type ChartPlotOptions<
@@ -31,8 +31,8 @@ type ChartPlotOptions<
   onRender?: (context: ChartRenderContext<TDatum, TXValue, TYValue>) => void;
 };
 
-// ChartPlot's wiring: the definition with its defaults, the scene the
-// container's table and empty state read, and the announcement a chart
+// ChartPlot's wiring: the definition with the container's defaults, the scene
+// the container's table and empty state read, and the announcement a chart
 // without a tooltip makes.
 export function useChartPlot<
   TDatum,
@@ -43,17 +43,9 @@ export function useChartPlot<
   onFocusGroupChange,
   onRender,
 }: ChartPlotOptions<TDatum, TXValue, TYValue>) {
-  const { config, highlighter, setScene } = useChart();
+  const { setScene } = useChart();
   const id = useId();
-  const format = useChartFormatter();
-  const describe = useCallback(
-    (points: readonly ChartPoint[]) => chartTooltipText(points, config, format),
-    [config, format],
-  );
-  const plotted = useMemo(
-    () => withChartDefaults(definition, highlighter.control, describe),
-    [definition, describe, highlighter],
-  );
+  const { describe, plotted } = usePlotted(definition);
   const isTooltip =
     definition.tooltip !== undefined && definition.tooltip !== false;
   const [announcement, setAnnouncement] = useState('');
@@ -104,4 +96,34 @@ function useEscapeDismiss(setIsDismissed: (isDismissed: boolean) => void) {
     return () => element?.removeEventListener('keydown', dismiss);
   }, [setIsDismissed]);
   return ref;
+}
+
+function usePlotted<
+  TDatum,
+  TXValue extends ChartValue,
+  TYValue extends ChartValue,
+>(definition: DomChartDefinition<TDatum, TXValue, TYValue>) {
+  const { config, format, hidden, highlighter, tickFormat } = useChart();
+  const describe = useCallback(
+    (points: readonly ChartPoint[]) => chartTooltipText(points, config, format),
+    [config, format],
+  );
+  const color = useMemo(
+    () =>
+      chartSeriesKeys(config).length > 0
+        ? chartColor(config, hidden)
+        : undefined,
+    [config, hidden],
+  );
+  const plotted = useMemo(
+    () =>
+      withChartDefaults(definition, {
+        color,
+        content: describe,
+        control: highlighter.control,
+        tickFormat,
+      }),
+    [color, definition, describe, highlighter, tickFormat],
+  );
+  return { describe, plotted };
 }

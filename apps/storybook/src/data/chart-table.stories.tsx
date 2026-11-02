@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ChartContainer, ChartPlot } from '@oakoss/ui/components/ui/data/chart';
 import { ChartLegend } from '@oakoss/ui/components/ui/data/chart-legend';
 import { ChartTable } from '@oakoss/ui/components/ui/data/chart-table';
-import { useMemo, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import {
@@ -11,22 +10,20 @@ import {
   browsersConfig,
   horizontalVisitorsChart,
   overlaidVisitorsChart,
-  visitorsBars,
+  visitorsBarsChart,
   visitorsChart,
   visitorsConfig,
 } from './chart-demo';
 
 function HideableTable() {
-  const [hidden, setHidden] = useState(() => new Set<string>());
-  const definition = useMemo(() => visitorsBars(hidden), [hidden]);
   return (
     <ChartContainer
       config={visitorsConfig}
       description="Desktop and mobile visitors from January to June."
       title="Visitors by month"
     >
-      <ChartPlot definition={definition} />
-      <ChartLegend hidden={hidden} onHiddenChange={setHidden} />
+      <ChartPlot definition={visitorsBarsChart} />
+      <ChartLegend />
       <ChartTable defaultExpanded />
     </ChartContainer>
   );

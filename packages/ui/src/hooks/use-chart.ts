@@ -2,6 +2,7 @@ import type { ChartScene } from '@tanstack/charts';
 
 import { type ComponentType, createContext, type ReactNode, use } from 'react';
 
+import type { ChartFormatter } from '#/hooks/use-chart-formatter';
 import type { ChartHighlighter } from '#/lib/chart-series';
 
 // Each key names a series or category; an entry with a color is a series.
@@ -13,13 +14,16 @@ export type ChartConfig = Record<
 export type ChartContextValue = {
   config: ChartConfig;
   description: string;
-  // The series the legend hides.
+  // Formats the tooltip and table from the container's options.
+  format: ChartFormatter;
   hidden: ReadonlySet<string>;
   highlighter: ChartHighlighter;
   // Each plot's last drawn scene, by plot id, in the order they first drew.
   scenes: ReadonlyMap<string, ChartScene>;
   setHidden: (hidden: ReadonlySet<string>) => void;
   setScene: (id: string, scene: ChartScene | null) => void;
+  // `format` with as many decimals as a tick needs.
+  tickFormat: ChartFormatter;
   title: string;
 };
 

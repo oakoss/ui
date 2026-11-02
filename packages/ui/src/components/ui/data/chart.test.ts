@@ -1,6 +1,7 @@
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 
 import type { ChartContainerProps } from '#/components/ui/data/chart';
+import type { ChartLegendProps } from '#/components/ui/data/chart-legend';
 
 const caption = {
   config: {},
@@ -21,4 +22,34 @@ test('the caption is the only name a chart takes', () => {
     { ...caption, 'aria-label': 'Chart' },
   ];
   expect(props).toHaveLength(4);
+});
+
+test('hidden series are held by the container or controlled with a handler', () => {
+  const onHiddenSeriesChange = vi.fn<(hidden: Set<string>) => void>();
+  const props: ChartContainerProps[] = [
+    { ...caption, defaultHiddenSeries: ['mobile'] },
+    { ...caption, hiddenSeries: new Set(['mobile']), onHiddenSeriesChange },
+    // @ts-expect-error controlled series need the handler, or toggles do nothing
+    { ...caption, hiddenSeries: ['mobile'] },
+    // @ts-expect-error a default is ignored once the series are controlled
+    {
+      ...caption,
+      defaultHiddenSeries: ['desktop'],
+      hiddenSeries: ['mobile'],
+      onHiddenSeriesChange,
+    },
+    // @ts-expect-error a string would hide its characters
+    { ...caption, defaultHiddenSeries: 'mobile' },
+  ];
+  expect(props).toHaveLength(5);
+});
+
+test('a static legend has no toolbar to name', () => {
+  const props: ChartLegendProps[] = [
+    { isStatic: true },
+    { label: 'Devices' },
+    // @ts-expect-error the label would name nothing
+    { isStatic: true, label: 'Devices' },
+  ];
+  expect(props).toHaveLength(3);
 });

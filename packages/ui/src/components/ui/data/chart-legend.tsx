@@ -8,36 +8,30 @@ import { focusRing } from '#/lib/recipes';
 
 export type ChartLegendProps = (
   | {
-      // The series hidden; pass the same set to chartColor in the definition.
-      hidden: Iterable<string>;
+      // A plain list of the series, with no toggles to name.
+      isStatic: true;
+      label?: never;
+    }
+  | {
+      isStatic?: false;
       // Names the toolbar of toggles.
       label?: string;
-      onHiddenChange: (hidden: Set<string>) => void;
     }
-  | { hidden?: never; label?: never; onHiddenChange?: never }
 ) & { className?: string };
 
 const legendStyles =
   'flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs';
 
-// The config's series. With `hidden` and `onHiddenChange`, each item toggles
-// its series and highlights it on hover and focus.
+// The config's series, each a toggle that hides its series and highlights it
+// on hover and focus. A single series has nothing to compare, so it's listed.
 export function ChartLegend({
   className,
-  hidden,
+  isStatic = false,
   label = 'Series',
-  onHiddenChange,
 }: ChartLegendProps) {
-  const { config, setHidden } = useChart();
+  const { config, hidden, setHidden } = useChart();
   const series = chartSeriesKeys(config);
-  const hiddenKeys = new Set(hidden);
-  const hiddenList = [...hiddenKeys].join('\n');
-  // The plots read it to tell no data from every series hidden.
-  useEffect(() => {
-    setHidden(new Set(hiddenList ? hiddenList.split('\n') : []));
-    return () => setHidden(new Set());
-  }, [hiddenList, setHidden]);
-  if (!onHiddenChange) {
+  if (isStatic || series.length < 2) {
     return (
       <ul className={cn(legendStyles, className)} data-slot="chart-legend">
         {series.map((key) => (
@@ -55,13 +49,13 @@ export function ChartLegend({
       className={cx(legendStyles, className)}
       data-slot="chart-legend"
       onSelectionChange={(visible) => {
-        onHiddenChange(new Set(series.filter((key) => !visible.has(key))));
+        setHidden(new Set(series.filter((key) => !visible.has(key))));
       }}
-      selectedKeys={series.filter((key) => !hiddenKeys.has(key))}
+      selectedKeys={series.filter((key) => !hidden.has(key))}
       selectionMode="multiple"
     >
       {series.map((key) => (
-        <ChartLegendItem id={key} isHidden={hiddenKeys.has(key)} key={key} />
+        <ChartLegendItem id={key} isHidden={hidden.has(key)} key={key} />
       ))}
     </ToggleButtonGroup>
   );

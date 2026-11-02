@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ChartContainer, ChartPlot } from '@oakoss/ui/components/ui/data/chart';
 import { ChartLegend } from '@oakoss/ui/components/ui/data/chart-legend';
 import { Button } from '@oakoss/ui/components/ui/inputs/button';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { expect, userEvent, waitFor } from 'storybook/test';
 
 import { flatBackground } from '#/helpers/color';
@@ -11,7 +11,7 @@ import { tabReal } from '#/helpers/keyboard';
 import { paintedColor } from '#/helpers/paint';
 import { hoverReal, parkPointer } from '#/helpers/pointer';
 
-import { visitorsConfig, visitorsLines } from './chart-demo';
+import { visitorsChart, visitorsConfig } from './chart-demo';
 
 // Two plots share the legend when `isPaired`, and a button removes the second.
 function LegendChart({
@@ -21,18 +21,17 @@ function LegendChart({
   initialHidden?: string[];
   isPaired?: boolean;
 }) {
-  const [hidden, setHidden] = useState(() => new Set(initialHidden));
   const [hasSecond, setHasSecond] = useState(isPaired);
-  const definition = useMemo(() => visitorsLines(hidden), [hidden]);
   return (
     <ChartContainer
       config={visitorsConfig}
+      defaultHiddenSeries={initialHidden}
       description="Desktop and mobile visitors from January to June."
       title="Visitors by month"
     >
-      <ChartPlot definition={definition} />
-      {hasSecond ? <ChartPlot definition={definition} /> : null}
-      <ChartLegend hidden={hidden} onHiddenChange={setHidden} />
+      <ChartPlot definition={visitorsChart} />
+      {hasSecond ? <ChartPlot definition={visitorsChart} /> : null}
+      <ChartLegend />
       {isPaired ? (
         <Button onPress={() => setHasSecond((has) => !has)} variant="outline">
           Toggle second chart
@@ -104,7 +103,8 @@ export const Hide: Story = {
   },
 };
 
-// Focusing an item dims the other series, and leaving restores them.
+// Focusing an item dims the other series, and leaving restores them. The
+// definition sets no states: ChartPlot adds the dimming to its lines.
 export const HighlightOnFocus: Story = {
   play: async ({ canvas }) => {
     canvas.getByRole('button', { name: 'Desktop' }).focus();
@@ -213,25 +213,6 @@ export const HiddenLook: Story = {
         .textDecorationLine,
     ).toBe('line-through');
   },
-};
-
-// Without hidden and onHiddenChange, the legend is a plain list of the series.
-export const Static: Story = {
-  play: async ({ canvas }) => {
-    await expect(canvas.queryByRole('button')).toBeNull();
-    await expect(canvas.getAllByRole('listitem')).toHaveLength(2);
-    await expect(canvas.getByRole('list')).toHaveTextContent('DesktopMobile');
-  },
-  render: () => (
-    <ChartContainer
-      config={visitorsConfig}
-      description="Desktop and mobile visitors from January to June."
-      title="Visitors by month"
-    >
-      <ChartPlot definition={visitorsLines()} />
-      <ChartLegend />
-    </ChartContainer>
-  ),
 };
 
 // Forced colors repaint backgrounds as the page color, so the swatch opts out

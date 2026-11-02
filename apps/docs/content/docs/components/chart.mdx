@@ -28,7 +28,6 @@ import { tooltip } from '@tanstack/charts/tooltip';
 
 import { ChartContainer, ChartPlot } from '#/components/ui/data/chart';
 import type { ChartConfig } from '#/hooks/use-chart';
-import { chartColor } from '#/lib/chart-series';
 
 const config = {
   desktop: { color: 'var(--color-chart-1)', label: 'Desktop' },
@@ -36,7 +35,6 @@ const config = {
 } satisfies ChartConfig;
 
 const definition = defineChart({
-  color: chartColor(config),
   marks: [barY(visitors, { color: 'device', x: 'month', y: 'visitors' })],
   scales: {
     x: { scale: scaleBand },
@@ -63,10 +61,11 @@ figure with the chart. Build the definition outside the component, or
 memoize it on the values it captures: a new definition rebuilds the chart.
 
 `config` names each series and category, and an entry with a color is a
-series. Marks name a row's series with their `color` channel, and
-`chartColor(config)` turns the config into TanStack's color scale, so the
-marks, tooltip and legend share one mapping. Charts with several series take
-one row per value, so focus can group a month's values into one tooltip:
+series. Marks name a row's series with their `color` channel, and `ChartPlot`
+turns the config into TanStack's color scale when the definition sets no
+`color`, so the marks, tooltip and legend share one mapping. Charts with
+several series take one row per value, so focus can group a month's values
+into one tooltip:
 
 ```tsx
 const visitors = [
@@ -88,38 +87,23 @@ instead: the legend can then highlight it but not hide it.
 
 ### Legend
 
-`ChartLegend` lists the config's series. Given `hidden` and `onHiddenChange`,
-each item toggles its series: pass the same set to `chartColor` and rebuild
-the definition, and TanStack removes the series without moving the axes.
-Hovering or focusing an item dims the other series; give each mark
-`chartSeriesStates` for that. Without those props, the legend is a plain list.
+`ChartLegend` lists the config's series, each a toggle that hides its series;
+TanStack removes it without moving the axes. Hovering or focusing an item dims
+the other series. The definition needs nothing for either: `ChartPlot` adds
+the legend's colors, and dims each mark whose series comes from `color`
+unless the mark sets `states` of its own.
 
 ```tsx
-const [hidden, setHidden] = useState(() => new Set<string>());
-const definition = useMemo(
-  () =>
-    defineChart({
-      color: chartColor(config, hidden),
-      marks: [
-        barY(visitors, {
-          color: 'device',
-          states: chartSeriesStates,
-          x: 'month',
-          y: 'visitors',
-        }),
-      ],
-      // …
-    }),
-  [hidden],
-);
-
 <ChartContainer config={config} description="…" title="Visitors by month">
   <ChartPlot definition={definition} />
-  <ChartLegend hidden={hidden} onHiddenChange={setHidden} />
-</ChartContainer>;
+  <ChartLegend />
+</ChartContainer>
 ```
 
-The chart at the top of this page has one.
+The container holds the hidden series. `defaultHiddenSeries` hides some at
+first; pass `hiddenSeries` and `onHiddenSeriesChange` to keep them in your own
+state, such as the URL. `isStatic` makes the legend a plain list, as it is
+for a single series. The chart at the top of this page has a legend.
 
 ### Data table
 
@@ -201,11 +185,14 @@ its two ends. A pie slice's point carries its angle and radius, so pass
 ### Axes and formatting
 
 Axis titles are the axis `label`, and `ticks.values` picks which ticks show,
-here only the first and last month. The tooltip formats numbers and dates in
-the app's locale, from React Aria's
-[I18nProvider](https://react-aria.adobe.com/I18nProvider);
-`useChartFormatter` gives axis ticks the same formatting; without it,
-numeric ticks take TanStack's default format.
+here only the first and last month. Numbers and dates format in the app's
+locale, from React Aria's
+[I18nProvider](https://react-aria.adobe.com/I18nProvider): the tooltip, the
+table and the ticks of a numeric axis that sets no `format`. Ticks keep every
+decimal their values have, so an axis from `0.00001` to `0.00003` doesn't read
+as a row of zeros. The container's `format` sets their number and date options
+together, here a currency. A time axis keeps TanStack's labels, which pick the
+unit each tick needs.
 
 <ComponentPreview name="chart-axes">
   <ChartAxes />
@@ -262,8 +249,8 @@ indicators do.
 
 ### ChartContainer
 
-A `figure` with a caption, which hands `config`, `title` and `description`
-to the parts inside it.
+A `figure` with a caption, which hands `config`, `title`, `description`, the
+number and date format, and the hidden series to the parts inside it.
 
 #### Props
 
@@ -290,9 +277,13 @@ as its tooltip body. It accepts TanStack Chart's props, except `ariaLabel`,
 `ariaDescription` and `style`; `aspectRatio` defaults to 16:9. Outside a
 `ChartContainer` it throws.
 
-It sets the focus ring and the tooltip's spoken text unless the definition
-sets its own (`focusRing`, or the tooltip's `content`, `format`,
-`formatGroup` or `items`), and adds the legend's highlight control.
+It fills in what the definition leaves unset: the focus ring, the tooltip's
+spoken text (unless the tooltip sets `content`, `format`, `formatGroup` or
+`items`), the config's `color` scale with the legend's hidden series, the
+legend's dimming on marks whose series comes from `color` and that set no
+`states`, and a locale `format` on each numeric axis's ticks. It also adds
+the legend's highlight control. A responsive definition gets the same in each
+spec it builds.
 
 #### Props
 
@@ -349,7 +340,7 @@ Also takes the context `renderTooltipBody` passes.
 
 The config's series: a React Aria
 [ToggleButtonGroup](https://react-aria.adobe.com/ToggleButtonGroup) of toggle
-buttons given `hidden` and `onHiddenChange`, otherwise a `ul`.
+buttons, or a `ul` given `isStatic` or a single series.
 
 #### Props
 
@@ -367,16 +358,20 @@ buttons given `hidden` and `onHiddenChange`, otherwise a `ul`.
 
 ### chartColor, chartSeriesStates and chartBarStates
 
-`chartColor(config, hidden)` returns a definition's `color` option: the
-config's series as the color domain, their colors as the range, and a legend
-that draws nothing and removes the `hidden` series after the scales resolve.
-`chartSeriesStates` goes in a mark's `states` and dims its series while the
-legend highlights another. `chartBarStates` adds an outline on the focused
-or hovered bar; use it on bar marks with `focusRing: false`.
+`ChartPlot` fills in the first two; use them when a definition sets its own
+`color` or `states`. A definition that sets its own `color` passes the
+container's hidden series, `useChart().hidden`, so the legend hides its
+series; otherwise give its legend `isStatic`. `chartColor(config, hidden)`
+returns a definition's `color` option: the config's series as the color
+domain, their colors as the
+range, and a legend that draws nothing and removes the `hidden` series after
+the scales resolve. `chartSeriesStates` goes in a mark's `states` and dims its
+series while the legend highlights another. `chartBarStates` adds an outline
+on the focused or hovered bar; use it on bar marks with `focusRing: false`.
 
 ### useChartFormatter
 
 Returns a function that formats a number or date in the app's locale, with
-optional `number` and `date` format options. Dates format in UTC by default.
-Keep the options outside the component or memoized, so the function, and a
-definition built on it, stays the same between renders.
+optional `number` and `date` format options, as the container's `format` does
+for its parts. Dates format in UTC by default. The function changes only when
+the locale or the options' values do, so options can be written inline.
