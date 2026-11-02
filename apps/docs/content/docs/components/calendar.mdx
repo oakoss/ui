@@ -70,7 +70,9 @@ edges, and days a neighboring month repeats are hidden.
 `heading` replaces the month heading. `CalendarMonthYearSelect`, installed with
 `calendar-month-year-select`, fills it with month and year dropdowns, once
 however many months show. `visibleYears` sets how many years the list holds,
-within `minValue` and `maxValue`.
+within `minValue` and `maxValue`. The dropdowns take the slots `month` and
+`year`, so a `SelectContext` with `slots` can set one; name both, since React
+Aria rejects a slot its context leaves out.
 
 <ComponentPreview name="calendar-month-year">
   <ClientOnly fallback={<div className="h-72 any-pointer-coarse:h-84" />}>

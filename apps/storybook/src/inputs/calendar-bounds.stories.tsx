@@ -6,13 +6,7 @@ import {
   RangeCalendar,
 } from '@oakoss/ui/components/ui/inputs/calendar';
 import { CalendarMonthYearSelect } from '@oakoss/ui/components/ui/inputs/calendar-month-year-select';
-import { Select, SelectItem } from '@oakoss/ui/components/ui/inputs/select';
-import {
-  CalendarMonthPicker,
-  CalendarYearPicker,
-  type Key,
-  SelectContext,
-} from 'react-aria-components';
+import { SelectContext } from 'react-aria-components';
 import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
 
 import { freezeDate } from '#/helpers/date';
@@ -86,34 +80,15 @@ export const YearChoice: Story = {
   },
 };
 
-type PickerItem = { formatted: string; id: number };
-
-// CalendarMonthYearSelect's markup, rebuilt so a SelectContext reaches one picker.
-function pickerSelect(picker: {
-  'aria-label': string;
-  items: PickerItem[];
-  onChange: (key: Key | null) => void;
-  value: Key;
-}) {
-  return (
-    <Select<PickerItem> {...picker} className="min-w-0" size="sm">
-      {(item: PickerItem) => (
-        <SelectItem id={item.id}>{item.formatted}</SelectItem>
-      )}
-    </Select>
-  );
-}
-
 // The year list opens alone, up to maxValue's year, beside the closed month.
 export const YearListOpen: Story = {
   args: {
     heading: (
-      <div className="flex items-center gap-1" data-slot="calendar-month-year">
-        <CalendarMonthPicker>{pickerSelect}</CalendarMonthPicker>
-        <SelectContext value={{ defaultOpen: true }}>
-          <CalendarYearPicker>{pickerSelect}</CalendarYearPicker>
-        </SelectContext>
-      </div>
+      <SelectContext
+        value={{ slots: { month: {}, year: { defaultOpen: true } } }}
+      >
+        <CalendarMonthYearSelect />
+      </SelectContext>
     ),
     maxValue: new CalendarDate(2027, 12, 31),
   },
