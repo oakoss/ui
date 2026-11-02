@@ -1,18 +1,11 @@
-import type { ChartScene, ChartValue } from '@tanstack/charts';
+import type { ChartValue } from '@tanstack/charts';
 
 import {
   Chart as ChartPrimitive,
   type ChartProps as ChartPrimitiveProps,
   type ChartTooltipBodyRenderContext,
 } from '@tanstack/charts/react/tooltip';
-import {
-  type ComponentProps,
-  type ReactNode,
-  useCallback,
-  useId,
-  useMemo,
-  useState,
-} from 'react';
+import { type ComponentProps, type ReactNode, useId } from 'react';
 
 import {
   ChartPlotEmpty,
@@ -21,19 +14,19 @@ import {
   type ChartPlotStatus,
 } from '#/components/ui/data/chart-plot-state';
 import { ChartTooltipContent } from '#/components/ui/data/chart-tooltip-content';
-import { type ChartConfig, ChartContext, useChart } from '#/hooks/use-chart';
+import { ChartContext, useChart } from '#/hooks/use-chart';
+import {
+  type ChartContainerOptions,
+  useChartContainer,
+} from '#/hooks/use-chart-container';
 import { useChartPlot } from '#/hooks/use-chart-plot';
-import { createChartHighlighter } from '#/lib/chart-series';
 import { cn } from '#/lib/cx';
 
-export type ChartContainerProps = {
-  config: ChartConfig;
-  description: string;
-  title: string;
-} & Omit<
-  ComponentProps<'figure'>,
-  'aria-describedby' | 'aria-label' | 'aria-labelledby' | 'title'
->;
+export type ChartContainerProps = ChartContainerOptions &
+  Omit<
+    ComponentProps<'figure'>,
+    'aria-describedby' | 'aria-label' | 'aria-labelledby' | 'title'
+  >;
 
 export type ChartPlotProps<
   TDatum,
@@ -49,24 +42,19 @@ export type ChartPlotProps<
     'ariaDescription' | 'ariaLabel' | 'style'
   >;
 
-const noneHidden: ReadonlySet<string> = new Set();
-
 // The figure: its visible caption names and describes the chart, and its
 // parts read the config and caption from context.
 export function ChartContainer({
   children,
   className,
-  config,
-  description,
-  title,
   ...props
 }: ChartContainerProps) {
   const id = useId();
-  const value = useChartContextValue(config, description, title);
+  const { figureProps, value } = useChartContainer(props);
   return (
     <ChartContext value={value}>
       <figure
-        {...props}
+        {...figureProps}
         aria-describedby={`${id}-description`}
         aria-labelledby={`${id}-title`}
         className={cn('flex flex-col gap-4', className)}
@@ -78,14 +66,14 @@ export function ChartContainer({
             data-slot="chart-title"
             id={`${id}-title`}
           >
-            {title}
+            {value.title}
           </span>
           <span
             className="text-sm text-muted-foreground"
             data-slot="chart-description"
             id={`${id}-description`}
           >
-            {description}
+            {value.description}
           </span>
         </figcaption>
         {children}
@@ -205,38 +193,4 @@ function defaultTooltipBody<
   TYValue extends ChartValue,
 >(context: ChartTooltipBodyRenderContext<TDatum, TXValue, TYValue>) {
   return <ChartTooltipContent points={context.points} />;
-}
-
-function useChartContextValue(
-  config: ChartConfig,
-  description: string,
-  title: string,
-) {
-  const highlighter = useMemo(() => createChartHighlighter(), []);
-  const [hidden, setHidden] = useState(noneHidden);
-  const [scenes, setScenes] = useState<ReadonlyMap<string, ChartScene>>(
-    () => new Map(),
-  );
-  const setScene = useCallback((id: string, scene: ChartScene | null) => {
-    setScenes((current) => {
-      if ((current.get(id) ?? null) === scene) return current;
-      const next = new Map(current);
-      if (scene) next.set(id, scene);
-      else next.delete(id);
-      return next;
-    });
-  }, []);
-  return useMemo(
-    () => ({
-      config,
-      description,
-      hidden,
-      highlighter,
-      scenes,
-      setHidden,
-      setScene,
-      title,
-    }),
-    [config, description, hidden, highlighter, scenes, setScene, title],
-  );
 }

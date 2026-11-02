@@ -6,7 +6,6 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from '@oakoss/ui/components/ui/inputs/toggle-group';
-import { chartColor } from '@oakoss/ui/lib/chart-series';
 import { defineChart, lineY } from '@tanstack/charts';
 import { scaleLinear } from '@tanstack/charts/scales/linear';
 import { scalePoint } from '@tanstack/charts/scales/point';
@@ -75,7 +74,6 @@ function isShown(key: Key | undefined): key is Shown {
 
 function visitorsLine(rows: typeof months) {
   return defineChart({
-    color: chartColor(config),
     marks: [
       lineY(rows, {
         color: 'series',

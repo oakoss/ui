@@ -17,7 +17,6 @@ import {
   CollapsibleTrigger,
 } from '#/components/ui/layout/collapsible';
 import { useChart } from '#/hooks/use-chart';
-import { useChartFormatter } from '#/hooks/use-chart-formatter';
 import { type ChartTableModel, chartTableModel } from '#/lib/chart-table-model';
 import {
   axisText,
@@ -104,8 +103,7 @@ function ChartSceneTable({
   seriesLabel,
   valueLabel,
 }: ChartSceneTableProps) {
-  const { config, title } = useChart();
-  const format = useChartFormatter();
+  const { config, format, title } = useChart();
   const model = chartTableModel(points);
   const isSeriesColumn = model.kind === 'points' && model.hasSeries;
   const text: ChartTableText = {

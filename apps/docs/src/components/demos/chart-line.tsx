@@ -1,7 +1,6 @@
 import type { ChartConfig } from '@oakoss/ui/hooks/use-chart';
 
 import { ChartContainer, ChartPlot } from '@oakoss/ui/components/ui/data/chart';
-import { chartColor } from '@oakoss/ui/lib/chart-series';
 import { defineChart, lineY } from '@tanstack/charts';
 import { crosshair } from '@tanstack/charts/crosshair';
 import { scaleLinear } from '@tanstack/charts/scales/linear';
@@ -27,7 +26,6 @@ const visitors = [
 );
 
 const definition = defineChart({
-  color: chartColor(config),
   focus: 'group-x',
   marks: [
     lineY(visitors, {

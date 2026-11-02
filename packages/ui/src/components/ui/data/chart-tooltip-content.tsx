@@ -2,7 +2,6 @@ import type { ChartPoint, ChartValue } from '@tanstack/charts';
 import type { CSSProperties, ReactNode } from 'react';
 
 import { useChart } from '#/hooks/use-chart';
-import { useChartFormatter } from '#/hooks/use-chart-formatter';
 import { axisText, axisValue, headingAxis, rowText } from '#/lib/chart-tooltip';
 import { cn } from '#/lib/cx';
 
@@ -51,7 +50,7 @@ export function ChartTooltipContent<
   points,
   valueFormatter,
 }: ChartTooltipContentProps<TDatum, TXValue, TYValue>) {
-  const format = useChartFormatter();
+  const { format } = useChart();
   const labelNode = useTooltipLabel(points, hideLabel, labelFormatter);
   if (points.length === 0) return null;
   const heading = headingAxis(points);
@@ -180,8 +179,7 @@ function useTooltipLabel<
     TYValue
   >['labelFormatter'],
 ): ReactNode {
-  const { config } = useChart();
-  const format = useChartFormatter();
+  const { config, format } = useChart();
   const [first] = points;
   const axis = headingAxis(points);
   if (isHidden || !first || axis === undefined) return null;

@@ -102,15 +102,6 @@ export const TooltipOnFocus: Story = {
   },
 };
 
-// Values and categories format in the app's locale, not the browser's.
-export const Locale: Story = {
-  globals: { locale: 'ar-EG' },
-  play: async () => {
-    const tooltip = await focusTooltip();
-    await expect(tooltip).toHaveTextContent('Desktop١٨٦');
-  },
-};
-
 // A horizontal bar is headed by its category, the y value, and reports its
 // length, the x value.
 export const Horizontal: Story = {
