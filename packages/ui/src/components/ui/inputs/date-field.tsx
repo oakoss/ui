@@ -19,7 +19,7 @@ import {
   type InputGroupSlots,
   useFieldShortcut,
 } from '#/components/ui/inputs/input-group';
-import { cx } from '#/lib/cx';
+import { cn, cx } from '#/lib/cx';
 
 export type DateFieldGroupProps = {
   children: Exclude<ReactNode, boolean | null | undefined>;
@@ -104,13 +104,24 @@ export function DateInput({ className, ...props }: DateInputProps) {
     <AriaDateInput
       {...props}
       className={cx(
-        'flex min-w-0 flex-1 cursor-text [scrollbar-width:none] items-center self-stretch overflow-x-auto px-control-x whitespace-nowrap disabled:cursor-default',
+        dateScrollStyles({
+          className:
+            'min-w-0 cursor-text whitespace-nowrap disabled:cursor-default',
+        }),
         className,
       )}
       data-slot="date-input"
     >
       {(segment) => <DateSegment segment={segment} />}
     </AriaDateInput>
+  );
+}
+
+// The row a date's segments scroll in, so a long locale keeps one line.
+export function dateScrollStyles({ className }: { className?: string } = {}) {
+  return cn(
+    'flex flex-1 [scrollbar-width:none] items-center self-stretch overflow-x-auto px-control-x',
+    className,
   );
 }
 

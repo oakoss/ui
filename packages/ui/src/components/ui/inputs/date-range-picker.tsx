@@ -11,6 +11,7 @@ import type { Shortcut } from '#/components/ui/inputs/field';
 import { RangeCalendar } from '#/components/ui/inputs/calendar';
 import {
   DateInput,
+  dateScrollStyles,
   type GranularityOf,
 } from '#/components/ui/inputs/date-field';
 import {
@@ -33,15 +34,11 @@ export type DateRangePickerProps<T extends DateValue = DateValue> = {
 } & Omit<AriaDateRangePickerProps<T>, 'children' | 'granularity'> &
   Shortcut<DateRangePickerLayoutProps>;
 
-// The start and end inputs scroll together, so a long locale keeps both in
-// one line. React Aria names their segments "Start Date" and "End Date".
+// React Aria names the segments "Start Date" and "End Date".
 export function DateRangeInput({ className }: { className?: string }) {
   return (
     <div
-      className={cn(
-        'flex flex-1 [scrollbar-width:none] items-center self-stretch overflow-x-auto px-control-x',
-        className,
-      )}
+      className={cn(dateScrollStyles(), className)}
       data-slot="date-range-input"
     >
       <DateInput className="flex-none overflow-visible px-0" slot="start" />
