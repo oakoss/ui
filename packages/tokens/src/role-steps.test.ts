@@ -8,6 +8,7 @@ import {
   intentStepRuleText,
   pickIntentSteps,
 } from '#/role-steps';
+import { contrastMinimum } from '#/roles';
 import {
   authored,
   type AuthoredScale,
@@ -155,6 +156,16 @@ describe('intentStepRuleText', () => {
     );
     expect(intentStepRuleText.text).toContain(
       `From ${textStart.light} in light, ${textStart.dark} in dark,`,
+    );
+  });
+
+  it('states the contrast minimums the picker checks', () => {
+    const text = `${contrastMinimum.text}:1`;
+    for (const kind of ['fill', 'hover', 'text'] as const) {
+      expect(intentStepRuleText[kind]).toContain(text);
+    }
+    expect(intentStepRuleText.fill).toContain(
+      `${contrastMinimum['non-text']}:1`,
     );
   });
 });
