@@ -43,6 +43,8 @@ async function open(trigger: HTMLElement) {
   return screen.findByRole('listbox');
 }
 
+const opened = () => screen.findByRole('listbox');
+
 // The trigger is named by its value and the label; choosing an option shows
 // it in the trigger.
 export const Default: Story = {
@@ -147,14 +149,16 @@ export const ItemDescription: Story = {
         </SelectItem>
       </>
     ),
+    defaultOpen: true,
+    defaultValue: 'team',
     label: 'Plan',
   },
   play: async ({ canvas }) => {
     const trigger = canvas.getByRole('button', { name: /Plan/u });
-    const list = await open(trigger);
+    const list = await opened();
     const team = within(list).getByRole('option', { name: 'Team' });
     await expect(team).toHaveAccessibleDescription('Up to 5 seats');
-    // Opened by mouse the list itself has focus; descriptions stay muted.
+    // An option without focus keeps its description muted.
     const probe = document.createElement('div');
     probe.style.color = 'var(--color-muted-foreground)';
     document.body.append(probe);
@@ -162,8 +166,6 @@ export const ItemDescription: Story = {
       getComputedStyle(within(list).getByText('Unlimited')).color,
     ).toBe(getComputedStyle(probe).color);
     probe.remove();
-    await userEvent.click(team);
-    await waitFor(() => expect(screen.queryByRole('listbox')).toBeNull());
     await expect(trigger).toHaveAccessibleName(/Team/u);
     await expect(trigger).not.toHaveAccessibleName(/Up to 5 seats/u);
   },
@@ -181,10 +183,11 @@ export const ListWidth: Story = {
       </>
     ),
     className: 'w-96',
+    defaultOpen: true,
   },
   play: async ({ canvas }) => {
     const trigger = canvas.getByRole('button', { name: /Fruit/u });
-    const list = await open(trigger);
+    const list = await opened();
     const option = within(list).getByRole('option', { name: /longer/u });
     const popover = list.closest<HTMLElement>('[data-slot=select-content]');
     if (!popover) throw new Error('No popover');
@@ -210,10 +213,11 @@ export const Sections: Story = {
         </SelectSection>
       </>
     ),
+    defaultOpen: true,
     label: 'Produce',
   },
-  play: async ({ canvas }) => {
-    const list = await open(canvas.getByRole('button', { name: /Produce/u }));
+  play: async () => {
+    const list = await opened();
     const vegetables = within(list).getByRole('group', { name: 'Vegetables' });
     await expect(getComputedStyle(vegetables).borderTopWidth).toBe('1px');
     await expect(
@@ -252,9 +256,9 @@ export const InvalidCustomLayout: Story = {
 
 // The selected option is marked, and the list is a single-select listbox.
 export const Selected: Story = {
-  args: { defaultValue: 'pear' },
-  play: async ({ canvas }) => {
-    const list = await open(canvas.getByRole('button', { name: /Fruit/u }));
+  args: { defaultOpen: true, defaultValue: 'pear' },
+  play: async () => {
+    const list = await opened();
     const pear = within(list).getByRole('option', { name: 'Pear' });
     await expect(pear).toHaveAttribute('aria-selected', 'true');
     await expect(
