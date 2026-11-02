@@ -13,6 +13,7 @@ import {
 import {
   facetTrigger,
   FiltersTable,
+  openedFacet,
   openFacet,
   ServerFiltersTable,
 } from './data-table-filters-demo';
@@ -94,9 +95,9 @@ export const FacetCounts: Story = {
 
 // Counts follow the table's other filters.
 export const CountsFollowSearch: Story = {
-  args: { defaultState: { globalFilter: 'customer2' } },
+  args: { defaultState: { globalFilter: 'customer2' }, openedFacet: 'status' },
   play: async () => {
-    const list = await openFacet('Status');
+    const list = await openedFacet();
     await expect(
       list.getByRole('option', { name: 'Paid' }),
     ).toHaveAccessibleDescription('2');
@@ -105,9 +106,9 @@ export const CountsFollowSearch: Story = {
 
 // Counts passed in replace the rows' own, and a value they leave out counts 0.
 export const CountsFromProps: Story = {
-  args: { statusCounts: { paid: 99 } },
+  args: { openedFacet: 'status', statusCounts: { paid: 99 } },
   play: async () => {
-    const list = await openFacet('Status');
+    const list = await openedFacet();
     await expect(
       list.getByRole('option', { name: 'Paid' }),
     ).toHaveAccessibleDescription('99');

@@ -1,6 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { expect, screen, userEvent, type within } from 'storybook/test';
+import {
+  expect,
+  screen,
+  userEvent,
+  waitFor,
+  type within,
+} from 'storybook/test';
 
 import { phoneWidth } from '#/helpers/viewport';
 
@@ -53,6 +59,28 @@ export const PageSize: Story = {
     await expect(bodyRows(canvas)).toHaveLength(20);
     await expect(rowHeaders(canvas)).toContain('PAY-011');
     await expect(pageLabel(canvas)).toHaveTextContent('Page 1 of 2');
+  },
+};
+
+export const LargerPageSize: Story = {
+  args: { defaultState: { pagination: { pageIndex: 0, pageSize: 20 } } },
+  play: async ({ canvas }) => {
+    await expect(bodyRows(canvas)).toHaveLength(20);
+    await expect(pageLabel(canvas)).toHaveTextContent('Page 1 of 2');
+  },
+};
+
+// A linked row on a later page opens the table on that page, marked.
+export const LinkedRowOnLaterPage: Story = {
+  args: { linkedRowId: 'PAY-015' },
+  play: async ({ canvas }) => {
+    await waitFor(() =>
+      expect(pageLabel(canvas)).toHaveTextContent('Page 2 of 3'),
+    );
+    const linked = bodyRows(canvas).find((row) =>
+      row.textContent.includes('PAY-015'),
+    );
+    await expect(linked).toHaveAttribute('aria-current', 'true');
   },
 };
 

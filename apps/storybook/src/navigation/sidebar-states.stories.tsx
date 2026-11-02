@@ -64,6 +64,14 @@ export const IconMode: Story = {
   },
 };
 
+export const IconCollapsed: Story = {
+  args: { collapsible: 'icon', defaultOpen: false },
+  play: async () => {
+    await expect(sidebarContainer().getBoundingClientRect().width).toBe(48);
+    await expect(screen.getByRole('link', { name: 'Project 2' })).toBeVisible();
+  },
+};
+
 // A link marked current, by the prop or by a router setting aria-current, is
 // highlighted; navigating moves the mark.
 export const Current: Story = {

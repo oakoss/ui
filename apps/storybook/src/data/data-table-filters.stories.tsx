@@ -188,6 +188,14 @@ export const HiddenColumnKeepsChip: Story = {
   },
 };
 
+export const Searched: Story = {
+  args: { defaultState: { globalFilter: 'customer2' } },
+  play: async ({ canvas }) => {
+    await expect(searchBox(canvas)).toHaveValue('customer2');
+    await expect(bodyRows(canvas)).toHaveLength(6);
+  },
+};
+
 // Search the app controls, such as one in the URL, shows a change made from
 // outside.
 export const AppSearchSyncs: Story = {

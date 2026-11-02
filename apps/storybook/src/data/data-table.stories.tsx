@@ -152,6 +152,25 @@ export const MultiSort: Story = {
   },
 };
 
+export const MultiSorted: Story = {
+  args: {
+    defaultState: {
+      sorting: [
+        { desc: false, id: 'status' },
+        { desc: false, id: 'amount' },
+      ],
+    },
+  },
+  play: async ({ canvas }) => {
+    await expect(sortButton(canvas, 'Status').button).toHaveTextContent('1');
+    await expect(sortButton(canvas, 'Amount').button).toHaveTextContent('2');
+    await expect(rowHeaders(canvas).slice(0, 2)).toEqual([
+      'PAY-015',
+      'PAY-024',
+    ]);
+  },
+};
+
 // A new order starts at its first page, where its top rows are.
 export const SortShowsFirstPage: Story = {
   args: { defaultState: { pagination: { pageIndex: 2, pageSize: 10 } } },
