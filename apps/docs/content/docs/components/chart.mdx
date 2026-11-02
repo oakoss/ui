@@ -363,10 +363,11 @@ buttons, or a `ul` given `isStatic` or a single series.
 container's hidden series, `useChart().hidden`, so the legend hides its
 series; otherwise give its legend `isStatic`. `chartColor(config, hidden)`
 returns a definition's `color` option: the config's series as the color
-domain, their colors as the
-range, and a legend that draws nothing and removes the `hidden` series after
-the scales resolve. `chartSeriesStates` goes in a mark's `states` and dims its
-series while the legend highlights another. `chartBarStates` adds an outline
+domain, their colors as the range, and a legend that draws nothing and
+removes the `hidden` series after the scales resolve. A config with no series
+gets `undefined`, which leaves TanStack's own colors. `chartSeriesStates` goes
+in a mark's `states` and dims its series while the legend highlights another.
+`chartBarStates` adds an outline
 on the focused or hovered bar; use it on bar marks with `focusRing: false`.
 
 ### useChartFormatter

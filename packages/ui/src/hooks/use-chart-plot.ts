@@ -16,7 +16,7 @@ import {
 
 import { useChart } from '#/hooks/use-chart';
 import { withChartDefaults } from '#/lib/chart-definition';
-import { chartColor, chartSeriesKeys } from '#/lib/chart-series';
+import { chartColor } from '#/lib/chart-series';
 import { chartTooltipText } from '#/lib/chart-tooltip';
 
 type ChartPlotOptions<
@@ -108,13 +108,7 @@ function usePlotted<
     (points: readonly ChartPoint[]) => chartTooltipText(points, config, format),
     [config, format],
   );
-  const color = useMemo(
-    () =>
-      chartSeriesKeys(config).length > 0
-        ? chartColor(config, hidden)
-        : undefined,
-    [config, hidden],
-  );
+  const color = useMemo(() => chartColor(config, hidden), [config, hidden]);
   const plotted = useMemo(
     () =>
       withChartDefaults(definition, {

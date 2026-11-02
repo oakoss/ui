@@ -5450,6 +5450,11 @@
           "target": "@hooks/use-chart-container.ts"
         },
         {
+          "path": "src/hooks/use-stable-value.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-stable-value.ts"
+        },
+        {
           "path": "src/lib/chart-definition.ts",
           "type": "registry:lib",
           "target": "@lib/chart-definition.ts"

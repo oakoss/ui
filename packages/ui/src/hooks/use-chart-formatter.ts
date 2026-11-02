@@ -1,7 +1,9 @@
 import type { ChartValue } from '@tanstack/charts';
 
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { useDateFormatter, useNumberFormatter } from 'react-aria';
+
+import { useStableValue } from '#/hooks/use-stable-value';
 
 export type ChartFormatOptions = {
   date?: Intl.DateTimeFormatOptions;
@@ -22,12 +24,12 @@ const defaultDate: Intl.DateTimeFormatOptions = {
 export function useChartFormatter(
   options: ChartFormatOptions = {},
 ): ChartFormatter {
+  const number = options.number ?? defaultNumber;
+  const date = options.date ?? defaultDate;
   const numberFormatter = useNumberFormatter(
-    useStableValue(options.number ?? defaultNumber),
+    useStableValue(number, optionsKey),
   );
-  const dateFormatter = useDateFormatter(
-    useStableValue(options.date ?? defaultDate),
-  );
+  const dateFormatter = useDateFormatter(useStableValue(date, optionsKey));
   return useCallback(
     (value: ChartValue) => {
       if (typeof value === 'number') return numberFormatter.format(value);
@@ -53,11 +55,9 @@ export function withTickPrecision(
   return { ...options, maximumFractionDigits: 20 };
 }
 
-// The first of a run of equal values, so an inline options object keeps the
-// formatter React Aria memoized for it.
-function useStableValue<T>(value: T): T {
-  const key = JSON.stringify(value);
-  const [stable, setStable] = useState({ key, value });
-  if (stable.key !== key) setStable({ key, value });
-  return stable.key === key ? stable.value : value;
+// Intl options hold only strings, numbers and booleans, so JSON keys them.
+function optionsKey(
+  options: Intl.DateTimeFormatOptions | Intl.NumberFormatOptions,
+): string {
+  return JSON.stringify(options);
 }

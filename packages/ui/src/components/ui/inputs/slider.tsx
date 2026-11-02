@@ -131,7 +131,6 @@ export function SliderTrack({ className, ...props }: SliderTrackProps) {
             <Thumb
               index={index}
               isDisabled={isDisabled}
-              // oxlint-disable-next-line react/no-array-index-key -- React Aria identifies a thumb by its index
               key={index}
               label={thumbLabels?.[index]}
             />
