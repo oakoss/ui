@@ -20,9 +20,9 @@ import { settled } from './overlay-test';
 
 const onAction = fn<(key: unknown) => void>();
 
-function Palette() {
+function Palette({ defaultInputValue }: { defaultInputValue?: string }) {
   return (
-    <Command>
+    <Command defaultInputValue={defaultInputValue}>
       <CommandInput placeholder="Type a command" />
       <CommandList aria-label="Commands" onAction={onAction}>
         <CommandGroup>
@@ -110,6 +110,26 @@ export const Keywords: Story = {
   },
 };
 
+// A search shows only the commands it matches.
+export const Filtered: Story = {
+  args: { defaultInputValue: 'file' },
+  play: async ({ canvas }) => {
+    await expect(
+      within(canvas.getByRole('menu')).getAllByRole('menuitem'),
+    ).toHaveLength(2);
+  },
+};
+
+// The empty label sits centered when nothing matches.
+export const NoResults: Story = {
+  args: { defaultInputValue: 'zzz' },
+  play: async ({ canvas }) => {
+    const empty = await canvas.findByText('No results');
+    await expect(getComputedStyle(empty).textAlign).toBe('center');
+    await expect(getComputedStyle(empty).paddingBlock).toBe('24px');
+  },
+};
+
 // The empty label shows only when nothing matches, and Escape clears the
 // search.
 export const Empty: Story = {
@@ -180,6 +200,33 @@ export const InDialog: Story = {
   },
   render: () => (
     <DialogTrigger>
+      <Button variant="outline">Open palette</Button>
+      <CommandDialog>
+        <Palette />
+      </CommandDialog>
+    </DialogTrigger>
+  ),
+};
+
+// The open palette has its search focused and no close button.
+export const DialogOpen: Story = {
+  decorators: [(Story) => <Story />],
+  play: async () => {
+    const dialog = await screen.findByRole('dialog', {
+      name: 'Command palette',
+    });
+    const panel = dialog.closest<HTMLElement>(
+      '[data-slot=command-dialog-content]',
+    );
+    if (!panel) throw new Error('No dialog panel');
+    await settled(panel);
+    await waitFor(async () => {
+      await expect(within(dialog).getByRole('searchbox')).toHaveFocus();
+    });
+    await expect(within(dialog).queryByRole('button')).toBeNull();
+  },
+  render: () => (
+    <DialogTrigger defaultOpen>
       <Button variant="outline">Open palette</Button>
       <CommandDialog>
         <Palette />
