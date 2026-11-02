@@ -26,8 +26,10 @@ export function useChartFormatter(
 ): ChartFormatter {
   const number = options.number ?? defaultNumber;
   const date = options.date ?? defaultDate;
-  const numberFormatter = useNumberFormatter(useStableValue(number));
-  const dateFormatter = useDateFormatter(useStableValue(date));
+  const numberFormatter = useNumberFormatter(
+    useStableValue(number, optionsKey),
+  );
+  const dateFormatter = useDateFormatter(useStableValue(date, optionsKey));
   return useCallback(
     (value: ChartValue) => {
       if (typeof value === 'number') return numberFormatter.format(value);
@@ -51,4 +53,11 @@ export function withTickPrecision(
     return options;
   }
   return { ...options, maximumFractionDigits: 20 };
+}
+
+// Intl options hold only strings, numbers and booleans, so JSON keys them.
+function optionsKey(
+  options: Intl.DateTimeFormatOptions | Intl.NumberFormatOptions,
+): string {
+  return JSON.stringify(options);
 }
