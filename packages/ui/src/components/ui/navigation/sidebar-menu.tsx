@@ -1,4 +1,5 @@
-import { type ComponentProps, type ReactNode, useId } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
+
 import {
   Button as AriaButton,
   type ButtonProps as AriaButtonProps,
@@ -75,8 +76,6 @@ const buttonStyles = tv({
     },
   },
 });
-
-const skeletonWidths = ['w-1/2', 'w-3/5', 'w-2/3', 'w-3/4', 'w-4/5'];
 
 export function SidebarMenu({ className, ...props }: ComponentProps<'ul'>) {
   return (
@@ -168,15 +167,11 @@ export function SidebarMenuItem({ className, ...props }: ComponentProps<'li'>) {
   );
 }
 
-// Widths vary by item but match between the server and the client.
 export function SidebarMenuSkeleton({
   className,
   showIcon = false,
   ...props
 }: { showIcon?: boolean } & ComponentProps<'div'>) {
-  const id = useId();
-  let sum = 0;
-  for (const character of id) sum += character.codePointAt(0) ?? 0;
   return (
     <div
       className={cn(
@@ -187,9 +182,7 @@ export function SidebarMenuSkeleton({
       {...props}
     >
       {showIcon ? <Skeleton className="size-4 rounded-md" /> : null}
-      <Skeleton
-        className={cn('h-4', skeletonWidths[sum % skeletonWidths.length])}
-      />
+      <Skeleton className="h-4 w-3/4 [li:nth-child(5n)>*>&]:w-2/3 [li:nth-child(5n+2)>*>&]:w-1/2 [li:nth-child(5n+3)>*>&]:w-4/5 [li:nth-child(5n+4)>*>&]:w-3/5" />
     </div>
   );
 }

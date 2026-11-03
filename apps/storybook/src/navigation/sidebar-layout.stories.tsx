@@ -1,7 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { SidebarInset } from '@oakoss/ui/components/ui/navigation/sidebar';
-import { SidebarMenuSkeleton } from '@oakoss/ui/components/ui/navigation/sidebar-menu';
+import {
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuSkeleton,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+} from '@oakoss/ui/components/ui/navigation/sidebar-menu';
 import { SidebarProvider } from '@oakoss/ui/components/ui/navigation/sidebar-provider';
 import { expect, screen, userEvent } from 'storybook/test';
 
@@ -172,26 +178,55 @@ export const InsetAsDiv: Story = {
   ),
 };
 
-// Placeholder rows vary in width without an inline style, so the server and
-// the client render the same classes.
+// Each row's share of its width, by the bar's own item.
+function skeletonShares(item: string) {
+  return [
+    ...document.querySelectorAll<HTMLElement>(
+      `[data-slot=${CSS.escape(item)}] > [data-slot=sidebar-menu-skeleton]`,
+    ),
+  ].map((row) => {
+    const style = getComputedStyle(row);
+    const room =
+      row.clientWidth -
+      Number(style.paddingInlineStart.replace('px', '')) -
+      Number(style.paddingInlineEnd.replace('px', ''));
+    const bar = row.lastElementChild?.getBoundingClientRect().width ?? 0;
+    return Math.round((bar / room) * 100);
+  });
+}
+
+// Placeholder rows vary in width by their item's place in the list, without
+// an inline style, so the server and the client render the same classes and
+// rows in a submenu vary like the menu's.
 export const Skeleton: Story = {
   play: async () => {
-    const rows = [
-      ...document.querySelectorAll('[data-slot=sidebar-menu-skeleton]'),
-    ];
-    const widths = new Set(
-      rows.map((row) => row.lastElementChild?.getBoundingClientRect().width),
-    );
-    await expect(widths.size).toBeGreaterThan(1);
-    await expect(rows.some((row) => row.querySelector('[style]'))).toBe(false);
+    const menu = skeletonShares('sidebar-menu-item');
+    await expect(new Set(menu).size).toBeGreaterThan(1);
+    await expect(skeletonShares('sidebar-menu-sub-item')).toEqual(menu);
+    await expect(
+      document.querySelector(
+        '[data-slot=sidebar-menu-skeleton][style], [data-slot=sidebar-menu-skeleton] [style]',
+      ),
+    ).toBeNull();
   },
   render: () => (
     <SidebarProvider persistKey={false}>
-      <div className="w-64">
+      <SidebarMenu className="w-64">
         {Array.from({ length: 5 }, (_, index) => (
-          <SidebarMenuSkeleton key={index} showIcon />
+          <SidebarMenuItem key={index}>
+            <SidebarMenuSkeleton />
+            {index === 3 ? (
+              <SidebarMenuSub>
+                {Array.from({ length: 5 }, (_, subIndex) => (
+                  <SidebarMenuSubItem key={subIndex}>
+                    <SidebarMenuSkeleton />
+                  </SidebarMenuSubItem>
+                ))}
+              </SidebarMenuSub>
+            ) : null}
+          </SidebarMenuItem>
         ))}
-      </div>
+      </SidebarMenu>
     </SidebarProvider>
   ),
 };
