@@ -204,7 +204,9 @@ export const Skeleton: Story = {
     await expect(new Set(menu).size).toBeGreaterThan(1);
     await expect(skeletonShares('sidebar-menu-sub-item')).toEqual(menu);
     await expect(
-      document.querySelector('[data-slot=sidebar-menu-skeleton] [style]'),
+      document.querySelector(
+        '[data-slot=sidebar-menu-skeleton][style], [data-slot=sidebar-menu-skeleton] [style]',
+      ),
     ).toBeNull();
   },
   render: () => (
