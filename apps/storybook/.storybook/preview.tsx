@@ -19,7 +19,11 @@ import {
   type ReactNode,
   useEffect,
 } from 'react';
-import { I18nProvider, isRTL } from 'react-aria-components';
+import {
+  I18nProvider,
+  isRTL,
+  setInteractionModality,
+} from 'react-aria-components';
 import { themes } from 'storybook/theming';
 
 import { parkPointer } from '#/helpers/pointer';
@@ -206,6 +210,10 @@ const preview: Preview = {
   afterEach: captureStory,
   beforeEach: async () => {
     await parkPointer();
+    // React Aria keeps the last input type page-wide, and it decides whether
+    // focus moved by a component draws a ring; keyboard draws one, as a fresh
+    // page's unset type does.
+    setInteractionModality('keyboard');
     return watchInput();
   },
   decorators: [withTheme, withPalette, withLocale, withIcons],
