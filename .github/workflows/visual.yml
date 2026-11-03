@@ -77,21 +77,45 @@ jobs:
         run: pnpm exec vitest run --update=all --reporter=default --reporter=github-actions --reporter=json --outputFile.json="$RUNNER_TEMP/visual.json"
 
       # A screenshot path without the project, or a capture that wrote nothing,
-      # would otherwise pass.
-      - name: Check each passed story wrote one image
+      # would otherwise pass. captureStory marks a story that sent input
+      # (meta.didSendInput) instead of screenshotting it.
+      - name: Check each passed static story wrote one image
         working-directory: apps/storybook
         shell: node {0}
         run: |
           const fs = require('node:fs');
           const path = require('node:path');
-          const report = path.join(process.env.RUNNER_TEMP, 'visual.json');
-          const passed = JSON.parse(fs.readFileSync(report, 'utf8')).numPassedTests;
+          const report = JSON.parse(
+            fs.readFileSync(path.join(process.env.RUNNER_TEMP, 'visual.json'), 'utf8'),
+          );
+          const tests = report.testResults.flatMap((file) => file.assertionResults);
+          const passed = tests.filter((test) => test.status === 'passed');
+          const interacting = passed.filter((test) => test.meta?.didSendInput === true).length;
+          const expected = passed.length - interacting;
           const written = fs
             .readdirSync('.visual', { recursive: true })
             .filter((file) => file.endsWith('.png')).length;
-          console.log(`${passed} passed, ${written} images`);
-          if (!Number.isInteger(passed) || passed === 0 || written !== passed) {
-            console.log(`::error title=Visual capture::${written} images for ${passed} passed stories`);
+          console.log(`${passed.length} passed, ${interacting} sent input, ${written} images`);
+          if (expected === 0 || written !== expected) {
+            console.log(`::error title=Visual capture::${written} images for ${expected} passed static stories`);
+            process.exit(1);
+          }
+          // A skipped story balances the count whether or not it sent input,
+          // so known stories pin the rule: static ones that run after
+          // interacting ones and one whose library fires a plain input Event
+          // are captured; one that only pastes isn't.
+          const captured = [
+            'light/navigation-sidebar-mobile-phone-open.png',
+            'light/inputs-input-otp-groups.png',
+          ];
+          const skipped = ['light/inputs-input-otp-paste.png'];
+          const exists = (file) => fs.existsSync(path.join('.visual', file));
+          const missing = captured.filter((file) => !exists(file));
+          const extra = skipped.filter(exists);
+          if (missing.length > 0 || extra.length > 0) {
+            console.log(
+              `::error title=Visual capture::not captured: ${missing.join(', ') || 'none'}; captured though it sends input: ${extra.join(', ') || 'none'}. Either captureStory no longer decides these stories as it should, or one moved or was renamed (update this list).`,
+            );
             process.exit(1);
           }
 
