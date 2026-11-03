@@ -49,12 +49,11 @@ export async function captureStory({ id }: { id: string }) {
       .toBeDefined();
     return;
   }
-  if (didSendInput) {
-    const test = vitest.TestRunner.getCurrentTest();
-    vitest.expect.soft(test, 'no current test to mark').toBeDefined();
-    if (test !== undefined) test.meta.didSendInput = true;
-    return;
-  }
+  // Set either way, so a retry's mark is its own attempt's.
+  const test = vitest.TestRunner.getCurrentTest();
+  vitest.expect.soft(test, 'no current test to mark').toBeDefined();
+  if (test !== undefined) test.meta.didSendInput = didSendInput;
+  if (didSendInput) return;
   vitest.expect
     .soft(await waitForCarousels(), 'a carousel was still moving after 3s')
     .toBe('settled');

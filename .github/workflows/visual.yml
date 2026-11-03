@@ -103,12 +103,16 @@ jobs:
           // A skipped story balances the count whether or not it sent input,
           // so known stories pin the rule: static ones that run after
           // interacting ones and one whose library fires a plain input Event
-          // are captured; one that only pastes isn't.
+          // are captured; one that only pastes and one that only presses a
+          // key aren't.
           const captured = [
             'light/navigation-sidebar-mobile-phone-open.png',
             'light/inputs-input-otp-groups.png',
           ];
-          const skipped = ['light/inputs-input-otp-paste.png'];
+          const skipped = [
+            'light/inputs-input-otp-paste.png',
+            'light/overlays-tooltip-controlled.png',
+          ];
           const exists = (file) => fs.existsSync(path.join('.visual', file));
           const missing = captured.filter((file) => !exists(file));
           const extra = skipped.filter(exists);
