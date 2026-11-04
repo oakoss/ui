@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { part } from '#/helpers/parts';
+import { hoverFresh } from '#/overlays/overlay-test';
 
 import { Demo, demoStore, resetDemoStore } from './toast-demo';
 import {
@@ -36,7 +37,7 @@ export const ReopensAfterEscape: Story = {
     await userEvent.keyboard('{Escape}');
     await isCollapsed(toasts);
     part('toast-viewport').blur();
-    await userEvent.hover(part('toast-viewport'));
+    await hoverFresh(part('toast-viewport'));
     await isExpanded(toasts);
     // With focus still on the region, leaving and hovering again reopens it.
     part('toast-viewport').focus();

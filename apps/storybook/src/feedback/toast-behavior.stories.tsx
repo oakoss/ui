@@ -18,7 +18,7 @@ import {
 } from 'storybook/test';
 
 import { part } from '#/helpers/parts';
-import { settled } from '#/overlays/overlay-test';
+import { hoverFresh, settled } from '#/overlays/overlay-test';
 
 import { stayedOpen } from '../overlays/dialog-demo';
 import {
@@ -201,7 +201,7 @@ export const UnmountResumes: Story = {
   play: async () => {
     const key = demoStore.show('Changes saved', { duration: Infinity });
     const toast = await findToast('Changes saved');
-    await userEvent.hover(toast);
+    await hoverFresh(toast);
     const resumeAll = spyOn(demoStore, 'resumeAll');
     demoStore.close(key);
     await gone('Changes saved');

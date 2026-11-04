@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, spyOn, userEvent, waitFor } from 'storybook/test';
 
 import { part } from '#/helpers/parts';
+import { hoverFresh } from '#/overlays/overlay-test';
 
 import { Demo, demoStore, resetDemoStore } from './toast-demo';
 import { isCollapsed, isExpanded, showThree } from './toast-stack-demo';
@@ -29,13 +30,31 @@ export const Collapsed: Story = {
   },
 };
 
+// A tap opens it on touch screens and pauses the timers; a tap outside
+// closes it. Kept above a hover story, which fails on its first attempt if
+// hoverFresh stops outlasting React Aria's ignore-mouse-after-touch window.
+export const TapExpands: Story = {
+  play: async () => {
+    const pause = spyOn(demoStore, 'pause');
+    const resume = spyOn(demoStore, 'resume');
+    const toasts = await showThree();
+    await userEvent.pointer({ keys: '[TouchA]', target: toasts[0] });
+    await isExpanded(toasts);
+    await expect(pause).toHaveBeenCalledWith('tap');
+    await expect(resume).not.toHaveBeenCalled();
+    await userEvent.pointer({ keys: '[TouchA]', target: document.body });
+    await isCollapsed(toasts);
+    await expect(resume).toHaveBeenCalledWith('tap');
+  },
+};
+
 // A taller toast behind the front one is clipped to the front toast's height
 // until the stack opens.
 export const TallerBehind: Story = {
   play: async () => {
     const toasts = await showThree('oldest');
     await isCollapsed(toasts);
-    await userEvent.hover(part('toast-viewport'));
+    await hoverFresh(part('toast-viewport'));
     await isExpanded(toasts);
   },
 };
@@ -44,7 +63,7 @@ export const TallerBehind: Story = {
 export const HoverExpands: Story = {
   play: async () => {
     const toasts = await showThree();
-    await userEvent.hover(part('toast-viewport'));
+    await hoverFresh(part('toast-viewport'));
     await isExpanded(toasts);
     await userEvent.unhover(part('toast-viewport'));
     await isCollapsed(toasts);
@@ -76,23 +95,6 @@ export const EscapeHidesPastVisible: Story = {
     await userEvent.keyboard('{Escape}');
     await isCollapsed(toasts.slice(0, 2));
     await expect(toasts[2]).toHaveAttribute('inert');
-  },
-};
-
-// A tap opens it on touch screens and pauses the timers; a tap outside
-// closes it.
-export const TapExpands: Story = {
-  play: async () => {
-    const pause = spyOn(demoStore, 'pause');
-    const resume = spyOn(demoStore, 'resume');
-    const toasts = await showThree();
-    await userEvent.pointer({ keys: '[TouchA]', target: toasts[0] });
-    await isExpanded(toasts);
-    await expect(pause).toHaveBeenCalledWith('tap');
-    await expect(resume).not.toHaveBeenCalled();
-    await userEvent.pointer({ keys: '[TouchA]', target: document.body });
-    await isCollapsed(toasts);
-    await expect(resume).toHaveBeenCalledWith('tap');
   },
 };
 

@@ -5,7 +5,7 @@ import { expect, userEvent, waitFor } from 'storybook/test';
 import { part } from '#/helpers/parts';
 import { parkPointer } from '#/helpers/pointer';
 import { atViewportSize, atViewportWidth } from '#/helpers/viewport';
-import { finished } from '#/overlays/overlay-test';
+import { finished, hoverFresh } from '#/overlays/overlay-test';
 
 import { Demo, resetDemoStore } from './toast-demo';
 import { showThree } from './toast-stack-demo';
@@ -98,7 +98,7 @@ export const ShrinkAfterMountScrolls: Story = {
   play: async () => {
     await parkPointer();
     const toasts = await showThree();
-    await userEvent.hover(region());
+    await hoverFresh(region());
     await Promise.all(toasts.map((toast) => finished(toast)));
     await expect(region()).not.toHaveAttribute('data-scrollable');
     // The same width, so the toasts keep their heights.
@@ -145,7 +145,7 @@ export const ScrollingStackPansVertically: Story = {
     await atViewportSize(400, 200, async () => {
       await parkPointer();
       const [newest] = await showThree();
-      await userEvent.hover(region());
+      await hoverFresh(region());
       await waitFor(async () => {
         await expect(region()).toHaveAttribute('data-scrollable');
       });
