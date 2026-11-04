@@ -271,6 +271,9 @@ importers:
       '@commitlint/config-conventional':
         specifier: ^21.2.3
         version: 21.2.4
+      '@commitlint/types':
+        specifier: ^21.2.3
+        version: 21.2.3
       '@oakoss/eslint-config':
         specifier: workspace:*
         version: link:tooling/eslint-config

@@ -12,12 +12,11 @@ export function ContextMenuDemo() {
       <ContextMenuTrigger>
         <Pressable>
           <div
-            aria-label="report.pdf"
             className="grid h-32 place-items-center rounded-panel border border-dashed border-input text-sm text-muted-foreground outline-offset-2 focus-visible:outline-2 focus-visible:outline-ring"
             role="button"
             tabIndex={0}
           >
-            Right-click or long press here
+            report.pdf
           </div>
         </Pressable>
         <ContextMenu>

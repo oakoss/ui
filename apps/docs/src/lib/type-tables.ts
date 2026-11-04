@@ -1,3 +1,5 @@
+import { createShikiHighlighter } from 'fumadocs-core/highlight/shiki';
+import { defaultShikiFactory } from 'fumadocs-core/highlight/shiki/full';
 import {
   createFileSystemGeneratorCache,
   createGenerator,
@@ -40,6 +42,12 @@ export const typeTableOptions: RemarkAutoTypeTableOptions = {
       });
     },
   },
+  highlighter: createShikiHighlighter(() => defaultShikiFactory.getOrInit(), {
+    defaultColor: false,
+    fallbackLanguage: 'plaintext',
+    themes: codeThemes,
+    transformers: [],
+  }),
   options: {
     transform(entry, _type, prop) {
       if (isInheritedDeclaration(prop.declarations[0]?.path)) {
@@ -49,7 +57,6 @@ export const typeTableOptions: RemarkAutoTypeTableOptions = {
   },
   // remarkTypeTableMarkdown reads the tables above, not a JSON copy.
   remarkStringify: false,
-  shiki: { themes: codeThemes },
 };
 
 /**

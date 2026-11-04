@@ -156,7 +156,7 @@ function Row({ token }: { token: TokenValue }) {
             style={{ background: color }}
           />
           <CopyButton
-            aria-label={`Copy var(--${name})`}
+            aria-label={`Copy --${name}`}
             className="font-mono"
             text={() => `var(--${name})`}
             variant="ghost"
