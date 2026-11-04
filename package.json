@@ -45,8 +45,8 @@
     "czg": "^1.14.0",
     "eslint": "catalog:",
     "lefthook": "^2.1.16",
-    "markdownlint-cli2": "^0.23.3",
-    "oxfmt": "^0.72.0",
+    "markdownlint-cli2": "^0.24.0",
+    "oxfmt": "^0.75.0",
     "oxlint": "catalog:",
     "oxlint-tsgolint": "^7.0.2004",
     "shadcn": "catalog:",
@@ -57,7 +57,7 @@
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
-      "version": "12.11.2",
+      "version": "12.16.1",
       "onFail": "download"
     },
     "runtime": {
