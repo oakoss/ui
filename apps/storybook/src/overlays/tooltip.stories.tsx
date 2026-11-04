@@ -53,6 +53,28 @@ export const FocusOpensAtOnce: Story = {
   },
 };
 
+// A trigger that isn't a React Aria control, such as a plain link, needs
+// Focusable. Ends with its tooltip open above a hover story, which fails if
+// withTooltipCooldown stops cooling the shared warm-up.
+export const FocusableTrigger: Story = {
+  play: async () => {
+    await userEvent.tab();
+    const link = screen.getByRole('link', { name: 'Shortcuts' });
+    await expect(link).toHaveFocus();
+    await expect(link).toHaveAccessibleDescription('Every keyboard shortcut');
+  },
+  render: () => (
+    <Centered>
+      <TooltipTrigger>
+        <Focusable>
+          <a href="#shortcuts">Shortcuts</a>
+        </Focusable>
+        <Tooltip>Every keyboard shortcut</Tooltip>
+      </TooltipTrigger>
+    </Centered>
+  ),
+};
+
 // Hover waits half a second to open and half a second to close, so passing
 // over a control doesn't flash its tooltip.
 export const HoverDelays: Story = {
@@ -236,27 +258,6 @@ export const Controlled: Story = {
       <TooltipTrigger isOpen onOpenChange={args.onOpenChange}>
         <Button variant="outline">Save</Button>
         <Tooltip>Save your changes</Tooltip>
-      </TooltipTrigger>
-    </Centered>
-  ),
-};
-
-// A trigger that isn't a React Aria control, such as a plain link, needs
-// Focusable.
-export const FocusableTrigger: Story = {
-  play: async () => {
-    await userEvent.tab();
-    const link = screen.getByRole('link', { name: 'Shortcuts' });
-    await expect(link).toHaveFocus();
-    await expect(link).toHaveAccessibleDescription('Every keyboard shortcut');
-  },
-  render: () => (
-    <Centered>
-      <TooltipTrigger>
-        <Focusable>
-          <a href="#shortcuts">Shortcuts</a>
-        </Focusable>
-        <Tooltip>Every keyboard shortcut</Tooltip>
       </TooltipTrigger>
     </Centered>
   ),

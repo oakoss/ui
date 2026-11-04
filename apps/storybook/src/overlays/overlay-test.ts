@@ -59,8 +59,9 @@ export async function hoverAt(element: HTMLElement) {
 // Hovers as a fresh pointer and returns when the hover began. React Aria opens
 // a tooltip or hover card on hover only after pointer input, which a
 // pointerenter alone doesn't record, and they share one warm-up that cools
-// down 500ms after a close is requested, never on unmount. So this waits out
-// that cooldown, and a hover story ends with `leave`.
+// down 500ms after a close is requested, never on unmount; it also ignores
+// mouse hovers for 500ms after a touch, such as a previous story's tap. So
+// this waits out both, and a hover story ends with `leave`.
 export async function hoverFresh(element: HTMLElement) {
   await wait(600);
   setInteractionModality('pointer');

@@ -27,6 +27,7 @@ import {
 import { themes } from 'storybook/theming';
 
 import { parkPointer } from '#/helpers/pointer';
+import { withTooltipCooldown } from '#/helpers/tooltip-cooldown';
 import { captureStory, watchInput } from '#/helpers/visual';
 
 // Installs swap icons at `shadcn add` time; Storybook resolves them live.
@@ -216,7 +217,13 @@ const preview: Preview = {
     setInteractionModality('keyboard');
     return watchInput();
   },
-  decorators: [withTheme, withPalette, withLocale, withIcons],
+  decorators: [
+    withTheme,
+    withPalette,
+    withLocale,
+    withIcons,
+    withTooltipCooldown,
+  ],
   globalTypes: {
     family: {
       description: 'Gray family',
