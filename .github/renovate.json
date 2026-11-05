@@ -52,7 +52,6 @@
       "overrideDatasource": "github-digest"
     }
   ],
-  "platformAutomerge": false,
   "platformCommit": "enabled",
   "prConcurrentLimit": 5,
   "vulnerabilityAlerts": { "labels": ["security"] }
