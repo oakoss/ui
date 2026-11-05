@@ -67,7 +67,7 @@ export function useScrollRegion<T extends HTMLElement>(
       ? watchSize(
           element,
           () => {
-            setIsScrollable(scrolls(element));
+            setIsScrollable(doesScroll(element));
             update(element);
             padInsets(element, stickyTop, stickyStart);
           },
@@ -108,6 +108,16 @@ function canScroll(overflow: string) {
 function clearInsets(element: HTMLElement, top?: string, start?: string) {
   if (top !== undefined) element.style.scrollPaddingTop = '';
   if (start !== undefined) element.style.scrollPaddingInlineStart = '';
+}
+
+// An axis counts only where it can scroll: content spilling out of an
+// overflow-visible container scrolls an ancestor instead.
+function doesScroll(element: HTMLElement) {
+  const { overflowX, overflowY } = getComputedStyle(element);
+  return (
+    (canScroll(overflowX) && element.scrollWidth > element.clientWidth) ||
+    (canScroll(overflowY) && element.scrollHeight > element.clientHeight)
+  );
 }
 
 // Skips an element that doesn't stick, such as a cell spanning columns.
@@ -152,16 +162,6 @@ function regionLabel(
     return { 'aria-label': options['aria-label'] };
   }
   return labelId === undefined ? undefined : { 'aria-labelledby': labelId };
-}
-
-// An axis counts only where it can scroll: content spilling out of an
-// overflow-visible container scrolls an ancestor instead.
-function scrolls(element: HTMLElement) {
-  const { overflowX, overflowY } = getComputedStyle(element);
-  return (
-    (canScroll(overflowX) && element.scrollWidth > element.clientWidth) ||
-    (canScroll(overflowY) && element.scrollHeight > element.clientHeight)
-  );
 }
 
 // The id of the element labelSelector finds while it has text, read from the

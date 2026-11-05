@@ -33,6 +33,20 @@ const tail = [
   // where static methods and private members go.
   { rules: { 'unicorn/consistent-class-member-order': 'off' } },
   {
+    rules: {
+      // A hook is named for what it returns, React's `use` plus a noun
+      // (`useMediaQuery`), and TanStack names filter functions `filterFn_*`;
+      // the values they're assigned to still take `is` and the like.
+      'unicorn/consistent-boolean-name': [
+        'error',
+        { ignore: ['^use[A-Z]', '^filterFn_'] },
+      ],
+      // It moves a type alias into the innermost block that uses it, even a
+      // JSX callback, and takes no options to skip types.
+      'unicorn/prefer-smaller-scope': 'off',
+    },
+  },
+  {
     // Tools require a config module's top-level `export default defineConfig(…)`.
     files: [
       '**/*.config.{js,ts}',

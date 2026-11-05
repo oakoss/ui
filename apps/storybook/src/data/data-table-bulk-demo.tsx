@@ -70,7 +70,7 @@ export function BulkPaymentsTable({
     selectionCommitMs,
   );
   const [result, setResult] = useState<Result>();
-  const matching = rows.filter((row) => matches(row, dataTableMatch(state)));
+  const matching = rows.filter((row) => isMatch(row, dataTableMatch(state)));
   const start = state.pagination.pageIndex * state.pagination.pageSize;
   const table = useDataTable({
     columns: paymentColumns,
@@ -154,6 +154,14 @@ function DeleteBar({
   );
 }
 
+function isMatch(row: Payment, { filters, search }: DataTableMatch) {
+  const statuses = filters?.status;
+  return (
+    (!Array.isArray(statuses) || statuses.includes(row.status)) &&
+    (search === undefined || row.email.includes(search))
+  );
+}
+
 // A server answers with the last page that still has rows.
 function lastPageWithRows(
   { pageIndex, pageSize }: ServerState['pagination'],
@@ -161,14 +169,6 @@ function lastPageWithRows(
 ) {
   const last = Math.max(Math.ceil(rows / pageSize) - 1, 0);
   return { pageIndex: Math.min(pageIndex, last), pageSize };
-}
-
-function matches(row: Payment, { filters, search }: DataTableMatch) {
-  const statuses = filters?.status;
-  return (
-    (!Array.isArray(statuses) || statuses.includes(row.status)) &&
-    (search === undefined || row.email.includes(search))
-  );
 }
 
 // Any shortfall from the count the user confirmed is a failure, including
@@ -197,7 +197,7 @@ function serverDelete(rows: Payment[], selection: DataTableSelection) {
   const isPicked = selectionTest(selection);
   const targets = rows.filter(
     (row) =>
-      (!isAllMatching(selection) || matches(row, selection.all)) &&
+      (!isAllMatching(selection) || isMatch(row, selection.all)) &&
       isPicked(row.id),
   );
   const failed = targets

@@ -77,7 +77,7 @@ export function SidebarSeparator({ className, ...props }: SeparatorProps) {
 }
 
 // Centers the current page once a group that opens for it has resized.
-function revealCurrent(container: HTMLElement) {
+function didRevealCurrent(container: HTMLElement) {
   const item = container.querySelector(currentPage);
   if (!item) return true;
   const target = item.getBoundingClientRect();
@@ -102,7 +102,7 @@ function useCurrentInView(ref: RefObject<HTMLDivElement | null>) {
   useLayoutEffect(() => {
     const container = ref.current;
     const observer = new ResizeObserver(() => {
-      if (container && revealCurrent(container)) observer.disconnect();
+      if (container && didRevealCurrent(container)) observer.disconnect();
     });
     const stop = () => observer.disconnect();
     const groups = container?.firstElementChild;

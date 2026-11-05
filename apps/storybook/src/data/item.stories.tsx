@@ -77,9 +77,7 @@ export const Group: Story = {
     const list = canvas.getByRole('list');
     await expect(canvas.getAllByRole('listitem')).toHaveLength(2);
     const roles = [...list.children].map((child) =>
-      child.tagName === 'HR'
-        ? child.getAttribute('aria-hidden')
-        : child.getAttribute('role'),
+      child.getAttribute(child.tagName === 'HR' ? 'aria-hidden' : 'role'),
     );
     await expect(roles).toEqual(['listitem', 'true', 'listitem']);
   },
