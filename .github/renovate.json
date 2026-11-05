@@ -44,6 +44,12 @@
       "allowedVersions": "<7",
       "description": "TypeScript 7 crashes the ESLint config load until typescript-eslint supports it (typescript-eslint#10940).",
       "matchPackageNames": ["typescript"]
+    },
+    {
+      "description": "reg-actions publishes its majors as branches, not tags, so the version-like `# v3` would send it to github-tags, which finds no v3.",
+      "matchDatasources": ["github-tags"],
+      "matchPackageNames": ["reg-viz/reg-actions"],
+      "overrideDatasource": "github-digest"
     }
   ],
   "platformAutomerge": false,
