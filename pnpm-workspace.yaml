@@ -49,6 +49,11 @@ allowBuilds:
   # Wrangler's local runtime; deploys don't need it.
   workerd: false
 
+# markdownlint pins re2js exactly, below 2.8.7's lookbehind DoS fix; drop once
+# its pin reaches 2.8.7.
+overrides:
+  markdownlint>re2js: 2.8.7
+
 # Our own packages; the release-age window guards against third-party compromises.
 minimumReleaseAgeExclude:
   - '@oakoss/*'
