@@ -153,8 +153,8 @@ function valueImports(text: string): [string, string][] {
       : undefined;
     const bindings = clause?.namedBindings;
     const isTypeOnly = clause?.phaseModifier === ts.SyntaxKind.TypeKeyword;
-    if (!clause || isTypeOnly || !bindings) return [];
-    if (!ts.isNamedImports(bindings)) return [];
+    if (!clause || isTypeOnly || !bindings || !ts.isNamedImports(bindings))
+      return [];
     return bindings.elements
       .filter((element) => !element.isTypeOnly)
       .map((element): [string, string] => [

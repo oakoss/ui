@@ -21,7 +21,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 // Whether the toast shows whole inside the region.
-function fits(toast: HTMLElement | undefined) {
+function doesFit(toast: HTMLElement | undefined) {
   if (!toast) return false;
   const inner = toast.getBoundingClientRect();
   const outer = region().getBoundingClientRect();
@@ -65,11 +65,11 @@ async function scrollsFromNewest(side: 'bottom' | 'top') {
   const box = region().getBoundingClientRect();
   await expect(box.top).toBeGreaterThanOrEqual(0);
   await expect(box.bottom).toBeLessThanOrEqual(200);
-  await expect(fits(newest)).toBe(true);
-  await expect(fits(oldest)).toBe(false);
+  await expect(doesFit(newest)).toBe(true);
+  await expect(doesFit(oldest)).toBe(false);
   region().scrollTop = (side === 'top' ? 1 : -1) * region().scrollHeight;
   await waitFor(async () => {
-    await expect(fits(oldest)).toBe(true);
+    await expect(doesFit(oldest)).toBe(true);
   });
 }
 
@@ -129,10 +129,10 @@ export const TabScrollsToToast: Story = {
         await expect(region()).toHaveAttribute('data-scrollable');
       });
       await Promise.all(toasts.map((toast) => finished(toast)));
-      await expect(fits(oldest)).toBe(false);
+      await expect(doesFit(oldest)).toBe(false);
       oldest?.focus();
       await waitFor(async () => {
-        await expect(fits(oldest)).toBe(true);
+        await expect(doesFit(oldest)).toBe(true);
       });
     });
   },

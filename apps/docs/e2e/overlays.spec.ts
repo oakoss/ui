@@ -72,8 +72,8 @@ test('on a short screen, the whole dialog scrolls', async ({ page }) => {
   await page.setViewportSize({ height: 400, width: 1024 });
   const content = await openSettled(page, 'Read terms');
   const body = content.locator('[data-slot=dialog-body]');
-  expect(await scrolls(content)).toBe(true);
-  expect(await scrolls(body)).toBe(false);
+  expect(await doesScroll(content)).toBe(true);
+  expect(await doesScroll(body)).toBe(false);
   const box = await body.boundingBox();
   expect(box?.height).toBeGreaterThan(200);
   // Scrolled to the end, the footer keeps the panel's bottom padding.
@@ -88,15 +88,19 @@ test('a shrunken visible viewport triggers the short-screen fallback', async ({
   await page.setViewportSize({ height: 700, width: 375 });
   const content = await openSettled(page, 'Read terms');
   const body = content.locator('[data-slot=dialog-body]');
-  expect(await scrolls(body)).toBe(true);
+  expect(await doesScroll(body)).toBe(true);
   await page
     .locator('[data-slot=dialog-overlay]')
     .evaluate((overlay: HTMLElement) =>
       overlay.style.setProperty('--visual-viewport-height', '300px'),
     );
-  await expect.poll(() => scrolls(body)).toBe(false);
-  expect(await scrolls(content)).toBe(true);
+  await expect.poll(() => doesScroll(body)).toBe(false);
+  expect(await doesScroll(content)).toBe(true);
 });
+
+function doesScroll(element: Locator) {
+  return element.evaluate((node) => node.scrollHeight > node.clientHeight);
+}
 
 // The gap under the footer once the panel is scrolled to its end.
 function footerGapAtEnd(panel: Locator) {
@@ -108,17 +112,15 @@ function footerGapAtEnd(panel: Locator) {
   });
 }
 
-function scrolls(element: Locator) {
-  return element.evaluate((node) => node.scrollHeight > node.clientHeight);
-}
-
 test('on a tall screen, the body scrolls between header and footer', async ({
   page,
 }) => {
   await page.setViewportSize({ height: 600, width: 1024 });
   const content = await openSettled(page, 'Read terms');
-  expect(await scrolls(content.locator('[data-slot=dialog-body]'))).toBe(true);
-  expect(await scrolls(content)).toBe(false);
+  expect(await doesScroll(content.locator('[data-slot=dialog-body]'))).toBe(
+    true,
+  );
+  expect(await doesScroll(content)).toBe(false);
 });
 
 test('the two themes paint the dialog differently', async ({ browser }) => {

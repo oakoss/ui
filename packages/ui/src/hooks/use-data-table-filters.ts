@@ -14,7 +14,7 @@ export const DataTableClearsContext = createContext<{
 export function focusSearch(from: Element) {
   from
     .closest('[data-slot=data-table]')
-    ?.querySelector<HTMLElement>('[data-slot=search-field] input')
+    ?.querySelector<HTMLElement>(':scope [data-slot=search-field] input')
     ?.focus();
 }
 
