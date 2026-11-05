@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.8.0 (2026-11-05)
+
+### Added
+
+chartColor returns undefined for a config with no series, so its return type now includes undefined. Select's trigger and IconPlaceholder no longer log console warnings; axe's nested-interactive rule reports a focusable element in a Select trigger. Internal cleanups to the chart hooks and date inputs.
+
+### Fixed
+
+CalendarMonthYearSelect names its month and year dropdowns with the slots month and year, so a SelectContext with slots can set one of them.
+
+CalendarMonthYearSelect's pickers take isDisabled from a SelectContext when the calendar itself isn't disabled.
+
+Sidebar menu skeletons take their varied widths from their item's position in its list, so they render the same every time; place each in its own `SidebarMenuItem` or `SidebarMenuSubItem`.
+
 ## 0.7.0 (2026-11-02)
 
 ### Added
