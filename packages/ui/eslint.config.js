@@ -55,14 +55,12 @@ export default defineConfig(
         {
           message:
             "Import icons as a namespace (import * as Icon from '#/components/icons') so they can't clash with component names.",
-          selector:
-            'ImportDeclaration[source.value=/(^|\\/)components\\/icons$/] > ImportSpecifier',
+          selector: String.raw`ImportDeclaration[source.value=/(^|\/)components\/icons$/] > ImportSpecifier`,
         },
         {
           message:
             'Use #/components/icons; shadcn swaps in the consumer’s icon library at install.',
-          selector:
-            'ImportDeclaration[source.value=/^((lucide-react|@tabler\\/icons-react|@phosphor-icons\\/react|@remixicon\\/react)(\\/|$)|@hugeicons\\/)/]',
+          selector: String.raw`ImportDeclaration[source.value=/^((lucide-react|@tabler\/icons-react|@phosphor-icons\/react|@remixicon\/react)(\/|$)|@hugeicons\/)/]`,
         },
         ...userFacingText.map((selector) => ({
           message:

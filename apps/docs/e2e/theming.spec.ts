@@ -19,7 +19,9 @@ function row(group: Locator, token: string) {
   return group
     .getByRole('row')
     .filter({
-      has: group.page().getByRole('button', { name: `Copy var(--${token})` }),
+      has: group
+        .page()
+        .getByRole('button', { exact: true, name: `Copy --${token}` }),
     });
 }
 
@@ -99,7 +101,9 @@ test("pressing a token's name copies its var()", async ({ page }) => {
   });
   await gotoHydrated(page, '/docs/theming/tokens');
   const neutral = page.getByRole('group', { name: 'Neutral roles' });
-  await neutral.getByRole('button', { name: 'Copy var(--muted)' }).click();
+  await neutral
+    .getByRole('button', { exact: true, name: 'Copy --muted' })
+    .click();
   await expect(neutral.getByRole('button', { name: 'Copied' })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute(
     'data-copied',

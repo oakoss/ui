@@ -85,6 +85,15 @@ function outlinedBars() {
   );
 }
 
+function overlapArea(first: Element, second: Element) {
+  const a = first.getBoundingClientRect();
+  const b = second.getBoundingClientRect();
+  return (
+    Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) *
+    Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top))
+  );
+}
+
 function tooltip() {
   const element = document.querySelector('.ts-chart-tooltip');
   if (!(element instanceof HTMLElement)) throw new Error('No tooltip');
@@ -177,7 +186,8 @@ export const AnnouncedWithoutTooltip: Story = {
   },
 };
 
-// The tooltip sits beside the focused mark, never over it.
+// The tooltip sits beside the focused mark, never over it. TanStack Charts
+// shows it a frame before placing it on first open; each move lands in place.
 export const TooltipClear: Story = {
   args: { children: <ChartPlot definition={visitorsBarsChart} /> },
   play: async () => {
@@ -185,12 +195,8 @@ export const TooltipClear: Story = {
     for (let index = 0; index < 12; index++) {
       const [bar] = outlinedBars();
       if (!bar) throw new Error('No outline');
-      const a = tooltip().getBoundingClientRect();
-      const b = bar.getBoundingClientRect();
-      const overlap =
-        Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) *
-        Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
-      await expect(overlap).toBe(0);
+      const expectClear = () => expect(overlapArea(tooltip(), bar)).toBe(0);
+      await (index === 0 ? waitFor(expectClear) : expectClear());
       await userEvent.keyboard('{ArrowRight}');
     }
   },
